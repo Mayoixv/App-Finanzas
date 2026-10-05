@@ -1,6 +1,6 @@
 import { Currency } from '../domain/currency';
 import { Cents } from '../domain/money';
-import { daysBetween, IsoDate, MonthKey } from '../domain/month';
+import { dateInMonth, daysBetween, IsoDate, MonthKey, monthOf } from '../domain/month';
 
 const formatters: Record<Currency, Intl.NumberFormat> = {
   DOP: new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }),
@@ -45,6 +45,11 @@ export function currentMonth(now = new Date()): MonthKey {
 
 export function todayIso(now = new Date()): string {
   return `${currentMonth(now)}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+/** Fecha propuesta para un registro nuevo: hoy si se está viendo el mes actual; si no, el mismo día dentro del mes visto. */
+export function defaultDateFor(month: MonthKey, today: IsoDate = todayIso()): IsoDate {
+  return monthOf(today) === month ? today : dateInMonth(month, Number(today.slice(8, 10)));
 }
 
 export function shiftMonth(month: MonthKey, delta: number): MonthKey {

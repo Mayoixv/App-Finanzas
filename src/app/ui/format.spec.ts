@@ -1,6 +1,7 @@
 import {
   amountToInput,
   currentMonth,
+  defaultDateFor,
   dueLabel,
   formatMoney,
   formatPercent,
@@ -69,5 +70,13 @@ describe('montos en centavos', () => {
     expect(formatMoney(125050)).toBe('RD$1,250.50');
     setDisplayCurrency('USD');
     expect(formatMoney(125050)).toBe('US$1,250.50');
+  });
+});
+
+describe('defaultDateFor', () => {
+  it('propone hoy en el mes actual y el mismo día dentro de otro mes', () => {
+    expect(defaultDateFor('2026-10', '2026-10-05')).toBe('2026-10-05');
+    expect(defaultDateFor('2026-11', '2026-10-05')).toBe('2026-11-05');
+    expect(defaultDateFor('2026-02', '2026-10-31')).toBe('2026-02-28');
   });
 });

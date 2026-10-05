@@ -1,13 +1,12 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, signal } from '@angular/core';
 import { IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { NotFoundError, ValidationError } from '../../application/errors';
-import { dateInMonth, monthOf } from '../../domain/month';
 import { SavingsGoal } from '../../domain/savings';
 import { CurrencyState } from '../currency-state';
-import { parseAmount, todayIso } from '../format';
+import { defaultDateFor, parseAmount } from '../format';
 import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 
@@ -20,7 +19,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   styleUrls: ['aporte.modal.scss'],
   imports: [IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
-export class AporteModalComponent implements OnInit {
+export class AporteModalComponent {
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly monthState = inject(MonthState);
@@ -28,7 +27,7 @@ export class AporteModalComponent implements OnInit {
   @Input({ required: true }) goal!: SavingsGoal;
 
   protected readonly amount = signal('');
-  protected readonly date = signal(todayIso());
+  protected readonly date = signal(defaultDateFor(this.monthState.month()));
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
@@ -38,13 +37,6 @@ export class AporteModalComponent implements OnInit {
 
   constructor() {
     addIcons({ close });
-  }
-
-  ngOnInit() {
-    // Si se está viendo otro mes, el aporte se propone en ese mes para que cuente ahí.
-    const today = todayIso();
-    const month = this.monthState.month();
-    if (monthOf(today) !== month) this.date.set(dateInMonth(month, Number(today.slice(8, 10))));
   }
 
   protected cancel() {

@@ -419,4 +419,4 @@ Componente `app-dropdown`; cerca del final de la pantalla el menú "⋯" se abre
 
 Conexión: al abrir, `abierto = true`. Al cerrar, `abierto = false`, `cerrando = true` y tras 150 ms (`--dropdown-close-dur`)
 `cerrando = false`. Cerrar al tocar fuera, al elegir una opción y con el botón atrás de Android.
-Cada fila usa `role="menuitem"`, y el botón que abre el menú lleva `aria-expanded` y `aria-haspopup="menu"`.
+Cada fila usa `role="menuitem"`, y el botón que abre el menú lleva `aria-expanded` y `aria-haspopup="menu"`.ok

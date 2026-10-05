@@ -14,7 +14,8 @@ import { APP_CONTAINER } from '../../app.container';
 import { ValidationError } from '../../application/errors';
 import { Category, isExpenseType } from '../../domain/category';
 import { Transaction } from '../../domain/transaction';
-import { amountToInput, parseAmount, todayIso } from '../format';
+import { amountToInput, defaultDateFor, parseAmount } from '../format';
+import { MonthState } from '../month-state';
 import { CurrencyState } from '../currency-state';
 import { SuccessCheckComponent } from '../success-check.component';
 
@@ -50,7 +51,7 @@ export class NuevaTransaccionModalComponent implements OnInit {
   protected readonly kind = signal<Kind>('gasto');
   protected readonly categoryId = signal<string | null>(null);
   protected readonly amount = signal('');
-  protected readonly date = signal(todayIso());
+  protected readonly date = signal(defaultDateFor(inject(MonthState).month()));
   protected readonly note = signal('');
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
