@@ -1,7 +1,7 @@
 import { Transaction } from '../../domain/transaction';
 import { NotFoundError } from '../errors';
 import { ICategoryRepository, ITransactionRepository } from '../ports/repositories';
-import { AddTransactionInput, validateTransactionInput } from './add-transaction';
+import { AddTransactionInput, buildTransaction, validateTransactionInput } from './add-transaction';
 
 export class UpdateTransaction {
   constructor(
@@ -12,14 +12,7 @@ export class UpdateTransaction {
   async execute(id: string, input: AddTransactionInput): Promise<Transaction> {
     if (!(await this.transactions.get(id))) throw new NotFoundError('Movimiento');
     await validateTransactionInput(input, this.categories);
-
-    const transaction: Transaction = {
-      id,
-      date: input.date,
-      amount: input.amount,
-      categoryId: input.categoryId,
-      note: input.note?.trim() ?? '',
-    };
+    const transaction = buildTransaction(id, input);
     await this.transactions.save(transaction);
     return transaction;
   }

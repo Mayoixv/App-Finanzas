@@ -14,7 +14,7 @@
 - [x] [MVP] "Marcar como pagado": crea el gasto en Movimientos y pasa a Pagado, con check de éxito.
 - [x] [MVP] Resumen: pendiente del mes, barra de pagado y total. Si todo está pagado, dice "Todo pagado".
 - [x] [MVP] Editar con el lápiz. Cambia lo pendiente desde el mes visto; los meses anteriores y lo pagado no cambian.
-- [ ] [Después] Ingresos recurrentes (sueldo fijo) con "Marcar como recibido".
+- [x] [Después] Ingresos recurrentes (sueldo fijo) con "Marcar como recibido".
 
 **Campos y datos:**
 
@@ -48,7 +48,7 @@
 **Funciones:**
 - [x] [MVP] Hoy se manejan como gasto fijo con la categoría "Suscripciones".
 - [ ] [Después] Total mensual y anual de suscripciones en Fijos.
-- [ ] [Después] Periodicidad anual o trimestral (hoy solo mensual).
+- [x] [Después] Periodicidad mensual, trimestral, semestral o anual.
 
 **Campos y datos:** [Después] `frequency` (`mensual`, `trimestral`, `anual`) en `recurring_expenses`. Una suscripción anual genera instancia solo en su mes.
 
@@ -65,7 +65,7 @@
 **Funciones:**
 - [x] [MVP] Vencimiento relativo en cada tarjeta ("Vence mañana", "Vence en 2 días", "Venció ayer").
 - [ ] [Después] Notificación local el día anterior y el día del vencimiento, con hora configurable.
-- [ ] [Después] Lista "Próximos 7 días" en Inicio.
+- [x] [Después] Lista "Próximos 7 días" en Inicio.
 
 **Campos y datos:** `due_date` de la instancia. [Después] `remind_days_before` (0 a 7) por gasto fijo.
 
@@ -81,7 +81,7 @@
 
 **Funciones:**
 - [x] [MVP] "Eliminar gasto fijo" desde el mes visto. Borra lo pendiente de ese mes en adelante y conserva lo pagado. Si nunca tuvo un pago, se borra por completo.
-- [ ] [Después] Pausar por N meses (no genera instancias) y reanudar.
+- [x] [Después] Pausar por N meses (no genera instancias) y reanudar.
 
 **Campos y datos:** `active` 0/1 (ya existe en la tabla). [Después] `paused_until` (`YYYY-MM`).
 

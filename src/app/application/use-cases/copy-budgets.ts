@@ -17,7 +17,7 @@ export class CopyBudgets {
     let copied = 0;
     for (const b of source) {
       if (taken.has(b.categoryId)) continue;
-      await this.budgets.save({ id: this.ids.next(), categoryId: b.categoryId, month: toMonth, limit: b.limit });
+      await this.budgets.save({ id: this.ids.next(), categoryId: b.categoryId, month: toMonth, limit: b.limit, rollover: b.rollover });
       copied++;
     }
     return copied;

@@ -36,7 +36,7 @@ describe('metas de ahorro', () => {
     await expect(add.execute({ name: '', targetAmount: 10 })).rejects.toThrow(ValidationError);
     await expect(add.execute({ name: 'X', targetAmount: 0 })).rejects.toThrow(ValidationError);
     await new UpdateSavingsGoal(s.savings).execute(g.id, { name: 'Viaje a Samaná', targetAmount: 60000 });
-    expect(await s.savings.getGoal(g.id)).toEqual({ id: g.id, name: 'Viaje a Samaná', targetAmount: 60000 });
+    expect(await s.savings.getGoal(g.id)).toMatchObject({ id: g.id, name: 'Viaje a Samaná', targetAmount: 60000 });
     await expect(new UpdateSavingsGoal(s.savings).execute('nope', { name: 'a', targetAmount: 1 })).rejects.toThrow(NotFoundError);
   });
 

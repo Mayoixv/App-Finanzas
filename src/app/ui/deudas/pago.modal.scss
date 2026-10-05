@@ -1,0 +1,22 @@
+@use '../sheet';
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted-on-light);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  font-size: 15px;
+
+  input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--violet-600);
+  }
+}

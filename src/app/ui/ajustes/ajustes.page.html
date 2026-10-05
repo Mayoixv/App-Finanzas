@@ -43,6 +43,20 @@
     <p class="note">Solo cambia el símbolo con que se muestran los montos. Los montos guardados no se convierten.</p>
   </section>
 
+  <section class="block" aria-labelledby="herramientas-title">
+    <h2 id="herramientas-title" class="section-title">Herramientas</h2>
+    <ul class="rows">
+      <li>
+        <a routerLink="/deudas" class="row">
+          <span class="row-title">Deudas y préstamos</span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <app-datos></app-datos>
+
   <section class="block" aria-labelledby="categorias-title">
     <h2 id="categorias-title" class="section-title">Categorías</h2>
     @if (failed()) {

@@ -49,6 +49,7 @@ describe('dueLabel', () => {
     expect(dueLabel('2026-10-14', today)).toEqual({ text: 'Vence en 4 días', urgent: false });
     expect(dueLabel('2026-10-25', today).urgent).toBe(false);
     expect(dueLabel('2026-10-25', today).text).toMatch(/^Vence el 25/);
+    expect(dueLabel('2026-10-09', today, true).text).toBe('Debió cobrarse ayer');
   });
 });
 

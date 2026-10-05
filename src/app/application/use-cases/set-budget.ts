@@ -9,6 +9,7 @@ export interface SetBudgetInput {
   categoryId: string;
   month: MonthKey;
   limit: number;
+  rollover?: boolean;
 }
 
 /** Crea el presupuesto de una categoría en el mes, o cambia su límite si ya existe (hay uno por categoría y mes). */
@@ -33,6 +34,7 @@ export class SetBudget {
       categoryId: input.categoryId,
       month: input.month,
       limit: input.limit,
+      rollover: !!input.rollover,
     };
     await this.budgets.save(budget);
     return budget;

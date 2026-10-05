@@ -245,3 +245,35 @@ li + li .row {
   font-size: 15px;
   line-height: 1.5;
 }
+
+.goal-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.link-button {
+  min-height: 48px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--violet-600);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.goal-projection {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted-on-light);
+
+  &.late {
+    color: var(--negative-on-light);
+  }
+}
+
+.row-amount.negative {
+  color: var(--negative-on-light);
+}

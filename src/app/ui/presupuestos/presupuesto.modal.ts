@@ -4,6 +4,7 @@ import {
   IonContent,
   IonIcon,
   IonInput,
+  IonToggle,
   IonSelect,
   IonSelectOption,
   ModalController,
@@ -26,7 +27,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-presupuesto-modal',
   templateUrl: 'presupuesto.modal.html',
   styleUrls: ['presupuesto.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
+  imports: [IonToggle, IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
 })
 export class PresupuestoModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);
@@ -41,6 +42,7 @@ export class PresupuestoModalComponent implements OnInit {
   protected readonly categories = signal<Category[]>([]);
   protected readonly categoryId = signal<string | null>(null);
   protected readonly limit = signal('');
+  protected readonly rollover = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
@@ -62,6 +64,7 @@ export class PresupuestoModalComponent implements OnInit {
       this.isEdit.set(true);
       this.categoryId.set(this.budget.categoryId);
       this.limit.set(amountToInput(this.budget.limit));
+      this.rollover.set(!!this.budget.rollover);
       this.categoryName.set(all.find((c) => c.id === this.budget!.categoryId)?.name ?? 'Categoría');
     } else {
       const taken = new Set(this.taken);
@@ -83,6 +86,7 @@ export class PresupuestoModalComponent implements OnInit {
         categoryId,
         month: this.budget?.month ?? this.monthState.month(),
         limit: parseAmount(this.limit()) ?? 0,
+        rollover: this.rollover(),
       });
       this.saved.set(true);
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));

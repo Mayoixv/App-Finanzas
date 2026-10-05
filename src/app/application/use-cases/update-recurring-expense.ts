@@ -1,5 +1,5 @@
 import { dateInMonth, MonthKey } from '../../domain/month';
-import { RecurringExpense } from '../../domain/recurring-expense';
+import { isDueIn, RecurringExpense } from '../../domain/recurring-expense';
 import { NotFoundError } from '../errors';
 import { ICategoryRepository, IRecurringExpenseRepository } from '../ports/repositories';
 import { RecurringExpenseFields, validateRecurringInput } from './add-recurring-expense';
@@ -29,11 +29,17 @@ export class UpdateRecurringExpense {
       amount: input.amount,
       categoryId: input.categoryId,
       dueDay: input.dueDay,
+      frequency: input.frequency ?? current.frequency ?? 1,
     };
     await this.recurring.save(updated);
 
     for (const instance of await this.recurring.listInstancesOf(id)) {
       if (instance.status !== 'pendiente' || instance.month < fromMonth) continue;
+      // Si con la frecuencia nueva ese mes ya no toca, su pendiente sobra.
+      if (!isDueIn(updated, instance.month)) {
+        await this.recurring.deleteInstance(id, instance.month);
+        continue;
+      }
       await this.recurring.saveInstance({
         ...instance,
         amount: updated.amount,

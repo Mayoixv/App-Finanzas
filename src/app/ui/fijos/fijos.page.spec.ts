@@ -4,6 +4,7 @@ import { APP_CONTAINER, buildContainer } from '../../app.container';
 import {
   InMemoryBudgets,
   InMemoryCategories,
+  InMemoryDebts,
   InMemoryRecurring,
   InMemorySavings,
   InMemorySettings,
@@ -22,6 +23,8 @@ async function render(withData: boolean) {
     savings: new InMemorySavings(),
     budgets: new InMemoryBudgets(),
     settings: new InMemorySettings(),
+    backup: { dump: () => Promise.reject(), restore: () => Promise.reject() },
+    debts: new InMemoryDebts(),
   };
   repos.categories.items.set('ren', { id: 'ren', name: 'Alquiler', type: 'fijo' });
   const container = buildContainer(repos, new SequentialIds());

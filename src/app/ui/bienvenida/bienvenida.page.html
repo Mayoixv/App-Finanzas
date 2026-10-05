@@ -1,0 +1,141 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <div class="wrap">
+    <p class="progress" aria-live="polite">Paso {{ stepNumber() }} de {{ total }}</p>
+
+    @switch (step()) {
+      @case ('hola') {
+        <div class="step">
+        <h1 class="title">Te damos la bienvenida</h1>
+        <p class="text">Anota tus ingresos y gastos, sigue tus gastos fijos y tus metas de ahorro, mes a mes.</p>
+        <p class="text">Todo se guarda solo en este teléfono. No hay cuenta ni nube: para no perder nada, haz respaldos desde Ajustes.</p>
+        <button type="button" class="btn-primary main" (click)="next()">Empezar</button>
+        </div>
+      }
+
+      @case ('moneda') {
+        <div class="step">
+        <h1 class="title">¿En qué moneda?</h1>
+        <p class="text">Solo cambia el símbolo de los montos. Puedes cambiarla luego en Ajustes.</p>
+        <div class="choices" role="radiogroup" aria-label="Moneda">
+          @for (c of currencies; track c.code) {
+            <button
+              type="button"
+              role="radio"
+              class="choice"
+              [attr.aria-checked]="currencyState.currency() === c.code"
+              (click)="pickCurrency(c.code)"
+            >
+              {{ c.label }}
+            </button>
+          }
+        </div>
+        </div>
+      }
+
+      @case ('sueldo') {
+        <div class="step">
+        <h1 class="title">Tu sueldo</h1>
+        <p class="text">Si cobras un monto fijo, anótalo y cada mes aparecerá en Fijos para marcarlo como recibido.</p>
+        <div class="field">
+          <ion-input
+            label="Sueldo mensual ({{ currencyState.currency() }})"
+            label-placement="stacked"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            placeholder="0.00"
+            [value]="salary()"
+            (ionInput)="salary.set(($event.detail.value ?? '').toString())"
+          ></ion-input>
+        </div>
+        <div class="field">
+          <ion-input
+            label="Día del mes en que cobras"
+            label-placement="stacked"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="31"
+            placeholder="Ej. 30"
+            [value]="salaryDay()"
+            (ionInput)="salaryDay.set(($event.detail.value ?? '').toString())"
+          ></ion-input>
+        </div>
+        @if (error(); as message) {
+          <p class="error" role="alert">{{ message }}</p>
+        }
+        <button type="button" class="btn-primary main" [disabled]="busy()" (click)="saveSalary()">
+          {{ salary() ? 'Guardar y seguir' : 'Saltar' }}
+        </button>
+        </div>
+      }
+
+      @case ('fijos') {
+        <div class="step">
+        <h1 class="title">Gastos fijos</h1>
+        <p class="text">Alquiler, luz, internet… Agrega los que quieras ahora; también puedes hacerlo luego en Fijos.</p>
+        @if (added().length) {
+          <ul class="added">
+            @for (a of added(); track $index) {
+              <li>{{ a }}</li>
+            }
+          </ul>
+        }
+        <div class="field">
+          <ion-input
+            label="Nombre"
+            label-placement="stacked"
+            placeholder="Alquiler"
+            [value]="fixedName()"
+            (ionInput)="fixedName.set(($event.detail.value ?? '').toString())"
+          ></ion-input>
+        </div>
+        <div class="field">
+          <ion-input
+            label="Monto ({{ currencyState.currency() }})"
+            label-placement="stacked"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            placeholder="0.00"
+            [value]="fixedAmount()"
+            (ionInput)="fixedAmount.set(($event.detail.value ?? '').toString())"
+          ></ion-input>
+        </div>
+        <div class="field">
+          <ion-select
+            label="Categoría"
+            label-placement="stacked"
+            placeholder="Elige una categoría"
+            cancelText="Cancelar"
+            [value]="fixedCategory()"
+            (ionChange)="fixedCategory.set($event.detail.value)"
+          >
+            @for (c of fixedCategories(); track c.id) {
+              <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
+        <div class="field">
+          <ion-input
+            label="Día en que vence"
+            label-placement="stacked"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="31"
+            placeholder="Ej. 5"
+            [value]="fixedDay()"
+            (ionInput)="fixedDay.set(($event.detail.value ?? '').toString())"
+          ></ion-input>
+        </div>
+        @if (error(); as message) {
+          <p class="error" role="alert">{{ message }}</p>
+        }
+        <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="addFixed()">Agregar este gasto</button>
+        <button type="button" class="btn-primary main" [disabled]="busy()" (click)="finish()">Terminar</button>
+        </div>
+      }
+    }
+  </div>
+</ion-content>

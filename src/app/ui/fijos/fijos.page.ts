@@ -6,17 +6,21 @@ import { APP_CONTAINER } from '../../app.container';
 import { MonthRecurringExpense } from '../../application/use-cases/get-month-recurring-expenses';
 import { monthOf } from '../../domain/month';
 import { RecurringExpense } from '../../domain/recurring-expense';
-import { dueLabel, formatDay, formatMoney, formatPercent, todayIso } from '../format';
+import { dueLabel, formatDay, formatMoney, formatPercent, monthLabel, todayIso } from '../format';
 import { MonthSwitcherComponent } from '../month-switcher.component';
 import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 import { RecurringFormService } from './recurring-form.service';
+
+/** Solo se muestra la frecuencia cuando no es mensual. */
+const FREQUENCY_LABEL: Record<number, string> = { 1: '', 3: 'Trimestral', 6: 'Semestral', 12: 'Anual' };
 
 /** Cuánto se ve el check de éxito sobre la tarjeta (design.md, 10.2). */
 const FLASH_MS = 1200;
 
 interface Row {
   id: string;
+  isIncome: boolean;
   expense: RecurringExpense;
   name: string;
   amount: string;
@@ -27,6 +31,8 @@ interface Row {
 }
 
 interface Totals {
+  /** Ingresos fijos del mes aún sin recibir. */
+  toReceive: number;
   total: number;
   paid: number;
   pending: number;
@@ -45,7 +51,8 @@ export class FijosPage {
   private readonly form = inject(RecurringFormService);
 
   protected readonly rows = signal<Row[] | null>(null);
-  protected readonly totals = signal<Totals>({ total: 0, paid: 0, pending: 0, percentPaid: 0 });
+  protected readonly totals = signal<Totals>({ toReceive: 0, total: 0, paid: 0, pending: 0, percentPaid: 0 });
+  protected readonly paused = signal<RecurringExpense[]>([]);
   protected readonly failed = signal(false);
   protected readonly flashId = signal<string | null>(null);
   protected readonly liveMessage = signal('');
@@ -82,7 +89,7 @@ export class FijosPage {
         paidDate,
       });
       this.flashId.set(row.id);
-      this.liveMessage.set(`${row.name} marcado como pagado`);
+      this.liveMessage.set(`${row.name} marcado como ${row.isIncome ? 'recibido' : 'pagado'}`);
       this.monthState.notifyChange();
       setTimeout(() => this.flashId.set(null), FLASH_MS);
     } catch (error) {
@@ -93,19 +100,45 @@ export class FijosPage {
     }
   }
 
+  protected async resume(expense: RecurringExpense) {
+    try {
+      await this.container.resumeRecurringExpense.execute(expense.id);
+      this.liveMessage.set(`${expense.name} reanudado`);
+      this.monthState.notifyChange();
+    } catch (error) {
+      console.error(error);
+      this.liveMessage.set('No se pudo reanudar. Inténtalo de nuevo.');
+    }
+  }
+
+  protected pausedLabel(expense: RecurringExpense): string {
+    return expense.pausedUntil ? `En pausa hasta ${monthLabel(expense.pausedUntil)}` : '';
+  }
+
   private async load(month: string) {
     const seq = ++this.loadSeq;
     try {
-      const items = await this.container.getMonthRecurringExpenses.execute(month);
+      const [items, paused, categories] = await Promise.all([
+        this.container.getMonthRecurringExpenses.execute(month),
+        this.container.getMonthRecurringExpenses.pausedIn(month),
+        this.container.categories.list(),
+      ]);
       if (seq !== this.loadSeq) return;
       const today = todayIso();
-      this.rows.set(items.map((item) => toRow(item, today)));
+      const incomeIds = new Set(categories.filter((c) => c.type === 'ingreso').map((c) => c.id));
+      this.rows.set(items.map((item) => toRow(item, today, incomeIds.has(item.expense.categoryId))));
+      this.paused.set(paused);
 
-      const total = items.reduce((s, i) => s + i.instance.amount, 0);
-      const paid = items
+      // El resumen es de gastos; los ingresos fijos se cuentan aparte como "por recibir".
+      const expenses = items.filter((i) => !incomeIds.has(i.expense.categoryId));
+      const total = expenses.reduce((s, i) => s + i.instance.amount, 0);
+      const paid = expenses
         .filter((i) => i.instance.status === 'pagado')
         .reduce((s, i) => s + i.instance.amount, 0);
       this.totals.set({
+        toReceive: items
+          .filter((i) => incomeIds.has(i.expense.categoryId) && i.instance.status === 'pendiente')
+          .reduce((s, i) => s + i.instance.amount, 0),
         total,
         paid,
         pending: total - paid,
@@ -119,16 +152,20 @@ export class FijosPage {
   }
 }
 
-function toRow({ expense, instance }: MonthRecurringExpense, today: string): Row {
+function toRow({ expense, instance }: MonthRecurringExpense, today: string, isIncome: boolean): Row {
   const paid = instance.status === 'pagado';
-  const due = paid ? { text: `Vencimiento ${formatDay(instance.dueDate)}`, urgent: false } : dueLabel(instance.dueDate, today);
+  const due = paid
+    ? { text: `${isIncome ? 'Cobro' : 'Vencimiento'} ${formatDay(instance.dueDate)}`, urgent: false }
+    : dueLabel(instance.dueDate, today, isIncome);
+  const every = FREQUENCY_LABEL[expense.frequency ?? 1];
   return {
     id: expense.id,
+    isIncome,
     expense,
     name: expense.name,
-    amount: formatMoney(instance.amount),
+    amount: `${isIncome ? '+' : ''}${formatMoney(instance.amount)}`,
     paid,
-    detail: due.text,
+    detail: every ? `${due.text} · ${every}` : due.text,
     urgent: due.urgent,
     dueDate: instance.dueDate,
   };

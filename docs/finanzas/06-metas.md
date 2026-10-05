@@ -40,7 +40,7 @@
 **Funciones:**
 - [x] [MVP] Aportar con monto y fecha (propuesta en el mes visto).
 - [x] [MVP] Lista de aportes del mes en la vista "Este mes". Tocar uno pide confirmación para borrarlo.
-- [ ] [Después] Retirar de una meta (aporte negativo con motivo).
+- [x] [Después] Retirar de una meta (sin pasar de lo ahorrado; resta del ahorrado del mes).
 - [ ] [Después] Aporte automático mensual como gasto fijo especial.
 
 **Campos y datos:**
@@ -70,9 +70,9 @@
 
 **Funciones:**
 - [x] [MVP] % de avance y lo aportado este mes.
-- [ ] [Después] Fecha objetivo.
-- [ ] [Después] Proyección: con el promedio de aportes de los últimos 3 meses, cuándo se llega.
-- [ ] [Después] Cuánto habría que aportar por mes para llegar a la fecha objetivo.
+- [x] [Después] Fecha objetivo.
+- [x] [Después] Proyección: con el promedio de aportes de los últimos 3 meses, cuándo se llega.
+- [x] [Después] Cuánto habría que aportar por mes para llegar a la fecha objetivo.
 
 **Campos y datos:** `target_date` en `savings_goals`. La proyección se calcula.
 

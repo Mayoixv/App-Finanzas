@@ -3,7 +3,7 @@ import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { Budget } from '../../domain/budget';
+import { Budget, BudgetStatus } from '../../domain/budget';
 import { formatMoney, monthLabel, shiftMonth } from '../format';
 import { MonthState } from '../month-state';
 import { BudgetFormService } from './budget-form.service';
@@ -86,8 +86,8 @@ export class BudgetsCardComponent {
       const names = new Map(categories.map((c) => [c.id, c.name]));
       this.rows.set(
         statuses
-          .map(({ budget, status }) => toRow(budget, status.spent, names.get(budget.categoryId)))
-          .sort((a, b) => b.spent / b.limit - a.spent / a.limit),
+          .map(({ budget, status }) => toRow(budget, status, names.get(budget.categoryId)))
+          .sort((a, b) => b.spent / Math.max(b.limit, 1) - a.spent / Math.max(a.limit, 1)),
       );
       this.previousCount.set(previousStatuses.length);
       this.previousLabel.set(monthLabel(previous));
@@ -99,17 +99,20 @@ export class BudgetsCardComponent {
   }
 }
 
-function toRow(budget: Budget, spent: number, name = 'Categoría'): BudgetRow {
-  const percent = budget.limit > 0 ? (spent / budget.limit) * 100 : 0;
-  const remaining = budget.limit - spent;
-  const state = spent > budget.limit ? 'exceeded' : percent >= BUDGET_WARNING_PERCENT ? 'warning' : 'ok';
+function toRow(budget: Budget, status: BudgetStatus, name = 'Categoría'): BudgetRow {
+  const { spent, limit, remaining, carry } = status;
+  const percent = limit > 0 ? (spent / limit) * 100 : spent > 0 ? 100 : 0;
+  const state = status.exceeded ? 'exceeded' : percent >= BUDGET_WARNING_PERCENT ? 'warning' : 'ok';
+  const left = state === 'exceeded' ? `Te pasaste por ${formatMoney(-remaining)}` : `Te quedan ${formatMoney(remaining)}`;
+  const carried =
+    carry > 0 ? ` · incluye ${formatMoney(carry)} del mes pasado` : carry < 0 ? ` · descuenta ${formatMoney(-carry)} del mes pasado` : '';
   return {
     budget,
     name,
     spent,
-    limit: budget.limit,
+    limit,
     bar: Math.min(percent, 100),
     state,
-    text: state === 'exceeded' ? `Te pasaste por ${formatMoney(-remaining)}` : `Te quedan ${formatMoney(remaining)}`,
+    text: left + carried,
   };
 }

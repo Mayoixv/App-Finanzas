@@ -30,6 +30,19 @@
       ></ion-input>
     </div>
 
+    <div class="field">
+      <ion-input
+        label="Para cuándo (opcional)"
+        label-placement="stacked"
+        type="date"
+        [value]="targetDate()"
+        (ionInput)="targetDate.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+    @if (targetDate()) {
+      <button type="button" class="link-button" (click)="targetDate.set('')">Quitar fecha</button>
+    }
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }

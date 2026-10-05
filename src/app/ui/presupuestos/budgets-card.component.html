@@ -6,9 +6,9 @@
     <p class="card-empty">No se pudieron leer los presupuestos de este mes.</p>
   } @else if (rows(); as list) {
     @if (list.length > 0) {
-      <ul class="budgets">
+      <ul [class.t-still]="!monthState.animateLists()" class="budgets">
         @for (b of list; track b.budget.id) {
-          <li>
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave">
             <button
               type="button"
               class="budget"

@@ -8,7 +8,12 @@ export class UpdateSavingsGoal {
 
   async execute(id: string, input: SavingsGoalFields): Promise<SavingsGoal> {
     if (!(await this.savings.getGoal(id))) throw new NotFoundError('Meta de ahorro');
-    const goal: SavingsGoal = { id, name: validateGoalInput(input), targetAmount: input.targetAmount };
+    const goal: SavingsGoal = {
+      id,
+      name: validateGoalInput(input),
+      targetAmount: input.targetAmount,
+      targetDate: input.targetDate || null,
+    };
     await this.savings.saveGoal(goal);
     return goal;
   }

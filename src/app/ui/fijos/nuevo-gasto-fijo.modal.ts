@@ -13,7 +13,7 @@ import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { NotFoundError, ValidationError } from '../../application/errors';
 import { Category } from '../../domain/category';
-import { RecurringExpense } from '../../domain/recurring-expense';
+import { Frequency, RecurringExpense } from '../../domain/recurring-expense';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, parseAmount } from '../format';
 import { MonthState } from '../month-state';
@@ -37,7 +37,24 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   /** Si llega, el formulario edita este gasto fijo en vez de crear uno. */
   @Input() expense?: RecurringExpense;
 
-  protected readonly categories = signal<Category[]>([]);
+  private readonly allCategories = signal<Category[]>([]);
+  /** Un fijo puede ser un gasto (alquiler) o un ingreso (sueldo); lo decide su categoría. */
+  protected readonly kind = signal<'gasto' | 'ingreso'>('gasto');
+  protected readonly categories = computed(() =>
+    this.allCategories().filter((c) => c.type === (this.kind() === 'ingreso' ? 'ingreso' : 'fijo')),
+  );
+  protected readonly frequency = signal<Frequency>(1);
+  protected readonly frequencies: { value: Frequency; label: string }[] = [
+    { value: 1, label: 'Cada mes' },
+    { value: 3, label: 'Cada 3 meses' },
+    { value: 6, label: 'Cada 6 meses' },
+    { value: 12, label: 'Cada año' },
+  ];
+  /** Está en pausa en el mes que se ve: se ofrece reanudar en vez de pausar. */
+  protected readonly isPaused = computed(() => {
+    const until = this.expense?.pausedUntil;
+    return !!until && this.monthState.month() <= until;
+  });
   protected readonly name = signal('');
   protected readonly amount = signal('');
   protected readonly categoryId = signal<string | null>(null);
@@ -64,7 +81,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
 
   async ngOnInit() {
     const all = await this.container.categories.list();
-    this.categories.set(all.filter((c) => c.type === 'fijo'));
+    this.allCategories.set(all);
 
     const e = this.expense;
     if (e) {
@@ -73,6 +90,54 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       this.amount.set(amountToInput(e.amount));
       this.categoryId.set(e.categoryId);
       this.dueDay.set(String(e.dueDay));
+      this.frequency.set(e.frequency ?? 1);
+      if (all.find((c) => c.id === e.categoryId)?.type === 'ingreso') this.kind.set('ingreso');
+    }
+  }
+
+  protected setKind(kind: 'gasto' | 'ingreso') {
+    this.kind.set(kind);
+    this.categoryId.set(null);
+  }
+
+  protected async pause() {
+    const e = this.expense;
+    if (!e) return;
+    const alert = await this.alerts.create({
+      cssClass: 'app-alert',
+      header: 'Pausar',
+      message: `¿Por cuánto tiempo, desde ${this.monthState.label()}? Lo pendiente de esos meses se quita; lo ya pagado se queda.`,
+      inputs: [1, 2, 3, 6].map((n) => ({
+        type: 'radio' as const,
+        label: n === 1 ? '1 mes' : `${n} meses`,
+        value: n,
+        checked: n === 1,
+      })),
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Pausar', role: 'confirm' },
+      ],
+    });
+    await alert.present();
+    const { role, data } = await alert.onDidDismiss();
+    if (role !== 'confirm') return;
+    await this.run(() => this.container.pauseRecurringExpense.execute(e.id, this.monthState.month(), Number(data?.values ?? 1)));
+  }
+
+  protected async resume() {
+    const e = this.expense;
+    if (e) await this.run(() => this.container.resumeRecurringExpense.execute(e.id));
+  }
+
+  private async run(work: () => Promise<unknown>) {
+    this.saving.set(true);
+    try {
+      await work();
+      await this.modalCtrl.dismiss(null, 'saved');
+    } catch (err) {
+      console.error(err);
+      this.error.set(err instanceof ValidationError ? err.message : 'No se pudo guardar. Inténtalo de nuevo.');
+      this.saving.set(false);
     }
   }
 
@@ -91,6 +156,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
         amount: parseAmount(this.amount()) ?? 0,
         categoryId,
         dueDay: Number(this.dueDay()),
+        frequency: this.frequency(),
       };
       if (this.expense) {
         await this.container.updateRecurringExpense.execute(
@@ -122,7 +188,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     if (!e) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar gasto fijo',
+      header: 'Eliminar fijo',
       message: `${e.name} dejará de aparecer desde ${this.monthState.label()} en adelante. Los pagos ya registrados se conservan.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },

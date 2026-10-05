@@ -9,9 +9,9 @@
 **Propósito:** que la primera apertura deje la app lista para usar en menos de un minuto.
 
 **Funciones:**
-- [ ] [MVP] Pantalla de bienvenida: qué hace la app y que todo se guarda solo en el teléfono.
-- [ ] [MVP] Elegir moneda (obligatorio).
-- [ ] [MVP] Ingreso del mes y gastos fijos principales (opcionales, con "Lo hago después").
+- [x] [MVP] Pantalla de bienvenida: qué hace la app y que todo se guarda solo en el teléfono.
+- [x] [MVP] Elegir moneda (obligatorio).
+- [x] [MVP] Ingreso del mes y gastos fijos principales (opcionales, con "Lo hago después").
 - [ ] [Después] Activar PIN y recordatorios.
 
 **Campos y datos:** `settings.onboarding_done` (0/1). Reusa los formularios existentes.

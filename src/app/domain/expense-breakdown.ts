@@ -1,6 +1,6 @@
 import { Category, isExpenseType } from './category';
 import { MonthKey, monthOf } from './month';
-import { Transaction } from './transaction';
+import { expandSplits, Transaction } from './transaction';
 
 export interface ExpenseSlice {
   categoryId: string;
@@ -19,7 +19,7 @@ export function expenseBreakdown(
   const byId = new Map(categories.map((c) => [c.id, c]));
   const totals = new Map<string, number>();
 
-  for (const t of transactions) {
+  for (const t of expandSplits(transactions)) {
     if (monthOf(t.date) !== month) continue;
     const category = byId.get(t.categoryId);
     if (!category || !isExpenseType(category.type)) continue;

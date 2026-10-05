@@ -12,20 +12,22 @@
       <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">Ingreso</button>
     </div>
 
-    <div class="field">
-      <ion-select
-        label="Categoría"
-        label-placement="stacked"
-        placeholder="Elige una categoría"
-        cancelText="Cancelar"
-        [value]="categoryId()"
-        (ionChange)="categoryId.set($event.detail.value)"
-      >
-        @for (c of options(); track c.id) {
-          <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
-        }
-      </ion-select>
-    </div>
+    @if (!splitOn()) {
+      <div class="field">
+        <ion-select
+          label="Categoría"
+          label-placement="stacked"
+          placeholder="Elige una categoría"
+          cancelText="Cancelar"
+          [value]="categoryId()"
+          (ionChange)="categoryId.set($event.detail.value)"
+        >
+          @for (c of options(); track c.id) {
+            <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    }
 
     <div class="field">
       <ion-input
@@ -39,6 +41,65 @@
         (ionInput)="amount.set(($event.detail.value ?? '').toString())"
       ></ion-input>
     </div>
+
+    <button type="button" class="link-button" [attr.aria-pressed]="splitOn()" (click)="toggleSplit()">
+      {{ splitOn() ? 'No dividir' : 'Dividir en varias categorías' }}
+    </button>
+
+    @if (splitOn()) {
+      <fieldset class="parts">
+        <legend class="sr-only">Partes del movimiento</legend>
+        @for (part of parts(); track $index; let i = $index) {
+          <div class="part">
+            <div class="field part-category">
+              <ion-select
+                [label]="'Parte ' + (i + 1)"
+                label-placement="stacked"
+                placeholder="Categoría"
+                cancelText="Cancelar"
+                [value]="part.categoryId"
+                (ionChange)="updatePart(i, { categoryId: $event.detail.value })"
+              >
+                @for (c of options(); track c.id) {
+                  <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+                }
+              </ion-select>
+            </div>
+            <div class="field part-amount">
+              <ion-input
+                label="Monto"
+                label-placement="stacked"
+                type="number"
+                inputmode="decimal"
+                min="0"
+                placeholder="0.00"
+                [value]="part.amount"
+                (ionInput)="updatePart(i, { amount: ($event.detail.value ?? '').toString() })"
+              ></ion-input>
+            </div>
+            @if (parts().length > 2) {
+              <button type="button" class="icon-button" [attr.aria-label]="'Quitar parte ' + (i + 1)" (click)="removePart(i)">
+                <ion-icon name="close" aria-hidden="true"></ion-icon>
+              </button>
+            }
+          </div>
+        }
+        <div class="parts-foot">
+          <button type="button" class="link-button" (click)="addPart()">
+            <ion-icon name="add-outline" aria-hidden="true"></ion-icon> Agregar parte
+          </button>
+          <p class="remaining" [class.off]="remaining() !== 0" aria-live="polite">
+            @if (remaining() > 0) {
+              Falta asignar {{ money(remaining()) }}
+            } @else if (remaining() < 0) {
+              Te pasaste por {{ money(abs(remaining())) }}
+            } @else {
+              Las partes suman el total
+            }
+          </p>
+        </div>
+      </fieldset>
+    }
 
     <div class="field">
       <ion-input
@@ -59,6 +120,35 @@
       ></ion-input>
     </div>
 
+    <div class="field">
+      <ion-input
+        label="Etiquetas (opcional, separadas por coma)"
+        label-placement="stacked"
+        placeholder="viaje, trabajo"
+        [value]="tags()"
+        (ionInput)="tags.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    <div class="photos">
+      @for (p of photos(); track p.id; let i = $index) {
+        <div class="photo">
+          <button type="button" class="photo-open" [attr.aria-label]="'Ver foto ' + (i + 1)" (click)="viewing.set(p.data)">
+            <img [src]="p.data" alt="" />
+          </button>
+          <button type="button" class="photo-remove" [attr.aria-label]="'Quitar foto ' + (i + 1)" (click)="removePhoto(p)">
+            <ion-icon name="close" aria-hidden="true"></ion-icon>
+          </button>
+        </div>
+      }
+      @if (photos().length < maxPhotos) {
+        <button type="button" class="photo-add" (click)="addPhoto()">
+          <ion-icon name="camera-outline" aria-hidden="true"></ion-icon>
+          Foto del recibo
+        </button>
+      }
+    </div>
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }
@@ -73,6 +163,13 @@
       </button>
     }
   </div>
+
+  @if (viewing(); as src) {
+    <div class="viewer" role="dialog" aria-modal="true" aria-label="Foto del recibo">
+      <img [src]="src" alt="Foto del recibo" />
+      <button type="button" class="btn-primary viewer-close" (click)="viewing.set(null)">Cerrar</button>
+    </div>
+  }
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {

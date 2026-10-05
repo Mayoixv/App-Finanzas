@@ -16,32 +16,40 @@
       </section>
     } @else {
       <section class="summary" aria-labelledby="pendiente-label">
-        @if (totals().pending > 0) {
-          <p id="pendiente-label" class="summary-label">Pendiente en {{ monthState.label() }}</p>
+        @if (totals().total === 0) {
+          <p id="pendiente-label" class="summary-label">{{ monthState.label() }}</p>
+          <p class="summary-amount">Sin gastos por pagar</p>
+        } @else if (totals().pending > 0) {
+          <p id="pendiente-label" class="summary-label">Por pagar en {{ monthState.label() }}</p>
           <p class="summary-amount">{{ money(totals().pending) }}</p>
         } @else {
           <p id="pendiente-label" class="summary-label">{{ monthState.label() }}</p>
           <p class="summary-amount">Todo pagado</p>
         }
-        <div
-          class="bar"
-          role="progressbar"
-          aria-label="Gastos fijos pagados"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          [attr.aria-valuenow]="totals().percentPaid"
-        >
-          <span class="bar-fill" [style.width.%]="totals().percentPaid"></span>
-        </div>
-        <p class="summary-note">
-          Pagado {{ money(totals().paid) }} de {{ money(totals().total) }} · {{ percent(totals().percentPaid) }}
-        </p>
+        @if (totals().total > 0) {
+          <div
+            class="bar"
+            role="progressbar"
+            aria-label="Gastos fijos pagados"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="totals().percentPaid"
+          >
+            <span class="bar-fill" [style.width.%]="totals().percentPaid"></span>
+          </div>
+          <p class="summary-note">
+            Pagado {{ money(totals().paid) }} de {{ money(totals().total) }} · {{ percent(totals().percentPaid) }}
+          </p>
+        }
+        @if (totals().toReceive > 0) {
+          <p class="summary-note">Ingresos por recibir: {{ money(totals().toReceive) }}</p>
+        }
       </section>
 
-      <ul class="list">
+      <ul [class.t-still]="!monthState.animateLists()" class="list">
         @for (row of list; track row.id) {
-          <li class="item">
-            <div class="item-head">
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
+            <div class="item-head" [class.income]="row.isIncome">
               <div class="item-text">
                 <span class="item-name">{{ row.name }}</span>
                 <span class="item-detail" [class.urgent]="row.urgent">{{ row.detail }}</span>
@@ -56,7 +64,7 @@
               @if (row.paid) {
                 <span class="chip paid">
                   <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-                  Pagado
+                  {{ row.isIncome ? 'Recibido' : 'Pagado' }}
                 </span>
                 @if (flashId() === row.id) {
                   <app-success-check state="in"></app-success-check>
@@ -69,13 +77,33 @@
                 <button
                   type="button"
                   class="btn-secondary pay"
-                  [attr.aria-label]="'Marcar ' + row.name + ' como pagado'"
+                  [attr.aria-label]="'Marcar ' + row.name + (row.isIncome ? ' como recibido' : ' como pagado')"
                   [disabled]="payingId() === row.id"
                   (click)="pay(row)"
                 >
-                  Marcar como pagado
+                  {{ row.isIncome ? 'Marcar como recibido' : 'Marcar como pagado' }}
                 </button>
               }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (paused().length) {
+      <h2 class="section-title paused-title">En pausa</h2>
+      <ul [class.t-still]="!monthState.animateLists()" class="list">
+        @for (p of paused(); track p.id) {
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item paused">
+            <div class="item-head">
+              <div class="item-text">
+                <span class="item-name">{{ p.name }}</span>
+                <span class="item-detail">{{ pausedLabel(p) }}</span>
+              </div>
+              <span class="item-amount">{{ money(p.amount) }}</span>
+            </div>
+            <div class="item-foot">
+              <button type="button" class="btn-secondary pay" [attr.aria-label]="'Reanudar ' + p.name" (click)="resume(p)">Reanudar</button>
             </div>
           </li>
         }

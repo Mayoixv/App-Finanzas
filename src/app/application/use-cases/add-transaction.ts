@@ -1,6 +1,7 @@
+import { isExpenseType } from '../../domain/category';
 import { isValidCents } from '../../domain/money';
 import { isValidIsoDate } from '../../domain/month';
-import { Transaction } from '../../domain/transaction';
+import { normalizeTags, Transaction, TransactionSplit } from '../../domain/transaction';
 import { NotFoundError, ValidationError } from '../errors';
 import {
   ICategoryRepository,
@@ -13,6 +14,9 @@ export interface AddTransactionInput {
   amount: number;
   categoryId: string;
   note?: string;
+  tags?: string[];
+  /** Al menos dos partes que sumen el monto, todas del mismo tipo (gasto o ingreso) que la categoría. */
+  splits?: TransactionSplit[];
 }
 
 /** Reglas comunes al crear y al editar un movimiento. */
@@ -22,7 +26,40 @@ export async function validateTransactionInput(
 ): Promise<void> {
   if (!isValidCents(input.amount)) throw new ValidationError('El monto debe ser mayor que cero');
   if (!isValidIsoDate(input.date)) throw new ValidationError('Fecha inválida');
-  if (!(await categories.get(input.categoryId))) throw new NotFoundError('Categoría');
+  const main = await categories.get(input.categoryId);
+  if (!main) throw new NotFoundError('Categoría');
+
+  const splits = input.splits ?? [];
+  if (splits.length === 0) return;
+  if (splits.length < 2) throw new ValidationError('Para dividir hacen falta al menos dos categorías');
+  if (new Set(splits.map((s) => s.categoryId)).size !== splits.length) {
+    throw new ValidationError('Cada parte debe tener una categoría distinta');
+  }
+  if (!splits.every((s) => isValidCents(s.amount))) throw new ValidationError('Cada parte debe ser mayor que cero');
+  if (splits.reduce((sum, s) => sum + s.amount, 0) !== input.amount) {
+    throw new ValidationError('Las partes deben sumar el monto total');
+  }
+  for (const s of splits) {
+    const category = await categories.get(s.categoryId);
+    if (!category) throw new NotFoundError('Categoría');
+    if (isExpenseType(category.type) !== isExpenseType(main.type)) {
+      throw new ValidationError('Todas las partes deben ser del mismo tipo (gasto o ingreso)');
+    }
+  }
+}
+
+/** Arma el movimiento a guardar: etiquetas limpias y, si está dividido, la parte mayor como categoría visible. */
+export function buildTransaction(id: string, input: AddTransactionInput): Transaction {
+  const splits = [...(input.splits ?? [])].sort((a, b) => b.amount - a.amount);
+  return {
+    id,
+    date: input.date,
+    amount: input.amount,
+    categoryId: splits[0]?.categoryId ?? input.categoryId,
+    note: input.note?.trim() ?? '',
+    tags: normalizeTags(input.tags ?? []),
+    splits,
+  };
 }
 
 export class AddTransaction {
@@ -34,14 +71,7 @@ export class AddTransaction {
 
   async execute(input: AddTransactionInput): Promise<Transaction> {
     await validateTransactionInput(input, this.categories);
-
-    const transaction: Transaction = {
-      id: this.ids.next(),
-      date: input.date,
-      amount: input.amount,
-      categoryId: input.categoryId,
-      note: input.note?.trim() ?? '',
-    };
+    const transaction = buildTransaction(this.ids.next(), input);
     await this.transactions.save(transaction);
     return transaction;
   }

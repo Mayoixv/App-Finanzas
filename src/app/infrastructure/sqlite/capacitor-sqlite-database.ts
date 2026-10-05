@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { defineCustomElements } from 'jeep-sqlite/loader';
-import { SqlDatabase, SqlValue } from './sql-database';
+import { SqlDatabase, SqlStatement, SqlValue } from './sql-database';
 
 /** En el navegador el plugin corre sobre sql.js dentro del componente <jeep-sqlite>. */
 async function initWeb(sqlite: SQLiteConnection): Promise<void> {
@@ -42,9 +42,11 @@ export class CapacitorSqliteDatabase implements SqlDatabase {
     return (res.values ?? []) as T[];
   }
 
-  async batch(statements: string[]): Promise<void> {
+  async batch(statements: SqlStatement[]): Promise<void> {
     await this.conn.executeSet(
-      statements.map((statement) => ({ statement, values: [] })),
+      statements.map((s) =>
+        typeof s === 'string' ? { statement: s, values: [] } : { statement: s.sql, values: s.params },
+      ),
       true,
     );
   }

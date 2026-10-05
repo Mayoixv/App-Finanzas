@@ -1,6 +1,7 @@
 import { MonthKey } from '../../domain/month';
 import {
   createInstance,
+  isDueIn,
   RecurringExpense,
   RecurringExpenseInstance,
 } from '../../domain/recurring-expense';
@@ -24,7 +25,7 @@ export class GetMonthRecurringExpenses {
 
     let created = false;
     for (const expense of expenses) {
-      if (hasInstance.has(expense.id) || !expense.active || month < expense.startMonth) continue;
+      if (hasInstance.has(expense.id) || !expense.active || !isDueIn(expense, month)) continue;
       await this.recurring.insertInstanceIfMissing(createInstance(expense, month));
       created = true;
     }
@@ -38,5 +39,12 @@ export class GetMonthRecurringExpenses {
       if (expense) result.push({ expense, instance });
     }
     return result.sort((a, b) => a.instance.dueDate.localeCompare(b.instance.dueDate));
+  }
+
+  /** Plantillas activas en pausa ese mes, para poder reanudarlas aunque no tengan instancia. */
+  async pausedIn(month: MonthKey): Promise<RecurringExpense[]> {
+    return (await this.recurring.list()).filter(
+      (e) => e.active && month >= e.startMonth && !!e.pausedUntil && month <= e.pausedUntil,
+    );
   }
 }

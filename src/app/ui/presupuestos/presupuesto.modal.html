@@ -45,6 +45,16 @@
       ></ion-input>
     </div>
 
+    <ion-toggle
+      class="rollover"
+      justify="space-between"
+      [checked]="rollover()"
+      (ionChange)="rollover.set($event.detail.checked)"
+    >
+      Pasar lo que sobre (o falte) al mes siguiente
+    </ion-toggle>
+    <p class="hint">Solo se arrastra entre meses que tengan esta opción activa en la misma categoría.</p>
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }

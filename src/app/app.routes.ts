@@ -29,5 +29,13 @@ export const routes: Routes = [
     path: 'ajustes',
     loadComponent: () => import('./ui/ajustes/ajustes.page').then((m) => m.AjustesPage),
   },
+  {
+    path: 'bienvenida',
+    loadComponent: () => import('./ui/bienvenida/bienvenida.page').then((m) => m.BienvenidaPage),
+  },
+  {
+    path: 'deudas',
+    loadComponent: () => import('./ui/deudas/deudas.page').then((m) => m.DeudasPage),
+  },
   { path: '', redirectTo: 'tabs', pathMatch: 'full' },
 ];

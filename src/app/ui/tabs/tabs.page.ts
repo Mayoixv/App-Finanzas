@@ -29,7 +29,7 @@ interface Tab {
 const TABS: Tab[] = [
   { path: 'inicio', label: 'Inicio', addLabel: 'Agregar movimiento' },
   { path: 'movimientos', label: 'Movimientos', addLabel: 'Agregar movimiento' },
-  { path: 'fijos', label: 'Fijos', addLabel: 'Agregar gasto fijo' },
+  { path: 'fijos', label: 'Fijos', addLabel: 'Agregar fijo (gasto o ingreso)' },
   { path: 'ahorro', label: 'Ahorro', addLabel: 'Agregar meta de ahorro' },
 ];
 

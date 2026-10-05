@@ -11,9 +11,9 @@ No existe todavía. Todo [Después].
 **Propósito:** saber cuánto se debe, a quién y cuándo se termina de pagar.
 
 **Funciones:**
-- [ ] [Después] Registrar deudas (préstamo bancario, préstamo personal, financiamiento).
-- [ ] [Después] Registrar préstamos hechos a otros (me deben).
-- [ ] [Después] Saldo pendiente y fecha estimada de fin.
+- [x] [Después] Registrar deudas (préstamo bancario, préstamo personal, financiamiento).
+- [x] [Después] Registrar préstamos hechos a otros (me deben).
+- [x] [Después] Saldo pendiente y fecha estimada de fin.
 
 **Campos y datos:**
 
@@ -42,7 +42,7 @@ No existe todavía. Todo [Después].
 **Propósito:** ver el calendario de pagos y cuánto de cada cuota es interés.
 
 **Funciones:**
-- [ ] [Después] Tabla de amortización (sistema francés: cuota fija).
+- [x] [Después] Tabla de amortización (sistema francés: cuota fija).
 - [ ] [Después] Próximas cuotas en el flujo de caja y en Fijos.
 
 **Campos y datos:** calculado desde la deuda. `debt_payments` (`debt_id`, `date`, `amount`, `principal`, `interest`, `transaction_id`).
@@ -60,8 +60,8 @@ No existe todavía. Todo [Después].
 **Propósito:** decidir cómo pagar antes y cuánto se ahorra en intereses.
 
 **Funciones:**
-- [ ] [Después] Simulador de pago anticipado: con X extra al mes, cuántos meses e intereses se ahorran.
-- [ ] [Después] Estrategias bola de nieve (menor saldo primero) y avalancha (mayor tasa primero), comparadas.
+- [x] [Después] Simulador de pago anticipado: con X extra al mes, cuántos meses e intereses se ahorran.
+- [x] [Después] Estrategias bola de nieve (menor saldo primero) y avalancha (mayor tasa primero), comparadas.
 
 **Campos y datos:** entrada: monto extra mensual. Solo lectura de las deudas.
 

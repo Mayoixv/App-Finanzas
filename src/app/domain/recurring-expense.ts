@@ -1,6 +1,10 @@
-import { dateInMonth, IsoDate, MonthKey } from './month';
+import { dateInMonth, IsoDate, MonthKey, monthsBetween } from './month';
 
-/** Plantilla de gasto fijo. */
+/** Cada cuántos meses se repite: mensual, trimestral, semestral o anual. */
+export type Frequency = 1 | 3 | 6 | 12;
+export const FREQUENCIES: readonly Frequency[] = [1, 3, 6, 12];
+
+/** Plantilla de pago (o cobro) que se repite: gasto fijo o ingreso fijo según su categoría. */
 export interface RecurringExpense {
   id: string;
   name: string;
@@ -11,6 +15,9 @@ export interface RecurringExpense {
   active: boolean;
   /** Primer mes en que corre; antes de él no genera instancias. */
   startMonth: MonthKey;
+  frequency?: Frequency;
+  /** Último mes en pausa ('YYYY-MM'); hasta ese mes inclusive no genera instancias. */
+  pausedUntil?: MonthKey | null;
 }
 
 export type PaymentStatus = 'pagado' | 'pendiente';
@@ -43,4 +50,11 @@ export function markPaid(
   transactionId: string,
 ): RecurringExpenseInstance {
   return { ...instance, status: 'pagado', transactionId };
+}
+
+/** Si la plantilla genera instancia en ese mes: desde su inicio, cada `frequency` meses y fuera de una pausa. */
+export function isDueIn(expense: RecurringExpense, month: MonthKey): boolean {
+  if (month < expense.startMonth) return false;
+  if (expense.pausedUntil && month <= expense.pausedUntil) return false;
+  return monthsBetween(expense.startMonth, month) % (expense.frequency ?? 1) === 0;
 }

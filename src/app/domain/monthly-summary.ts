@@ -1,7 +1,7 @@
 import { Category, isExpenseType } from './category';
 import { monthOf, MonthKey } from './month';
-import { SavingsContribution } from './savings';
-import { Transaction } from './transaction';
+import { SavingsContribution, signedAmount } from './savings';
+import { expandSplits, Transaction } from './transaction';
 
 export type SavingsRating = 'excelente' | 'regular' | 'bajo';
 
@@ -32,7 +32,7 @@ export function summarizeMonth(
   let income = 0;
   let expenses = 0;
 
-  for (const t of transactions) {
+  for (const t of expandSplits(transactions)) {
     if (monthOf(t.date) !== month) continue;
     const type = typeById.get(t.categoryId);
     if (type === 'ingreso') income += t.amount;
@@ -41,7 +41,7 @@ export function summarizeMonth(
 
   const saved = contributions
     .filter((c) => monthOf(c.date) === month)
-    .reduce((sum, c) => sum + c.amount, 0);
+    .reduce((sum, c) => sum + signedAmount(c), 0);
 
   const savingsPercent = income > 0 ? (saved / income) * 100 : 0;
 

@@ -1,15 +1,32 @@
 import { InjectionToken } from '@angular/core';
 import { AddRecurringExpense } from './application/use-cases/add-recurring-expense';
-import { DeleteTransaction } from './application/use-cases/delete-transaction';
+import { DeleteTransaction, RestoreTransaction } from './application/use-cases/delete-transaction';
 import { RemoveRecurringExpense } from './application/use-cases/remove-recurring-expense';
 import { UpdateRecurringExpense } from './application/use-cases/update-recurring-expense';
 import { UpdateTransaction } from './application/use-cases/update-transaction';
 import { AddSavingsGoal } from './application/use-cases/add-savings-goal';
 import { AddCategory, DeleteCategory, RenameCategory } from './application/use-cases/manage-categories';
+import { CreateBackup, OpenBackup, RestoreBackup } from './application/use-cases/backup';
+import { ExportTransactionsCsv } from './application/use-cases/export-csv';
+import { PinLock } from './application/use-cases/pin-lock';
+import { BulkUpdateTransactions } from './application/use-cases/bulk-update-transactions';
+import {
+  DeleteDebt,
+  DeleteDebtPayment,
+  GetDebtsOverview,
+  RegisterDebtPayment,
+  SaveDebt,
+} from './application/use-cases/debts';
+import { Onboarding } from './application/use-cases/onboarding';
+import { GetUpcomingRecurring } from './application/use-cases/get-upcoming-recurring';
+import { PauseRecurringExpense, ResumeRecurringExpense } from './application/use-cases/pause-recurring-expense';
 import { CurrencySettings } from './application/use-cases/currency-settings';
 import { CopyBudgets } from './application/use-cases/copy-budgets';
 import { DeleteBudget } from './application/use-cases/delete-budget';
-import { DeleteSavingsContribution } from './application/use-cases/delete-savings-contribution';
+import {
+  DeleteSavingsContribution,
+  RestoreSavingsContribution,
+} from './application/use-cases/delete-savings-contribution';
 import { DeleteSavingsGoal } from './application/use-cases/delete-savings-goal';
 import { GetSavingsOverview } from './application/use-cases/get-savings-overview';
 import { SetBudget } from './application/use-cases/set-budget';
@@ -21,8 +38,10 @@ import { GetMonthOverview } from './application/use-cases/get-month-overview';
 import { GetMonthRecurringExpenses } from './application/use-cases/get-month-recurring-expenses';
 import { PayRecurringExpense } from './application/use-cases/pay-recurring-expense';
 import {
+  IBackupStore,
   IBudgetRepository,
   ICategoryRepository,
+  IDebtRepository,
   IdGenerator,
   IRecurringExpenseRepository,
   ISavingsRepository,
@@ -32,11 +51,13 @@ import {
 import {
   SqliteBudgetRepository,
   SqliteCategoryRepository,
+  SqliteDebtRepository,
   SqliteRecurringExpenseRepository,
   SqliteSavingsRepository,
   SqliteSettingsRepository,
   SqliteTransactionRepository,
 } from './infrastructure/repositories/sqlite-repositories';
+import { SqliteBackupStore } from './infrastructure/sqlite/sqlite-backup-store';
 import { CapacitorSqliteDatabase } from './infrastructure/sqlite/capacitor-sqlite-database';
 import { runMigrations } from './infrastructure/sqlite/migrations';
 
@@ -47,6 +68,8 @@ export interface Repositories {
   savings: ISavingsRepository;
   budgets: IBudgetRepository;
   settings: ISettingsRepository;
+  backup: IBackupStore;
+  debts: IDebtRepository;
 }
 
 /** Raíz de composición: une repositorios y casos de uso. La UI solo ve esto. */
@@ -76,6 +99,24 @@ export interface AppContainer {
   addCategory: AddCategory;
   renameCategory: RenameCategory;
   deleteCategory: DeleteCategory;
+  restoreTransaction: RestoreTransaction;
+  restoreSavingsContribution: RestoreSavingsContribution;
+  createBackup: CreateBackup;
+  openBackup: OpenBackup;
+  restoreBackup: RestoreBackup;
+  exportCsv: ExportTransactionsCsv;
+  pinLock: PinLock;
+  bulkUpdateTransactions: BulkUpdateTransactions;
+  settings: ISettingsRepository;
+  pauseRecurringExpense: PauseRecurringExpense;
+  resumeRecurringExpense: ResumeRecurringExpense;
+  getUpcomingRecurring: GetUpcomingRecurring;
+  saveDebt: SaveDebt;
+  deleteDebt: DeleteDebt;
+  getDebtsOverview: GetDebtsOverview;
+  registerDebtPayment: RegisterDebtPayment;
+  deleteDebtPayment: DeleteDebtPayment;
+  onboarding: Onboarding;
 }
 
 export const APP_CONTAINER = new InjectionToken<AppContainer>('AppContainer');
@@ -83,6 +124,7 @@ export const APP_CONTAINER = new InjectionToken<AppContainer>('AppContainer');
 export const uuidGenerator: IdGenerator = { next: () => crypto.randomUUID() };
 
 export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGenerator): AppContainer {
+  const getMonthRecurringExpenses = new GetMonthRecurringExpenses(repos.recurring);
   return {
     categories: repos.categories,
     transactions: repos.transactions,
@@ -93,7 +135,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     updateRecurringExpense: new UpdateRecurringExpense(repos.recurring, repos.categories),
     removeRecurringExpense: new RemoveRecurringExpense(repos.recurring),
     getMonthOverview: new GetMonthOverview(repos.transactions, repos.categories, repos.savings),
-    getMonthRecurringExpenses: new GetMonthRecurringExpenses(repos.recurring),
+    getMonthRecurringExpenses,
     payRecurringExpense: new PayRecurringExpense(repos.recurring, repos.transactions, ids),
     getSavingsOverview: new GetSavingsOverview(repos.savings),
     addSavingsGoal: new AddSavingsGoal(repos.savings, ids),
@@ -109,6 +151,24 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     addCategory: new AddCategory(repos.categories, ids),
     renameCategory: new RenameCategory(repos.categories),
     deleteCategory: new DeleteCategory(repos.categories),
+    restoreTransaction: new RestoreTransaction(repos.transactions, repos.recurring),
+    restoreSavingsContribution: new RestoreSavingsContribution(repos.savings),
+    createBackup: new CreateBackup(repos.backup),
+    openBackup: new OpenBackup(),
+    restoreBackup: new RestoreBackup(repos.backup),
+    exportCsv: new ExportTransactionsCsv(repos.transactions, repos.categories),
+    pinLock: new PinLock(repos.settings),
+    bulkUpdateTransactions: new BulkUpdateTransactions(repos.transactions, repos.categories),
+    settings: repos.settings,
+    pauseRecurringExpense: new PauseRecurringExpense(repos.recurring),
+    resumeRecurringExpense: new ResumeRecurringExpense(repos.recurring),
+    getUpcomingRecurring: new GetUpcomingRecurring(getMonthRecurringExpenses),
+    saveDebt: new SaveDebt(repos.debts, ids),
+    deleteDebt: new DeleteDebt(repos.debts),
+    getDebtsOverview: new GetDebtsOverview(repos.debts),
+    registerDebtPayment: new RegisterDebtPayment(repos.debts, repos.transactions, repos.categories, ids),
+    deleteDebtPayment: new DeleteDebtPayment(repos.debts, repos.transactions),
+    onboarding: new Onboarding(repos.settings, repos.transactions, repos.recurring),
   };
 }
 
@@ -122,5 +182,7 @@ export async function createSqliteContainer(): Promise<AppContainer> {
     savings: new SqliteSavingsRepository(db),
     budgets: new SqliteBudgetRepository(db),
     settings: new SqliteSettingsRepository(db),
+    backup: new SqliteBackupStore(db),
+    debts: new SqliteDebtRepository(db),
   });
 }

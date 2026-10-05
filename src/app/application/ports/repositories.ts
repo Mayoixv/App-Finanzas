@@ -2,8 +2,9 @@ import { Budget } from '../../domain/budget';
 import { Category } from '../../domain/category';
 import { MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
+import { Debt, DebtPayment } from '../../domain/debts';
 import { SavingsContribution, SavingsGoal } from '../../domain/savings';
-import { Transaction } from '../../domain/transaction';
+import { Attachment, Transaction } from '../../domain/transaction';
 
 export interface ICategoryRepository {
   list(): Promise<Category[]>;
@@ -16,6 +17,10 @@ export interface ICategoryRepository {
 
 export interface ITransactionRepository {
   listByMonth(month: MonthKey): Promise<Transaction[]>;
+  listAll(): Promise<Transaction[]>;
+  listAttachments(transactionId: string): Promise<Attachment[]>;
+  saveAttachment(attachment: Attachment): Promise<void>;
+  deleteAttachment(id: string): Promise<void>;
   get(id: string): Promise<Transaction | undefined>;
   save(transaction: Transaction): Promise<void>;
   delete(id: string): Promise<void>;
@@ -52,10 +57,31 @@ export interface IBudgetRepository {
   delete(id: string): Promise<void>;
 }
 
+export interface IDebtRepository {
+  list(): Promise<Debt[]>;
+  get(id: string): Promise<Debt | undefined>;
+  save(debt: Debt): Promise<void>;
+  delete(id: string): Promise<void>;
+  listPayments(debtId?: string): Promise<DebtPayment[]>;
+  savePayment(payment: DebtPayment): Promise<void>;
+  deletePayment(id: string): Promise<void>;
+}
+
 /** Preferencias de la app guardadas en el dispositivo, como pares clave/valor. */
 export interface ISettingsRepository {
   get(key: string): Promise<string | undefined>;
   set(key: string, value: string): Promise<void>;
+}
+
+/** Copia completa de los datos: filas de cada tabla y la versión del esquema que las produjo. */
+export interface BackupData {
+  schemaVersion: number;
+  tables: Record<string, Record<string, string | number | null>[]>;
+}
+
+export interface IBackupStore {
+  dump(): Promise<BackupData>;
+  restore(data: BackupData): Promise<void>;
 }
 
 export interface IdGenerator {

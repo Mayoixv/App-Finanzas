@@ -64,9 +64,9 @@
           <h2 id="ultimos-title" class="section-title">Últimos movimientos</h2>
           <a routerLink="/tabs/movimientos" class="link">Ver todos</a>
         </div>
-        <ul class="rows">
+        <ul [class.t-still]="!monthState.animateLists()" class="rows">
           @for (row of recent(); track row.id) {
-            <li>
+            <li animate.enter="t-row-enter" animate.leave="t-row-leave">
               <button type="button" class="row" [attr.aria-label]="'Editar ' + row.title + ', ' + row.amount" (click)="edit(row)">
                 <span class="avatar" [class.income]="row.isIncome" aria-hidden="true">{{ row.initial }}</span>
                 <span class="row-text">
@@ -81,6 +81,7 @@
       </section>
     }
 
+    <app-upcoming-card></app-upcoming-card>
     <app-budgets-card></app-budgets-card>
   }
 </ion-content>

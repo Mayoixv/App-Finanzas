@@ -1,6 +1,15 @@
 <ion-content class="surface-light" [fullscreen]="true">
   <header class="screen-head">
-    <h1 class="screen-title">Movimientos</h1>
+    <div class="title-row">
+      <h1 class="screen-title">Movimientos</h1>
+      @if (rows()?.length) {
+        @if (selecting()) {
+          <button type="button" class="head-action" (click)="stopSelecting()">Listo</button>
+        } @else {
+          <button type="button" class="head-action" (click)="startSelecting()">Seleccionar</button>
+        }
+      }
+    </div>
     <app-month-switcher></app-month-switcher>
   </header>
 
@@ -15,50 +24,145 @@
         <p class="empty-text">Toca el botón + para registrar un ingreso o un gasto de este mes.</p>
       </section>
     } @else {
-      <ul class="rows">
-        @for (row of list; track row.id) {
-          <li class="item">
-            <button type="button" class="row" [attr.aria-label]="'Editar ' + row.title + ', ' + row.amount" (click)="edit(row)">
-              <span class="avatar" [class.income]="row.isIncome" aria-hidden="true">{{ row.initial }}</span>
-              <span class="row-text">
-                <span class="row-title">{{ row.title }}</span>
-                <span class="row-sub">{{ row.subtitle }}</span>
-              </span>
-              <span class="row-amount" [class.income]="row.isIncome">{{ row.amount }}</span>
+      <section class="filters" aria-label="Buscar y filtrar">
+        <label class="search">
+          <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+          <span class="sr-only">Buscar por nota, categoría o etiqueta</span>
+          <input
+            type="search"
+            placeholder="Buscar nota, categoría o etiqueta"
+            [value]="search()"
+            (input)="search.set($any($event.target).value)"
+          />
+        </label>
+        <app-pill-toggle label="Tipo de movimiento" [options]="kindOptions" [(value)]="kindFilter"></app-pill-toggle>
+        <div class="anchor">
+          <button
+            type="button"
+            class="select"
+            aria-haspopup="menu"
+            [attr.aria-expanded]="categoryMenuOpen()"
+            (click)="categoryMenuOpen.set(!categoryMenuOpen())"
+          >
+            {{ categoryFilterLabel() }}
+            <ion-icon name="chevron-down" aria-hidden="true"></ion-icon>
+          </button>
+          <app-dropdown class="category-menu" origin="top-left" label="Filtrar por categoría" [(open)]="categoryMenuOpen">
+            <button type="button" role="menuitemradio" class="t-menu-item" [attr.aria-checked]="!categoryFilter()" (click)="setCategoryFilter(null)">
+              Todas las categorías
+              @if (!categoryFilter()) {
+                <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+              }
             </button>
-            <div class="anchor">
+            @for (c of monthCategories(); track c.id) {
+              <button type="button" role="menuitemradio" class="t-menu-item" [attr.aria-checked]="categoryFilter() === c.id" (click)="setCategoryFilter(c.id)">
+                {{ c.name }}
+                @if (categoryFilter() === c.id) {
+                  <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                }
+              </button>
+            }
+          </app-dropdown>
+        </div>
+        @if (filtering()) {
+          <p class="filter-summary" aria-live="polite">
+            {{ visible().length }} de {{ list.length }} · Neto {{ money(visibleTotal()) }}
+            <button type="button" class="link" (click)="clearFilters()">Quitar filtros</button>
+          </p>
+        }
+      </section>
+
+      @if (visible().length === 0) {
+        <p class="notice">Ningún movimiento coincide con la búsqueda.</p>
+      } @else {
+        @if (selecting()) {
+          <p class="select-hint">
+            Toca los movimientos que quieras cambiar.
+            <button type="button" class="link" (click)="selectAllVisible()">Seleccionar los {{ visible().length }}</button>
+          </p>
+        }
+        <ul [class.t-still]="!monthState.animateLists()" class="rows">
+          @for (row of visible(); track row.id) {
+            <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item" [class.picked]="selected().has(row.id)">
               <button
                 type="button"
-                class="more"
-                aria-haspopup="menu"
-                [attr.aria-expanded]="menuFor() === row.id"
-                [attr.aria-label]="'Más acciones para ' + row.title"
-                (click)="toggleMenu(row, $event)"
+                class="row"
+                [attr.aria-pressed]="selecting() ? selected().has(row.id) : null"
+                [attr.aria-label]="(selecting() ? 'Seleccionar ' : 'Editar ') + row.title + ', ' + row.amount"
+                (click)="tapRow(row)"
               >
-                <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
+                @if (selecting()) {
+                  <span class="check" aria-hidden="true">
+                    @if (selected().has(row.id)) {
+                      <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                    }
+                  </span>
+                } @else {
+                  <span class="avatar" [class.income]="row.isIncome" aria-hidden="true">{{ row.initial }}</span>
+                }
+                <span class="row-text">
+                  <span class="row-title">{{ row.title }}</span>
+                  <span class="row-sub">
+                    @if (row.hasPhotos) {
+                      <ion-icon name="attach-outline" class="clip" aria-label="con foto del recibo"></ion-icon>
+                    }
+                    {{ row.subtitle }}
+                  </span>
+                  @if (row.tags.length) {
+                    <span class="row-tags">
+                      @for (t of row.tags; track t) {
+                        <span class="tag">#{{ t }}</span>
+                      }
+                    </span>
+                  }
+                </span>
+                <span class="row-amount" [class.income]="row.isIncome">{{ row.amount }}</span>
               </button>
-              <app-dropdown
-                class="row-menu"
-                [class.up]="menuUp()"
-                [origin]="menuUp() ? 'bottom-right' : 'top-right'"
-                [label]="'Acciones para ' + row.title"
-                [open]="menuFor() === row.id"
-                (openChange)="setMenu(row, $event)"
-              >
-                <button type="button" role="menuitem" class="t-menu-item" (click)="edit(row)">
-                  Editar <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
-                </button>
-                <button type="button" role="menuitem" class="t-menu-item" (click)="duplicate(row)">
-                  Duplicar <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
-                </button>
-                <button type="button" role="menuitem" class="t-menu-item danger" (click)="remove(row)">
-                  Eliminar <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
-                </button>
-              </app-dropdown>
-            </div>
-          </li>
-        }
-      </ul>
+              @if (!selecting()) {
+                <div class="anchor">
+                  <button
+                    type="button"
+                    class="more"
+                    aria-haspopup="menu"
+                    [attr.aria-expanded]="menuFor() === row.id"
+                    [attr.aria-label]="'Más acciones para ' + row.title"
+                    (click)="toggleMenu(row, $event)"
+                  >
+                    <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
+                  </button>
+                  <app-dropdown
+                    class="row-menu"
+                    [class.up]="menuUp()"
+                    [origin]="menuUp() ? 'bottom-right' : 'top-right'"
+                    [label]="'Acciones para ' + row.title"
+                    [open]="menuFor() === row.id"
+                    (openChange)="setMenu(row, $event)"
+                  >
+                    <button type="button" role="menuitem" class="t-menu-item" (click)="edit(row)">
+                      Editar <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                    <button type="button" role="menuitem" class="t-menu-item" (click)="duplicate(row)">
+                      Duplicar <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                    <button type="button" role="menuitem" class="t-menu-item danger" (click)="remove(row)">
+                      Eliminar <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                  </app-dropdown>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
     }
   }
 </ion-content>
+
+@if (selecting()) {
+  <div class="selection-bar" role="toolbar" aria-label="Acciones para los seleccionados">
+    <span class="count" aria-live="polite">{{ selected().size }} seleccionados</span>
+    <button type="button" [disabled]="!selected().size" (click)="bulkCategory()">Categoría</button>
+    <button type="button" [disabled]="!selected().size" (click)="bulkDate()">Fecha</button>
+    <button type="button" class="danger" [disabled]="!selected().size" (click)="bulkDelete()">Eliminar</button>
+  </div>
+}

@@ -42,8 +42,8 @@
 **Propósito:** que lo que sobra (o falta) de un mes pase al siguiente.
 
 **Funciones:**
-- [ ] [Después] Activar el rollover por presupuesto.
-- [ ] [Después] Límite efectivo = límite + sobrante del mes anterior (puede ser negativo si se pasó).
+- [x] [Después] Activar el rollover por presupuesto.
+- [x] [Después] Límite efectivo = límite + sobrante del mes anterior (puede ser negativo si se pasó).
 
 **Campos y datos:** `rollover` 0/1 en `budgets`. El sobrante se calcula, no se guarda.
 

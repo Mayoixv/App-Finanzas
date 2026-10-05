@@ -1,6 +1,6 @@
 import { isValidCents } from '../../domain/money';
 import { MonthKey } from '../../domain/month';
-import { RecurringExpense } from '../../domain/recurring-expense';
+import { FREQUENCIES, Frequency, RecurringExpense } from '../../domain/recurring-expense';
 import { NotFoundError, ValidationError } from '../errors';
 import {
   ICategoryRepository,
@@ -13,6 +13,7 @@ export interface RecurringExpenseFields {
   amount: number;
   categoryId: string;
   dueDay: number;
+  frequency?: Frequency;
 }
 
 /** Reglas comunes al crear y al editar un gasto fijo. Devuelve el nombre ya recortado. */
@@ -28,15 +29,14 @@ export async function validateRecurringInput(
   }
   const category = await categories.get(input.categoryId);
   if (!category) throw new NotFoundError('Categoría');
-  if (category.type !== 'fijo') throw new ValidationError('Elige una categoría de gasto fijo');
+  if (category.type === 'variable') throw new ValidationError('Elige una categoría de gasto fijo o de ingreso');
+  if (input.frequency !== undefined && !FREQUENCIES.includes(input.frequency)) {
+    throw new ValidationError('Frecuencia inválida');
+  }
   return name;
 }
 
-export interface AddRecurringExpenseInput {
-  name: string;
-  amount: number;
-  categoryId: string;
-  dueDay: number;
+export interface AddRecurringExpenseInput extends RecurringExpenseFields {
   /** Mes desde el que empieza a aplicar. */
   startMonth: MonthKey;
 }
@@ -59,6 +59,7 @@ export class AddRecurringExpense {
       dueDay: input.dueDay,
       active: true,
       startMonth: input.startMonth,
+      frequency: input.frequency ?? 1,
     };
     await this.recurring.save(expense);
     return expense;

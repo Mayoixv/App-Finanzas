@@ -110,6 +110,56 @@ export const MIGRATIONS: Migration[] = [
        )`,
     ],
   },
+  {
+    version: 6,
+    name: 'etiquetas, divisiones y fotos de recibos',
+    statements: [
+      `ALTER TABLE transactions ADD COLUMN tags TEXT NOT NULL DEFAULT ''`,
+      `CREATE TABLE transaction_splits (
+         transaction_id TEXT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+         category_id    TEXT NOT NULL REFERENCES categories(id),
+         amount         INTEGER NOT NULL CHECK (amount > 0),
+         PRIMARY KEY (transaction_id, category_id)
+       )`,
+      `CREATE TABLE attachments (
+         id             TEXT PRIMARY KEY,
+         transaction_id TEXT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+         data           TEXT NOT NULL,
+         created_at     TEXT NOT NULL
+       )`,
+      `CREATE INDEX idx_attachments_transaction ON attachments(transaction_id)`,
+    ],
+  },
+  {
+    version: 7,
+    name: 'frecuencia y pausa de fijos, metas con fecha, retiros, rollover y deudas',
+    statements: [
+      `ALTER TABLE recurring_expenses ADD COLUMN frequency INTEGER NOT NULL DEFAULT 1 CHECK (frequency IN (1, 3, 6, 12))`,
+      `ALTER TABLE recurring_expenses ADD COLUMN paused_until TEXT`,
+      `ALTER TABLE savings_goals ADD COLUMN target_date TEXT`,
+      `ALTER TABLE savings_contributions ADD COLUMN withdrawal INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE budgets ADD COLUMN rollover INTEGER NOT NULL DEFAULT 0`,
+      `CREATE TABLE debts (
+         id          TEXT PRIMARY KEY,
+         name        TEXT NOT NULL,
+         direction   TEXT NOT NULL CHECK (direction IN ('debo', 'me_deben')),
+         principal   INTEGER NOT NULL CHECK (principal > 0),
+         annual_rate REAL NOT NULL DEFAULT 0 CHECK (annual_rate BETWEEN 0 AND 200),
+         term_months INTEGER CHECK (term_months BETWEEN 1 AND 600),
+         start_date  TEXT NOT NULL
+       )`,
+      `CREATE TABLE debt_payments (
+         id             TEXT PRIMARY KEY,
+         debt_id        TEXT NOT NULL REFERENCES debts(id) ON DELETE CASCADE,
+         date           TEXT NOT NULL,
+         amount         INTEGER NOT NULL CHECK (amount > 0),
+         principal      INTEGER NOT NULL,
+         interest       INTEGER NOT NULL,
+         transaction_id TEXT REFERENCES transactions(id) ON DELETE SET NULL
+       )`,
+      `INSERT OR IGNORE INTO categories (id, name, type) VALUES ('cat-pago-deudas', 'Pago de deudas', 'fijo')`,
+    ],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

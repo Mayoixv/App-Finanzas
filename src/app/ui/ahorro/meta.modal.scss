@@ -1,1 +1,13 @@
 @use '../sheet';
+
+.link-button {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--violet-600);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

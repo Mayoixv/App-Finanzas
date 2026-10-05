@@ -12,6 +12,7 @@ import { MonthSwitcherComponent } from '../month-switcher.component';
 import { MonthState } from '../month-state';
 import { TransactionFormService } from '../movimientos/transaction-form.service';
 import { BudgetsCardComponent } from '../presupuestos/budgets-card.component';
+import { UpcomingCardComponent } from '../fijos/upcoming-card.component';
 import { BalanceReelComponent } from '../balance-reel.component';
 import { ExpenseDonutComponent } from './expense-donut.component';
 
@@ -43,6 +44,7 @@ interface RecentRow {
     ExpenseDonutComponent,
     BudgetsCardComponent,
     BalanceReelComponent,
+    UpcomingCardComponent,
   ],
 })
 export class InicioPage {

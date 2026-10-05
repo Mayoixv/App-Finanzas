@@ -1,17 +1,22 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar gasto fijo' : 'Nuevo gasto fijo' }}</h1>
+      <h1 class="screen-title">{{ isEdit() ? 'Editar fijo' : 'Nuevo fijo' }}</h1>
       <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
+    <div class="kind" role="radiogroup" aria-label="Tipo de fijo">
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">Gasto</button>
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">Ingreso</button>
+    </div>
+
     <div class="field">
       <ion-input
         label="Nombre"
         label-placement="stacked"
-        placeholder="Alquiler, internet, suscripción"
+        [placeholder]="kind() === 'ingreso' ? 'Sueldo, alquiler que cobras' : 'Alquiler, internet, suscripción'"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -19,7 +24,7 @@
 
     <div class="field">
       <ion-input
-        label="Monto mensual ({{ currency() }})"
+        label="Monto ({{ currency() }})"
         label-placement="stacked"
         type="number"
         inputmode="decimal"
@@ -47,7 +52,7 @@
 
     <div class="field">
       <ion-input
-        label="Día del mes en que vence (1 a 31)"
+        [label]="kind() === 'ingreso' ? 'Día del mes en que cobras (1 a 31)' : 'Día del mes en que vence (1 a 31)'"
         label-placement="stacked"
         type="number"
         inputmode="numeric"
@@ -59,18 +64,37 @@
       ></ion-input>
     </div>
 
+    <div class="field">
+      <ion-select
+        label="Se repite"
+        label-placement="stacked"
+        cancelText="Cancelar"
+        [value]="frequency()"
+        (ionChange)="frequency.set($event.detail.value)"
+      >
+        @for (f of frequencies; track f.value) {
+          <ion-select-option [value]="f.value">{{ f.label }}</ion-select-option>
+        }
+      </ion-select>
+    </div>
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isEdit() ? 'Guardar cambios' : 'Guardar gasto fijo' }}
+      {{ isEdit() ? 'Guardar cambios' : 'Guardar fijo' }}
     </button>
 
     @if (isEdit()) {
       <p class="hint">Los cambios aplican desde {{ monthLabel() }}. Los meses anteriores y lo ya pagado no cambian.</p>
+      @if (isPaused()) {
+        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="resume()">Reanudar</button>
+      } @else {
+        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="pause()">Pausar…</button>
+      }
       <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">
-        Eliminar gasto fijo
+        Eliminar fijo
       </button>
     }
   </div>
@@ -78,7 +102,7 @@
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Gasto fijo guardado' }}</p>
+      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Fijo guardado' }}</p>
     }
   </div>
 </ion-content>

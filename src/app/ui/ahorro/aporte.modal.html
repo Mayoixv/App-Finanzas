@@ -1,7 +1,7 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">Aportar a {{ goal.name }}</h1>
+      <h1 class="screen-title">{{ withdrawal ? 'Retirar de ' : 'Aportar a ' }}{{ goal.name }}</h1>
       <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
@@ -30,19 +30,25 @@
       ></ion-input>
     </div>
 
-    <p class="hint">El aporte cuenta como ahorrado en el mes de su fecha y se resta del balance de ese mes.</p>
+    <p class="hint">
+      @if (withdrawal) {
+        El retiro resta de la meta y del ahorrado del mes de su fecha, y vuelve al balance de ese mes.
+      } @else {
+        El aporte cuenta como ahorrado en el mes de su fecha y se resta del balance de ese mes.
+      }
+    </p>
 
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }
 
-    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">Guardar aporte</button>
+    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">{{ withdrawal ? 'Guardar retiro' : 'Guardar aporte' }}</button>
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">Aporte guardado</p>
+      <p class="done-text">{{ withdrawal ? 'Retiro guardado' : 'Aporte guardado' }}</p>
     }
   </div>
 </ion-content>

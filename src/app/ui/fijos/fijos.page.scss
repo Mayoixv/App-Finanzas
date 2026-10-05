@@ -216,3 +216,15 @@
     outline-offset: -3px;
   }
 }
+
+.item-head.income .item-amount {
+  color: var(--positive);
+}
+
+.paused-title {
+  margin: 28px 20px 12px;
+}
+
+.item.paused {
+  opacity: 0.85;
+}

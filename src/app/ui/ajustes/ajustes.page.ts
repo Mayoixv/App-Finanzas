@@ -10,6 +10,7 @@ import { CurrencyState } from '../currency-state';
 import { DropdownComponent } from '../dropdown.component';
 import { MonthState } from '../month-state';
 import { CategoriaModalComponent } from './categoria.modal';
+import { DatosComponent } from './datos.component';
 
 interface Group {
   type: CategoryType;
@@ -27,7 +28,7 @@ const GROUPS: { type: CategoryType; title: string }[] = [
   selector: 'app-ajustes',
   templateUrl: 'ajustes.page.html',
   styleUrls: ['ajustes.page.scss'],
-  imports: [RouterLink, IonContent, IonIcon, DropdownComponent],
+  imports: [RouterLink, IonContent, IonIcon, DropdownComponent, DatosComponent],
 })
 export class AjustesPage {
   private readonly container = inject(APP_CONTAINER);

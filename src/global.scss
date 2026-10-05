@@ -233,7 +233,8 @@ ion-alert.app-alert button.alert-button-role-destructive {
   transition: opacity 0.15s ease, transform 0.12s ease, background-color 0.12s ease;
 }
 
-body:has(.t-dropdown.is-open) .add-button {
+body:has(.t-dropdown.is-open) .add-button,
+body:has(.selection-bar) .add-button {
   opacity: 0;
   pointer-events: none;
 }
@@ -291,5 +292,114 @@ body:has(.t-dropdown.is-open) .add-button {
   .t-reel-strip {
     transition: none !important;
     filter: none !important;
+  }
+}
+
+/* Aviso con "Deshacer" (ion-toast con cssClass "app-toast"). */
+ion-toast.app-toast {
+  --background: var(--ink-800);
+  --color: var(--text-on-dark);
+  --border-radius: var(--radius-field);
+  --button-color: #c9b8ff;
+  --box-shadow: 0 16px 40px -12px rgba(10, 10, 18, 0.6);
+}
+
+ion-toast.app-toast::part(button) {
+  text-transform: none;
+  font-weight: 600;
+}
+
+/* ---------- Movimiento añadido (aprobado tras design.md sección 10) ---------- */
+
+/* Deja animar alturas hasta "auto" para que las filas se abran y se cierren sin saltos. */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+/* Filas que entran (al guardar) y salen (al borrar). Con .t-still en la lista se reemplazan sin animación. */
+.t-row-enter {
+  overflow: hidden;
+  animation: t-row-in 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.t-row-leave {
+  overflow: hidden;
+  animation: t-row-out 0.28s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.t-still .t-row-enter,
+.t-still .t-row-leave {
+  animation: none;
+}
+
+@keyframes t-row-in {
+  from {
+    height: 0;
+    padding-block: 0;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    height: auto;
+  }
+}
+
+@keyframes t-row-out {
+  from {
+    height: auto;
+  }
+  to {
+    height: 0;
+    padding-block: 0;
+    margin-block: 0;
+    opacity: 0;
+    transform: translateX(24px) scale(0.98);
+  }
+}
+
+/* Barras de presupuesto, metas, fijos y deudas: se llenan desde la izquierda al aparecer. */
+.bar-fill {
+  transform-origin: left center;
+  animation: t-bar-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes t-bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Respuesta al tocar: tarjetas, filas y botones de ícono se hunden un poco (los botones ya lo hacen). */
+.row,
+.budget,
+.payment,
+.choice,
+.kind button,
+.edit,
+.close {
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-row-enter,
+  .t-row-leave,
+  .bar-fill {
+    animation: none !important;
+  }
+
+  .row,
+  .budget,
+  .payment,
+  .choice,
+  .kind button,
+  .edit,
+  .close {
+    &:active:not(:disabled) {
+      transform: none;
+    }
   }
 }

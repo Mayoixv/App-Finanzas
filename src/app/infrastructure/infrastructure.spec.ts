@@ -3,6 +3,7 @@ import { Migration, MIGRATIONS, runMigrations } from './sqlite/migrations';
 import {
   SqliteBudgetRepository,
   SqliteCategoryRepository,
+  SqliteDebtRepository,
   SqliteRecurringExpenseRepository,
   SqliteSavingsRepository,
   SqliteSettingsRepository,
@@ -127,7 +128,7 @@ describe('repositorios SQLite', () => {
     await expect(
       repo.save({ id: 'b2', categoryId: 'c1', month: '2026-10', limit: 500 }),
     ).rejects.toThrow();
-    expect(await repo.listByMonth('2026-10')).toEqual([
+    expect(await repo.listByMonth('2026-10')).toMatchObject([
       { id: 'b1', categoryId: 'c1', month: '2026-10', limit: 400 },
     ]);
   });
@@ -165,5 +166,59 @@ describe('categorías en uso', () => {
       id: 'r', name: 'Luz', amount: 100, categoryId: 'cat-servicios', dueDay: 1, active: true, startMonth: '2026-10',
     });
     expect(await cats.isInUse('cat-servicios')).toBe(true);
+  });
+});
+
+describe('etiquetas, divisiones y fotos en SQLite', () => {
+  it('guarda y lee etiquetas y partes, reemplaza las partes al editar y borra todo en cascada', async () => {
+    const db = await freshDb();
+    const repo = new SqliteTransactionRepository(db);
+    const t = {
+      id: 't', date: '2026-10-02', amount: 1000, categoryId: 'cat-comida', note: '', tags: ['Viaje', 'Samaná'],
+      splits: [{ categoryId: 'cat-comida', amount: 700 }, { categoryId: 'cat-ocio', amount: 300 }],
+    };
+    await repo.save(t);
+    await repo.saveAttachment({ id: 'f', transactionId: 't', data: 'data:image/jpeg;base64,AAA' });
+    expect(await repo.get('t')).toEqual({ ...t, attachmentCount: 1 });
+    expect((await repo.listByMonth('2026-10'))[0].splits).toHaveLength(2);
+
+    await repo.save({ ...t, splits: [] });
+    expect((await repo.get('t'))?.splits).toEqual([]);
+
+    expect(await new SqliteCategoryRepository(db).isInUse('cat-ocio')).toBe(false);
+    await repo.save(t);
+    expect(await new SqliteCategoryRepository(db).isInUse('cat-ocio')).toBe(true);
+
+    await repo.delete('t');
+    expect(await repo.listAttachments('t')).toEqual([]);
+    expect(await db.all('SELECT * FROM transaction_splits')).toEqual([]);
+  });
+});
+
+describe('migración 7 en SQLite', () => {
+  it('guarda frecuencia y pausa de fijos, fecha de metas, retiros, rollover y deudas con pagos en cascada', async () => {
+    const db = await freshDb();
+    const rec = new SqliteRecurringExpenseRepository(db);
+    await rec.save({ id: 'r', name: 'Seguro', amount: 100, categoryId: 'cat-servicios', dueDay: 1, active: true, startMonth: '2026-10', frequency: 12, pausedUntil: '2026-12' });
+    expect(await rec.get('r')).toMatchObject({ frequency: 12, pausedUntil: '2026-12' });
+
+    const sav = new SqliteSavingsRepository(db);
+    await sav.saveGoal({ id: 'g', name: 'Viaje', targetAmount: 500, targetDate: '2027-01-01' });
+    await sav.saveContribution({ id: 'w', goalId: 'g', date: '2026-10-01', amount: 50, withdrawal: true });
+    expect(await sav.getGoal('g')).toMatchObject({ targetDate: '2027-01-01' });
+    expect((await sav.listContributions())[0]).toMatchObject({ withdrawal: true });
+
+    const bud = new SqliteBudgetRepository(db);
+    await bud.save({ id: 'b', categoryId: 'cat-comida', month: '2026-10', limit: 100, rollover: true });
+    expect((await bud.listByMonth('2026-10'))[0].rollover).toBe(true);
+
+    const debts = new SqliteDebtRepository(db);
+    await debts.save({ id: 'd', name: 'Carro', direction: 'debo', principal: 1000, annualRate: 12.5, termMonths: 24, startDate: '2026-10-01' });
+    await debts.savePayment({ id: 'p', debtId: 'd', date: '2026-10-15', amount: 100, principal: 90, interest: 10 });
+    expect(await debts.get('d')).toMatchObject({ annualRate: 12.5, termMonths: 24 });
+    expect(await debts.listPayments('d')).toHaveLength(1);
+    await debts.delete('d');
+    expect(await debts.listPayments()).toEqual([]);
+    expect((await new SqliteCategoryRepository(db).get('cat-pago-deudas'))?.type).toBe('fijo');
   });
 });

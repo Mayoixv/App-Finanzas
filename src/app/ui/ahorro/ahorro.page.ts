@@ -5,11 +5,12 @@ import { checkmarkCircleOutline, createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { GoalProgress, MonthContribution } from '../../application/use-cases/get-savings-overview';
 import { MonthlySummary, SavingsRating } from '../../domain/monthly-summary';
-import { formatDay, formatMoney, formatPercent } from '../format';
+import { formatDay, formatMoney, formatPercent, monthLabel } from '../format';
 import { MonthSwitcherComponent } from '../month-switcher.component';
 import { PageSlideComponent } from '../page-slide.component';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { MonthState } from '../month-state';
+import { UndoService } from '../undo.service';
 import { SavingsFormService } from './savings-form.service';
 
 const RATING_TEXT: Record<SavingsRating, string> = {
@@ -33,6 +34,7 @@ interface View {
 export class AhorroPage {
   private readonly container = inject(APP_CONTAINER);
   private readonly alerts = inject(AlertController);
+  private readonly undo = inject(UndoService);
   protected readonly monthState = inject(MonthState);
   protected readonly form = inject(SavingsFormService);
 
@@ -51,6 +53,23 @@ export class AhorroPage {
   protected readonly money = formatMoney;
   protected readonly percent = formatPercent;
   protected readonly day = formatDay;
+  protected readonly abs = Math.abs;
+
+  /** Una línea: para cuándo se llega al ritmo actual y cuánto aportar para llegar a la fecha elegida. */
+  protected projection(g: GoalProgress): string {
+    if (g.reached) return '';
+    const parts: string[] = [];
+    if (g.goal.targetDate) {
+      parts.push(
+        g.targetPassed
+          ? `La fecha objetivo (${monthLabel(g.goal.targetDate.slice(0, 7))}) ya pasó`
+          : `Para ${monthLabel(g.goal.targetDate.slice(0, 7))}: ${formatMoney(g.neededPerMonth ?? 0)} al mes`,
+      );
+    }
+    if (g.projectedMonth) parts.push(`A tu ritmo llegas en ${monthLabel(g.projectedMonth)}`);
+    else if (g.saved > 0 || g.goal.targetDate) parts.push('Sin aportes recientes para proyectar');
+    return parts.join(' · ');
+  }
   protected readonly ratingText = RATING_TEXT;
 
   constructor() {
@@ -74,8 +93,8 @@ export class AhorroPage {
   protected async confirmDeleteContribution(item: MonthContribution) {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar aporte',
-      message: `Se borrará el aporte de ${formatMoney(item.contribution.amount)} a ${item.goalName} del ${formatDay(item.contribution.date)}.`,
+      header: item.contribution.withdrawal ? 'Eliminar retiro' : 'Eliminar aporte',
+      message: `Se borrará el ${item.contribution.withdrawal ? 'retiro' : 'aporte'} de ${formatMoney(item.contribution.amount)} a ${item.goalName} del ${formatDay(item.contribution.date)}.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         { text: 'Eliminar', role: 'destructive' },
@@ -85,9 +104,9 @@ export class AhorroPage {
     const { role } = await alert.onDidDismiss();
     if (role !== 'destructive') return;
     try {
-      await this.container.deleteSavingsContribution.execute(item.contribution.id);
-      this.liveMessage.set('Aporte eliminado');
+      const removed = await this.container.deleteSavingsContribution.execute(item.contribution.id);
       this.monthState.notifyChange();
+      if (removed) this.undo.offer(removed.withdrawal ? 'Retiro eliminado' : 'Aporte eliminado', () => this.container.restoreSavingsContribution.execute(removed));
     } catch (error) {
       console.error(error);
       this.liveMessage.set('No se pudo eliminar el aporte. Inténtalo de nuevo.');

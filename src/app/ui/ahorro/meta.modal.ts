@@ -28,6 +28,7 @@ export class MetaModalComponent implements OnInit {
 
   protected readonly name = signal('');
   protected readonly target = signal('');
+  protected readonly targetDate = signal('');
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
@@ -47,6 +48,7 @@ export class MetaModalComponent implements OnInit {
       this.isEdit.set(true);
       this.name.set(this.goal.name);
       this.target.set(amountToInput(this.goal.targetAmount));
+      this.targetDate.set(this.goal.targetDate ?? '');
     }
   }
 
@@ -57,7 +59,11 @@ export class MetaModalComponent implements OnInit {
   protected async save() {
     this.saving.set(true);
     this.error.set(null);
-    const fields = { name: this.name(), targetAmount: parseAmount(this.target()) ?? 0 };
+    const fields = {
+      name: this.name(),
+      targetAmount: parseAmount(this.target()) ?? 0,
+      targetDate: this.targetDate() || null,
+    };
     try {
       if (this.goal) await this.container.updateSavingsGoal.execute(this.goal.id, fields);
       else await this.container.addSavingsGoal.execute(fields);

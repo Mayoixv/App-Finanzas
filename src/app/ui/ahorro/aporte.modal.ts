@@ -25,6 +25,8 @@ export class AporteModalComponent {
   private readonly monthState = inject(MonthState);
 
   @Input({ required: true }) goal!: SavingsGoal;
+  /** Sacar dinero de la meta en vez de aportar. */
+  @Input() withdrawal = false;
 
   protected readonly amount = signal('');
   protected readonly date = signal(defaultDateFor(this.monthState.month()));
@@ -51,6 +53,7 @@ export class AporteModalComponent {
         goalId: this.goal.id,
         date: this.date(),
         amount: parseAmount(this.amount()) ?? 0,
+        withdrawal: this.withdrawal,
       });
       this.saved.set(true);
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));

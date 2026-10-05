@@ -117,7 +117,7 @@ describe('GetBudgetStatuses', () => {
     await add.execute({ date: '2026-10-02', amount: 300, categoryId: 'com' });
     await add.execute({ date: '2026-10-09', amount: 200, categoryId: 'com' });
     const [result] = await new GetBudgetStatuses(s.budgets, s.transactions).execute('2026-10');
-    expect(result.status).toEqual({ spent: 500, remaining: -100, exceeded: true });
+    expect(result.status).toMatchObject({ spent: 500, remaining: -100, exceeded: true });
   });
 });
 
@@ -235,7 +235,7 @@ describe('editar y eliminar movimientos', () => {
     });
     const update = new UpdateTransaction(s.transactions, s.categories);
     await update.execute(t.id, { date: '2026-10-03', amount: 650, categoryId: 'com', note: ' cena ' });
-    expect(await s.transactions.get(t.id)).toEqual({
+    expect(await s.transactions.get(t.id)).toMatchObject({
       id: t.id,
       date: '2026-10-03',
       amount: 650,

@@ -1,0 +1,63 @@
+<section class="block" aria-labelledby="datos-title">
+  <h2 id="datos-title" class="section-title">Tus datos</h2>
+  <ul class="rows">
+    <li>
+      <button type="button" class="row" (click)="createBackup()">
+        <span class="row-text">
+          <span class="row-title">Crear respaldo</span>
+          <span class="row-sub">Archivo cifrado con contraseña para guardar fuera del teléfono</span>
+        </span>
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+    </li>
+    <li>
+      <button type="button" class="row" (click)="restoreBackup()">
+        <span class="row-text">
+          <span class="row-title">Restaurar respaldo</span>
+          <span class="row-sub">Reemplaza los datos de la app por los del archivo</span>
+        </span>
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+    </li>
+    <li>
+      <button type="button" class="row" (click)="exportCsv()">
+        <span class="row-text">
+          <span class="row-title">Exportar movimientos a Excel</span>
+          <span class="row-sub">Archivo CSV con todos tus movimientos</span>
+        </span>
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+    </li>
+  </ul>
+</section>
+
+<section class="block" aria-labelledby="seguridad-title">
+  <h2 id="seguridad-title" class="section-title">Bloqueo con PIN</h2>
+  <ul class="rows">
+    @if (pinEnabled()) {
+      <li>
+        <button type="button" class="row" (click)="enablePin()">
+          <span class="row-title">Cambiar PIN</span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="row" (click)="disablePin()">
+          <span class="row-title danger">Quitar PIN</span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </button>
+      </li>
+    } @else {
+      <li>
+        <button type="button" class="row" (click)="enablePin()">
+          <span class="row-text">
+            <span class="row-title">Activar bloqueo con PIN</span>
+            <span class="row-sub">Se pide al abrir la app y al volver tras 1 minuto</span>
+          </span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </button>
+      </li>
+    }
+  </ul>
+  <p class="status" aria-live="polite">{{ status() }}</p>
+</section>

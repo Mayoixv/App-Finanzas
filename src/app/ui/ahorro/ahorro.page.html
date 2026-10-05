@@ -32,9 +32,9 @@
       <app-page-slide [page]="page()">
         <div page1>
           <h2 class="sr-only">Metas, ahorro acumulado</h2>
-          <ul class="goals">
+          <ul [class.t-still]="!monthState.animateLists()" class="goals">
             @for (g of v.goals; track g.goal.id) {
-              <li class="goal">
+              <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="goal">
                 <div class="goal-head">
                   <span class="goal-name">{{ g.goal.name }}</span>
                   <button type="button" class="edit" [attr.aria-label]="'Editar ' + g.goal.name" (click)="form.openGoal(g.goal)">
@@ -64,15 +64,25 @@
                   } @else {
                     <span class="goal-meta">
                       {{ percent(g.percent) }}
-                      @if (g.savedThisMonth > 0) {
-                        · +{{ money(g.savedThisMonth) }} este mes
+                      @if (g.savedThisMonth !== 0) {
+                        · {{ g.savedThisMonth > 0 ? '+' : '−' }}{{ money(abs(g.savedThisMonth)) }} este mes
                       }
                     </span>
                   }
-                  <button type="button" class="btn-secondary contribute" [attr.aria-label]="'Aportar a ' + g.goal.name" (click)="form.openContribution(g.goal)">
-                    Aportar
-                  </button>
+                  <span class="goal-actions">
+                    @if (g.saved > 0) {
+                      <button type="button" class="link-button" [attr.aria-label]="'Retirar de ' + g.goal.name" (click)="form.openContribution(g.goal, true)">
+                        Retirar
+                      </button>
+                    }
+                    <button type="button" class="btn-secondary contribute" [attr.aria-label]="'Aportar a ' + g.goal.name" (click)="form.openContribution(g.goal)">
+                      Aportar
+                    </button>
+                  </span>
                 </div>
+                @if (projection(g); as text) {
+                  <p class="goal-projection" [class.late]="g.targetPassed">{{ text }}</p>
+                }
               </li>
             }
           </ul>
@@ -82,20 +92,20 @@
         <div page2>
           <h2 class="sr-only">Aportes de {{ monthState.label() }}</h2>
           @if (v.contributions.length > 0) {
-            <ul class="rows">
+            <ul [class.t-still]="!monthState.animateLists()" class="rows">
               @for (c of v.contributions; track c.contribution.id) {
-                <li>
+                <li animate.enter="t-row-enter" animate.leave="t-row-leave">
                   <button
                     type="button"
                     class="row"
-                    [attr.aria-label]="'Eliminar aporte de ' + money(c.contribution.amount) + ' a ' + c.goalName"
+                    [attr.aria-label]="'Eliminar ' + (c.contribution.withdrawal ? 'retiro de ' : 'aporte de ') + money(c.contribution.amount) + ' de ' + c.goalName"
                     (click)="confirmDeleteContribution(c)"
                   >
                     <span class="row-text">
                       <span class="row-title">{{ c.goalName }}</span>
-                      <span class="row-sub">{{ day(c.contribution.date) }}</span>
+                      <span class="row-sub">{{ day(c.contribution.date) }}{{ c.contribution.withdrawal ? ' · Retiro' : '' }}</span>
                     </span>
-                    <span class="row-amount">{{ money(c.contribution.amount) }}</span>
+                    <span class="row-amount" [class.negative]="c.contribution.withdrawal">{{ c.contribution.withdrawal ? '−' : '' }}{{ money(c.contribution.amount) }}</span>
                   </button>
                 </li>
               }

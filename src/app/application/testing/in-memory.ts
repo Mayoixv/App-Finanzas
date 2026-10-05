@@ -2,11 +2,13 @@ import { Budget } from '../../domain/budget';
 import { Category } from '../../domain/category';
 import { monthOf, MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
+import { Debt, DebtPayment } from '../../domain/debts';
 import { SavingsContribution, SavingsGoal } from '../../domain/savings';
-import { Transaction } from '../../domain/transaction';
+import { Attachment, Transaction } from '../../domain/transaction';
 import {
   IBudgetRepository,
   ICategoryRepository,
+  IDebtRepository,
   IdGenerator,
   IRecurringExpenseRepository,
   ISavingsRepository,
@@ -31,6 +33,13 @@ export class InMemoryTransactions implements ITransactionRepository {
   async listByMonth(month: MonthKey) {
     return [...this.items.values()].filter((t) => monthOf(t.date) === month);
   }
+  async listAll() { return [...this.items.values()].sort((a, b) => a.date.localeCompare(b.date)); }
+  attachments = new Map<string, Attachment>();
+  async listAttachments(transactionId: string) {
+    return [...this.attachments.values()].filter((a) => a.transactionId === transactionId);
+  }
+  async saveAttachment(a: Attachment) { this.attachments.set(a.id, a); }
+  async deleteAttachment(id: string) { this.attachments.delete(id); }
   async get(id: string) { return this.items.get(id); }
   async save(t: Transaction) { this.items.set(t.id, t); }
   async delete(id: string) { this.items.delete(id); }
@@ -101,6 +110,23 @@ export class InMemorySettings implements ISettingsRepository {
   values = new Map<string, string>();
   async get(key: string) { return this.values.get(key); }
   async set(key: string, value: string) { this.values.set(key, value); }
+}
+
+export class InMemoryDebts implements IDebtRepository {
+  items = new Map<string, Debt>();
+  payments = new Map<string, DebtPayment>();
+  async list() { return [...this.items.values()]; }
+  async get(id: string) { return this.items.get(id); }
+  async save(d: Debt) { this.items.set(d.id, d); }
+  async delete(id: string) {
+    this.items.delete(id);
+    for (const p of [...this.payments.values()]) if (p.debtId === id) this.payments.delete(p.id);
+  }
+  async listPayments(debtId?: string) {
+    return [...this.payments.values()].filter((p) => !debtId || p.debtId === debtId).sort((a, b) => a.date.localeCompare(b.date));
+  }
+  async savePayment(p: DebtPayment) { this.payments.set(p.id, p); }
+  async deletePayment(id: string) { this.payments.delete(id); }
 }
 
 export class SequentialIds implements IdGenerator {
