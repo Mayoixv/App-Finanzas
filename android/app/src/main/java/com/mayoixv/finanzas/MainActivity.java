@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.mayoixv.finanzas;
 
 import com.getcapacitor.BridgeActivity;
 
