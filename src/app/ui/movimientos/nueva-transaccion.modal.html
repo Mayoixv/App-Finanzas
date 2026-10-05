@@ -1,0 +1,83 @@
+<ion-content class="surface-light">
+  <div class="sheet" [class.is-saved]="saved()">
+    <header class="sheet-head">
+      <h1 class="screen-title">{{ isEdit() ? 'Editar movimiento' : isCopy() ? 'Duplicar movimiento' : 'Nuevo movimiento' }}</h1>
+      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    <div class="kind" role="radiogroup" aria-label="Tipo de movimiento">
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">Gasto</button>
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">Ingreso</button>
+    </div>
+
+    <div class="field">
+      <ion-select
+        label="Categoría"
+        label-placement="stacked"
+        placeholder="Elige una categoría"
+        cancelText="Cancelar"
+        [value]="categoryId()"
+        (ionChange)="categoryId.set($event.detail.value)"
+      >
+        @for (c of options(); track c.id) {
+          <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+        }
+      </ion-select>
+    </div>
+
+    <div class="field">
+      <ion-input
+        label="Monto ({{ currency() }})"
+        label-placement="stacked"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        placeholder="0.00"
+        [value]="amount()"
+        (ionInput)="amount.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    <div class="field">
+      <ion-input
+        label="Fecha"
+        label-placement="stacked"
+        type="date"
+        [value]="date()"
+        (ionInput)="date.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    <div class="field">
+      <ion-input
+        label="Nota (opcional)"
+        label-placement="stacked"
+        [value]="note()"
+        (ionInput)="note.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
+      {{ saveLabel() }}
+    </button>
+
+    @if (isEdit()) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">
+        Eliminar movimiento
+      </button>
+    }
+  </div>
+
+  <div class="done" [class.visible]="saved()" aria-live="polite">
+    @if (saved()) {
+      <app-success-check state="in"></app-success-check>
+      <p class="done-text">{{ doneMessage() }}</p>
+    }
+  </div>
+</ion-content>

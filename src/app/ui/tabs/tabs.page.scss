@@ -1,0 +1,97 @@
+// Pestañas con píldora deslizante (design.md, sección 10.1). Barra flotante con efecto cristal.
+:host {
+  --tabs-dur: 250ms;
+  --tabs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tabs-text-muted: var(--muted);
+  --tabs-text-active: #ffffff;
+  --tabs-bar-bg: rgba(23, 23, 34, 0.92);
+  --tabs-pill-bg: var(--violet-600);
+
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.t-tabs {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: calc(var(--ion-safe-area-bottom, 0px) + 16px);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 48px;
+  background: var(--tabs-bar-bg);
+  border: 1px solid var(--border-glow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.t-tab {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  height: 48px;
+  padding: 4px 10px;
+  border-radius: 48px;
+  color: var(--tabs-text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--tabs-dur) var(--tabs-ease);
+
+  &:not([aria-selected='true']):hover,
+  &[aria-selected='true'] {
+    color: var(--tabs-text-active);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-400);
+    outline-offset: -3px;
+  }
+}
+
+.t-tabs-pill {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  z-index: 0;
+  height: 48px;
+  width: 0;
+  background: var(--tabs-pill-bg);
+  border-radius: 48px;
+  transform: translateX(0);
+  transition: transform var(--tabs-dur) var(--tabs-ease), width var(--tabs-dur) var(--tabs-ease);
+  will-change: transform, width;
+  pointer-events: none;
+}
+
+.add-button {
+  position: fixed;
+  right: 20px;
+  bottom: calc(var(--ion-safe-area-bottom, 0px) + 92px);
+  z-index: 10;
+  width: 56px;
+  min-height: 56px;
+  height: 56px;
+  padding: 0;
+  font-size: 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-tabs-pill,
+  .t-tab {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,32 @@
+<div class="donut">
+  <svg viewBox="0 0 200 200" role="img" [attr.aria-label]="'Gasto por categoría: ' + summary()">
+    <circle class="track" cx="100" cy="100" r="80" />
+    @for (arc of arcs(); track arc.name) {
+      <circle
+        class="arc"
+        cx="100"
+        cy="100"
+        r="80"
+        [attr.stroke]="arc.color"
+        [attr.stroke-dasharray]="arc.dashArray"
+        [attr.stroke-dashoffset]="arc.dashOffset"
+        transform="rotate(-90 100 100)"
+      />
+    }
+  </svg>
+  <div class="center">
+    <span class="center-amount">{{ money(total()) }}</span>
+    <span class="center-label">gastado</span>
+  </div>
+</div>
+
+<ul class="legend">
+  @for (arc of arcs(); track arc.name) {
+    <li>
+      <span class="swatch" [style.background]="arc.color" aria-hidden="true"></span>
+      <span class="name">{{ arc.name }}</span>
+      <span class="value">{{ money(arc.amount) }}</span>
+      <span class="share">{{ percent(arc.percent) }}</span>
+    </li>
+  }
+</ul>

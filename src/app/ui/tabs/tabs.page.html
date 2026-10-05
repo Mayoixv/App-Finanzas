@@ -1,0 +1,21 @@
+<ion-router-outlet [animated]="false"></ion-router-outlet>
+
+<nav class="t-tabs" role="tablist" aria-label="Secciones">
+  <span #pill class="t-tabs-pill" aria-hidden="true"></span>
+  @for (tab of tabs; track tab.path; let i = $index) {
+    <button
+      #tab
+      type="button"
+      class="t-tab"
+      role="tab"
+      [attr.aria-selected]="active() === i"
+      (click)="go(tab)"
+    >
+      {{ tab.label }}
+    </button>
+  }
+</nav>
+
+<button type="button" class="btn-primary add-button" [attr.aria-label]="addLabel()" (click)="add()">
+  <ion-icon name="add" aria-hidden="true"></ion-icon>
+</button>

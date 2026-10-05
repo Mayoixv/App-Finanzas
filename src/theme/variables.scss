@@ -1,2 +1,54 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Tokens de design.md. Pantallas oscuras (Inicio) y claras (Movimientos) comparten estos valores.
+
+:root {
+  --violet-600: #6a3df0;
+  --violet-400: #8f6bff;
+  --violet-900: #2a1478;
+  --ink-950: #0a0a12;
+  --ink-800: #171722;
+  --paper: #ffffff;
+  --surface-soft: #e2deee; // fondo de las pantallas claras: más apagado que el blanco
+  --surface-soft-card: #ece9f6; // tarjetas sobre --surface-soft
+  --surface-soft-chip: #f6f4fc; // círculos de ícono sobre --surface-soft-card
+  --lavender-100: #efeaff;
+  --text-on-dark: #f4f2ff;
+  --text-on-light: #14121f;
+  --muted: #8c88a6; // solo sobre fondos oscuros (AA)
+  --muted-on-light: #5f5b7a; // el --muted de design.md no llega a 4.5:1 sobre blanco
+  --positive: #2bd07f;
+  --positive-on-light: #0a6f40;
+  --negative: #ff5470;
+  --negative-on-light: #b01e39;
+  --warning: #ffb84d;
+
+  --brand-gradient: linear-gradient(160deg, #8f6bff 0%, #6a3df0 45%, #2a1478 100%);
+  --brand-glow: radial-gradient(circle at 50% 0%, rgba(143, 107, 255, 0.55), transparent 65%);
+  --border-glow: rgba(143, 107, 255, 0.25);
+
+  --radius-pill: 999px;
+  --radius-card: 24px;
+  --radius-field: 16px;
+
+  --font-display: 'Anton', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --ion-font-family: var(--font-body);
+
+  --ion-color-primary: #6a3df0;
+  --ion-color-primary-rgb: 106, 61, 240;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #5d36d3;
+  --ion-color-primary-tint: #7950f2;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,64 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <h1 class="screen-title">Movimientos</h1>
+    <app-month-switcher></app-month-switcher>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  @if (failed()) {
+    <p class="notice">No se pudieron leer los movimientos. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+  } @else if (rows(); as list) {
+    @if (list.length === 0) {
+      <section class="empty">
+        <p class="empty-title">Sin movimientos en {{ monthState.label() }}.</p>
+        <p class="empty-text">Toca el botón + para registrar un ingreso o un gasto de este mes.</p>
+      </section>
+    } @else {
+      <ul class="rows">
+        @for (row of list; track row.id) {
+          <li class="item">
+            <button type="button" class="row" [attr.aria-label]="'Editar ' + row.title + ', ' + row.amount" (click)="edit(row)">
+              <span class="avatar" [class.income]="row.isIncome" aria-hidden="true">{{ row.initial }}</span>
+              <span class="row-text">
+                <span class="row-title">{{ row.title }}</span>
+                <span class="row-sub">{{ row.subtitle }}</span>
+              </span>
+              <span class="row-amount" [class.income]="row.isIncome">{{ row.amount }}</span>
+            </button>
+            <div class="anchor">
+              <button
+                type="button"
+                class="more"
+                aria-haspopup="menu"
+                [attr.aria-expanded]="menuFor() === row.id"
+                [attr.aria-label]="'Más acciones para ' + row.title"
+                (click)="toggleMenu(row, $event)"
+              >
+                <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
+              </button>
+              <app-dropdown
+                class="row-menu"
+                [class.up]="menuUp()"
+                [origin]="menuUp() ? 'bottom-right' : 'top-right'"
+                [label]="'Acciones para ' + row.title"
+                [open]="menuFor() === row.id"
+                (openChange)="setMenu(row, $event)"
+              >
+                <button type="button" role="menuitem" class="t-menu-item" (click)="edit(row)">
+                  Editar <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                </button>
+                <button type="button" role="menuitem" class="t-menu-item" (click)="duplicate(row)">
+                  Duplicar <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
+                </button>
+                <button type="button" role="menuitem" class="t-menu-item danger" (click)="remove(row)">
+                  Eliminar <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+                </button>
+              </app-dropdown>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</ion-content>

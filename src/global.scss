@@ -34,4 +34,206 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* La app define sus propias superficies claras y oscuras (ver design.md), así que no sigue el tema del sistema. */
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
+
+/* Superficies de pantalla (design.md): Inicio es oscura, Movimientos es clara. */
+ion-content.surface-dark {
+  --background: var(--ink-950);
+  --color: var(--text-on-dark);
+  color: var(--text-on-dark);
+}
+
+ion-content.surface-light {
+  --switcher-bg: var(--surface-soft-card);
+  --background: var(--surface-soft);
+  --color: var(--text-on-light);
+  color: var(--text-on-light);
+}
+
+.screen-head {
+  padding: calc(var(--ion-safe-area-top, 0px) + 20px) 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.screen-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-400);
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  border: 0;
+  background: var(--violet-600);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(106, 61, 240, 0.45);
+
+  &:active:not(:disabled) {
+    background: #5530c4;
+  }
+}
+
+.btn-secondary {
+  border: 1.5px solid var(--violet-400);
+  background: transparent;
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Confirmaciones (ion-alert con cssClass "app-alert"): misma superficie suave que los formularios y sin mayúsculas.
+   Los selectores llevan elemento + clase para ganarle a los estilos internos de Ionic. */
+ion-alert.app-alert {
+  --background: var(--surface-soft-card);
+  --max-width: 340px;
+}
+
+ion-alert.app-alert div.alert-wrapper {
+  border-radius: var(--radius-card);
+}
+
+ion-alert.app-alert h2.alert-title {
+  color: var(--text-on-light);
+  font-weight: 600;
+}
+
+ion-alert.app-alert div.alert-message {
+  color: var(--muted-on-light);
+}
+
+ion-alert.app-alert button.alert-button {
+  min-height: 48px;
+  text-transform: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--violet-600);
+}
+
+ion-alert.app-alert button.alert-button-role-destructive {
+  color: var(--negative-on-light);
+}
+
+/* Fila de título con una acción a la derecha (por ejemplo, Ajustes en Inicio). */
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-right: -8px;
+  border-radius: 50%;
+  color: inherit;
+  font-size: 24px;
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-400);
+    outline-offset: -3px;
+  }
+}
+
+/* Filas de los menús desplegables (design.md 10.4); van proyectadas dentro de app-dropdown. */
+.t-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-on-dark);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--violet-400);
+  }
+
+  &.danger {
+    color: var(--negative);
+  }
+
+  ion-icon {
+    font-size: 18px;
+  }
+}
+
+/* Mientras hay un menú desplegable abierto, el botón + flotante se aparta para no taparlo. */
+.add-button {
+  transition: opacity 0.15s ease, transform 0.12s ease, background-color 0.12s ease;
+}
+
+body:has(.t-dropdown.is-open) .add-button {
+  opacity: 0;
+  pointer-events: none;
+}

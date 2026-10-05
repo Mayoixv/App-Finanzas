@@ -1,0 +1,32 @@
+@use '../sheet';
+
+.kind {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-soft-card);
+
+  button {
+    min-height: 48px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted-on-light);
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[aria-checked='true'] {
+      background: var(--violet-600);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--violet-600);
+      outline-offset: 2px;
+    }
+  }
+}

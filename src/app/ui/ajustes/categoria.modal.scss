@@ -1,0 +1,49 @@
+@use '../sheet';
+
+.kind {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-field);
+  background: var(--surface-soft-card);
+
+  button {
+    min-height: 48px;
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted-on-light);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+
+    &[aria-checked='true'] {
+      background: var(--violet-600);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--violet-600);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.fixed-type {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-field);
+  background: var(--surface-soft-card);
+  font-size: 16px;
+}
+
+.fixed-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: var(--muted-on-light);
+}

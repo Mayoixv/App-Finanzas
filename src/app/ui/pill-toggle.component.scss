@@ -1,0 +1,68 @@
+// Misma píldora de design.md 10.1, en colores de superficie clara.
+:host {
+  --tabs-dur: 250ms;
+  --tabs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tabs-text-muted: var(--muted-on-light);
+  --tabs-text-active: #ffffff;
+  --tabs-bar-bg: var(--surface-soft-card);
+  --tabs-pill-bg: var(--violet-600);
+
+  display: block;
+}
+
+.t-tabs {
+  position: relative;
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 48px;
+  background: var(--tabs-bar-bg);
+}
+
+.t-tab {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  height: 48px;
+  padding: 4px 16px;
+  border: 0;
+  border-radius: 48px;
+  background: transparent;
+  color: var(--tabs-text-muted);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--tabs-dur) var(--tabs-ease);
+
+  &[aria-selected='true'] {
+    color: var(--tabs-text-active);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-600);
+    outline-offset: 2px;
+  }
+}
+
+.t-tabs-pill {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  z-index: 0;
+  width: 0;
+  height: 48px;
+  border-radius: 48px;
+  background: var(--tabs-pill-bg);
+  transform: translateX(0);
+  transition: transform var(--tabs-dur) var(--tabs-ease), width var(--tabs-dur) var(--tabs-ease);
+  will-change: transform, width;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-tabs-pill,
+  .t-tab {
+    transition: none !important;
+  }
+}

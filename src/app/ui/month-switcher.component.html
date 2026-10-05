@@ -1,0 +1,50 @@
+<div class="switcher" role="group" aria-label="Mes">
+  <button type="button" class="arrow" aria-label="Mes anterior" (click)="state.previous()">
+    <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+  </button>
+
+  <div class="anchor">
+    <button
+      type="button"
+      class="label"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="open()"
+      [attr.aria-label]="state.label() + '. Elegir otro mes'"
+      (click)="toggle()"
+    >
+      <span aria-live="polite">{{ state.label() }}</span>
+      <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="open()"></ion-icon>
+    </button>
+
+    <app-dropdown class="month-menu" origin="top-center" label="Elegir mes" [(open)]="open">
+      <div class="year">
+        <button type="button" class="year-arrow" aria-label="Año anterior" (click)="year.set(year() - 1)">
+          <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+        </button>
+        <span class="year-label">{{ year() }}</span>
+        <button type="button" class="year-arrow" aria-label="Año siguiente" (click)="year.set(year() + 1)">
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+      <div class="months">
+        @for (m of months; track m.number) {
+          <button
+            type="button"
+            role="menuitemradio"
+            class="month"
+            [class.today]="key(m.number) === today"
+            [attr.aria-checked]="key(m.number) === selected()"
+            (click)="pick(key(m.number))"
+          >
+            {{ m.name }}
+          </button>
+        }
+      </div>
+      <button type="button" role="menuitem" class="t-menu-item go-today" (click)="pick(today)">Ir al mes actual</button>
+    </app-dropdown>
+  </div>
+
+  <button type="button" class="arrow" aria-label="Mes siguiente" (click)="state.next()">
+    <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+  </button>
+</div>

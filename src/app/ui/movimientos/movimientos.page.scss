@@ -1,0 +1,155 @@
+:host ion-content {
+  --padding-bottom: 168px;
+}
+
+.notice {
+  margin: 0 20px;
+  color: var(--muted-on-light);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.rows {
+  list-style: none;
+  margin: 8px 20px 0;
+  padding: 8px 20px;
+  border-radius: var(--radius-card);
+  background: var(--surface-soft-card);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.item + .item {
+  border-top: 1px solid rgba(20, 18, 31, 0.08);
+}
+
+.anchor {
+  position: relative;
+  flex: none;
+}
+
+.more {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 48px;
+  margin-right: -12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted-on-light);
+  font-size: 20px;
+  cursor: pointer;
+
+  &[aria-expanded='true'] {
+    color: var(--violet-600);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-600);
+    outline-offset: -3px;
+  }
+}
+
+.row-menu {
+  top: calc(100% + 4px);
+  right: 0;
+
+  &.up {
+    top: auto;
+    bottom: calc(100% + 4px);
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-600);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+}
+
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-soft-chip);
+  color: var(--violet-600);
+  font-weight: 600;
+
+  &.income {
+    color: var(--positive-on-light);
+  }
+}
+
+.row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.row-title {
+  font-size: 16px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted-on-light);
+}
+
+.row-amount {
+  flex: none;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+
+  &.income {
+    color: var(--positive-on-light);
+  }
+}
+
+.empty {
+  margin: 24px 20px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.empty-text {
+  margin: 16px auto 28px;
+  max-width: 30ch;
+  color: var(--muted-on-light);
+  font-size: 15px;
+  line-height: 1.5;
+}

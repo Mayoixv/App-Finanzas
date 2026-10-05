@@ -1,0 +1,54 @@
+<ion-content class="surface-light">
+  <div class="sheet" [class.is-saved]="saved()">
+    <header class="sheet-head">
+      <h1 class="screen-title">{{ isEdit() ? 'Editar categoría' : 'Nueva categoría' }}</h1>
+      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    @if (isEdit()) {
+      <p class="fixed-type">
+        <span class="fixed-label">Tipo</span>
+        {{ typeLabel[type()] }}
+      </p>
+    } @else {
+      <div class="kind" role="radiogroup" aria-label="Tipo de categoría">
+        @for (t of types; track t) {
+          <button type="button" role="radio" [attr.aria-checked]="type() === t" (click)="type.set(t)">
+            {{ typeLabel[t] }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="field">
+      <ion-input
+        label="Nombre"
+        label-placement="stacked"
+        placeholder="Mascotas, educación, propinas"
+        [value]="name()"
+        (ionInput)="name.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
+      {{ isEdit() ? 'Guardar cambios' : 'Guardar categoría' }}
+    </button>
+
+    @if (isEdit()) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar categoría</button>
+    }
+  </div>
+
+  <div class="done" [class.visible]="saved()" aria-live="polite">
+    @if (saved()) {
+      <app-success-check state="in"></app-success-check>
+      <p class="done-text">Categoría guardada</p>
+    }
+  </div>
+</ion-content>

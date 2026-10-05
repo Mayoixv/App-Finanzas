@@ -1,0 +1,67 @@
+<ion-content class="surface-light">
+  <div class="sheet" [class.is-saved]="saved()">
+    <header class="sheet-head">
+      <h1 class="screen-title">{{ isEdit() ? 'Editar presupuesto' : 'Nuevo presupuesto' }}</h1>
+      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    @if (isEdit()) {
+      <p class="fixed-category">
+        <span class="fixed-label">Categoría</span>
+        {{ categoryName() }}
+      </p>
+    } @else {
+      @if (categories().length === 0) {
+        <p class="hint">Todas tus categorías de gasto ya tienen presupuesto en {{ monthState.label() }}.</p>
+      }
+      <div class="field">
+        <ion-select
+          label="Categoría"
+          label-placement="stacked"
+          placeholder="Elige una categoría de gasto"
+          cancelText="Cancelar"
+          [value]="categoryId()"
+          (ionChange)="categoryId.set($event.detail.value)"
+        >
+          @for (c of categories(); track c.id) {
+            <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    }
+
+    <div class="field">
+      <ion-input
+        label="Límite para {{ monthState.label() }} ({{ currency() }})"
+        label-placement="stacked"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        placeholder="0.00"
+        [value]="limit()"
+        (ionInput)="limit.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
+      {{ isEdit() ? 'Guardar cambios' : 'Guardar presupuesto' }}
+    </button>
+
+    @if (isEdit()) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar presupuesto</button>
+    }
+  </div>
+
+  <div class="done" [class.visible]="saved()" aria-live="polite">
+    @if (saved()) {
+      <app-success-check state="in"></app-success-check>
+      <p class="done-text">Presupuesto guardado</p>
+    }
+  </div>
+</ion-content>

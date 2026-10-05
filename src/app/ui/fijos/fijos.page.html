@@ -1,0 +1,85 @@
+<ion-content class="surface-dark" [fullscreen]="true">
+  <header class="screen-head">
+    <h1 class="screen-title">Fijos</h1>
+    <app-month-switcher></app-month-switcher>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  @if (failed()) {
+    <p class="notice">No se pudieron leer los gastos fijos. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+  } @else if (rows(); as list) {
+    @if (list.length === 0) {
+      <section class="empty">
+        <p class="empty-title">Aún no tienes gastos fijos en {{ monthState.label() }}.</p>
+        <p class="empty-text">Toca el botón + para agregar el primero: alquiler, internet, una suscripción.</p>
+      </section>
+    } @else {
+      <section class="summary" aria-labelledby="pendiente-label">
+        @if (totals().pending > 0) {
+          <p id="pendiente-label" class="summary-label">Pendiente en {{ monthState.label() }}</p>
+          <p class="summary-amount">{{ money(totals().pending) }}</p>
+        } @else {
+          <p id="pendiente-label" class="summary-label">{{ monthState.label() }}</p>
+          <p class="summary-amount">Todo pagado</p>
+        }
+        <div
+          class="bar"
+          role="progressbar"
+          aria-label="Gastos fijos pagados"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="totals().percentPaid"
+        >
+          <span class="bar-fill" [style.width.%]="totals().percentPaid"></span>
+        </div>
+        <p class="summary-note">
+          Pagado {{ money(totals().paid) }} de {{ money(totals().total) }} · {{ percent(totals().percentPaid) }}
+        </p>
+      </section>
+
+      <ul class="list">
+        @for (row of list; track row.id) {
+          <li class="item">
+            <div class="item-head">
+              <div class="item-text">
+                <span class="item-name">{{ row.name }}</span>
+                <span class="item-detail" [class.urgent]="row.urgent">{{ row.detail }}</span>
+              </div>
+              <span class="item-amount">{{ row.amount }}</span>
+              <button type="button" class="edit" [attr.aria-label]="'Editar ' + row.name" (click)="edit(row)">
+                <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+              </button>
+            </div>
+
+            <div class="item-foot">
+              @if (row.paid) {
+                <span class="chip paid">
+                  <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+                  Pagado
+                </span>
+                @if (flashId() === row.id) {
+                  <app-success-check state="in"></app-success-check>
+                }
+              } @else {
+                <span class="chip pending">
+                  <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+                  Pendiente
+                </span>
+                <button
+                  type="button"
+                  class="btn-secondary pay"
+                  [attr.aria-label]="'Marcar ' + row.name + ' como pagado'"
+                  [disabled]="payingId() === row.id"
+                  (click)="pay(row)"
+                >
+                  Marcar como pagado
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</ion-content>

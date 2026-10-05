@@ -1,0 +1,45 @@
+<section class="card" aria-labelledby="presupuestos-title">
+  <h2 id="presupuestos-title" class="section-title">Presupuestos de {{ monthState.label() }}</h2>
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  @if (failed()) {
+    <p class="card-empty">No se pudieron leer los presupuestos de este mes.</p>
+  } @else if (rows(); as list) {
+    @if (list.length > 0) {
+      <ul class="budgets">
+        @for (b of list; track b.budget.id) {
+          <li>
+            <button
+              type="button"
+              class="budget"
+              [attr.aria-label]="'Editar presupuesto de ' + b.name + '. ' + b.text"
+              (click)="edit(b)"
+            >
+              <span class="budget-head">
+                <span class="budget-name">{{ b.name }}</span>
+                <span class="budget-amounts">{{ money(b.spent) }} de {{ money(b.limit) }}</span>
+              </span>
+              <span class="bar" aria-hidden="true">
+                <span [class]="'bar-fill ' + b.state" [style.width.%]="b.bar"></span>
+              </span>
+              <span [class]="'budget-text ' + b.state">
+                @if (b.state === 'exceeded') {
+                  <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+                }
+                {{ b.text }}
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="card-empty">Ponle un límite a una categoría de gasto y aquí verás cuánto te queda.</p>
+      @if (previousCount() > 0) {
+        <button type="button" class="btn-secondary action" (click)="copyPrevious()">
+          Copiar los de {{ previousLabel() }}
+        </button>
+      }
+    }
+    <button type="button" class="btn-secondary action" (click)="add()">Agregar presupuesto</button>
+  }
+</section>

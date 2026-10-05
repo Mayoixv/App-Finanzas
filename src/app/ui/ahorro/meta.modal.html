@@ -1,0 +1,52 @@
+<ion-content class="surface-light">
+  <div class="sheet" [class.is-saved]="saved()">
+    <header class="sheet-head">
+      <h1 class="screen-title">{{ isEdit() ? 'Editar meta' : 'Nueva meta' }}</h1>
+      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    <div class="field">
+      <ion-input
+        label="Nombre"
+        label-placement="stacked"
+        placeholder="Fondo de emergencia, viaje, inicial del carro"
+        [value]="name()"
+        (ionInput)="name.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    <div class="field">
+      <ion-input
+        label="Cuánto quieres juntar ({{ currency() }})"
+        label-placement="stacked"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        placeholder="0.00"
+        [value]="target()"
+        (ionInput)="target.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
+      {{ isEdit() ? 'Guardar cambios' : 'Guardar meta' }}
+    </button>
+
+    @if (isEdit()) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar meta</button>
+    }
+  </div>
+
+  <div class="done" [class.visible]="saved()" aria-live="polite">
+    @if (saved()) {
+      <app-success-check state="in"></app-success-check>
+      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Meta guardada' }}</p>
+    }
+  </div>
+</ion-content>

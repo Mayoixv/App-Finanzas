@@ -1,0 +1,110 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <h1 class="screen-title">Ahorro</h1>
+    <app-month-switcher></app-month-switcher>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  @if (failed()) {
+    <p class="notice">No se pudieron leer tus ahorros. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+  } @else if (view(); as v) {
+    <section class="hero" aria-labelledby="ahorro-label">
+      <p id="ahorro-label" class="hero-label">Ahorrado en {{ monthState.label() }}</p>
+      <p class="hero-amount">{{ money(v.summary.saved) }}</p>
+      <p class="hero-note">
+        @if (v.summary.income > 0) {
+          {{ percent(v.summary.savingsPercent) }} del ingreso · {{ ratingText[v.summary.rating] }}
+        } @else {
+          Sin ingresos este mes, no hay porcentaje de ahorro.
+        }
+      </p>
+    </section>
+
+    @if (v.goals.length === 0) {
+      <section class="empty">
+        <p class="empty-title">Aún no tienes metas de ahorro.</p>
+        <p class="empty-text">Toca el botón + para crear la primera, por ejemplo un fondo de emergencia.</p>
+      </section>
+    } @else {
+      <app-pill-toggle class="views" label="Ver ahorro" [options]="viewOptions" [(value)]="view1or2"></app-pill-toggle>
+
+      <app-page-slide [page]="page()">
+        <div page1>
+          <h2 class="sr-only">Metas, ahorro acumulado</h2>
+          <ul class="goals">
+            @for (g of v.goals; track g.goal.id) {
+              <li class="goal">
+                <div class="goal-head">
+                  <span class="goal-name">{{ g.goal.name }}</span>
+                  <button type="button" class="edit" [attr.aria-label]="'Editar ' + g.goal.name" (click)="form.openGoal(g.goal)">
+                    <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                  </button>
+                </div>
+                <p class="goal-amounts">
+                  <span class="goal-saved">{{ money(g.saved) }}</span>
+                  de {{ money(g.goal.targetAmount) }}
+                </p>
+                <div
+                  class="bar"
+                  role="progressbar"
+                  [attr.aria-label]="'Progreso de ' + g.goal.name"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [attr.aria-valuenow]="barWidth(g.percent)"
+                >
+                  <span class="bar-fill" [class.reached]="g.reached" [style.width.%]="barWidth(g.percent)"></span>
+                </div>
+                <div class="goal-foot">
+                  @if (g.reached) {
+                    <span class="chip reached">
+                      <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+                      Meta cumplida
+                    </span>
+                  } @else {
+                    <span class="goal-meta">
+                      {{ percent(g.percent) }}
+                      @if (g.savedThisMonth > 0) {
+                        · +{{ money(g.savedThisMonth) }} este mes
+                      }
+                    </span>
+                  }
+                  <button type="button" class="btn-secondary contribute" [attr.aria-label]="'Aportar a ' + g.goal.name" (click)="form.openContribution(g.goal)">
+                    Aportar
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+
+        </div>
+
+        <div page2>
+          <h2 class="sr-only">Aportes de {{ monthState.label() }}</h2>
+          @if (v.contributions.length > 0) {
+            <ul class="rows">
+              @for (c of v.contributions; track c.contribution.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="row"
+                    [attr.aria-label]="'Eliminar aporte de ' + money(c.contribution.amount) + ' a ' + c.goalName"
+                    (click)="confirmDeleteContribution(c)"
+                  >
+                    <span class="row-text">
+                      <span class="row-title">{{ c.goalName }}</span>
+                      <span class="row-sub">{{ day(c.contribution.date) }}</span>
+                    </span>
+                    <span class="row-amount">{{ money(c.contribution.amount) }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="page-empty">Sin aportes en {{ monthState.label() }}. Toca Aportar en una meta para registrar uno.</p>
+          }
+        </div>
+      </app-page-slide>
+    }
+  }
+</ion-content>

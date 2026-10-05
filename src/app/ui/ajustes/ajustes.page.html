@@ -1,0 +1,69 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <a routerLink="/tabs/inicio" class="back" aria-label="Volver a Inicio">
+      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+      Inicio
+    </a>
+    <h1 class="screen-title">Ajustes</h1>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  <section class="block" aria-labelledby="moneda-title">
+    <h2 id="moneda-title" class="section-title">Moneda</h2>
+    <div class="anchor">
+      <button
+        type="button"
+        class="select"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="currencyOpen()"
+        [attr.aria-label]="'Moneda: ' + currencyLabel() + '. Cambiar'"
+        (click)="currencyOpen.set(!currencyOpen())"
+      >
+        {{ currencyLabel() }}
+        <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="currencyOpen()"></ion-icon>
+      </button>
+      <app-dropdown class="currency-menu" origin="top-left" label="Moneda" [(open)]="currencyOpen">
+        @for (c of currencies; track c.code) {
+          <button
+            type="button"
+            role="menuitemradio"
+            class="t-menu-item"
+            [attr.aria-checked]="currencyState.currency() === c.code"
+            (click)="setCurrency(c.code)"
+          >
+            {{ c.label }}
+            @if (currencyState.currency() === c.code) {
+              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+            }
+          </button>
+        }
+      </app-dropdown>
+    </div>
+    <p class="note">Solo cambia el símbolo con que se muestran los montos. Los montos guardados no se convierten.</p>
+  </section>
+
+  <section class="block" aria-labelledby="categorias-title">
+    <h2 id="categorias-title" class="section-title">Categorías</h2>
+    @if (failed()) {
+      <p class="note">No se pudieron leer las categorías. Vuelve a abrir Ajustes.</p>
+    } @else {
+      @for (g of groups(); track g.type) {
+        <h3 class="group-title">{{ g.title }}</h3>
+        <ul class="rows">
+          @for (c of g.items; track c.id) {
+            <li>
+              <button type="button" class="row" [attr.aria-label]="'Editar categoría ' + c.name" (click)="openCategory(c)">
+                <span class="row-title">{{ c.name }}</span>
+                <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+              </button>
+            </li>
+          } @empty {
+            <li class="row-empty">Sin categorías de este tipo.</li>
+          }
+        </ul>
+      }
+      <button type="button" class="btn-secondary add" (click)="openCategory()">Agregar categoría</button>
+    }
+  </section>
+</ion-content>
