@@ -120,7 +120,7 @@ No hacer:
 
 ## 10. Transiciones (Transitions.dev)
 
-Solo hay cinco transiciones aprobadas. Todas responden a una acción del usuario (tocar una pestaña, guardar algo, abrir un menú, cambiar de mes),
+Solo hay nueve transiciones aprobadas (10.1 a 10.9). Todas responden a una acción del usuario (tocar una pestaña, guardar algo, abrir un menú, cambiar de mes),
 así que no cuentan como animación decorativa. Cualquier otra transición nueva se consulta antes de agregarla.
 Todas respetan `prefers-reduced-motion` (ya incluido en el CSS).
 
@@ -556,3 +556,47 @@ Notas:
 - El signo menos y el símbolo de moneda son estáticos. Con balance negativo, mostrar además un chip
   ("Negativo, gastas más de lo que ganas") en `--negative`; no colorear el número, porque el rojo pierde contraste sobre el degradado violeta.
 - El texto real del balance va siempre en el `<span class="sr-only">`, porque el lector de pantalla no debe leer las columnas.
+
+### 10.6 Hojas y pantallas
+
+Dónde: todos los formularios (`ion-modal`) y el cambio entre pantallas fuera de las pestañas (Ajustes, Deudas, Bienvenida).
+Está en `src/app/ui/motion.ts` y se registra en `main.ts` con `provideIonicAngular({ modalEnter, modalLeave, navAnimation })`.
+
+- Hoja al abrir: sube desde abajo (`translateY(100%)` a `0`) en 440 ms con `cubic-bezier(0.22, 1, 0.36, 1)`, y el fondo
+  se oscurece a la vez. Al cerrar: baja en 260 ms con `cubic-bezier(0.4, 0, 1, 1)`. La hoja mantiene `opacity: 1`
+  (en modo Android Ionic la deja casi transparente si la animación no la fija).
+- Pantalla al avanzar: la nueva entra desde la derecha (`translateX(100%)`) y la anterior se corre a `-25%` con opacidad 0.5,
+  en 380 ms. Al volver, al revés. Las pestañas no usan esta transición (su outlet tiene `[animated]="false"`; ver 10.1).
+- Pasos de la bienvenida: cada paso entra con `translateX(40px)` y opacidad 0, en 420 ms.
+
+### 10.7 Filas que entran y salen
+
+Dónde: Movimientos, Fijos, Ahorro (metas y aportes), Deudas (deudas y pagos), presupuestos y últimos movimientos de Inicio.
+Cuándo corre: solo en el momento siguiente a guardar, borrar o deshacer (`MonthState.animateLists`, 1.5 s tras
+`notifyChange()`). Al cambiar de mes o de filtro, la lista lleva `.t-still` y las filas se reemplazan sin animación.
+
+```html
+<ul [class.t-still]="!monthState.animateLists()" class="rows">
+  @for (row of rows(); track row.id) {
+    <li animate.enter="t-row-enter" animate.leave="t-row-leave">…</li>
+  }
+</ul>
+```
+
+- Entrada: la fila se abre de altura 0 a `auto` con opacidad y `translateY(-6px) scale(0.98)`, en 360 ms.
+- Salida: se cierra a altura 0 y se va hacia la derecha (`translateX(24px)`), en 280 ms.
+- Animar hasta `height: auto` usa `interpolate-size: allow-keywords` en `:root`; donde no exista, la fila solo se desvanece.
+
+### 10.8 Barras y dona que crecen
+
+- `.bar-fill` (presupuestos, metas, fijos, deudas): al aparecer se llena desde la izquierda (`scaleX(0)` a `1`) en 700 ms.
+  Si cambia el valor, el ancho ya tiene su propia transición.
+- Dona de gastos: entra girando desde `rotate(-120deg) scale(0.85)` en 800 ms; al cambiar los datos, cada arco ajusta
+  `stroke-dasharray` y `stroke-dashoffset` en 600 ms (por eso van como `[style.…]`, no como atributos).
+
+### 10.9 Respuesta al tocar
+
+- Filas, tarjetas tocables, opciones y botones de ícono (`.row`, `.budget`, `.payment`, `.choice`, `.kind button`,
+  `.edit`, `.close`) se hunden a `scale(0.97)` mientras se presionan, en 140 ms. Los botones `.btn-*` ya lo hacen a 0.98.
+- PIN: cada bolita rebota a `scale(1.35)` al llenarse (220 ms); con PIN incorrecto, la fila de bolitas tiembla de lado
+  a lado (±10 px, 420 ms).
