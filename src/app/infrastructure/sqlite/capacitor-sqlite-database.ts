@@ -18,7 +18,20 @@ async function initWeb(sqlite: SQLiteConnection): Promise<void> {
 }
 
 export class CapacitorSqliteDatabase implements SqlDatabase {
+  /**
+   * Cola de operaciones: el plugin abre una transacción por cada escritura y dos al mismo tiempo fallan
+   * ("cannot start a transaction within a transaction"), por ejemplo cuando dos tarjetas de Inicio crean a la vez
+   * los fijos del mes. Se ejecutan de una en una.
+   */
+  private queue: Promise<unknown> = Promise.resolve();
+
   private constructor(private readonly conn: SQLiteDBConnection) {}
+
+  private serial<T>(work: () => Promise<T>): Promise<T> {
+    const next = this.queue.then(work, work);
+    this.queue = next.catch(() => undefined);
+    return next;
+  }
 
   static async open(name = 'finanzas'): Promise<CapacitorSqliteDatabase> {
     const sqlite = new SQLiteConnection(CapacitorSQLite);
@@ -34,20 +47,20 @@ export class CapacitorSqliteDatabase implements SqlDatabase {
   }
 
   async run(sql: string, params: SqlValue[] = []): Promise<void> {
-    await this.conn.run(sql, params);
+    await this.serial(() => this.conn.run(sql, params));
   }
 
   async all<T>(sql: string, params: SqlValue[] = []): Promise<T[]> {
-    const res = await this.conn.query(sql, params);
+    const res = await this.serial(() => this.conn.query(sql, params));
     return (res.values ?? []) as T[];
   }
 
   async batch(statements: SqlStatement[]): Promise<void> {
-    await this.conn.executeSet(
+    await this.serial(() => this.conn.executeSet(
       statements.map((s) =>
         typeof s === 'string' ? { statement: s, values: [] } : { statement: s.sql, values: s.params },
       ),
       true,
-    );
+    ));
   }
 }

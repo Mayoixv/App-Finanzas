@@ -17,6 +17,7 @@
         <p class="empty-title">Aún no registras movimientos en {{ monthState.label() }}.</p>
         <p class="empty-text">Toca el botón + para registrar el primero y aquí verás tu balance y en qué se va el gasto.</p>
       </section>
+      <app-alerts-row></app-alerts-row>
     } @else {
       <section class="hero" aria-labelledby="balance-label">
         <p id="balance-label" class="hero-label">Balance de {{ monthState.label() }}</p>
@@ -49,6 +50,8 @@
           }
         </p>
       </section>
+
+      <app-alerts-row></app-alerts-row>
 
       <section class="card" aria-labelledby="gasto-title">
         <h2 id="gasto-title" class="section-title">¿En qué se va el gasto?</h2>

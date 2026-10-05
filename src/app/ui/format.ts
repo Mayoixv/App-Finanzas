@@ -2,10 +2,10 @@ import { Currency } from '../domain/currency';
 import { Cents } from '../domain/money';
 import { addMonths, dateInMonth, daysBetween, IsoDate, MonthKey, monthOf } from '../domain/month';
 
-const formatters: Record<Currency, Intl.NumberFormat> = {
-  DOP: new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }),
-  USD: new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'USD' }),
-};
+// El símbolo va fijo: el WebView de Android trae datos de idioma recortados y con style 'currency'
+// escribe "DOP 12.50" en vez de "RD$12.50".
+const SYMBOLS: Record<Currency, string> = { DOP: 'RD$', USD: 'US$' };
+const number = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 let currency: Currency = 'DOP';
 
 /** Se llama al arrancar y al cambiar la moneda en Ajustes. */
@@ -19,7 +19,8 @@ export function displayCurrency(): Currency {
 
 /** Recibe centavos: formatMoney(1250) muestra RD$12.50. */
 export function formatMoney(cents: Cents): string {
-  return formatters[currency].format(cents / 100);
+  const text = `${SYMBOLS[currency]}${number.format(Math.abs(cents) / 100)}`;
+  return cents < 0 ? `-${text}` : text;
 }
 
 /** Convierte lo escrito en un campo de monto a centavos; null si no es un monto válido mayor que cero. */

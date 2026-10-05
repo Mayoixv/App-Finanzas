@@ -3,13 +3,10 @@ import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { Budget, BudgetStatus } from '../../domain/budget';
+import { Budget, budgetLevel, BudgetStatus } from '../../domain/budget';
 import { formatMoney, monthLabel, shiftMonth } from '../format';
 import { MonthState } from '../month-state';
 import { BudgetFormService } from './budget-form.service';
-
-/** Desde este porcentaje del límite la barra pasa a ámbar como aviso. */
-const BUDGET_WARNING_PERCENT = 85;
 
 interface BudgetRow {
   budget: Budget;
@@ -102,7 +99,7 @@ export class BudgetsCardComponent {
 function toRow(budget: Budget, status: BudgetStatus, name = 'Categoría'): BudgetRow {
   const { spent, limit, remaining, carry } = status;
   const percent = limit > 0 ? (spent / limit) * 100 : spent > 0 ? 100 : 0;
-  const state = status.exceeded ? 'exceeded' : percent >= BUDGET_WARNING_PERCENT ? 'warning' : 'ok';
+  const state = budgetLevel(status);
   const left = state === 'exceeded' ? `Te pasaste por ${formatMoney(-remaining)}` : `Te quedan ${formatMoney(remaining)}`;
   const carried =
     carry > 0 ? ` · incluye ${formatMoney(carry)} del mes pasado` : carry < 0 ? ` · descuenta ${formatMoney(-carry)} del mes pasado` : '';

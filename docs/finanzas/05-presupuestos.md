@@ -61,7 +61,7 @@
 
 **Funciones:**
 - [x] [MVP] Barra ámbar desde el 85% y roja con ícono y texto al pasarse.
-- [ ] [MVP] Llevar estas alertas a la fila de alertas de Inicio.
+- [x] [MVP] Llevar estas alertas a la fila de alertas de Inicio.
 - [ ] [Después] Notificación local al cruzar el 85% y el 100% (una vez por umbral y mes).
 
 **Campos y datos:** umbral fijo del 85% (constante `BUDGET_WARNING_PERCENT`). [Después] configurable entre 50% y 95%.

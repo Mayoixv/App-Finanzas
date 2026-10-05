@@ -18,6 +18,7 @@ import {
   SaveDebt,
 } from './application/use-cases/debts';
 import { Onboarding } from './application/use-cases/onboarding';
+import { GetAlerts } from './application/use-cases/get-alerts';
 import { GetUpcomingRecurring } from './application/use-cases/get-upcoming-recurring';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './application/use-cases/pause-recurring-expense';
 import { CurrencySettings } from './application/use-cases/currency-settings';
@@ -117,6 +118,7 @@ export interface AppContainer {
   registerDebtPayment: RegisterDebtPayment;
   deleteDebtPayment: DeleteDebtPayment;
   onboarding: Onboarding;
+  getAlerts: GetAlerts;
 }
 
 export const APP_CONTAINER = new InjectionToken<AppContainer>('AppContainer');
@@ -125,6 +127,8 @@ export const uuidGenerator: IdGenerator = { next: () => crypto.randomUUID() };
 
 export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGenerator): AppContainer {
   const getMonthRecurringExpenses = new GetMonthRecurringExpenses(repos.recurring);
+  const getBudgetStatuses = new GetBudgetStatuses(repos.budgets, repos.transactions);
+  const getUpcomingRecurring = new GetUpcomingRecurring(getMonthRecurringExpenses);
   return {
     categories: repos.categories,
     transactions: repos.transactions,
@@ -143,7 +147,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     deleteSavingsGoal: new DeleteSavingsGoal(repos.savings),
     addSavingsContribution: new AddSavingsContribution(repos.savings, ids),
     deleteSavingsContribution: new DeleteSavingsContribution(repos.savings),
-    getBudgetStatuses: new GetBudgetStatuses(repos.budgets, repos.transactions),
+    getBudgetStatuses,
     setBudget: new SetBudget(repos.budgets, repos.categories, ids),
     deleteBudget: new DeleteBudget(repos.budgets),
     copyBudgets: new CopyBudgets(repos.budgets, ids),
@@ -162,7 +166,8 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     settings: repos.settings,
     pauseRecurringExpense: new PauseRecurringExpense(repos.recurring),
     resumeRecurringExpense: new ResumeRecurringExpense(repos.recurring),
-    getUpcomingRecurring: new GetUpcomingRecurring(getMonthRecurringExpenses),
+    getUpcomingRecurring,
+    getAlerts: new GetAlerts(getUpcomingRecurring, getBudgetStatuses, repos.categories),
     saveDebt: new SaveDebt(repos.debts, ids),
     deleteDebt: new DeleteDebt(repos.debts),
     getDebtsOverview: new GetDebtsOverview(repos.debts),

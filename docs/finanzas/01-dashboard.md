@@ -84,7 +84,7 @@ Pantalla oscura con un solo protagonista: la tarjeta de balance. Desde ella se l
 - [x] [MVP] Balance negativo: aviso con ícono en la tarjeta de balance.
 - [x] [MVP] Presupuesto pasado o cerca del límite: barra ámbar desde el 85% y roja al pasarse, con texto.
 - [x] [MVP] Gastos fijos vencidos o por vencer en 3 días o menos, marcados en ámbar en Fijos.
-- [ ] [MVP] Fila de alertas en Inicio que reúna las tres: "2 fijos vencen esta semana", "Te pasaste en Ocio".
+- [x] [MVP] Fila de alertas en Inicio que reúna las tres: "2 fijos vencen esta semana", "Te pasaste en Ocio".
 - [ ] [Después] Notificaciones del sistema para estas mismas alertas (ver [Notificaciones](13-notificaciones.md)).
 
 **Campos y datos:** se derivan de presupuestos, instancias de gastos fijos y resumen. No se guardan.

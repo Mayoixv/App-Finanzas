@@ -9,7 +9,7 @@
 **Propósito:** sacar todos los datos del teléfono, para respaldarlos, analizarlos en Excel o cambiar de app.
 
 **Funciones:**
-- [ ] [MVP] Exportación completa en JSON: todas las tablas, con la versión del esquema.
+- [x] [MVP] Exportación completa en JSON: todas las tablas, con la versión del esquema (es el respaldo cifrado).
 - [ ] [MVP] Exportar movimientos a CSV (todos o por rango de meses).
 - [ ] [Después] Exportar un mes o un reporte a PDF.
 
@@ -35,7 +35,7 @@
 - [ ] [Después] Elegir un archivo `.csv` o `.xlsx`.
 - [ ] [Después] Mapear columnas: fecha, monto, descripción y, opcionalmente, categoría y tipo.
 - [ ] [Después] Vista previa con errores y duplicados marcados.
-- [ ] [Después] Restaurar una exportación JSON completa (ver [Respaldos](16-respaldos.md)).
+- [x] [Después] Restaurar una exportación JSON completa (ver [Respaldos](16-respaldos.md)).
 
 **Campos y datos:**
 - **Formato de fecha:** elegible entre `DD/MM/AAAA`, `AAAA-MM-DD` y `MM/DD/AAAA`.

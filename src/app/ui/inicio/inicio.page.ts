@@ -13,6 +13,7 @@ import { MonthState } from '../month-state';
 import { TransactionFormService } from '../movimientos/transaction-form.service';
 import { BudgetsCardComponent } from '../presupuestos/budgets-card.component';
 import { UpcomingCardComponent } from '../fijos/upcoming-card.component';
+import { AlertsRowComponent } from './alerts-row.component';
 import { BalanceReelComponent } from '../balance-reel.component';
 import { ExpenseDonutComponent } from './expense-donut.component';
 
@@ -45,6 +46,7 @@ interface RecentRow {
     BudgetsCardComponent,
     BalanceReelComponent,
     UpcomingCardComponent,
+    AlertsRowComponent,
   ],
 })
 export class InicioPage {

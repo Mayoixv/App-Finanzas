@@ -19,6 +19,7 @@ import { GetMonthRecurringExpenses } from './get-month-recurring-expenses';
 import { GetSavingsOverview } from './get-savings-overview';
 import { GetUpcomingRecurring } from './get-upcoming-recurring';
 import { Onboarding } from './onboarding';
+import { GetAlerts } from './get-alerts';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './pause-recurring-expense';
 import { SetBudget } from './set-budget';
 import { UpdateRecurringExpense } from './update-recurring-expense';
@@ -193,5 +194,36 @@ describe('bienvenida', () => {
 
     await new AddTransaction(s.transactions, s.categories, s.ids).execute({ date: '2026-10-01', amount: 100, categoryId: 'com' });
     expect(await new Onboarding(new InMemorySettings(), s.transactions, s.recurring).needed()).toBe(false);
+  });
+});
+
+describe('alertas de Inicio', () => {
+  it('junta fijos vencidos y por vencer (sin ingresos) y presupuestos en aviso o pasados', async () => {
+    const s = setup();
+    s.categories.items.set('oci', { id: 'oci', name: 'Ocio', type: 'variable' });
+    const add = new AddRecurringExpense(s.recurring, s.categories, s.ids);
+    await add.execute({ name: 'Luz', amount: 100, categoryId: 'ren', dueDay: 2, startMonth: '2026-10' });
+    await add.execute({ name: 'Internet', amount: 100, categoryId: 'ren', dueDay: 12, startMonth: '2026-10' });
+    await add.execute({ name: 'Gym', amount: 100, categoryId: 'ren', dueDay: 20, startMonth: '2026-10' });
+    await add.execute({ name: 'Sueldo', amount: 100, categoryId: 'sal', dueDay: 11, startMonth: '2026-10' });
+    const set = new SetBudget(s.budgets, s.categories, s.ids);
+    const tx = new AddTransaction(s.transactions, s.categories, s.ids);
+    await set.execute({ categoryId: 'com', month: '2026-10', limit: 1_000 });
+    await set.execute({ categoryId: 'oci', month: '2026-10', limit: 1_000 });
+    await tx.execute({ date: '2026-10-05', amount: 1_200, categoryId: 'com' });
+    await tx.execute({ date: '2026-10-05', amount: 900, categoryId: 'oci' });
+
+    const recurring = new GetMonthRecurringExpenses(s.recurring);
+    const alerts = new GetAlerts(
+      new GetUpcomingRecurring(recurring),
+      new GetBudgetStatuses(s.budgets, s.transactions),
+      s.categories,
+    );
+    expect(await alerts.execute('2026-10-10')).toEqual({
+      overdue: ['Luz'],
+      dueSoon: ['Internet'],
+      exceeded: ['Comida'],
+      nearLimit: ['Ocio'],
+    });
   });
 });

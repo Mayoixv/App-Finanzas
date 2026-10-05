@@ -22,3 +22,14 @@ export function budgetStatus(budget: Budget, spent: number, carry = 0): BudgetSt
   const limit = budget.limit + carry;
   return { limit, carry, spent, remaining: limit - spent, exceeded: spent > limit };
 }
+
+/** Desde este porcentaje del límite el presupuesto pasa a aviso (ámbar). */
+export const BUDGET_WARNING_PERCENT = 85;
+
+export type BudgetLevel = 'ok' | 'warning' | 'exceeded';
+
+export function budgetLevel(status: BudgetStatus): BudgetLevel {
+  if (status.exceeded) return 'exceeded';
+  const percent = status.limit > 0 ? (status.spent / status.limit) * 100 : status.spent > 0 ? 100 : 0;
+  return percent >= BUDGET_WARNING_PERCENT ? 'warning' : 'ok';
+}

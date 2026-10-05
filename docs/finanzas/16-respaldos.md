@@ -11,8 +11,8 @@ Hoy no existe ningún respaldo: si se pierde o se resetea el teléfono, se pierd
 **Propósito:** poder recuperar todo en otro teléfono o tras un reinicio de fábrica.
 
 **Funciones:**
-- [ ] [MVP] "Crear respaldo": genera la exportación JSON completa ([Exportar](12-importar-exportar.md#exportar)) cifrada con una contraseña y la comparte (Drive, correo, archivos).
-- [ ] [MVP] "Restaurar respaldo": elegir el archivo, escribir la contraseña, ver un resumen (cuántos movimientos y de qué meses) y confirmar.
+- [x] [MVP] "Crear respaldo": genera la exportación JSON completa ([Exportar](12-importar-exportar.md#exportar)) cifrada con una contraseña y la comparte (Drive, correo, archivos).
+- [x] [MVP] "Restaurar respaldo": elegir el archivo, escribir la contraseña, ver un resumen (cuántos movimientos y de qué meses) y confirmar.
 - [ ] [MVP] Respaldo automático local antes de cada migración que cambie datos.
 - [ ] [Después] Respaldo automático semanal a una carpeta elegida por el usuario (Storage Access Framework de Android).
 

@@ -11,7 +11,7 @@ La app no tiene cuentas en línea. La seguridad es del teléfono hacia adentro. 
 **Propósito:** que nadie con el teléfono en la mano vea las finanzas.
 
 **Funciones:**
-- [ ] [MVP] Activar un PIN de 4 a 6 dígitos.
+- [x] [MVP] Activar un PIN de 4 a 6 dígitos.
 - [ ] [MVP] Desbloqueo con huella o rostro (biometría de Android), con el PIN como respaldo.
 - [ ] [MVP] Bloquear al abrir y al volver de segundo plano tras 1 minuto (configurable: inmediato, 1, 5 o 15 minutos).
 - [ ] [MVP] Ocultar el contenido en la vista de apps recientes e impedir capturas (`FLAG_SECURE`), con un interruptor.

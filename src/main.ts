@@ -29,6 +29,9 @@ async function start() {
 
 start().catch((error) => {
   console.error(error);
-  document.body.textContent =
-    'No se pudo abrir la base de datos local. Cierra y vuelve a abrir la aplicación.';
+  // El detalle técnico va debajo para poder diagnosticar fallos que solo pasan en el teléfono.
+  const detail = error instanceof Error ? error.message : String(error);
+  document.body.style.cssText = 'padding:24px;font-family:sans-serif;color:#14121f;background:#e2deee';
+  document.body.innerText =
+    'No se pudo abrir la base de datos local. Cierra y vuelve a abrir la aplicación.\n\nDetalle: ' + detail;
 });

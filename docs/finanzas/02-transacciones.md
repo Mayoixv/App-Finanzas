@@ -15,7 +15,7 @@
 - [x] [MVP] Eliminar con confirmación. Si era el pago de un gasto fijo, ese fijo vuelve a Pendiente.
 - [x] [MVP] Lista del mes ordenada de más reciente a más antigua, con ingresos en verde y signo `+`.
 - [ ] [MVP] Cuenta de origen o destino (ver [Cuentas](03-cuentas.md)).
-- [ ] [Después] Recordar la última categoría usada por tipo.
+- [x] [Después] Recordar la última categoría usada por tipo.
 
 **Campos y datos:**
 
@@ -35,7 +35,7 @@
 - Crear, editar, duplicar y eliminar. No hay archivado.
 - **Vacío:** "Sin movimientos en {mes}".
 - **Error de lectura**, y check de éxito al guardar.
-- [ ] [MVP] "Deshacer" durante 5 s tras eliminar (borrado lógico).
+- [x] [MVP] "Deshacer" durante 5 s tras eliminar (se guarda una copia y se restaura, con sus fotos).
 
 **Casos borde y errores:**
 - Monto 0, negativo o texto: el botón Guardar queda desactivado.
@@ -70,7 +70,7 @@
 **Propósito:** repartir un pago entre varias categorías (por ejemplo, una compra de supermercado con comida y limpieza).
 
 **Funciones:**
-- [ ] [Después] Agregar partes con categoría y monto.
+- [x] [Después] Agregar partes con categoría y monto.
 - [ ] [Después] Mostrar lo que falta por asignar.
 
 **Campos y datos:** `transaction_splits` (`transaction_id`, `category_id`, `amount`). La suma de las partes es igual al total, al centavo.
@@ -89,7 +89,7 @@
 
 **Funciones:**
 - [x] [MVP] Nota de texto libre.
-- [ ] [Después] Foto del recibo (cámara o galería), guardada en el almacenamiento privado de la app.
+- [x] [Después] Foto del recibo (cámara o galería), hasta 3, reducida y guardada en la base local.
 
 **Campos y datos:** `note` TEXT. Adjuntos: `attachments` (`transaction_id`, `path`, `mime`), con un máximo de 3 por movimiento y 5 MB por imagen.
 
@@ -120,8 +120,8 @@
 **Propósito:** encontrar un movimiento sin recorrer meses.
 
 **Funciones:**
-- [ ] [MVP] Buscar por texto en la nota y el nombre de la categoría, dentro del mes visto.
-- [ ] [MVP] Filtrar por categoría y por tipo.
+- [x] [MVP] Buscar por texto en la nota y el nombre de la categoría, dentro del mes visto.
+- [x] [MVP] Filtrar por categoría y por tipo.
 - [ ] [Después] Buscar en todos los meses; filtrar por rango de montos, fechas, cuenta y etiqueta.
 
 **Campos y datos:** consulta con `LIKE` sobre `note` (con un índice si pasa de 10,000 filas).
