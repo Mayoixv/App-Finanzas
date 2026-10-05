@@ -22,19 +22,13 @@ tipografía son estimados a ojo desde una captura, así que ajústalos si el res
 | `--violet-900` | `#2A1478` | Fondo del degradado profundo (hero, tarjetas destacadas) |
 | `--ink-950` | `#0A0A12` | Fondo de pantallas oscuras |
 | `--ink-800` | `#171722` | Tarjetas sobre fondo oscuro |
-| `--paper` | `#FFFFFF` | Solo texto o íconos sobre superficies de color. No se usa como fondo: es demasiado potente |
-| `--surface-soft` | `#E2DEEE` | Fondo de las pantallas claras (Movimientos, Ahorro, Ajustes y los formularios) |
-| `--surface-soft-card` | `#ECE9F6` | Tarjetas, campos y selectores sobre `--surface-soft` |
-| `--surface-soft-chip` | `#F6F4FC` | Círculos de ícono dentro de `--surface-soft-card` |
+| `--paper` | `#FFFFFF` | Fondo de pantallas claras |
 | `--lavender-100` | `#EFEAFF` | Superficies suaves sobre fondo claro |
 | `--text-on-dark` | `#F4F2FF` | Texto sobre oscuro |
 | `--text-on-light` | `#14121F` | Texto sobre claro |
-| `--muted` | `#8C88A6` | Texto secundario sobre fondos oscuros (5.2:1 sobre `--ink-800`) |
-| `--muted-on-light` | `#5F5B7A` | Texto secundario sobre `--surface-soft` (4.9:1); el `--muted` no llega a 4.5:1 en claro |
-| `--positive` | `#2BD07F` | Ingresos, balance positivo, meta cumplida (sobre oscuro) |
-| `--positive-on-light` | `#0A6F40` | Igual, sobre `--surface-soft` (AA) |
-| `--negative` | `#FF5470` | Gastos pasados de presupuesto, balance negativo (sobre oscuro) |
-| `--negative-on-light` | `#B01E39` | Igual, sobre `--surface-soft` (AA) |
+| `--muted` | `#8C88A6` | Texto secundario |
+| `--positive` | `#2BD07F` | Ingresos, balance positivo, meta cumplida |
+| `--negative` | `#FF5470` | Gastos pasados de presupuesto, balance negativo |
 | `--warning` | `#FFB84D` | Gasto fijo pendiente cerca del vencimiento |
 
 Degradado de marca: `linear-gradient(160deg, #8F6BFF 0%, #6A3DF0 45%, #2A1478 100%)`.
@@ -72,18 +66,8 @@ Largo de línea menor a 80 caracteres. Las mayúsculas se reservan para titulare
 - **Barra de progreso de ahorro**: pista `rgba(255,255,255,.12)`, relleno con degradado violeta, el porcentaje al final.
 - **Fila de transacción**: ícono en círculo, nombre, nota en `--muted`, monto alineado a la derecha.
   Gasto fijo con chip "Pagado" (verde) o "Pendiente" (ámbar).
-- **Barra inferior**: píldora flotante oscura con 4 pestañas solo con texto (Inicio, Movimientos, Fijos, Ahorro);
-  cada una mide lo que su texto para caber en 360 px. El botón + redondo agrega lo que toca según la pestaña:
-  un movimiento, un gasto fijo o una meta de ahorro.
-- **Fijos (pantalla oscura)**: tarjeta con lo pendiente del mes, barra de lo pagado y una tarjeta por gasto con
-  vencimiento relativo (ámbar si faltan 3 días o menos), chip Pendiente/Pagado y "Marcar como pagado".
-- **Ahorro (pantalla clara)**: tarjeta de marca con lo ahorrado en el mes y su % del ingreso; control
-  "Acumulado / Este mes" (10.3): metas con barra de progreso (verde al cumplirse) y botón "Aportar", o los
-  aportes del mes.
-- **Presupuestos (tarjeta en Inicio)**: lo gastado contra el límite por categoría; barra ámbar desde el 85% y
-  roja con ícono al pasarse. Si el mes no tiene y el anterior sí, ofrece copiarlos.
-- **Ajustes (pantalla clara, fuera de las pestañas)**: desde el engranaje de Inicio. Moneda (DOP o USD, solo cambia
-  el símbolo; menú de 10.4) y categorías por tipo con alta, renombrar y eliminar (solo si nada la usa).
+- **Barra inferior**: 4 pestañas (Inicio, Mes, Ahorros, Resumen), píldora flotante oscura con la pestaña
+  activa resaltada en violeta.
 
 ## 5. Layout
 
@@ -136,13 +120,13 @@ No hacer:
 
 ## 10. Transiciones (Transitions.dev)
 
-Solo hay cuatro transiciones aprobadas. Todas responden a una acción del usuario (tocar una pestaña, guardar algo, abrir un menú),
+Solo hay cinco transiciones aprobadas. Todas responden a una acción del usuario (tocar una pestaña, guardar algo, abrir un menú, cambiar de mes),
 así que no cuentan como animación decorativa. Cualquier otra transición nueva se consulta antes de agregarla.
 Todas respetan `prefers-reduced-motion` (ya incluido en el CSS).
 
 ### 10.1 Pestañas con píldora deslizante (barra inferior)
 
-Dónde: la barra inferior (Inicio, Movimientos, Fijos, Ahorro). También el control de dos opciones de 10.3. Implementarla como componente propio
+Dónde: la barra inferior de 4 pestañas (Inicio, Mes, Ahorros, Resumen). Implementarla como componente propio
 de Angular con `<span class="t-tabs-pill">` y botones `.t-tab`, no con el `ion-tab-bar` por defecto.
 
 Cambios respecto al original, por las zonas táctiles de 48 px y la paleta del proyecto:
@@ -353,9 +337,6 @@ Si no, el contenedor colapsa a 0 px de alto.
 </div>
 ```
 
-Aplicado en: Ahorro, "Acumulado / Este mes" (componente `app-page-slide`). En la app no hay pestaña "Mes".
-Para que no colapse, las páginas usan `inset: 0 0 auto` y el contenedor toma la altura de la visible.
-
 Conexión: `vista` es `1` o `2` en el componente. El control que lo cambia puede reutilizar la píldora de 10.1.
 Poner `--page-exit-enabled: 0` si se quiere solo fundido, sin deslizamiento ni desenfoque.
 
@@ -413,10 +394,165 @@ Colocarlo con `position: absolute` junto al botón que lo abre y con `z-index` p
 </div>
 ```
 
-Aplicado en: selector de mes (cuadrícula de meses con cambio de año e "Ir al mes actual"), menú "⋯" de cada fila
-en Movimientos (Duplicar abre un movimiento nuevo con los mismos datos y la fecha de hoy) y moneda en Ajustes.
-Componente `app-dropdown`; cerca del final de la pantalla el menú "⋯" se abre hacia arriba (`bottom-right`).
-
 Conexión: al abrir, `abierto = true`. Al cerrar, `abierto = false`, `cerrando = true` y tras 150 ms (`--dropdown-close-dur`)
 `cerrando = false`. Cerrar al tocar fuera, al elegir una opción y con el botón atrás de Android.
-Cada fila usa `role="menuitem"`, y el botón que abre el menú lleva `aria-expanded` y `aria-haspopup="menu"`.ok
+Cada fila usa `role="menuitem"`, y el botón que abre el menú lleva `aria-expanded` y `aria-haspopup="menu"`.
+
+### 10.5 Contador giratorio (solo el balance final del mes)
+
+Dónde: SOLO el monto grande de "Balance final" en la tarjeta de balance de Inicio (la cifra más grande de la app).
+Los demás números (ingresos, gastos, totales del resumen, montos de las filas) se muestran estáticos.
+Cuándo corre: al abrir Inicio, al cambiar de mes y cuando guardar o borrar un movimiento cambia el balance.
+Si el valor no cambió, no se anima. Es la animación protagonista de esa pantalla, así que no agregar otras
+animaciones de entrada ahí.
+
+Dimensiones: el desvanecido de los bordes oculta el 22 % superior e inferior de la celda, por eso la celda debe ser
+más alta que el texto. Con el monto principal en 48 px de la fuente condensada (sección 3), la celda es de 72 px.
+Si se cambia el tamaño del monto, mantener la celda en 1.5 veces el `font-size`.
+
+```css
+:root {
+  --reel-dur: 1400ms;
+  --reel-cell: 72px;
+  --reel-spin-blur: 3px;
+  --reel-stagger: 90ms;
+  --reel-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.t-reel {
+  display: inline-flex;
+  align-items: center;
+  height: var(--reel-cell);
+  font-family: var(--font-display); /* la condensada de titulares; definirla junto a las demás variables */
+  font-weight: 800;
+  font-size: 48px;
+  line-height: 1;
+  color: var(--text-on-dark);
+  font-variant-numeric: tabular-nums;
+}
+.t-reel-col {
+  position: relative;
+  height: var(--reel-cell);
+  overflow: hidden;
+  /* Desvanece los bordes de la ventana en vez de recortarlos en seco. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
+}
+.t-reel-strip { display: flex; flex-direction: column; will-change: transform, filter; }
+.t-reel-digit { height: var(--reel-cell); display: flex; align-items: center; justify-content: center; }
+/* Caracteres que no giran: símbolo de moneda, comas, punto decimal y signo menos. */
+.t-reel-static { height: var(--reel-cell); display: flex; align-items: center; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-reel-strip { transition: none !important; filter: none !important; }
+}
+```
+
+```html
+<div class="balance-amount">
+  <div class="t-reel" #reel aria-hidden="true"></div>
+  <span class="sr-only" aria-live="polite">{{ balanceTexto }}</span>
+</div>
+```
+
+Cómo funciona: se formatea el balance con `Intl.NumberFormat("es-DO", { style: "currency", currency })` y se construye
+una columna por cada dígito. Cada columna recorta una tira con las cifras 0 a 9 repetidas y se desplaza hacia arriba
+`(vueltas * 10 + dígito)` celdas. El desenfoque de movimiento es un `feGaussianBlur` de SVG con `stdDeviation="0 Y"`
+(solo vertical, porque el `blur()` de CSS también ensucia hacia los lados), y baja a 0 en cada columna mientras se detiene.
+
+```ts
+// reel.ts — sin dependencias. Llamar desde ngAfterViewInit y cada vez que cambie el balance.
+const SPINS = 2;          // vueltas completas antes de caer en el dígito final
+const DIGITS = "0123456789";
+const NS = "http://www.w3.org/2000/svg";
+const mk = (tag: string, cls: string) => {
+  const e = document.createElement(tag);
+  e.className = cls;
+  return e;
+};
+
+export function renderReel(root: HTMLElement, text: string, prev: string = ""): void {
+  const css = getComputedStyle(document.documentElement);
+  const num = (v: string) => parseFloat(css.getPropertyValue(v));
+  const cell = num("--reel-cell"), dur = num("--reel-dur");
+  const stagger = num("--reel-stagger"), blur = num("--reel-spin-blur");
+
+  root.replaceChildren();
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    root.textContent = text;       // sin animación: el valor final directo
+    return;
+  }
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("width", "0");
+  svg.setAttribute("height", "0");
+  svg.style.position = "absolute";
+  const defs = document.createElementNS(NS, "defs");
+  svg.append(defs);
+  root.append(svg);
+
+  const sameLength = prev.length === text.length;
+  let n = 0; // índice entre las columnas de dígitos, para el escalonado
+
+  [...text].forEach((ch, i) => {
+    if (!DIGITS.includes(ch)) {
+      const s = mk("span", "t-reel-static");
+      s.textContent = ch;
+      root.append(s);
+      return;
+    }
+    const col = mk("span", "t-reel-col");
+    const strip = mk("span", "t-reel-strip");
+    for (let k = 0; k < SPINS * 10 + 10; k++) {
+      const d = mk("span", "t-reel-digit");
+      d.textContent = String(k % 10);
+      strip.append(d);
+    }
+    col.append(strip);
+    root.append(col);
+
+    const digit = Number(ch);
+    const prevDigit = sameLength && DIGITS.includes(prev[i]) ? Number(prev[i]) : 0;
+    if (sameLength && prev[i] === ch) {            // no cambió: queda quieto
+      strip.style.transform = `translateY(${-digit * cell}px)`;
+      return;
+    }
+
+    const f = document.createElementNS(NS, "filter");
+    f.id = `reel-blur-${i}`;
+    f.setAttribute("y", "-20%");
+    f.setAttribute("height", "140%");
+    const fe = document.createElementNS(NS, "feGaussianBlur");
+    fe.setAttribute("stdDeviation", `0 ${blur}`);
+    f.append(fe);
+    defs.append(f);
+    strip.style.filter = `url(#${f.id})`;
+
+    strip.style.transform = `translateY(${-prevDigit * cell}px)`;
+    void strip.offsetHeight;                       // fija el punto de partida antes de animar
+    const delay = n++ * stagger;
+    requestAnimationFrame(() => {
+      strip.style.transition = `transform ${dur}ms var(--reel-ease) ${delay}ms`;
+      strip.style.transform = `translateY(${-(SPINS * 10 + digit) * cell}px)`;
+    });
+
+    const t0 = performance.now() + delay;          // el desenfoque decae en la ventana de cada columna
+    const tick = (now: number) => {
+      const t = Math.min(Math.max((now - t0) / dur, 0), 1);
+      fe.setAttribute("stdDeviation", `0 ${blur * Math.pow(1 - t, 3)}`);
+      if (t < 1) requestAnimationFrame(tick);
+      else strip.style.filter = "none";
+    };
+    requestAnimationFrame(tick);
+  });
+}
+```
+
+Notas:
+- Si la cantidad de caracteres cambia (por ejemplo de 999.00 a 1,000.00), todas las columnas giran desde 0.
+- Guardar el último texto mostrado para pasarlo como `prev` en el siguiente llamado.
+- El signo menos y el símbolo de moneda son estáticos. Con balance negativo, mostrar además un chip
+  ("Negativo, gastas más de lo que ganas") en `--negative`; no colorear el número, porque el rojo pierde contraste sobre el degradado violeta.
+- El texto real del balance va siempre en el `<span class="sr-only">`, porque el lector de pantalla no debe leer las columnas.

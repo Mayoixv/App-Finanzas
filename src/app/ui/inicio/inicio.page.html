@@ -20,11 +20,11 @@
     } @else {
       <section class="hero" aria-labelledby="balance-label">
         <p id="balance-label" class="hero-label">Balance de {{ monthState.label() }}</p>
-        <p class="hero-amount">{{ money(o.summary.balance) }}</p>
+        <app-balance-reel class="hero-amount" [text]="money(o.summary.balance)"></app-balance-reel>
         @if (o.summary.balance < 0) {
           <p class="hero-alert">
             <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
-            Este mes gastas más de lo que ingresa.
+            Negativo, gastas más de lo que ganas
           </p>
         }
         <dl class="hero-stats">
