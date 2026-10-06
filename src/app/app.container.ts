@@ -19,6 +19,7 @@ import {
 } from './application/use-cases/debts';
 import { Onboarding } from './application/use-cases/onboarding';
 import { GetAlerts } from './application/use-cases/get-alerts';
+import { GetNotificationPlan } from './application/use-cases/get-notification-plan';
 import { GetUpcomingRecurring } from './application/use-cases/get-upcoming-recurring';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './application/use-cases/pause-recurring-expense';
 import { CurrencySettings } from './application/use-cases/currency-settings';
@@ -119,6 +120,7 @@ export interface AppContainer {
   deleteDebtPayment: DeleteDebtPayment;
   onboarding: Onboarding;
   getAlerts: GetAlerts;
+  getNotificationPlan: GetNotificationPlan;
 }
 
 export const APP_CONTAINER = new InjectionToken<AppContainer>('AppContainer');
@@ -168,6 +170,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     resumeRecurringExpense: new ResumeRecurringExpense(repos.recurring),
     getUpcomingRecurring,
     getAlerts: new GetAlerts(getUpcomingRecurring, getBudgetStatuses, repos.categories),
+    getNotificationPlan: new GetNotificationPlan(getMonthRecurringExpenses, getBudgetStatuses, repos.categories),
     saveDebt: new SaveDebt(repos.debts, ids),
     deleteDebt: new DeleteDebt(repos.debts),
     getDebtsOverview: new GetDebtsOverview(repos.debts),

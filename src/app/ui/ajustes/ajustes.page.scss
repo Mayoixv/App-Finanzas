@@ -141,3 +141,22 @@ li + li .row {
   border-color: var(--violet-600);
   color: var(--violet-600);
 }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+}
+
+.toggle {
+  flex: 1;
+  font-size: 16px;
+  --track-background-checked: var(--violet-600);
+}
+
+.error {
+  margin: 8px 0 0;
+  color: var(--negative-on-light);
+  font-size: 14px;
+  font-weight: 500;
+}

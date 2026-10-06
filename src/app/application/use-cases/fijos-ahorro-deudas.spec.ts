@@ -20,6 +20,7 @@ import { GetSavingsOverview } from './get-savings-overview';
 import { GetUpcomingRecurring } from './get-upcoming-recurring';
 import { Onboarding } from './onboarding';
 import { GetAlerts } from './get-alerts';
+import { GetNotificationPlan } from './get-notification-plan';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './pause-recurring-expense';
 import { SetBudget } from './set-budget';
 import { UpdateRecurringExpense } from './update-recurring-expense';
@@ -225,5 +226,36 @@ describe('alertas de Inicio', () => {
       exceeded: ['Comida'],
       nearLimit: ['Ocio'],
     });
+  });
+});
+
+describe('plan de notificaciones', () => {
+  it('recuerda el día antes y el día del vencimiento desde hoy, cruza de mes y avisa presupuestos', async () => {
+    const s = setup();
+    const add = new AddRecurringExpense(s.recurring, s.categories, s.ids);
+    await add.execute({ name: 'Luz', amount: 100, categoryId: 'ren', dueDay: 30, startMonth: '2026-10' });
+    await add.execute({ name: 'Renta', amount: 500, categoryId: 'ren', dueDay: 1, startMonth: '2026-10' });
+    await add.execute({ name: 'Sueldo', amount: 900, categoryId: 'sal', dueDay: 30, startMonth: '2026-10' });
+    await new SetBudget(s.budgets, s.categories, s.ids).execute({ categoryId: 'com', month: '2026-10', limit: 1_000 });
+    await new AddTransaction(s.transactions, s.categories, s.ids).execute({ date: '2026-10-02', amount: 1_100, categoryId: 'com' });
+
+    const plan = await new GetNotificationPlan(
+      new GetMonthRecurringExpenses(s.recurring),
+      new GetBudgetStatuses(s.budgets, s.transactions),
+      s.categories,
+    ).execute('2026-10-29');
+
+    // Renta de octubre ya pasó; la de noviembre se avisa el 31 y el 1. Sin recordatorios del sueldo.
+    expect(plan.reminders.map((r) => `${r.name} ${r.when} ${r.date}`)).toEqual([
+      'Luz antes 2026-10-29',
+      'Luz hoy 2026-10-30',
+      'Renta antes 2026-10-31',
+      'Renta hoy 2026-11-01',
+      'Luz antes 2026-11-29',
+      'Luz hoy 2026-11-30',
+    ]);
+    expect(plan.budgets).toEqual([
+      { key: 'presupuesto:com:2026-10:exceeded', name: 'Comida', level: 'exceeded', spent: 1_100, limit: 1_000 },
+    ]);
   });
 });

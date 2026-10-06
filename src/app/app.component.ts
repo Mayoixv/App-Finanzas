@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
 import { LockScreenComponent } from './ui/lock/lock-screen.component';
 import { LockState } from './ui/lock/lock-state';
+import { NotificationsService } from './ui/notifications.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,6 @@ import { LockState } from './ui/lock/lock-state';
 })
 export class AppComponent {
   protected readonly lock = inject(LockState);
+  /** Se crea al arrancar para que reprograme los avisos con cada cambio de datos. */
+  private readonly notifications = inject(NotificationsService);
 }

@@ -11,8 +11,8 @@ No existe todavía. Solo notificaciones **locales** (plugin `@capacitor/local-no
 **Propósito:** recordar lo importante sin abrir la app y sin molestar.
 
 **Funciones:**
-- [ ] [Después] Gasto fijo por vencer (el día anterior y el mismo día).
-- [ ] [Después] Presupuesto al 85% y al 100% (una vez por umbral, categoría y mes).
+- [x] [Después] Gasto fijo por vencer (el día anterior y el mismo día).
+- [x] [Después] Presupuesto al 85% y al 100% (una vez por umbral, categoría y mes).
 - [ ] [Después] Pago de tarjeta por vencer.
 - [ ] [Después] Recordatorio diario opcional para registrar gastos ("¿Registraste tus gastos de hoy?").
 - [ ] [Después] Preferencias: activar o desactivar cada tipo, hora del recordatorio diario y horas de silencio.

@@ -55,6 +55,31 @@
     </ul>
   </section>
 
+  <section class="block" aria-labelledby="avisos-title">
+    <h2 id="avisos-title" class="section-title">Avisos</h2>
+    <div class="rows toggle-row">
+      <ion-toggle
+        class="toggle"
+        justify="space-between"
+        [disabled]="!notifications.available || togglingNotifications()"
+        [checked]="notifications.enabled()"
+        (ionChange)="toggleNotifications($event.detail.checked)"
+      >
+        Notificaciones
+      </ion-toggle>
+    </div>
+    <p class="note">
+      @if (notifications.available) {
+        Gastos fijos el día antes y el día que vencen, a las 9:00, y presupuestos al llegar al 85% y al pasarse.
+      } @else {
+        Disponible en la app del teléfono.
+      }
+    </p>
+    @if (notificationsError(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+  </section>
+
   <app-datos></app-datos>
 
   <section class="block" aria-labelledby="categorias-title">
