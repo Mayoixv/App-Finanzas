@@ -49,7 +49,8 @@ export class GetReport {
     private readonly recurring: GetMonthRecurringExpenses,
   ) {}
 
-  async execute(endMonth: MonthKey, count: number, currentMonth: MonthKey): Promise<Report> {
+  async execute(endMonth: MonthKey, requested: number, currentMonth: MonthKey): Promise<Report> {
+    const count = Math.max(1, Math.floor(requested) || 1);
     const months = Array.from({ length: count }, (_, i) => addMonths(endMonth, i - count + 1));
     const categories = await this.categories.list();
     const perMonth = await Promise.all(

@@ -6,7 +6,9 @@
   margin: 0 20px 20px;
   padding: 24px;
   border-radius: var(--radius-card);
-  background: var(--brand-gradient);
+  /* Color de respaldo bajo el degradado: lo usan los revisores de contraste, que no leen degradados. */
+  background-color: var(--violet-600);
+  background-image: var(--brand-gradient);
   box-shadow: 0 24px 56px -20px rgba(106, 61, 240, 0.55);
   color: #fff;
 }

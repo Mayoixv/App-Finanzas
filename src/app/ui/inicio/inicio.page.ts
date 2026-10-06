@@ -18,6 +18,7 @@ import { MonthCompareComponent } from './month-compare.component';
 import { NetWorthCardComponent } from './net-worth-card.component';
 import { BalanceReelComponent } from '../balance-reel.component';
 import { ExpenseDonutComponent } from './expense-donut.component';
+import { LoadingComponent } from '../loading.component';
 
 const RATING_TEXT: Record<SavingsRating, string> = {
   excelente: 'Excelente',
@@ -40,6 +41,7 @@ interface RecentRow {
   templateUrl: 'inicio.page.html',
   styleUrls: ['inicio.page.scss'],
   imports: [
+    LoadingComponent,
     RouterLink,
     IonContent,
     IonIcon,

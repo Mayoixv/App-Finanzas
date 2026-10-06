@@ -6,7 +6,7 @@ import { APP_CONTAINER } from '../app.container';
 import { BudgetNotice, PaymentReminder } from '../application/use-cases/get-notification-plan';
 import { addDays, monthOf } from '../domain/month';
 import { formatMoney, todayIso } from './format';
-import { deferPastQuiet } from './quiet-hours';
+import { deferPastQuiet, fitInSameDay } from './quiet-hours';
 import { MonthState } from './month-state';
 
 const ENABLED_KEY = 'notifications_enabled';
@@ -70,7 +70,7 @@ function reminderOf(r: PaymentReminder, hour: number): LocalNotificationSchema |
     title: r.when === 'antes' ? `Mañana vence ${r.name}` : `Hoy vence ${r.name}`,
     body:
       r.kind === 'tarjeta'
-        ? `Te falta ${formatMoney(r.amount)} del estado${r.minimum ? ` (mínimo ${formatMoney(r.minimum)})` : ''}. Págalo desde Dinero › Tarjetas para no pagar intereses.`
+        ? `Te falta ${formatMoney(r.amount)} del estado${r.minimum && r.minimum < r.amount ? ` (mínimo ${formatMoney(r.minimum)})` : ''}. Págalo desde Dinero › Tarjetas para no pagar intereses.`
         : `${formatMoney(r.amount)} · Márcalo como pagado en Fijos.`,
     schedule: { at, allowWhileIdle: true },
     extra: { target: r.kind === 'tarjeta' ? '/tabs/dinero?ver=tarjetas' : '/tabs/fijos' },
@@ -85,7 +85,7 @@ function budgetOf(b: BudgetNotice): LocalNotificationSchema {
       b.level === 'exceeded'
         ? `Llevas ${formatMoney(b.spent)} de ${formatMoney(b.limit)} este mes.`
         : `Llevas ${formatMoney(b.spent)} de ${formatMoney(b.limit)}; te quedan ${formatMoney(b.limit - b.spent)}.`,
-    extra: { target: '/tabs/inicio' },
+    extra: { target: '/tabs/inicio', kind: 'presupuesto' },
   };
 }
 
@@ -177,7 +177,7 @@ export class NotificationsService {
     const plan = await this.container.getNotificationPlan.execute(today);
 
     // Todo lo programado se rehace: así un fijo pagado, editado o borrado, o un aviso apagado, deja de sonar.
-    await this.cancelPending();
+    await this.cancelPending(true);
     const reminders = prefs.fijos
       ? plan.reminders.map((r) => reminderOf(r, prefs.hour)).filter((n): n is LocalNotificationSchema => n !== null)
       : [];
@@ -195,12 +195,15 @@ export class NotificationsService {
     }
 
     const all = [...reminders, ...daily, ...budgets];
-    // Horas de silencio: lo que caería dentro se pasa al final del silencio.
+    // Horas de silencio. Los recordatorios dicen "hoy" o "mañana": se mueven sin cambiar de día. Los avisos de
+    // presupuesto (sin hora) suenan al terminar el silencio.
     if (prefs.quiet) {
       for (const n of all) {
-        const at = n.schedule?.at ?? new Date();
-        const moved = deferPastQuiet(at, prefs.quietStart, prefs.quietEnd);
-        if (moved !== at) n.schedule = { at: moved, allowWhileIdle: true };
+        const at = n.schedule?.at;
+        const moved = at ? fitInSameDay(at, prefs.quietStart, prefs.quietEnd) : deferPastQuiet(new Date(), prefs.quietStart, prefs.quietEnd);
+        if (!at || moved !== at) {
+          if (moved.getTime() > Date.now()) n.schedule = { at: moved, allowWhileIdle: true };
+        }
       }
     }
     if (all.length) await LocalNotifications.schedule({ notifications: all });
@@ -225,8 +228,13 @@ export class NotificationsService {
     return out;
   }
 
-  private async cancelPending() {
+  /**
+   * Cancela lo programado para volver a calcularlo. Con `keepBudgets`, deja los avisos de presupuesto: se avisan una
+   * sola vez y, si las horas de silencio los pospusieron, recalcular no los volvería a crear.
+   */
+  private async cancelPending(keepBudgets = false) {
     const { notifications } = await LocalNotifications.getPending();
-    if (notifications.length) await LocalNotifications.cancel({ notifications: notifications.map((n) => ({ id: n.id })) });
+    const ids = notifications.filter((n) => !(keepBudgets && n.extra?.kind === 'presupuesto')).map((n) => ({ id: n.id }));
+    if (ids.length) await LocalNotifications.cancel({ notifications: ids });
   }
 }

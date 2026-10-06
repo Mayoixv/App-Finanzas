@@ -6,20 +6,37 @@ import { addIcons } from 'ionicons';
 import { chevronBack } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { Report } from '../../application/use-cases/get-report';
-import { ColumnChartComponent, ColumnSeries } from '../charts/column-chart.component';
+import {
+  ColumnChartComponent,
+  ColumnSeries,
+} from '../charts/column-chart.component';
 import { LineChartComponent } from '../charts/line-chart.component';
 import { shortMonth } from '../charts/scale';
-import { currentMonth, formatMoney, formatPercent, monthLabel } from '../format';
+import {
+  currentMonth,
+  formatMoney,
+  formatPercent,
+  monthLabel,
+} from '../format';
 import { MonthState } from '../month-state';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { exportMonthPdf } from './month-pdf';
+import { LoadingComponent } from '../loading.component';
 
 /** Reportes del periodo que termina en el mes visto: por mes, por categoría y saldo de cuentas. */
 @Component({
   selector: 'app-reportes',
   templateUrl: 'reportes.page.html',
   styleUrls: ['reportes.page.scss'],
-  imports: [IonContent, IonIcon, RouterLink, PillToggleComponent, ColumnChartComponent, LineChartComponent],
+  imports: [
+    LoadingComponent,
+    IonContent,
+    IonIcon,
+    RouterLink,
+    PillToggleComponent,
+    ColumnChartComponent,
+    LineChartComponent,
+  ],
 })
 export class ReportesPage {
   private readonly container = inject(APP_CONTAINER);
@@ -40,18 +57,35 @@ export class ReportesPage {
   protected readonly percent = formatPercent;
   private loadSeq = 0;
 
-  protected readonly labels = computed(() => (this.report()?.months ?? []).map(shortMonth));
-  protected readonly fullLabels = computed(() => (this.report()?.months ?? []).map(monthLabel));
+  protected readonly labels = computed(() =>
+    (this.report()?.months ?? []).map(shortMonth),
+  );
+  protected readonly fullLabels = computed(() =>
+    (this.report()?.months ?? []).map(monthLabel),
+  );
   protected readonly isEmpty = computed(() => {
     const r = this.report();
-    return !!r && r.summaries.every((s) => s.income === 0 && s.expenses === 0 && s.saved === 0);
+    return (
+      !!r &&
+      r.summaries.every(
+        (s) => s.income === 0 && s.expenses === 0 && s.saved === 0,
+      )
+    );
   });
 
   protected readonly monthSeries = computed<ColumnSeries[]>(() => {
     const s = this.report()?.summaries ?? [];
     return [
-      { name: 'Ingresos', color: 'var(--series-ingresos)', values: s.map((m) => m.income) },
-      { name: 'Gastos', color: 'var(--series-gastos)', values: s.map((m) => m.expenses) },
+      {
+        name: 'Ingresos',
+        color: 'var(--series-ingresos)',
+        values: s.map((m) => m.income),
+      },
+      {
+        name: 'Gastos',
+        color: 'var(--series-gastos)',
+        values: s.map((m) => m.expenses),
+      },
     ];
   });
 
@@ -59,10 +93,18 @@ export class ReportesPage {
     const cats = this.report()?.categories ?? [];
     const total = cats.reduce((s, c) => s + c.total, 0);
     const top = cats[0]?.total ?? 1;
-    return cats.map((c) => ({ ...c, width: (c.total / top) * 100, share: total ? (c.total / total) * 100 : 0 }));
+    return cats.map((c) => ({
+      ...c,
+      width: (c.total / top) * 100,
+      share: total ? (c.total / total) * 100 : 0,
+    }));
   });
 
-  protected readonly selectedCategory = computed(() => this.categoryRows().find((c) => c.categoryId === this.categoryId()) ?? null);
+  protected readonly selectedCategory = computed(
+    () =>
+      this.categoryRows().find((c) => c.categoryId === this.categoryId()) ??
+      null,
+  );
 
   constructor() {
     addIcons({ chevronBack });
@@ -101,7 +143,11 @@ export class ReportesPage {
   private async load(month: string, count: number) {
     const seq = ++this.loadSeq;
     try {
-      const report = await this.container.getReport.execute(month, count, currentMonth());
+      const report = await this.container.getReport.execute(
+        month,
+        count,
+        currentMonth(),
+      );
       if (seq !== this.loadSeq) return;
       this.report.set(report);
       this.failed.set(false);

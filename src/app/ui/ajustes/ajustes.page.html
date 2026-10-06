@@ -88,4 +88,24 @@
       <button type="button" class="btn-secondary add" (click)="openCategory()">Agregar categoría</button>
     }
   </section>
+  <section class="block" aria-labelledby="acerca-title">
+    <h2 id="acerca-title" class="section-title">Acerca de</h2>
+    <ul class="rows">
+      <li>
+        <button type="button" class="row" [attr.aria-expanded]="showPrivacy()" (click)="showPrivacy.set(!showPrivacy())">
+          <span class="row-title">Privacidad</span>
+          <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="showPrivacy()"></ion-icon>
+        </button>
+      </li>
+    </ul>
+    @if (showPrivacy()) {
+      <div class="privacy">
+        <p>Finanzas guarda todo solo en este teléfono. No hay cuentas, servidores ni publicidad, y la app no envía tus datos a nadie.</p>
+        <p>Tus datos salen del teléfono únicamente cuando tú creas un respaldo o exportas un archivo y eliges dónde mandarlo. Los respaldos van cifrados con tu contraseña.</p>
+        <p>Los permisos que pide son para mostrarte avisos, desbloquear con huella y guardar respaldos o archivos en el teléfono.</p>
+        <p>Si borras la app sin un respaldo, tus datos se pierden: nadie más tiene una copia.</p>
+      </div>
+    }
+    <p class="note">Finanzas {{ version }}</p>
+  </section>
 </ion-content>

@@ -1,14 +1,35 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronForward, swapHorizontal } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { AccountView, CardStatus } from '../../application/use-cases/accounts';
-import { CARD_UTILIZATION_WARNING, isCard, Transfer } from '../../domain/account';
+import {
+  CARD_UTILIZATION_WARNING,
+  isCard,
+  Transfer,
+} from '../../domain/account';
 import { DineroFormService } from '../dinero/dinero-form.service';
-import { amountToInput, currentMonth, formatDay, formatMoney, formatPercent, monthLabel, parseAmount, todayIso } from '../format';
+import {
+  amountToInput,
+  currentMonth,
+  formatDay,
+  formatMoney,
+  formatPercent,
+  monthLabel,
+  parseAmount,
+  todayIso,
+} from '../format';
 import { MonthState } from '../month-state';
 import { ACCOUNT_TYPE_LABEL } from './account-choices';
+import { LoadingComponent } from '../loading.component';
 
 interface Row {
   view: AccountView;
@@ -28,7 +49,7 @@ interface Row {
   selector: 'app-cuentas-view',
   templateUrl: 'cuentas-view.component.html',
   styleUrls: ['cuentas-view.component.scss'],
-  imports: [IonIcon],
+  imports: [LoadingComponent, IonIcon],
 })
 export class CuentasViewComponent {
   private readonly container = inject(APP_CONTAINER);
@@ -46,11 +67,14 @@ export class CuentasViewComponent {
   protected readonly liveMessage = signal('');
   protected readonly money = formatMoney;
   protected readonly day = formatDay;
+  protected readonly min = Math.min;
   protected readonly monthName = monthLabel(currentMonth());
 
   protected readonly loaded = computed(() => this.views() !== null);
   private readonly ofMode = computed(() =>
-    (this.views() ?? []).filter((v) => isCard(v.account) === (this.mode() === 'tarjetas')),
+    (this.views() ?? []).filter(
+      (v) => isCard(v.account) === (this.mode() === 'tarjetas'),
+    ),
   );
   protected readonly rows = computed(() => {
     const statuses = new Map(this.cardStatuses().map((c) => [c.account.id, c]));
@@ -58,9 +82,18 @@ export class CuentasViewComponent {
       .filter((v) => !v.account.archived)
       .map((v) => withStatus(toRow(v), statuses.get(v.account.id)));
   });
-  protected readonly archived = computed(() => this.ofMode().filter((v) => v.account.archived).map(toRow));
-  protected readonly canTransfer = computed(() => (this.views() ?? []).filter((v) => !v.account.archived).length > 1);
-  private readonly names = computed(() => new Map((this.views() ?? []).map((v) => [v.account.id, v.account.name])));
+  protected readonly archived = computed(() =>
+    this.ofMode()
+      .filter((v) => v.account.archived)
+      .map(toRow),
+  );
+  protected readonly canTransfer = computed(
+    () => (this.views() ?? []).filter((v) => !v.account.archived).length > 1,
+  );
+  private readonly names = computed(
+    () =>
+      new Map((this.views() ?? []).map((v) => [v.account.id, v.account.name])),
+  );
 
   constructor() {
     addIcons({ chevronForward, swapHorizontal });
@@ -84,7 +117,10 @@ export class CuentasViewComponent {
   }
 
   protected payCard(r: Row) {
-    return this.forms.openTransfer(r.view.account.id, r.status?.pending || r.status?.currentDebt);
+    return this.forms.openTransfer(
+      r.view.account.id,
+      r.status?.pending || r.status?.currentDebt,
+    );
   }
 
   /** El pago mínimo lo fija el banco en cada estado: se anota a mano y vale solo para ese corte. */
@@ -119,7 +155,11 @@ export class CuentasViewComponent {
       return;
     }
     try {
-      await this.container.setCardMinimum.execute(r.view.account.id, status.lastCut, amount);
+      await this.container.setCardMinimum.execute(
+        r.view.account.id,
+        status.lastCut,
+        amount,
+      );
       this.monthState.notifyChange();
     } catch (error) {
       console.error(error);
@@ -167,11 +207,15 @@ function withStatus(row: Row, status: CardStatus | undefined): Row {
   const cut = formatDay(status.lastCut);
   const due = formatDay(status.dueDate);
   let statusText: string;
-  if (status.statementDebt === 0) statusText = `Nada que pagar del corte del ${cut}`;
+  if (status.statementDebt === 0)
+    statusText = `Nada que pagar del corte del ${cut}`;
   else if (status.pending === 0) statusText = `Estado del ${cut} pagado`;
-  else if (status.daysToDue < 0) statusText = `Venció el ${due}: falta ${formatMoney(status.pending)} del corte del ${cut}`;
-  else statusText = `Paga ${formatMoney(status.pending)} antes del ${due} (corte del ${cut})`;
-  if (status.cycleCharges > 0) statusText += ` · ${formatMoney(status.cycleCharges)} en compras nuevas`;
+  else if (status.daysToDue < 0)
+    statusText = `Venció el ${due}: falta ${formatMoney(status.pending)} del corte del ${cut}`;
+  else
+    statusText = `Paga ${formatMoney(status.pending)} antes del ${due} (corte del ${cut})`;
+  if (status.cycleCharges > 0)
+    statusText += ` · ${formatMoney(status.cycleCharges)} en compras nuevas`;
   return {
     ...row,
     status,

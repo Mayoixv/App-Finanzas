@@ -1,5 +1,6 @@
   <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
+  <app-loading [show]="!debts() && !failed()"></app-loading>
   @if (failed()) {
     <p class="notice">No se pudieron leer las deudas. Vuelve a abrir esta pantalla.</p>
   } @else if (debts(); as list) {

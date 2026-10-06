@@ -1,7 +1,9 @@
 import { Account, AccountType, CASH_ACCOUNT_ID, dueDateAfter, isCard, lastCutDate, Transfer } from '../../domain/account';
 import { isValidCents } from '../../domain/money';
 import { daysBetween, IsoDate, isValidIsoDate } from '../../domain/month';
+import { DebtDirection } from '../../domain/debts';
 import { NotFoundError, ValidationError } from '../errors';
+import { GetDebtsOverview } from './debts';
 import { IAccountRepository, IdGenerator, ISettingsRepository } from '../ports/repositories';
 
 const TYPES: AccountType[] = ['efectivo', 'banco', 'ahorro', 'tarjeta', 'inversion'];
@@ -190,7 +192,11 @@ export interface CardStatus {
   minimum: number | null;
 }
 
-/** Clave del pago mínimo de una tarjeta para el estado que cortó en `cut`. */
+/**
+ * Clave del pago mínimo de una tarjeta para el estado que cortó en `cut`.
+ * ponytail: una fila de ajustes por tarjeta y mes que no se borra (unas 12 al año por tarjeta); si crece, pasar a
+ * una columna de la tabla de cuentas con una migración.
+ */
 const minimumKey = (accountId: string, cut: IsoDate) => `card_min:${accountId}:${cut}`;
 
 export class SetCardMinimum {
@@ -206,7 +212,7 @@ export class SetCardMinimum {
 export class GetCardStatuses {
   constructor(
     private readonly accounts: IAccountRepository,
-    private readonly settings?: ISettingsRepository,
+    private readonly settings: ISettingsRepository,
   ) {}
 
   /** Estado de cada tarjeta activa con días de corte y pago. */
@@ -214,11 +220,16 @@ export class GetCardStatuses {
     const cards = (await this.accounts.list()).filter((a) => isCard(a) && !a.archived && a.cutDay && a.dueDay);
     if (cards.length === 0) return [];
     const [now, transfers] = await Promise.all([this.accounts.balances(today), this.accounts.listTransfers()]);
+    const cuts = cards.map((a) => lastCutDate(a.cutDay!, today));
+    const [atCuts, minimums] = await Promise.all([
+      Promise.all(cuts.map((cut) => this.accounts.balances(cut))),
+      Promise.all(cards.map((a, i) => this.settings.get(minimumKey(a.id, cuts[i])))),
+    ]);
     const out: CardStatus[] = [];
-    for (const account of cards) {
-      const lastCut = lastCutDate(account.cutDay!, today);
+    for (const [i, account] of cards.entries()) {
+      const lastCut = cuts[i];
       const dueDate = dueDateAfter(lastCut, account.dueDay!);
-      const atCut = (await this.accounts.balances(lastCut)).get(account.id) ?? account.initialBalance;
+      const atCut = atCuts[i].get(account.id) ?? account.initialBalance;
       const statementDebt = Math.max(0, -atCut);
       const currentDebt = Math.max(0, -(now.get(account.id) ?? account.initialBalance));
       const paidSinceCut = transfers
@@ -235,7 +246,7 @@ export class GetCardStatuses {
         cycleCharges: Math.max(0, currentDebt - statementDebt + paidSinceCut),
         currentDebt,
         utilization: account.creditLimit ? (currentDebt / account.creditLimit) * 100 : null,
-        minimum: Number((await this.settings?.get(minimumKey(account.id, lastCut))) || 0) || null,
+        minimum: Number(minimums[i] || 0) || null,
       });
     }
     return out;
@@ -255,12 +266,12 @@ export interface NetWorth {
 export class GetNetWorth {
   constructor(
     private readonly accounts: GetAccountsOverview,
-    private readonly debts: { execute(): Promise<{ debt: { direction: string }; balance: number }[]> },
+    private readonly debts: GetDebtsOverview,
   ) {}
 
   async execute(): Promise<NetWorth> {
     const [accounts, debts] = await Promise.all([this.accounts.execute(), this.debts.execute()]);
-    const sum = (dir: string) => debts.filter((d) => d.debt.direction === dir).reduce((s, d) => s + Math.max(0, d.balance), 0);
+    const sum = (dir: DebtDirection) => debts.filter((d) => d.debt.direction === dir).reduce((s, d) => s + Math.max(0, d.balance), 0);
     const have = accounts.assets + sum('me_deben');
     const owe = accounts.cardDebt + sum('debo');
     return { have, owe, total: have - owe };

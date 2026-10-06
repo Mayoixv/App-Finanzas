@@ -12,6 +12,7 @@ import { MonthState } from '../month-state';
 import { CategoriaModalComponent } from './categoria.modal';
 import { DatosComponent } from './datos.component';
 import { AvisosComponent } from './avisos.component';
+import { APP_VERSION } from '../../version';
 
 interface Group {
   type: CategoryType;
@@ -38,6 +39,8 @@ export class AjustesPage {
   protected readonly currencyState = inject(CurrencyState);
   private readonly alerts = inject(AlertController);
   protected readonly userName = signal('');
+  protected readonly showPrivacy = signal(false);
+  protected readonly version = APP_VERSION;
 
   protected readonly currencies: { code: Currency; label: string }[] = [
     { code: 'DOP', label: 'Peso dominicano (RD$)' },

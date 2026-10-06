@@ -1,5 +1,6 @@
 <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
+<app-loading [show]="!loaded() && !failed()"></app-loading>
 @if (failed()) {
   <p class="note">No se pudieron leer las cuentas. Cambia de sección y vuelve.</p>
 } @else if (loaded()) {
@@ -37,7 +38,7 @@
                 <span [class.urgent]="r.urgent">{{ r.statusText }}</span>
                 @if (r.status && r.status.pending > 0) {
                   <button type="button" class="min-link" (click)="askMinimum(r)">
-                    {{ r.status.minimum ? 'Mínimo: ' + money(r.status.minimum) + ' · cambiar' : 'Anotar pago mínimo' }}
+                    {{ r.status.minimum ? 'Mínimo: ' + money(min(r.status.minimum, r.status.pending)) + ' · cambiar' : 'Anotar pago mínimo' }}
                   </button>
                 }
               </span>

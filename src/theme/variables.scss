@@ -1,7 +1,7 @@
 // Tokens de design.md. Pantallas oscuras (Inicio) y claras (Movimientos) comparten estos valores.
 
 :root {
-  --violet-600: #6a3df0;
+  --violet-600: #6639ec; // apenas más oscuro que el de design.md (#6a3df0) para que el texto llegue a 4.5:1 sobre --surface-soft
   --violet-400: #8f6bff;
   --violet-900: #2a1478;
   --ink-950: #0a0a12;
@@ -13,7 +13,7 @@
   --lavender-100: #efeaff;
   --text-on-dark: #f4f2ff;
   --text-on-light: #14121f;
-  --muted: #8c88a6; // solo sobre fondos oscuros (AA)
+  --muted: #928eac; // solo sobre fondos oscuros; aclarado para llegar a 4.5:1 también sobre la barra de pestañas
   --muted-on-light: #5f5b7a; // el --muted de design.md no llega a 4.5:1 sobre blanco
   --positive: #2bd07f;
   --positive-on-light: #0a6f40;
@@ -34,7 +34,7 @@
 
   --ion-font-family: var(--font-body);
 
-  --ion-color-primary: #6a3df0;
+  --ion-color-primary: #6639ec;
   --ion-color-primary-rgb: 106, 61, 240;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;

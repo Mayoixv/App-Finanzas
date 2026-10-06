@@ -12,6 +12,7 @@
     <app-month-switcher></app-month-switcher>
   </header>
 
+  <app-loading [show]="!overview() && !failed()"></app-loading>
   @if (failed()) {
     <p class="notice">No se pudieron leer los datos de este mes. Cambia de mes y vuelve, o reinicia la aplicación.</p>
   } @else if (overview(); as o) {

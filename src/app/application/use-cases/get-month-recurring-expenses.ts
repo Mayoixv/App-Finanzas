@@ -2,6 +2,7 @@ import { MonthKey } from '../../domain/month';
 import {
   createInstance,
   isDueIn,
+  isPausedIn,
   RecurringExpense,
   RecurringExpenseInstance,
 } from '../../domain/recurring-expense';
@@ -44,7 +45,7 @@ export class GetMonthRecurringExpenses {
   /** Plantillas activas en pausa ese mes, para poder reanudarlas aunque no tengan instancia. */
   async pausedIn(month: MonthKey): Promise<RecurringExpense[]> {
     return (await this.recurring.list()).filter(
-      (e) => e.active && month >= e.startMonth && !!e.pausedUntil && month <= e.pausedUntil,
+      (e) => e.active && isPausedIn(e, month),
     );
   }
 }

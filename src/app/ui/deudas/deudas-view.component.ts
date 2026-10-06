@@ -4,15 +4,31 @@ import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { DebtView } from '../../application/use-cases/debts';
-import { amortization, AmortizationRow, DebtPayment, simulateStrategy, StrategyResult } from '../../domain/debts';
+import {
+  amortization,
+  AmortizationRow,
+  DebtPayment,
+  simulateStrategy,
+  StrategyResult,
+} from '../../domain/debts';
 import { addMonths } from '../../domain/month';
-import { currentMonth, formatDay, formatMoney, monthLabel, parseAmount } from '../format';
+import {
+  currentMonth,
+  formatDay,
+  formatMoney,
+  monthLabel,
+  parseAmount,
+} from '../format';
 import { MonthState } from '../month-state';
 import { DeudaModalComponent } from './deuda.modal';
 import { PagoModalComponent } from './pago.modal';
 import { DineroFormService } from '../dinero/dinero-form.service';
+import { LoadingComponent } from '../loading.component';
 
-const SHORT_MONTH = new Intl.DateTimeFormat('es-DO', { month: 'short', year: 'numeric' });
+const SHORT_MONTH = new Intl.DateTimeFormat('es-DO', {
+  month: 'short',
+  year: 'numeric',
+});
 
 interface Strategies {
   snowball: StrategyResult;
@@ -27,7 +43,7 @@ interface Strategies {
   selector: 'app-deudas-view',
   templateUrl: 'deudas-view.component.html',
   styleUrls: ['deudas-view.component.scss'],
-  imports: [IonIcon],
+  imports: [LoadingComponent, IonIcon],
 })
 /** Sección Deudas de la pestaña Dinero. */
 export class DeudasViewComponent {
@@ -48,12 +64,17 @@ export class DeudasViewComponent {
 
   protected readonly totals = computed(() => {
     const list = this.debts() ?? [];
-    const sum = (dir: string) => list.filter((d) => d.debt.direction === dir).reduce((s, d) => s + d.balance, 0);
+    const sum = (dir: string) =>
+      list
+        .filter((d) => d.debt.direction === dir)
+        .reduce((s, d) => s + d.balance, 0);
     return { owe: sum('debo'), owed: sum('me_deben') };
   });
 
   protected readonly strategies = computed<Strategies | null>(() => {
-    const mine = (this.debts() ?? []).filter((d) => d.debt.direction === 'debo' && d.balance > 0);
+    const mine = (this.debts() ?? []).filter(
+      (d) => d.debt.direction === 'debo' && d.balance > 0,
+    );
     const usable = mine.filter((d) => d.installment > 0);
     if (usable.length < 2) return null;
     const input = usable.map((d) => ({
@@ -80,14 +101,21 @@ export class DeudasViewComponent {
   }
 
   protected percentPaid(d: DebtView): number {
-    return Math.min(100, Math.max(0, ((d.debt.principal - d.balance) / d.debt.principal) * 100));
+    return Math.min(
+      100,
+      Math.max(0, ((d.debt.principal - d.balance) / d.debt.principal) * 100),
+    );
   }
 
   protected detail(d: DebtView): string {
-    const parts = [d.debt.annualRate > 0 ? `${d.debt.annualRate}% anual` : 'Sin interés'];
+    const parts = [
+      d.debt.annualRate > 0 ? `${d.debt.annualRate}% anual` : 'Sin interés',
+    ];
     if (d.installment > 0 && d.debt.termMonths) {
       parts.push(`cuota ${formatMoney(d.installment)} × ${d.debt.termMonths}`);
-      parts.push(`termina en ${monthLabel(addMonths(d.debt.startDate.slice(0, 7), d.debt.termMonths))}`);
+      parts.push(
+        `termina en ${monthLabel(addMonths(d.debt.startDate.slice(0, 7), d.debt.termMonths))}`,
+      );
     }
     parts.push(`desde ${formatDay(d.debt.startDate)}`);
     return parts.join(' · ');
@@ -99,17 +127,24 @@ export class DeudasViewComponent {
 
   /** Mes de la cuota n: la primera vence el mes siguiente al inicio. */
   protected scheduleMonth(d: DebtView, n: number): string {
-    const [y, m] = addMonths(d.debt.startDate.slice(0, 7), n).split('-').map(Number);
+    const [y, m] = addMonths(d.debt.startDate.slice(0, 7), n)
+      .split('-')
+      .map(Number);
     return SHORT_MONTH.format(new Date(y, m - 1, 1));
   }
 
   protected endLabel(r: StrategyResult): string {
-    return r.months === null ? 'No se termina de pagar con esos montos' : `Terminas en ${monthLabel(addMonths(currentMonth(), r.months - 1))}`;
+    return r.months === null
+      ? 'No se termina de pagar con esos montos'
+      : `Terminas en ${monthLabel(addMonths(currentMonth(), r.months - 1))}`;
   }
 
   /** Con el extra, cuántos meses e intereses se ahorran frente a pagar solo las cuotas (con la mejor estrategia). */
   protected savings(s: Strategies): string {
-    const best = s.avalanche.totalInterest <= s.snowball.totalInterest ? s.avalanche : s.snowball;
+    const best =
+      s.avalanche.totalInterest <= s.snowball.totalInterest
+        ? s.avalanche
+        : s.snowball;
     if (best.months === null || s.base.months === null) return '';
     const months = s.base.months - best.months;
     const interest = s.base.totalInterest - best.totalInterest;
@@ -118,7 +153,9 @@ export class DeudasViewComponent {
   }
 
   protected orderNames(r: StrategyResult): string {
-    const names = new Map((this.debts() ?? []).map((d) => [d.debt.id, d.debt.name]));
+    const names = new Map(
+      (this.debts() ?? []).map((d) => [d.debt.id, d.debt.name]),
+    );
     return r.order.map((id) => names.get(id) ?? '').join(' → ');
   }
 
@@ -157,8 +194,6 @@ export class DeudasViewComponent {
       this.liveMessage.set('No se pudo eliminar el pago. Inténtalo de nuevo.');
     }
   }
-
-
 
   private async load() {
     try {

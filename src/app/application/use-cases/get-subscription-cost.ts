@@ -1,4 +1,5 @@
 import { MonthKey } from '../../domain/month';
+import { isRunningIn } from '../../domain/recurring-expense';
 import { ICategoryRepository, IRecurringExpenseRepository } from '../ports/repositories';
 
 export interface SubscriptionCost {
@@ -21,9 +22,7 @@ export class GetSubscriptionCost {
   async execute(month: MonthKey): Promise<SubscriptionCost> {
     const [expenses, categories] = await Promise.all([this.recurring.list(), this.categories.list()]);
     const ids = new Set(categories.filter(isSubscriptionCategory).map((c) => c.id));
-    const subs = expenses.filter(
-      (e) => e.active && ids.has(e.categoryId) && month >= e.startMonth && !(e.pausedUntil && month <= e.pausedUntil),
-    );
+    const subs = expenses.filter((e) => e.active && ids.has(e.categoryId) && isRunningIn(e, month));
     const monthly = Math.round(subs.reduce((s, e) => s + e.amount / (e.frequency ?? 1), 0));
     return { count: subs.length, monthly, yearly: Math.round(subs.reduce((s, e) => s + (e.amount * 12) / (e.frequency ?? 1), 0)) };
   }

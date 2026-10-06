@@ -16,6 +16,7 @@
 
   <app-pill-toggle class="range" label="Periodo" [options]="rangeOptions" [(value)]="range"></app-pill-toggle>
 
+  <app-loading [show]="!report() && !failed()"></app-loading>
   @if (failed()) {
     <p class="note">No se pudieron preparar los reportes. Vuelve a abrir esta pantalla.</p>
   } @else if (report(); as r) {

@@ -1,7 +1,11 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, createOutline, timeOutline } from 'ionicons/icons';
+import {
+  checkmarkCircleOutline,
+  createOutline,
+  timeOutline,
+} from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { MonthRecurringExpense } from '../../application/use-cases/get-month-recurring-expenses';
 import { SubscriptionCost } from '../../application/use-cases/get-subscription-cost';
@@ -10,14 +14,27 @@ import { DineroFormService } from '../dinero/dinero-form.service';
 import { PagoModalComponent } from '../deudas/pago.modal';
 import { monthOf } from '../../domain/month';
 import { RecurringExpense } from '../../domain/recurring-expense';
-import { dueLabel, formatDay, formatMoney, formatPercent, monthLabel, todayIso } from '../format';
+import {
+  dueLabel,
+  formatDay,
+  formatMoney,
+  formatPercent,
+  monthLabel,
+  todayIso,
+} from '../format';
 import { MonthSwitcherComponent } from '../month-switcher.component';
 import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 import { RecurringFormService } from './recurring-form.service';
+import { LoadingComponent } from '../loading.component';
 
 /** Solo se muestra la frecuencia cuando no es mensual. */
-const FREQUENCY_LABEL: Record<number, string> = { 1: '', 3: 'Trimestral', 6: 'Semestral', 12: 'Anual' };
+const FREQUENCY_LABEL: Record<number, string> = {
+  1: '',
+  3: 'Trimestral',
+  6: 'Semestral',
+  12: 'Anual',
+};
 
 /** Cuánto se ve el check de éxito sobre la tarjeta (design.md, 10.2). */
 const FLASH_MS = 1200;
@@ -47,7 +64,13 @@ interface Totals {
   selector: 'app-fijos',
   templateUrl: 'fijos.page.html',
   styleUrls: ['fijos.page.scss'],
-  imports: [IonContent, IonIcon, MonthSwitcherComponent, SuccessCheckComponent],
+  imports: [
+    LoadingComponent,
+    IonContent,
+    IonIcon,
+    MonthSwitcherComponent,
+    SuccessCheckComponent,
+  ],
 })
 export class FijosPage {
   private readonly container = inject(APP_CONTAINER);
@@ -55,7 +78,13 @@ export class FijosPage {
   private readonly form = inject(RecurringFormService);
 
   protected readonly rows = signal<Row[] | null>(null);
-  protected readonly totals = signal<Totals>({ toReceive: 0, total: 0, paid: 0, pending: 0, percentPaid: 0 });
+  protected readonly totals = signal<Totals>({
+    toReceive: 0,
+    total: 0,
+    paid: 0,
+    pending: 0,
+    percentPaid: 0,
+  });
   protected readonly paused = signal<RecurringExpense[]>([]);
   protected readonly subscriptions = signal<SubscriptionCost | null>(null);
   protected readonly installments = signal<DebtInstallment[]>([]);
@@ -96,12 +125,16 @@ export class FijosPage {
         paidDate,
       });
       this.flashId.set(row.id);
-      this.liveMessage.set(`${row.name} marcado como ${row.isIncome ? 'recibido' : 'pagado'}`);
+      this.liveMessage.set(
+        `${row.name} marcado como ${row.isIncome ? 'recibido' : 'pagado'}`,
+      );
       this.monthState.notifyChange();
       setTimeout(() => this.flashId.set(null), FLASH_MS);
     } catch (error) {
       console.error(error);
-      this.liveMessage.set(`No se pudo marcar ${row.name} como pagado. Inténtalo de nuevo.`);
+      this.liveMessage.set(
+        `No se pudo marcar ${row.name} como pagado. Inténtalo de nuevo.`,
+      );
     } finally {
       this.payingId.set(null);
     }
@@ -119,7 +152,9 @@ export class FijosPage {
   }
 
   protected pausedLabel(expense: RecurringExpense): string {
-    return expense.pausedUntil ? `En pausa hasta ${monthLabel(expense.pausedUntil)}` : '';
+    return expense.pausedUntil
+      ? `En pausa hasta ${monthLabel(expense.pausedUntil)}`
+      : '';
   }
 
   protected installmentDue(c: DebtInstallment) {
@@ -133,31 +168,47 @@ export class FijosPage {
   private async load(month: string) {
     const seq = ++this.loadSeq;
     try {
-      const [items, paused, categories, subscriptions, installments] = await Promise.all([
-        this.container.getMonthRecurringExpenses.execute(month),
-        this.container.getMonthRecurringExpenses.pausedIn(month),
-        this.container.categories.list(),
-        this.container.getSubscriptionCost.execute(month),
-        this.container.getDebtInstallments.execute(month),
-      ]);
+      const [items, paused, categories, subscriptions, installments] =
+        await Promise.all([
+          this.container.getMonthRecurringExpenses.execute(month),
+          this.container.getMonthRecurringExpenses.pausedIn(month),
+          this.container.categories.list(),
+          this.container.getSubscriptionCost.execute(month),
+          this.container.getDebtInstallments.execute(month),
+        ]);
       if (seq !== this.loadSeq) return;
       this.installments.set(installments);
       this.subscriptions.set(subscriptions.count > 0 ? subscriptions : null);
       const today = todayIso();
-      const incomeIds = new Set(categories.filter((c) => c.type === 'ingreso').map((c) => c.id));
-      this.rows.set(items.map((item) => toRow(item, today, incomeIds.has(item.expense.categoryId))));
+      const incomeIds = new Set(
+        categories.filter((c) => c.type === 'ingreso').map((c) => c.id),
+      );
+      this.rows.set(
+        items.map((item) =>
+          toRow(item, today, incomeIds.has(item.expense.categoryId)),
+        ),
+      );
       this.paused.set(paused);
 
       // El resumen es de gastos; los ingresos fijos se cuentan aparte como "por recibir".
-      const expenses = items.filter((i) => !incomeIds.has(i.expense.categoryId));
+      const expenses = items.filter(
+        (i) => !incomeIds.has(i.expense.categoryId),
+      );
       const total =
-        expenses.reduce((s, i) => s + i.instance.amount, 0) + installments.reduce((s, c) => s + c.amount, 0);
+        expenses.reduce((s, i) => s + i.instance.amount, 0) +
+        installments.reduce((s, c) => s + c.amount, 0);
       const paid =
-        expenses.filter((i) => i.instance.status === 'pagado').reduce((s, i) => s + i.instance.amount, 0) +
+        expenses
+          .filter((i) => i.instance.status === 'pagado')
+          .reduce((s, i) => s + i.instance.amount, 0) +
         installments.filter((c) => c.paid).reduce((s, c) => s + c.amount, 0);
       this.totals.set({
         toReceive: items
-          .filter((i) => incomeIds.has(i.expense.categoryId) && i.instance.status === 'pendiente')
+          .filter(
+            (i) =>
+              incomeIds.has(i.expense.categoryId) &&
+              i.instance.status === 'pendiente',
+          )
           .reduce((s, i) => s + i.instance.amount, 0),
         total,
         paid,
@@ -172,10 +223,17 @@ export class FijosPage {
   }
 }
 
-function toRow({ expense, instance }: MonthRecurringExpense, today: string, isIncome: boolean): Row {
+function toRow(
+  { expense, instance }: MonthRecurringExpense,
+  today: string,
+  isIncome: boolean,
+): Row {
   const paid = instance.status === 'pagado';
   const due = paid
-    ? { text: `${isIncome ? 'Cobro' : 'Vencimiento'} ${formatDay(instance.dueDate)}`, urgent: false }
+    ? {
+        text: `${isIncome ? 'Cobro' : 'Vencimiento'} ${formatDay(instance.dueDate)}`,
+        urgent: false,
+      }
     : dueLabel(instance.dueDate, today, isIncome);
   const every = FREQUENCY_LABEL[expense.frequency ?? 1];
   return {

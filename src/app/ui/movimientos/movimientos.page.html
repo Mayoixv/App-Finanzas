@@ -15,6 +15,7 @@
 
   <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
+  <app-loading [show]="!rows() && !failed()"></app-loading>
   @if (failed()) {
     <p class="notice">No se pudieron leer los movimientos. Cambia de mes y vuelve, o reinicia la aplicación.</p>
   } @else if (rows(); as list) {

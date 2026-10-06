@@ -3,7 +3,10 @@ import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { GoalProgress, MonthContribution } from '../../application/use-cases/get-savings-overview';
+import {
+  GoalProgress,
+  MonthContribution,
+} from '../../application/use-cases/get-savings-overview';
 import { MonthlySummary, SavingsRating } from '../../domain/monthly-summary';
 import { formatDay, formatMoney, formatPercent, monthLabel } from '../format';
 import { MonthSwitcherComponent } from '../month-switcher.component';
@@ -12,6 +15,7 @@ import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { MonthState } from '../month-state';
 import { UndoService } from '../undo.service';
 import { SavingsFormService } from './savings-form.service';
+import { LoadingComponent } from '../loading.component';
 
 const RATING_TEXT: Record<SavingsRating, string> = {
   excelente: 'Excelente',
@@ -29,7 +33,13 @@ interface View {
   selector: 'app-metas-view',
   templateUrl: 'metas-view.component.html',
   styleUrls: ['metas-view.component.scss'],
-  imports: [IonIcon, MonthSwitcherComponent, PillToggleComponent, PageSlideComponent],
+  imports: [
+    LoadingComponent,
+    IonIcon,
+    MonthSwitcherComponent,
+    PillToggleComponent,
+    PageSlideComponent,
+  ],
 })
 /** Sección Metas de la pestaña Dinero: ahorrado del mes, metas y aportes. */
 export class MetasViewComponent {
@@ -67,8 +77,10 @@ export class MetasViewComponent {
           : `Para ${monthLabel(g.goal.targetDate.slice(0, 7))}: ${formatMoney(g.neededPerMonth ?? 0)} al mes`,
       );
     }
-    if (g.projectedMonth) parts.push(`A tu ritmo llegas en ${monthLabel(g.projectedMonth)}`);
-    else if (g.saved > 0 || g.goal.targetDate) parts.push('Sin aportes recientes para proyectar');
+    if (g.projectedMonth)
+      parts.push(`A tu ritmo llegas en ${monthLabel(g.projectedMonth)}`);
+    else if (g.saved > 0 || g.goal.targetDate)
+      parts.push('Sin aportes recientes para proyectar');
     return parts.join(' · ');
   }
   protected readonly ratingText = RATING_TEXT;
@@ -94,7 +106,9 @@ export class MetasViewComponent {
   protected async confirmDeleteContribution(item: MonthContribution) {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: item.contribution.withdrawal ? 'Eliminar retiro' : 'Eliminar aporte',
+      header: item.contribution.withdrawal
+        ? 'Eliminar retiro'
+        : 'Eliminar aporte',
       message: `Se borrará el ${item.contribution.withdrawal ? 'retiro' : 'aporte'} de ${formatMoney(item.contribution.amount)} a ${item.goalName} del ${formatDay(item.contribution.date)}.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
@@ -105,12 +119,20 @@ export class MetasViewComponent {
     const { role } = await alert.onDidDismiss();
     if (role !== 'destructive') return;
     try {
-      const removed = await this.container.deleteSavingsContribution.execute(item.contribution.id);
+      const removed = await this.container.deleteSavingsContribution.execute(
+        item.contribution.id,
+      );
       this.monthState.notifyChange();
-      if (removed) this.undo.offer(removed.withdrawal ? 'Retiro eliminado' : 'Aporte eliminado', () => this.container.restoreSavingsContribution.execute(removed));
+      if (removed)
+        this.undo.offer(
+          removed.withdrawal ? 'Retiro eliminado' : 'Aporte eliminado',
+          () => this.container.restoreSavingsContribution.execute(removed),
+        );
     } catch (error) {
       console.error(error);
-      this.liveMessage.set('No se pudo eliminar el aporte. Inténtalo de nuevo.');
+      this.liveMessage.set(
+        'No se pudo eliminar el aporte. Inténtalo de nuevo.',
+      );
     }
   }
 

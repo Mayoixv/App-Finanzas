@@ -1,0 +1,39 @@
+# Cada push y pull request: revisar, probar y compilar. Deja el APK de prueba como archivo descargable.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Las pruebas de la base usan node:sqlite, que necesita Node 22.5 o más nuevo.
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npx ng lint
+      - run: npx ng test --no-watch
+      - run: npx ng build
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: APK de prueba
+        run: |
+          npx cap sync android
+          cd android && chmod +x gradlew && ./gradlew assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finanzas-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

@@ -170,6 +170,8 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
   const getMonthRecurringExpenses = new GetMonthRecurringExpenses(repos.recurring);
   const createBackup = new CreateBackup(repos.backup);
   const getCardStatuses = new GetCardStatuses(repos.accounts, repos.settings);
+  const getDebtsOverview = new GetDebtsOverview(repos.debts);
+  const getAccountsOverview = new GetAccountsOverview(repos.accounts);
   const getBudgetStatuses = new GetBudgetStatuses(repos.budgets, repos.transactions);
   const getUpcomingRecurring = new GetUpcomingRecurring(getMonthRecurringExpenses);
   return {
@@ -182,7 +184,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     updateRecurringExpense: new UpdateRecurringExpense(repos.recurring, repos.categories),
     removeRecurringExpense: new RemoveRecurringExpense(repos.recurring),
     getMonthOverview: new GetMonthOverview(repos.transactions, repos.categories, repos.savings),
-    getDebtInstallments: new GetDebtInstallments(new GetDebtsOverview(repos.debts)),
+    getDebtInstallments: new GetDebtInstallments(getDebtsOverview),
     getSubscriptionCost: new GetSubscriptionCost(repos.recurring, repos.categories),
     getReport: new GetReport(repos.transactions, repos.categories, repos.savings, repos.accounts, getMonthRecurringExpenses),
     getMonthHistory: new GetMonthHistory(repos.transactions, repos.categories, repos.savings),
@@ -214,9 +216,9 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     archiveAccount: new ArchiveAccount(repos.accounts),
     deleteAccount: new DeleteAccount(repos.accounts),
     adjustAccountBalance: new AdjustAccountBalance(repos.accounts),
-    getAccountsOverview: new GetAccountsOverview(repos.accounts),
+    getAccountsOverview,
     setCardMinimum: new SetCardMinimum(repos.settings),
-    getNetWorth: new GetNetWorth(new GetAccountsOverview(repos.accounts), new GetDebtsOverview(repos.debts)),
+    getNetWorth: new GetNetWorth(getAccountsOverview, getDebtsOverview),
     getCardStatuses,
     saveTransfer: new SaveTransfer(repos.accounts, ids),
     deleteTransfer: new DeleteTransfer(repos.accounts),
@@ -231,7 +233,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     getNotificationPlan: new GetNotificationPlan(getMonthRecurringExpenses, getBudgetStatuses, repos.categories, getCardStatuses),
     saveDebt: new SaveDebt(repos.debts, ids),
     deleteDebt: new DeleteDebt(repos.debts),
-    getDebtsOverview: new GetDebtsOverview(repos.debts),
+    getDebtsOverview,
     registerDebtPayment: new RegisterDebtPayment(repos.debts, repos.transactions, repos.categories, ids),
     deleteDebtPayment: new DeleteDebtPayment(repos.debts, repos.transactions),
     profile: new UserProfile(repos.settings),

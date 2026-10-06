@@ -228,7 +228,7 @@ describe('alertas de Inicio', () => {
       new GetUpcomingRecurring(recurring),
       new GetBudgetStatuses(s.budgets, s.transactions),
       s.categories,
-      new GetCardStatuses(new InMemoryAccounts(s.transactions, s.categories)),
+      new GetCardStatuses(new InMemoryAccounts(s.transactions, s.categories), new InMemorySettings()),
     );
     expect(await alerts.execute('2026-10-10')).toEqual({
       cardsDue: [],
@@ -255,7 +255,7 @@ describe('plan de notificaciones', () => {
       new GetMonthRecurringExpenses(s.recurring),
       new GetBudgetStatuses(s.budgets, s.transactions),
       s.categories,
-      new GetCardStatuses(new InMemoryAccounts(s.transactions, s.categories)),
+      new GetCardStatuses(new InMemoryAccounts(s.transactions, s.categories), new InMemorySettings()),
     ).execute('2026-10-29');
 
     // Renta de octubre ya pasó; la de noviembre se avisa el 31 y el 1. Sin recordatorios del sueldo.
@@ -371,7 +371,7 @@ describe('estado de tarjeta', () => {
     await add.execute({ date: '2026-10-18', amount: 5_000, categoryId: 'com', accountId: visa.id });
     await new SaveTransfer(accounts, s.ids).execute({ date: '2026-10-20', amount: 10_000, fromAccountId: 'acc-efectivo', toAccountId: visa.id });
 
-    const [card] = await new GetCardStatuses(accounts).execute('2026-10-25');
+    const [card] = await new GetCardStatuses(accounts, new InMemorySettings()).execute('2026-10-25');
     expect(card).toMatchObject({
       lastCut: '2026-10-15',
       dueDate: '2026-11-05',
@@ -390,7 +390,7 @@ describe('estado de tarjeta', () => {
     const accounts = new InMemoryAccounts(s.transactions, s.categories);
     const visa = await new SaveAccount(accounts, s.ids).execute({ name: 'Visa', type: 'tarjeta', initialBalance: 0, creditLimit: 100_000, cutDay: 15, dueDay: 5 });
     await new AddTransaction(s.transactions, s.categories, s.ids, accounts).execute({ date: '2026-10-10', amount: 40_000, categoryId: 'com', accountId: visa.id });
-    const cards = new GetCardStatuses(accounts);
+    const cards = new GetCardStatuses(accounts, new InMemorySettings());
     const recurring = new GetMonthRecurringExpenses(s.recurring);
     const budgets = new GetBudgetStatuses(s.budgets, s.transactions);
 

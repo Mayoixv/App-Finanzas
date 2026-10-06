@@ -55,8 +55,15 @@ export function markPaid(
 }
 
 /** Si la plantilla genera instancia en ese mes: desde su inicio, cada `frequency` meses y fuera de una pausa. */
+/** Si el fijo ya empezó y no está en pausa ese mes (sin mirar la frecuencia). */
+export function isRunningIn(expense: RecurringExpense, month: MonthKey): boolean {
+  return month >= expense.startMonth && !(expense.pausedUntil && month <= expense.pausedUntil);
+}
+
+export function isPausedIn(expense: RecurringExpense, month: MonthKey): boolean {
+  return month >= expense.startMonth && !!expense.pausedUntil && month <= expense.pausedUntil;
+}
+
 export function isDueIn(expense: RecurringExpense, month: MonthKey): boolean {
-  if (month < expense.startMonth) return false;
-  if (expense.pausedUntil && month <= expense.pausedUntil) return false;
-  return monthsBetween(expense.startMonth, month) % (expense.frequency ?? 1) === 0;
+  return isRunningIn(expense, month) && monthsBetween(expense.startMonth, month) % (expense.frequency ?? 1) === 0;
 }

@@ -1,3 +1,4 @@
+import { splitPayment } from '../../domain/debts';
 import { dateInMonth, IsoDate, MonthKey, monthOf, monthsBetween } from '../../domain/month';
 import { DebtView, GetDebtsOverview } from './debts';
 
@@ -31,8 +32,10 @@ export class GetDebtInstallments {
         number,
         of: debt.termMonths,
         dueDate: dateInMonth(month, Number(debt.startDate.slice(8))),
-        // La última cuota puede ser menor si queda menos saldo.
-        amount: paid ? view.installment : Math.min(view.installment, view.balance),
+        // La última cuota puede ser menor: lo que queda más el interés de ese mes (el pago cubre primero el interés).
+        amount: paid
+          ? view.installment
+          : Math.min(view.installment, view.balance + splitPayment(view.balance, debt.annualRate, Number.MAX_SAFE_INTEGER).interest),
         paid,
       });
     }

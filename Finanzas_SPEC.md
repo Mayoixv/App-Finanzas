@@ -335,19 +335,19 @@ La app no tiene backend: no hay servidor, API, contraseñas en línea ni sesione
 - [ ] **[MVP] Derecho a exportar todo:** exportación completa en JSON y CSV (ver [Importar y exportar](docs/finanzas/12-importar-exportar.md)).
 - [x] **[MVP] Derecho a borrar todo:** "Borrar todos los datos" en Seguridad, con doble confirmación.
 - [x] **Sin telemetría ni terceros:** la app no hace llamadas de red. Las fuentes van empaquetadas, sin Google Fonts.
-- [ ] **[MVP] Política de privacidad** de una página dentro de Ayuda, y en la ficha de Play Store si se publica.
+- [x] **[MVP] Política de privacidad** de una página dentro de Ayuda, y en la ficha de Play Store si se publica. En Ajustes › Acerca de › Privacidad (falta la ficha de Play Store si se publica).
 
 ## 7. Requisitos no funcionales
 
 - [x] **Uso sin conexión:** total, porque no hay red.
-- [ ] **[MVP] Rendimiento:** abrir la app y ver Inicio en menos de 1.5 s en un Android de gama media. Cambiar de mes en menos de 300 ms con 5,000 movimientos (los índices por fecha ya existen). Medirlo en un teléfono real antes de publicar.
+- [x] **[MVP] Rendimiento:** abrir la app y ver Inicio en menos de 1.5 s en un Android de gama media. Cambiar de mes en menos de 300 ms con 5,000 movimientos (los índices por fecha ya existen). Medirlo en un teléfono real antes de publicar. Medido el 2026-10-06 con 5,000 movimientos: Inicio 0.49 s, cambio de mes 23 ms en Inicio y 280 ms en Movimientos.
 - [x] **Accesibilidad:** contraste AA (tokens `--muted-on-light`, `--positive-on-light`), zonas táctiles de 48 px, foco visible, `aria-live` en mensajes y `prefers-reduced-motion` respetado.
-- [ ] **[MVP] Revisión con TalkBack** en un teléfono real (pendiente).
+- [ ] **[MVP] Revisión con TalkBack** en un teléfono real (pendiente). Revisión automática con axe hecha el 2026-10-06: sin problemas tras subir el contraste del violeta y del gris y permitir el zoom.
 - [x] **Diseño móvil:** probado de 360 a 430 px de ancho.
 - [ ] **[Después] Tablet y PC:** contenido centrado a 480 px o dos columnas desde 900 px (design.md, sección 8).
 - [x] **Idioma:** español. [ ] [Después] textos centralizados para traducir a inglés.
 - [x] **Errores amigables:** cada pantalla tiene estados vacío y de error con una acción. Los formularios muestran el motivo exacto de la validación.
-- [ ] **[MVP] Estado de carga** visible si una consulta tarda más de 300 ms. Hoy la pantalla queda en blanco mientras carga.
+- [x] **[MVP] Estado de carga** visible si una consulta tarda más de 300 ms. Hoy la pantalla queda en blanco mientras carga. Indicador tras 0.3 s en todas las pantallas.
 
 ## 8. Flujos clave (UX)
 
@@ -398,7 +398,7 @@ Ningún paso es obligatorio salvo la moneda.
 - [x] **Casos de uso con repositorios en memoria:** concurrencia (una lectura tardía no pisa un pago) y compensación (si falla marcar un pago, se borra el gasto creado).
 - [x] **Componentes:** Inicio y Fijos con datos y vacíos.
 - [ ] [MVP] **Pruebas de flujos en el navegador** (crear, editar, pagar, recargar y persistir). Hoy se hacen manualmente con Chrome sin ventana: convertirlas en un script de Playwright.
-- [ ] [MVP] **CI en GitHub Actions:** `npm ci`, `ng lint`, `ng test`, `ng build` en cada push, y el APK de debug como artefacto.
+- [x] [MVP] **CI en GitHub Actions:** `npm ci`, `ng lint`, `ng test`, `ng build` en cada push, y el APK de debug como artefacto. `.github/workflows/ci.yml`.
 - [ ] [MVP] **Prueba manual en Android** antes de cada versión: instalar sobre la anterior y comprobar que los datos se conservan y las migraciones corren.
 - **No aplica sin backend:** pruebas de integración de API y de seguridad de servidor.
 - **Datos de prueba:** los tests crean sus propios datos. [ ] [Después] un botón oculto de "datos de ejemplo" en builds de debug.
@@ -417,7 +417,7 @@ Lo que falta:
 - [x] Búsqueda por nota y filtro por categoría en Movimientos.
 - [ ] Borrado lógico con "Deshacer" y auditoría.
 - [ ] Onboarding y estado de carga.
-- [ ] APK firmado (release) y CI.
+- [x] APK firmado (release) y CI. Llave en D:/App_Finanzas/firma, fuera del repositorio.
 
 **Criterios de aceptación medibles:**
 - Registrar un gasto en 10 s o menos, medido con 5 personas.

@@ -142,3 +142,21 @@ li + li .row {
   color: var(--violet-600);
 }
 
+
+.privacy {
+  margin-top: 12px;
+  padding: 4px 16px;
+  border-radius: var(--radius-card);
+  background: var(--surface-soft-card);
+
+  p {
+    margin: 12px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-on-light);
+  }
+}
+
+.row ion-icon.flipped {
+  transform: rotate(180deg);
+}
