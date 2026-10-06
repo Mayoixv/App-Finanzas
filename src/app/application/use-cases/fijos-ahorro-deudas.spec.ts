@@ -20,6 +20,8 @@ import { GetSavingsOverview } from './get-savings-overview';
 import { GetUpcomingRecurring } from './get-upcoming-recurring';
 import { Onboarding } from './onboarding';
 import { GetAlerts } from './get-alerts';
+import { GetMonthHistory } from './get-month-history';
+import { change } from '../../domain/monthly-summary';
 import { GetNotificationPlan } from './get-notification-plan';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './pause-recurring-expense';
 import { SetBudget } from './set-budget';
@@ -257,5 +259,20 @@ describe('plan de notificaciones', () => {
     expect(plan.budgets).toEqual([
       { key: 'presupuesto:com:2026-10:exceeded', name: 'Comida', level: 'exceeded', spent: 1_100, limit: 1_000 },
     ]);
+  });
+});
+
+describe('comparación mes a mes', () => {
+  it('resume los últimos meses del más reciente al más antiguo y compara con el anterior', async () => {
+    const s = setup();
+    const tx = new AddTransaction(s.transactions, s.categories, s.ids);
+    await tx.execute({ date: '2026-09-01', amount: 50_000, categoryId: 'sal' });
+    await tx.execute({ date: '2026-09-10', amount: 10_000, categoryId: 'com' });
+    await tx.execute({ date: '2026-10-01', amount: 50_000, categoryId: 'sal' });
+    await tx.execute({ date: '2026-10-10', amount: 12_000, categoryId: 'com' });
+    const history = await new GetMonthHistory(s.transactions, s.categories, s.savings).execute('2026-10', 3);
+    expect(history.map((h) => [h.month, h.expenses])).toEqual([['2026-10', 12_000], ['2026-09', 10_000], ['2026-08', 0]]);
+    expect(change(history[0].expenses, history[1].expenses)).toEqual({ diff: 2_000, percent: 20 });
+    expect(change(5, 0)).toEqual({ diff: 5, percent: null });
   });
 });

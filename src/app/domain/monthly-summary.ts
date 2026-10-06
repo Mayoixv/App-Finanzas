@@ -55,3 +55,14 @@ export function summarizeMonth(
     rating: rateSavings(savingsPercent),
   };
 }
+
+export interface Change {
+  /** Diferencia en centavos (actual - anterior). */
+  diff: number;
+  /** Cambio en porcentaje sobre el mes anterior; null si el anterior fue 0 (no hay base para comparar). */
+  percent: number | null;
+}
+
+export function change(current: number, previous: number): Change {
+  return { diff: current - previous, percent: previous !== 0 ? ((current - previous) / Math.abs(previous)) * 100 : null };
+}

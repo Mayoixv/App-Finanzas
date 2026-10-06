@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+.card {
+  margin: 0 20px 24px;
+  padding: 24px 20px;
+  border-radius: var(--radius-card);
+  background: var(--ink-800);
+  border: 1px solid var(--border-glow);
+
+  .section-title {
+    margin-bottom: 16px;
+  }
+}
+
+.card-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.compare {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.line {
+  dt {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  dd {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 0 0;
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ion-icon {
+    flex: none;
+    font-size: 18px;
+  }
+
+  &.good ion-icon {
+    color: var(--positive);
+  }
+
+  &.bad ion-icon {
+    color: var(--negative);
+  }
+
+  &.same ion-icon {
+    color: var(--muted);
+  }
+}
+
+.sub-title {
+  margin: 24px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.months {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 0;
+  }
+
+  li + li {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  li.current .month-label {
+    color: var(--violet-400);
+  }
+}
+
+.month-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.month-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.month-balance {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+
+  &.negative {
+    color: var(--negative);
+  }
+}
+
+.month-empty,
+.month-detail {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.month-detail {
+  font-variant-numeric: tabular-nums;
+}

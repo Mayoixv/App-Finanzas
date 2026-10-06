@@ -1,0 +1,46 @@
+@if (rows().length) {
+  <section class="card" aria-labelledby="mes-a-mes-title">
+    <h2 id="mes-a-mes-title" class="section-title">Mes a mes</h2>
+
+    @if (lines(); as list) {
+      <dl class="compare">
+        @for (l of list; track l.label) {
+          <div [class]="'line ' + l.tone">
+            <dt>{{ l.label }}</dt>
+            <dd>
+              <ion-icon [name]="l.icon" aria-hidden="true"></ion-icon>
+              {{ l.text }}
+            </dd>
+          </div>
+        }
+      </dl>
+    } @else {
+      <p class="card-empty">
+        Sin movimientos en {{ prevName() }} para comparar.
+      </p>
+    }
+
+    @if (rows().length > 1) {
+      <h3 class="sub-title">Últimos {{ rows().length }} meses</h3>
+      <ul class="months">
+        @for (r of rows(); track r.month) {
+          <li [class.current]="r.current">
+            <span class="month-head">
+              <span class="month-label">{{ r.label }}</span>
+              @if (r.empty) {
+                <span class="month-empty">Sin movimientos</span>
+              } @else {
+                <span class="month-balance" [class.negative]="r.negative">{{
+                  r.balance
+                }}</span>
+              }
+            </span>
+            @if (!r.empty) {
+              <span class="month-detail">{{ r.detail }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}

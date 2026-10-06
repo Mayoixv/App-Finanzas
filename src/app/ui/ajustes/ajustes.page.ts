@@ -1,6 +1,6 @@
-import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IonContent, IonIcon, IonToggle, ModalController } from '@ionic/angular';
+import { IonContent, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmark, chevronBack, chevronDown, chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -11,7 +11,7 @@ import { DropdownComponent } from '../dropdown.component';
 import { MonthState } from '../month-state';
 import { CategoriaModalComponent } from './categoria.modal';
 import { DatosComponent } from './datos.component';
-import { NotificationsService } from '../notifications.service';
+import { AvisosComponent } from './avisos.component';
 
 interface Group {
   type: CategoryType;
@@ -29,17 +29,13 @@ const GROUPS: { type: CategoryType; title: string }[] = [
   selector: 'app-ajustes',
   templateUrl: 'ajustes.page.html',
   styleUrls: ['ajustes.page.scss'],
-  imports: [RouterLink, IonContent, IonIcon, IonToggle, DropdownComponent, DatosComponent],
+  imports: [RouterLink, IonContent, IonIcon, DropdownComponent, DatosComponent, AvisosComponent],
 })
 export class AjustesPage {
   private readonly container = inject(APP_CONTAINER);
   private readonly modals = inject(ModalController);
   private readonly monthState = inject(MonthState);
   protected readonly currencyState = inject(CurrencyState);
-  protected readonly notifications = inject(NotificationsService);
-  protected readonly togglingNotifications = signal(false);
-  protected readonly notificationsError = signal('');
-  private readonly notificationsToggle = viewChild(IonToggle);
 
   protected readonly currencies: { code: Currency; label: string }[] = [
     { code: 'DOP', label: 'Peso dominicano (RD$)' },
@@ -69,32 +65,6 @@ export class AjustesPage {
       this.monthState.version();
       this.load();
     });
-  }
-
-  protected async toggleNotifications(on: boolean) {
-    if (on === this.notifications.enabled()) return;
-    this.togglingNotifications.set(true);
-    this.notificationsError.set('');
-    try {
-      if (!on) {
-        await this.notifications.disable();
-        this.liveMessage.set('Notificaciones desactivadas');
-      } else if (await this.notifications.enable()) {
-        this.liveMessage.set('Notificaciones activadas');
-      } else {
-        this.notificationsError.set(
-          'Android no dio permiso para notificar. Actívalo en Ajustes del teléfono › Aplicaciones › Finanzas › Notificaciones.',
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      this.notificationsError.set('No se pudieron cambiar las notificaciones. Inténtalo de nuevo.');
-    } finally {
-      this.togglingNotifications.set(false);
-      // El interruptor cambia solo al tocarlo; si no se pudo, vuelve a mostrar el estado real.
-      const toggle = this.notificationsToggle();
-      if (toggle) toggle.checked = this.notifications.enabled();
-    }
   }
 
   protected async setCurrency(code: Currency) {

@@ -52,8 +52,8 @@
 **Propósito:** saber si este mes va mejor o peor.
 
 **Funciones:**
-- [ ] [Después] En Inicio: diferencia de gasto e ingreso contra el mes anterior, con flecha y texto.
-- [ ] [Después] Tabla de los últimos 6 meses: ingresos, gastos, ahorrado y balance.
+- [x] [Después] En Inicio: diferencia de gasto e ingreso contra el mes anterior, con flecha y texto.
+- [x] [Después] Tabla de los últimos 6 meses: ingresos, gastos, ahorrado y balance.
 
 **Campos y datos:** calculado con `summarizeMonth` mes a mes.
 

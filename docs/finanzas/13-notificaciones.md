@@ -14,8 +14,9 @@ No existe todavía. Solo notificaciones **locales** (plugin `@capacitor/local-no
 - [x] [Después] Gasto fijo por vencer (el día anterior y el mismo día).
 - [x] [Después] Presupuesto al 85% y al 100% (una vez por umbral, categoría y mes).
 - [ ] [Después] Pago de tarjeta por vencer.
-- [ ] [Después] Recordatorio diario opcional para registrar gastos ("¿Registraste tus gastos de hoy?").
-- [ ] [Después] Preferencias: activar o desactivar cada tipo, hora del recordatorio diario y horas de silencio.
+- [x] [Después] Recordatorio diario opcional para registrar gastos ("¿Registraste tus gastos de hoy?"). No suena si ya se anotó algo ese día.
+- [x] [Después] Preferencias: activar o desactivar cada tipo, hora de los fijos y hora del recordatorio diario.
+- [ ] [Después] Horas de silencio.
 
 **Campos y datos:** en `settings`: `notify_fixed`, `notify_budget`, `notify_cards`, `notify_daily` (0/1), `notify_daily_time` (`HH:MM`), `quiet_from` y `quiet_to`.
 

@@ -18,7 +18,7 @@ Pantalla oscura con un solo protagonista: la tarjeta de balance. Desde ella se l
 - [x] [MVP] Últimos 5 movimientos del mes; tocar uno lo abre para editar.
 - [x] [MVP] Tarjeta de presupuestos del mes (ver [Presupuestos](05-presupuestos.md)).
 - [x] [MVP] Contador giratorio del balance (design.md, sección 10.5): solo gira lo que cambia y respeta el movimiento reducido.
-- [ ] [Después] Comparación con el mes anterior ("+12% de gasto que septiembre").
+- [x] [Después] Comparación con el mes anterior ("+12% de gasto que septiembre").
 
 **Campos y datos:** solo lectura. Usa `transactions` del mes (por rango de fecha), `categories` (para saber si un movimiento es ingreso o gasto) y `savings_contributions` del mes. Montos en centavos.
 

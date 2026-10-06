@@ -1,0 +1,77 @@
+<section class="block" aria-labelledby="avisos-title">
+  <h2 id="avisos-title" class="section-title">Avisos</h2>
+  <div class="rows">
+    <div class="row">
+      <ion-toggle
+        #main
+        justify="space-between"
+        [disabled]="!notifications.available || busy()"
+        [checked]="notifications.enabled()"
+        (ionChange)="toggle($event.detail.checked)"
+      >
+        Notificaciones
+      </ion-toggle>
+    </div>
+
+    @if (notifications.enabled()) {
+      @let p = notifications.prefs();
+      <div class="row">
+        <ion-toggle justify="space-between" [checked]="p.fijos" (ionChange)="set('fijos', $event.detail.checked)">
+          <span class="label">Gastos fijos por vencer</span>
+          <span class="sub">El día antes y el día que vencen</span>
+        </ion-toggle>
+      </div>
+      @if (p.fijos) {
+        <div class="row">
+          <ion-select
+            label="Hora"
+            interface="action-sheet"
+            cancelText="Cancelar"
+            [value]="p.hour"
+            (ionChange)="set('hour', $event.detail.value)"
+          >
+            @for (h of hours; track h) {
+              <ion-select-option [value]="h">{{ hourLabel(h) }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
+      }
+      <div class="row">
+        <ion-toggle justify="space-between" [checked]="p.budgets" (ionChange)="set('budgets', $event.detail.checked)">
+          <span class="label">Presupuestos</span>
+          <span class="sub">Al llegar al 85% y al pasarse, una vez al mes</span>
+        </ion-toggle>
+      </div>
+      <div class="row">
+        <ion-toggle justify="space-between" [checked]="p.daily" (ionChange)="set('daily', $event.detail.checked)">
+          <span class="label">Recordatorio diario</span>
+          <span class="sub">"¿Registraste tus gastos de hoy?" Si ya anotaste algo hoy, no suena</span>
+        </ion-toggle>
+      </div>
+      @if (p.daily) {
+        <div class="row">
+          <ion-select
+            label="Hora"
+            interface="action-sheet"
+            cancelText="Cancelar"
+            [value]="p.dailyHour"
+            (ionChange)="set('dailyHour', $event.detail.value)"
+          >
+            @for (h of hours; track h) {
+              <ion-select-option [value]="h">{{ hourLabel(h) }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
+      }
+    }
+  </div>
+
+  @if (!notifications.available) {
+    <p class="note">Disponible en la app del teléfono.</p>
+  } @else if (!notifications.enabled()) {
+    <p class="note">Te avisa de gastos fijos por vencer y presupuestos al límite, aunque no abras la app.</p>
+  }
+  @if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+</section>

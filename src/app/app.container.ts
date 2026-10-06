@@ -19,6 +19,7 @@ import {
 } from './application/use-cases/debts';
 import { Onboarding } from './application/use-cases/onboarding';
 import { GetAlerts } from './application/use-cases/get-alerts';
+import { GetMonthHistory } from './application/use-cases/get-month-history';
 import { GetNotificationPlan } from './application/use-cases/get-notification-plan';
 import { GetUpcomingRecurring } from './application/use-cases/get-upcoming-recurring';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './application/use-cases/pause-recurring-expense';
@@ -121,6 +122,7 @@ export interface AppContainer {
   onboarding: Onboarding;
   getAlerts: GetAlerts;
   getNotificationPlan: GetNotificationPlan;
+  getMonthHistory: GetMonthHistory;
 }
 
 export const APP_CONTAINER = new InjectionToken<AppContainer>('AppContainer');
@@ -141,6 +143,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     updateRecurringExpense: new UpdateRecurringExpense(repos.recurring, repos.categories),
     removeRecurringExpense: new RemoveRecurringExpense(repos.recurring),
     getMonthOverview: new GetMonthOverview(repos.transactions, repos.categories, repos.savings),
+    getMonthHistory: new GetMonthHistory(repos.transactions, repos.categories, repos.savings),
     getMonthRecurringExpenses,
     payRecurringExpense: new PayRecurringExpense(repos.recurring, repos.transactions, ids),
     getSavingsOverview: new GetSavingsOverview(repos.savings),
