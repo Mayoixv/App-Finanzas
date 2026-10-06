@@ -24,6 +24,10 @@ describe('PIN', () => {
     await expect(pin.enable('12a4')).rejects.toThrow(ValidationError);
     await pin.enable('2468');
     expect(await pin.length()).toBe(4);
+    expect(await pin.lockAfter()).toBe(60);
+    await pin.setLockAfter(0);
+    expect(await pin.lockAfter()).toBe(0);
+    await expect(pin.setLockAfter(30)).rejects.toThrow(ValidationError);
     expect(await pin.isEnabled()).toBe(true);
     expect([...settings.values.values()].join()).not.toContain('2468');
     expect(await pin.verify('2468')).toEqual({ ok: true });

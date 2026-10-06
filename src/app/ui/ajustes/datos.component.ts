@@ -1,5 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { AlertController, IonIcon, LoadingController } from '@ionic/angular';
+import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
+import { AlertController, IonIcon, IonSelect, IonSelectOption, IonToggle, LoadingController } from '@ionic/angular';
+import { isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -15,15 +16,26 @@ type Values = Record<string, string>;
   selector: 'app-datos',
   templateUrl: 'datos.component.html',
   styleUrls: ['datos.component.scss'],
-  imports: [IonIcon],
+  imports: [IonIcon, IonSelect, IonSelectOption, IonToggle],
 })
 export class DatosComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);
   private readonly alerts = inject(AlertController);
   private readonly loading = inject(LoadingController);
-  private readonly lock = inject(LockState);
+  protected readonly lock = inject(LockState);
+  protected readonly lockOptions = [
+    { value: 0, label: 'Al momento' },
+    { value: 60, label: 'Tras 1 minuto' },
+    { value: 300, label: 'Tras 5 minutos' },
+    { value: 900, label: 'Tras 15 minutos' },
+  ];
 
   protected readonly pinEnabled = signal(false);
+  protected readonly privacy = signal(false);
+  protected readonly privacyAvailable = privacyAvailable;
+  private readonly privacyToggle = viewChild<IonToggle>('privacyToggle');
+  private readonly bioToggle = viewChild<IonToggle>('bioToggle');
+  protected readonly biometryAvailable = signal(false);
   protected readonly status = signal('');
 
   constructor() {
@@ -32,6 +44,8 @@ export class DatosComponent implements OnInit {
 
   async ngOnInit() {
     this.pinEnabled.set(await this.container.pinLock.isEnabled());
+    this.privacy.set(await isPrivacyOn(this.container.settings));
+    this.biometryAvailable.set(await this.lock.biometryAvailable().catch(() => false));
   }
 
   protected async createBackup() {
@@ -131,6 +145,7 @@ export class DatosComponent implements OnInit {
     }
     this.pinEnabled.set(false);
     this.lock.setEnabled(false);
+    if (this.lock.biometricOn()) await this.lock.setBiometric(false);
     this.status.set('Bloqueo con PIN desactivado.');
   }
 
@@ -169,5 +184,45 @@ export class DatosComponent implements OnInit {
   private async fail(message: string) {
     const alert = await this.alerts.create({ cssClass: 'app-alert', header: 'No se pudo', message, buttons: ['Entendido'] });
     await alert.present();
+  }
+
+  protected async setLockAfter(seconds: number) {
+    try {
+      await this.lock.setLockAfter(seconds);
+      this.status.set('Tiempo de bloqueo guardado.');
+    } catch (e) {
+      console.error(e);
+      this.status.set('No se pudo guardar el tiempo de bloqueo.');
+    }
+  }
+
+  protected async togglePrivacy(on: boolean) {
+    if (on === this.privacy()) return;
+    try {
+      await setPrivacy(this.container.settings, on);
+      this.privacy.set(on);
+      this.status.set(on ? 'La app se oculta en recientes y no permite capturas.' : 'La app vuelve a verse en recientes.');
+    } catch (e) {
+      console.error(e);
+      this.status.set('No se pudo cambiar. Inténtalo de nuevo.');
+      const toggle = this.privacyToggle();
+      if (toggle) toggle.checked = this.privacy();
+    }
+  }
+
+  protected async toggleBiometric(on: boolean) {
+    if (on === this.lock.biometricOn()) return;
+    try {
+      const ok = await this.lock.setBiometric(on);
+      this.status.set(
+        !ok ? 'No se confirmó la huella; sigue desactivada.' : on ? 'Desbloqueo con huella activado.' : 'Desbloqueo con huella desactivado.',
+      );
+    } catch (e) {
+      console.error(e);
+      this.status.set('No se pudo cambiar. Inténtalo de nuevo.');
+    } finally {
+      const toggle = this.bioToggle();
+      if (toggle) toggle.checked = this.lock.biometricOn();
+    }
   }
 }

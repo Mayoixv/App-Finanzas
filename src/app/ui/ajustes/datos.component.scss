@@ -76,3 +76,35 @@ li + li .row {
   font-size: 14px;
   color: var(--muted-on-light);
 }
+
+.select-row {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+
+  ion-select {
+    flex: 1;
+    font-size: 16px;
+    color: var(--text-on-light);
+    min-height: 52px;
+  }
+}
+
+li + li.select-row,
+li.select-row + li .row {
+  border-top: 1px solid rgba(20, 18, 31, 0.08);
+}
+
+.select-row ion-toggle {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 16px;
+  color: var(--text-on-light);
+  --track-background-checked: var(--violet-600);
+}
+
+.toggle-title,
+.select-row .row-sub {
+  display: block;
+  white-space: normal;
+}

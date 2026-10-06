@@ -7,7 +7,7 @@ describe('AppComponent', () => {
   it('should create the app', async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideRouter([]), { provide: APP_CONTAINER, useValue: {} }]
+      providers: [provideRouter([]), { provide: APP_CONTAINER, useValue: { pinLock: { lockAfter: () => Promise.resolve(60) } } }]
     }).compileComponents();
     
     const fixture = TestBed.createComponent(AppComponent);

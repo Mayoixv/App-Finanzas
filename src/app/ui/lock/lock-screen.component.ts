@@ -1,7 +1,7 @@
-import { Component, computed, HostListener, inject, signal } from '@angular/core';
+import { Component, computed, effect, HostListener, inject, signal, untracked } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { backspaceOutline } from 'ionicons/icons';
+import { backspaceOutline, fingerPrint } from 'ionicons/icons';
 import { LockState } from './lock-state';
 
 const MAX_DIGITS = 6;
@@ -28,7 +28,11 @@ export class LockScreenComponent {
   private timer?: ReturnType<typeof setInterval>;
 
   constructor() {
-    addIcons({ backspaceOutline });
+    addIcons({ backspaceOutline, fingerPrint });
+    // Al bloquearse (al abrir o al volver a la app), pide la huella sola. Si se cancela, queda el PIN.
+    effect(() => {
+      if (this.lock.locked() && this.lock.biometricOn()) untracked(() => setTimeout(() => this.lock.unlockWithBiometry(), 300));
+    });
   }
 
   protected press(digit: string) {

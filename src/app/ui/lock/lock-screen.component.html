@@ -23,5 +23,12 @@
         Entrar
       </button>
     </div>
+
+    @if (lock.biometricOn()) {
+      <button type="button" class="bio" [disabled]="blocked()" (click)="lock.unlockWithBiometry()">
+        <ion-icon name="finger-print" aria-hidden="true"></ion-icon>
+        Usar huella o rostro
+      </button>
+    }
   </div>
 }

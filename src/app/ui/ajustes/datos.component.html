@@ -32,7 +32,7 @@
 </section>
 
 <section class="block" aria-labelledby="seguridad-title">
-  <h2 id="seguridad-title" class="section-title">Bloqueo con PIN</h2>
+  <h2 id="seguridad-title" class="section-title">Seguridad</h2>
   <ul class="rows">
     @if (pinEnabled()) {
       <li>
@@ -40,6 +40,32 @@
           <span class="row-title">Cambiar PIN</span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
+      </li>
+      @if (biometryAvailable()) {
+        <li class="select-row">
+          <ion-toggle
+            #bioToggle
+            justify="space-between"
+            [checked]="lock.biometricOn()"
+            (ionChange)="toggleBiometric($event.detail.checked)"
+          >
+            <span class="toggle-title">Desbloquear con huella o rostro</span>
+            <span class="row-sub">El PIN sigue sirviendo si la huella falla</span>
+          </ion-toggle>
+        </li>
+      }
+      <li class="select-row">
+        <ion-select
+          label="Volver a pedirlo tras salir"
+          interface="action-sheet"
+          cancelText="Cancelar"
+          [value]="lock.lockAfterSeconds()"
+          (ionChange)="setLockAfter($event.detail.value)"
+        >
+          @for (o of lockOptions; track o.value) {
+            <ion-select-option [value]="o.value">{{ o.label }}</ion-select-option>
+          }
+        </ion-select>
       </li>
       <li>
         <button type="button" class="row" (click)="disablePin()">
@@ -52,12 +78,28 @@
         <button type="button" class="row" (click)="enablePin()">
           <span class="row-text">
             <span class="row-title">Activar bloqueo con PIN</span>
-            <span class="row-sub">Se pide al abrir la app y al volver tras 1 minuto</span>
+            <span class="row-sub">Se pide al abrir la app y al volver a ella</span>
           </span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
       </li>
     }
+    <li class="select-row">
+      <ion-toggle
+        #privacyToggle
+        justify="space-between"
+        [disabled]="!privacyAvailable"
+        [checked]="privacy()"
+        (ionChange)="togglePrivacy($event.detail.checked)"
+      >
+        <span class="toggle-title">Ocultar en recientes</span>
+        <span class="row-sub">{{
+          privacyAvailable
+            ? 'Oscurece la app al cambiar de app e impide capturas de pantalla'
+            : 'Disponible en la app del teléfono'
+        }}</span>
+      </ion-toggle>
+    </li>
   </ul>
   <p class="status" aria-live="polite">{{ status() }}</p>
 </section>

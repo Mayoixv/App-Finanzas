@@ -8,11 +8,14 @@ import { APP_CONTAINER, createSqliteContainer } from './app/app.container';
 import { setDisplayCurrency } from './app/ui/format';
 import { setInitialLock } from './app/ui/lock/lock-state';
 import { pageTransition, sheetEnter, sheetLeave } from './app/ui/motion';
+import { applyPrivacy, isPrivacyOn } from './app/ui/privacy';
 
 async function start() {
   const container = await createSqliteContainer();
   setDisplayCurrency(await container.currencySettings.get());
   setInitialLock(await container.pinLock.isEnabled(), await container.pinLock.length());
+  // Antes de mostrar nada, para que el balance no aparezca en la vista de recientes.
+  if (await isPrivacyOn(container.settings)) await applyPrivacy(true).catch(console.error);
   // La primera vez, la app abre en la bienvenida en vez de Inicio.
   if ((await container.onboarding.needed()) && !location.pathname.startsWith('/bienvenida')) {
     history.replaceState(null, '', '/bienvenida');

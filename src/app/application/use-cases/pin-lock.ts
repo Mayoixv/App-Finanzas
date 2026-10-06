@@ -12,11 +12,26 @@ export type PinCheck = { ok: true } | { ok: false; waitSeconds: number };
  * PIN de la app. Se guarda solo su hash PBKDF2 con salt. Tras 5 fallos hay que esperar 30 s, y el tiempo
  * se duplica con cada fallo siguiente (máximo 15 min). Los fallos se guardan para que reiniciar no los borre.
  */
+/** Segundos en segundo plano tras los que se vuelve a pedir el PIN: inmediato, 1, 5 o 15 minutos. */
+export const LOCK_AFTER_OPTIONS = [0, 60, 300, 900] as const;
+const DEFAULT_LOCK_AFTER = 60;
+
 export class PinLock {
   constructor(private readonly settings: ISettingsRepository) {}
 
   async isEnabled(): Promise<boolean> {
     return !!(await this.settings.get('pin_hash'));
+  }
+
+  async lockAfter(): Promise<number> {
+    const stored = await this.settings.get('lock_after');
+    const n = Number(stored);
+    return stored && (LOCK_AFTER_OPTIONS as readonly number[]).includes(n) ? n : DEFAULT_LOCK_AFTER;
+  }
+
+  async setLockAfter(seconds: number): Promise<void> {
+    if (!(LOCK_AFTER_OPTIONS as readonly number[]).includes(seconds)) throw new ValidationError('Tiempo de bloqueo no válido');
+    await this.settings.set('lock_after', String(seconds));
   }
 
   /** Cuántos números tiene el PIN, para dibujar las bolitas justas; null si se creó antes de guardarlo. */
