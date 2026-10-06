@@ -1,17 +1,14 @@
-import { Location } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { AlertController, IonContent, IonIcon, ModalController } from '@ionic/angular';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronBack, chevronForward, swapHorizontal } from 'ionicons/icons';
+import { chevronForward, swapHorizontal } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { AccountsOverview, AccountView, CardStatus } from '../../application/use-cases/accounts';
+import { AccountView, CardStatus } from '../../application/use-cases/accounts';
 import { CARD_UTILIZATION_WARNING, isCard, Transfer } from '../../domain/account';
-import { currentMonth, formatDay, formatMoney, formatPercent, monthLabel, todayIso } from '../format';
+import { DineroFormService } from '../dinero/dinero-form.service';
+import { amountToInput, currentMonth, formatDay, formatMoney, formatPercent, monthLabel, parseAmount, todayIso } from '../format';
 import { MonthState } from '../month-state';
-import { UndoService } from '../undo.service';
 import { ACCOUNT_TYPE_LABEL } from './account-choices';
-import { CuentaModalComponent } from './cuenta.modal';
-import { TransferenciaModalComponent } from './transferencia.modal';
 
 interface Row {
   view: AccountView;
@@ -26,21 +23,22 @@ interface Row {
   highUse?: boolean;
 }
 
+/** Secciones Cuentas y Tarjetas de la pestaña Dinero (misma carga, distinto contenido). */
 @Component({
-  selector: 'app-cuentas',
-  templateUrl: 'cuentas.page.html',
-  styleUrls: ['cuentas.page.scss'],
-  imports: [IonContent, IonIcon],
+  selector: 'app-cuentas-view',
+  templateUrl: 'cuentas-view.component.html',
+  styleUrls: ['cuentas-view.component.scss'],
+  imports: [IonIcon],
 })
-export class CuentasPage {
+export class CuentasViewComponent {
   private readonly container = inject(APP_CONTAINER);
-  private readonly modals = inject(ModalController);
+  protected readonly forms = inject(DineroFormService);
   private readonly alerts = inject(AlertController);
-  private readonly location = inject(Location);
-  private readonly undo = inject(UndoService);
   protected readonly monthState = inject(MonthState);
 
-  protected readonly overview = signal<AccountsOverview | null>(null);
+  readonly mode = input<'cuentas' | 'tarjetas'>('cuentas');
+
+  private readonly views = signal<AccountView[] | null>(null);
   protected readonly transfers = signal<Transfer[]>([]);
   private readonly cardStatuses = signal<CardStatus[]>([]);
   protected readonly failed = signal(false);
@@ -49,30 +47,27 @@ export class CuentasPage {
   protected readonly money = formatMoney;
   protected readonly day = formatDay;
   protected readonly monthName = monthLabel(currentMonth());
-  private opening = false;
 
-  private readonly views = computed(() => this.overview()?.accounts ?? []);
-  protected readonly accounts = computed(() => this.views().filter((v) => !v.account.archived && !isCard(v.account)).map(toRow));
-  protected readonly cards = computed(() => {
+  protected readonly loaded = computed(() => this.views() !== null);
+  private readonly ofMode = computed(() =>
+    (this.views() ?? []).filter((v) => isCard(v.account) === (this.mode() === 'tarjetas')),
+  );
+  protected readonly rows = computed(() => {
     const statuses = new Map(this.cardStatuses().map((c) => [c.account.id, c]));
-    return this.views()
-      .filter((v) => !v.account.archived && isCard(v.account))
+    return this.ofMode()
+      .filter((v) => !v.account.archived)
       .map((v) => withStatus(toRow(v), statuses.get(v.account.id)));
   });
-  protected readonly archived = computed(() => this.views().filter((v) => v.account.archived).map(toRow));
-  protected readonly canTransfer = computed(() => this.views().filter((v) => !v.account.archived).length > 1);
-  private readonly names = computed(() => new Map(this.views().map((v) => [v.account.id, v.account.name])));
+  protected readonly archived = computed(() => this.ofMode().filter((v) => v.account.archived).map(toRow));
+  protected readonly canTransfer = computed(() => (this.views() ?? []).filter((v) => !v.account.archived).length > 1);
+  private readonly names = computed(() => new Map((this.views() ?? []).map((v) => [v.account.id, v.account.name])));
 
   constructor() {
-    addIcons({ chevronBack, chevronForward, swapHorizontal });
+    addIcons({ chevronForward, swapHorizontal });
     effect(() => {
       this.monthState.version();
       this.load();
     });
-  }
-
-  protected back() {
-    this.location.back();
   }
 
   protected transferText(t: Transfer): string {
@@ -80,54 +75,55 @@ export class CuentasPage {
     return `${n.get(t.fromAccountId) ?? 'Cuenta'} → ${n.get(t.toAccountId) ?? 'Cuenta'}`;
   }
 
-  protected openAccount(view?: AccountView) {
-    return this.open(CuentaModalComponent, { view });
+  protected openAccount(view: AccountView) {
+    return this.forms.openAccount(view);
   }
 
   protected openTransfer() {
-    return this.open(TransferenciaModalComponent, {});
+    return this.forms.openTransfer();
   }
 
   protected payCard(r: Row) {
-    return this.open(TransferenciaModalComponent, {
-      toAccountId: r.view.account.id,
-      suggestedAmount: r.status?.pending || r.status?.currentDebt,
-    });
+    return this.forms.openTransfer(r.view.account.id, r.status?.pending || r.status?.currentDebt);
   }
 
-  protected async confirmDeleteTransfer(t: Transfer) {
+  /** El pago mínimo lo fija el banco en cada estado: se anota a mano y vale solo para ese corte. */
+  protected async askMinimum(r: Row) {
+    const status = r.status;
+    if (!status) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar transferencia',
-      message: `Se borrará ${formatMoney(t.amount)} de ${this.transferText(t)} del ${formatDay(t.date)}.`,
+      header: 'Pago mínimo',
+      message: `Lo que dice el estado de ${r.name} del corte del ${formatDay(status.lastCut)}. Déjalo vacío para quitarlo.`,
+      inputs: [
+        {
+          name: 'min',
+          type: 'number',
+          placeholder: '0.00',
+          value: status.minimum ? amountToInput(status.minimum) : '',
+          attributes: { inputmode: 'decimal', min: 0 },
+        },
+      ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: 'Guardar', role: 'confirm' },
       ],
     });
     await alert.present();
-    if ((await alert.onDidDismiss()).role !== 'destructive') return;
+    const { role, data } = await alert.onDidDismiss();
+    if (role !== 'confirm') return;
+    const text = String(data?.values?.min ?? '').trim();
+    const amount = text ? parseAmount(text) : null;
+    if (text && amount === null) {
+      this.liveMessage.set('Monto no válido.');
+      return;
+    }
     try {
-      const removed = await this.container.deleteTransfer.execute(t.id);
+      await this.container.setCardMinimum.execute(r.view.account.id, status.lastCut, amount);
       this.monthState.notifyChange();
-      if (removed) this.undo.offer('Transferencia eliminada', () => this.container.accounts.saveTransfer(removed));
     } catch (error) {
       console.error(error);
-      this.liveMessage.set('No se pudo eliminar la transferencia. Inténtalo de nuevo.');
-    }
-  }
-
-  private async open(component: unknown, componentProps: Record<string, unknown>) {
-    // Un doble toque no debe abrir dos formularios.
-    if (this.opening) return;
-    this.opening = true;
-    try {
-      const modal = await this.modals.create({ component: component as never, componentProps });
-      await modal.present();
-      await modal.onWillDismiss();
-      this.monthState.notifyChange();
-    } finally {
-      this.opening = false;
+      this.liveMessage.set('No se pudo guardar el pago mínimo.');
     }
   }
 
@@ -139,8 +135,8 @@ export class CuentasPage {
         this.container.getCardStatuses.execute(todayIso()),
       ]);
       this.cardStatuses.set(cards);
-      this.overview.set(overview);
       this.transfers.set(transfers);
+      this.views.set(overview.accounts);
       this.failed.set(false);
     } catch (error) {
       console.error(error);

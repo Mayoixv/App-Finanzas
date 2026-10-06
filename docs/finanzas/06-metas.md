@@ -1,4 +1,4 @@
-# 6. Metas de ahorro (pestaña "Ahorro")
+# 6. Metas de ahorro (pestaña "Dinero" › Metas)
 
 [← Índice](../../Finanzas_SPEC.md#0-índice)
 

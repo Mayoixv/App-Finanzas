@@ -33,6 +33,7 @@
   - ¿Qué pasa si borro un pago de un gasto fijo?
   - ¿Dónde se guardan mis datos?
 - [ ] [Después] Consejos breves la primera vez que se abre cada pantalla, que se pueden cerrar y no vuelven.
+- [x] [Después] Recorrido opcional de la app (una pantalla por sección) en la bienvenida y en Ajustes › Tú › "Ver el recorrido de la app". Si se agrega una función, se agrega también en `src/app/ui/tutorial/tutorial.component.ts`.
 
 **Campos y datos:** texto empaquetado en la app (funciona sin conexión). `settings.tips_seen` (lista).
 

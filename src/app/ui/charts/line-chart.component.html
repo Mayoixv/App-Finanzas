@@ -1,0 +1,40 @@
+<div class="readout" aria-live="polite">
+  <span class="readout-title">{{ fullLabels()[active()] }}</span>
+  <span class="readout-row">
+    <span class="key key-line" [style.background]="color()" aria-hidden="true"></span>
+    <strong>{{ money(values()[active()] ?? 0) }}</strong>
+    <span class="readout-name">{{ name() }}</span>
+  </span>
+</div>
+
+<svg [attr.viewBox]="'0 0 ' + W + ' ' + H" class="chart" role="group" [attr.aria-label]="name() + ' por mes'">
+  @for (t of ticks(); track $index) {
+    <line class="grid" [attr.x1]="40" [attr.x2]="W" [attr.y1]="t.y" [attr.y2]="t.y" />
+    <text class="tick" [attr.x]="34" [attr.y]="t.y + 4" text-anchor="end">{{ t.label }}</text>
+  }
+  <path class="area" [attr.d]="area()" [style.fill]="color()" />
+  <path class="line" [attr.d]="line()" [style.stroke]="color()" />
+  @for (p of points(); track p.i) {
+    <text class="tick" [attr.x]="p.x" [attr.y]="H - 6" text-anchor="middle">{{ p.label }}</text>
+  }
+  @if (points()[active()]; as p) {
+    <line class="cursor" [attr.x1]="p.x" [attr.x2]="p.x" y1="12" [attr.y2]="H - 22" />
+    <circle class="dot" [attr.cx]="p.x" [attr.cy]="p.y" r="5" [style.fill]="color()" />
+  }
+  @for (p of points(); track p.i) {
+    <rect
+      class="hit"
+      [attr.x]="hitX(p.i)"
+      y="0"
+      [attr.width]="hitW"
+      [attr.height]="H"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="fullLabels()[p.i] + ': ' + money(values()[p.i])"
+      [attr.aria-pressed]="p.i === active()"
+      (click)="select(p.i)"
+      (keydown.enter)="select(p.i)"
+      (keydown.space)="select(p.i); $event.preventDefault()"
+    />
+  }
+</svg>

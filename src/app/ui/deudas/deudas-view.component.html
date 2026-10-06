@@ -1,12 +1,3 @@
-<ion-content class="surface-light" [fullscreen]="true">
-  <header class="screen-head">
-    <a routerLink="/ajustes" class="back" aria-label="Volver a Ajustes">
-      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
-      Ajustes
-    </a>
-    <h1 class="screen-title">Deudas y préstamos</h1>
-  </header>
-
   <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
   @if (failed()) {
@@ -139,10 +130,7 @@
     } @else {
       <section class="empty">
         <p class="empty-title">No tienes deudas registradas.</p>
-        <p class="empty-text">Anota un préstamo, una tarjeta o lo que alguien te debe para llevar la cuenta de cuánto falta.</p>
+        <p class="empty-text">Toca + para anotar un préstamo o lo que alguien te debe y llevar la cuenta de cuánto falta.</p>
       </section>
     }
-
-    <button type="button" class="btn-primary add" (click)="openDebt()">Agregar deuda</button>
   }
-</ion-content>

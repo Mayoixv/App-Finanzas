@@ -19,9 +19,11 @@ export const routes: Routes = [
         loadComponent: () => import('./ui/fijos/fijos.page').then((m) => m.FijosPage),
       },
       {
-        path: 'ahorro',
-        loadComponent: () => import('./ui/ahorro/ahorro.page').then((m) => m.AhorroPage),
+        path: 'dinero',
+        loadComponent: () => import('./ui/dinero/dinero.page').then((m) => m.DineroPage),
       },
+      // Direcciones viejas: llevan a la sección correspondiente de Dinero.
+      { path: 'ahorro', redirectTo: '/tabs/dinero?ver=metas' },
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
     ],
   },
@@ -30,16 +32,18 @@ export const routes: Routes = [
     loadComponent: () => import('./ui/ajustes/ajustes.page').then((m) => m.AjustesPage),
   },
   {
+    path: 'tutorial',
+    loadComponent: () => import('./ui/tutorial/tutorial.page').then((m) => m.TutorialPage),
+  },
+  {
+    path: 'reportes',
+    loadComponent: () => import('./ui/reportes/reportes.page').then((m) => m.ReportesPage),
+  },
+  {
     path: 'bienvenida',
     loadComponent: () => import('./ui/bienvenida/bienvenida.page').then((m) => m.BienvenidaPage),
   },
-  {
-    path: 'cuentas',
-    loadComponent: () => import('./ui/cuentas/cuentas.page').then((m) => m.CuentasPage),
-  },
-  {
-    path: 'deudas',
-    loadComponent: () => import('./ui/deudas/deudas.page').then((m) => m.DeudasPage),
-  },
+  { path: 'cuentas', redirectTo: '/tabs/dinero?ver=cuentas' },
+  { path: 'deudas', redirectTo: '/tabs/dinero?ver=deudas' },
   { path: '', redirectTo: 'tabs', pathMatch: 'full' },
 ];

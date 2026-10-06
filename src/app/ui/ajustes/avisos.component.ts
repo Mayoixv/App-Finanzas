@@ -17,6 +17,7 @@ export class AvisosComponent {
   protected readonly busy = signal(false);
   protected readonly error = signal('');
   protected readonly hours = HOURS;
+  protected readonly allHours = Array.from({ length: 24 }, (_, i) => i);
   private readonly mainToggle = viewChild<IonToggle>('main');
 
   protected hourLabel(h: number): string {

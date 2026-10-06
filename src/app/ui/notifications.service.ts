@@ -6,6 +6,7 @@ import { APP_CONTAINER } from '../app.container';
 import { BudgetNotice, PaymentReminder } from '../application/use-cases/get-notification-plan';
 import { addDays, monthOf } from '../domain/month';
 import { formatMoney, todayIso } from './format';
+import { deferPastQuiet } from './quiet-hours';
 import { MonthState } from './month-state';
 
 const ENABLED_KEY = 'notifications_enabled';
@@ -21,6 +22,10 @@ export interface NotificationPrefs {
   hour: number;
   /** Hora del recordatorio diario para registrar gastos. */
   dailyHour: number;
+  /** Horas de silencio: ningún aviso suena entre quietStart y quietEnd. */
+  quiet: boolean;
+  quietStart: number;
+  quietEnd: number;
 }
 
 const PREF_KEYS: Record<keyof NotificationPrefs, string> = {
@@ -29,9 +34,21 @@ const PREF_KEYS: Record<keyof NotificationPrefs, string> = {
   daily: 'notify_daily',
   hour: 'notify_hour',
   dailyHour: 'notify_daily_hour',
+  quiet: 'notify_quiet',
+  quietStart: 'notify_quiet_start',
+  quietEnd: 'notify_quiet_end',
 };
 
-const DEFAULT_PREFS: NotificationPrefs = { fijos: true, budgets: true, daily: false, hour: 9, dailyHour: 20 };
+const DEFAULT_PREFS: NotificationPrefs = {
+  fijos: true,
+  budgets: true,
+  daily: false,
+  hour: 9,
+  dailyHour: 20,
+  quiet: false,
+  quietStart: 22,
+  quietEnd: 7,
+};
 
 function atHour(date: string, hour: number): Date {
   const [y, m, d] = date.split('-').map(Number);
@@ -53,10 +70,10 @@ function reminderOf(r: PaymentReminder, hour: number): LocalNotificationSchema |
     title: r.when === 'antes' ? `Mañana vence ${r.name}` : `Hoy vence ${r.name}`,
     body:
       r.kind === 'tarjeta'
-        ? `Te falta ${formatMoney(r.amount)} del estado. Págalo desde Cuentas para no pagar intereses.`
+        ? `Te falta ${formatMoney(r.amount)} del estado${r.minimum ? ` (mínimo ${formatMoney(r.minimum)})` : ''}. Págalo desde Dinero › Tarjetas para no pagar intereses.`
         : `${formatMoney(r.amount)} · Márcalo como pagado en Fijos.`,
     schedule: { at, allowWhileIdle: true },
-    extra: { target: r.kind === 'tarjeta' ? '/cuentas' : '/tabs/fijos' },
+    extra: { target: r.kind === 'tarjeta' ? '/tabs/dinero?ver=tarjetas' : '/tabs/fijos' },
   };
 }
 
@@ -105,11 +122,11 @@ export class NotificationsService {
 
   private async loadPrefs(): Promise<NotificationPrefs> {
     const read = async (key: keyof NotificationPrefs) => this.container.settings.get(PREF_KEYS[key]);
-    const flag = async (key: 'fijos' | 'budgets' | 'daily') => {
+    const flag = async (key: 'fijos' | 'budgets' | 'daily' | 'quiet') => {
       const v = await read(key);
       return v ? v === '1' : DEFAULT_PREFS[key];
     };
-    const hour = async (key: 'hour' | 'dailyHour') => {
+    const hour = async (key: 'hour' | 'dailyHour' | 'quietStart' | 'quietEnd') => {
       const v = await read(key);
       const n = Number(v);
       return v && Number.isInteger(n) && n >= 0 && n <= 23 ? n : DEFAULT_PREFS[key];
@@ -120,6 +137,9 @@ export class NotificationsService {
       daily: await flag('daily'),
       hour: await hour('hour'),
       dailyHour: await hour('dailyHour'),
+      quiet: await flag('quiet'),
+      quietStart: await hour('quietStart'),
+      quietEnd: await hour('quietEnd'),
     };
     this.prefs.set(prefs);
     return prefs;
@@ -175,6 +195,14 @@ export class NotificationsService {
     }
 
     const all = [...reminders, ...daily, ...budgets];
+    // Horas de silencio: lo que caería dentro se pasa al final del silencio.
+    if (prefs.quiet) {
+      for (const n of all) {
+        const at = n.schedule?.at ?? new Date();
+        const moved = deferPastQuiet(at, prefs.quietStart, prefs.quietEnd);
+        if (moved !== at) n.schedule = { at: moved, allowWhileIdle: true };
+      }
+    }
     if (all.length) await LocalNotifications.schedule({ notifications: all });
   }
 

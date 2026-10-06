@@ -27,6 +27,8 @@ export class CuentaModalComponent implements OnInit {
 
   /** Si llega, el formulario edita esta cuenta en vez de crear una. */
   @Input() view?: AccountView;
+  /** Tipo propuesto al crear (desde la sección Tarjetas, una tarjeta). */
+  @Input() presetType?: AccountType;
 
   protected readonly types = (Object.keys(ACCOUNT_TYPE_LABEL) as AccountType[])
     .filter((t) => t !== 'efectivo')
@@ -54,7 +56,10 @@ export class CuentaModalComponent implements OnInit {
 
   ngOnInit() {
     const v = this.view;
-    if (!v) return;
+    if (!v) {
+      if (this.presetType) this.type.set(this.presetType);
+      return;
+    }
     const a = v.account;
     this.isEdit.set(true);
     this.isCash.set(a.id === CASH_ACCOUNT_ID);

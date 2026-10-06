@@ -1,0 +1,46 @@
+<div class="readout" aria-live="polite">
+  <span class="readout-title">{{ fullLabels()[active()] }}</span>
+  @for (s of series(); track s.name) {
+    <span class="readout-row">
+      <span class="key key-bar" [style.background]="s.color" aria-hidden="true"></span>
+      <strong>{{ money(s.values[active()] ?? 0) }}</strong>
+      <span class="readout-name">{{ s.name }}</span>
+    </span>
+  }
+</div>
+
+<svg [attr.viewBox]="'0 0 ' + W + ' ' + H" class="chart" role="group" aria-label="Gráfica por mes">
+  @for (t of ticks(); track $index) {
+    <line class="grid" [attr.x1]="40" [attr.x2]="W" [attr.y1]="t.y" [attr.y2]="t.y" />
+    <text class="tick" [attr.x]="34" [attr.y]="t.y + 4" text-anchor="end">{{ t.label }}</text>
+  }
+  @for (g of groups(); track g.i) {
+    <g class="group" [class.dim]="g.i !== active()">
+      @for (b of g.bars; track $index) {
+        <path [attr.d]="b.path" [style.fill]="b.color" />
+      }
+    </g>
+    <text class="tick" [attr.x]="g.cx" [attr.y]="H - 6" text-anchor="middle">{{ g.label }}</text>
+    <!-- Zona de toque de todo el mes, más grande que las columnas. -->
+    <rect
+      class="hit"
+      [attr.x]="g.hitX"
+      y="0"
+      [attr.width]="band$"
+      [attr.height]="H"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="ariaFor(g.i)"
+      [attr.aria-pressed]="g.i === active()"
+      (click)="select(g.i)"
+      (keydown.enter)="select(g.i)"
+      (keydown.space)="select(g.i); $event.preventDefault()"
+    />
+  }
+</svg>
+
+<div class="legend" aria-hidden="true">
+  @for (s of series(); track s.name) {
+    <span class="legend-item"><span class="key key-bar" [style.background]="s.color"></span>{{ s.name }}</span>
+  }
+</div>

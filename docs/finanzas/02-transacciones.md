@@ -49,7 +49,7 @@
 
 **Funciones:**
 - [x] [Después] Crear transferencia: cuenta origen, cuenta destino, monto, fecha y nota.
-- [ ] [Después] Editar y eliminar las dos partes juntas.
+- [x] [Después] Editar y eliminar las dos partes juntas.
 
 **Campos y datos:** `transfer_id` compartido por dos movimientos (salida en origen, entrada en destino). Monto en centavos > 0. Origen distinto de destino.
 

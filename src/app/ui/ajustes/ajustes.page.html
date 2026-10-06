@@ -9,6 +9,24 @@
 
   <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
+  <section class="block" aria-labelledby="tu-title">
+    <h2 id="tu-title" class="section-title">Tú</h2>
+    <ul class="rows">
+      <li>
+        <button type="button" class="row" (click)="editName()">
+          <span class="row-title">{{ userName() ? 'Nombre: ' + userName() : 'Agregar tu nombre' }}</span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </button>
+      </li>
+      <li>
+        <a routerLink="/tutorial" class="row">
+          <span class="row-title">Ver el recorrido de la app</span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </a>
+      </li>
+    </ul>
+  </section>
+
   <section class="block" aria-labelledby="moneda-title">
     <h2 id="moneda-title" class="section-title">Moneda</h2>
     <div class="anchor">
@@ -41,24 +59,6 @@
       </app-dropdown>
     </div>
     <p class="note">Solo cambia el símbolo con que se muestran los montos. Los montos guardados no se convierten.</p>
-  </section>
-
-  <section class="block" aria-labelledby="herramientas-title">
-    <h2 id="herramientas-title" class="section-title">Herramientas</h2>
-    <ul class="rows">
-      <li>
-        <a routerLink="/cuentas" class="row">
-          <span class="row-title">Cuentas y tarjetas</span>
-          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </a>
-      </li>
-      <li>
-        <a routerLink="/deudas" class="row">
-          <span class="row-title">Deudas y préstamos</span>
-          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </a>
-      </li>
-    </ul>
   </section>
 
   <app-avisos></app-avisos>

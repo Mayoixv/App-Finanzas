@@ -63,6 +63,28 @@
           </ion-select>
         </div>
       }
+      <div class="row">
+        <ion-toggle justify="space-between" [checked]="p.quiet" (ionChange)="set('quiet', $event.detail.checked)">
+          <span class="label">Horas de silencio</span>
+          <span class="sub">Lo que caiga en ese rango suena al terminar</span>
+        </ion-toggle>
+      </div>
+      @if (p.quiet) {
+        <div class="row">
+          <ion-select label="Desde" interface="action-sheet" cancelText="Cancelar" [value]="p.quietStart" (ionChange)="set('quietStart', $event.detail.value)">
+            @for (h of allHours; track h) {
+              <ion-select-option [value]="h">{{ hourLabel(h) }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
+        <div class="row">
+          <ion-select label="Hasta" interface="action-sheet" cancelText="Cancelar" [value]="p.quietEnd" (ionChange)="set('quietEnd', $event.detail.value)">
+            @for (h of allHours; track h) {
+              <ion-select-option [value]="h">{{ hourLabel(h) }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
+      }
     }
   </div>
 

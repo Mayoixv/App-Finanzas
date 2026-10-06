@@ -100,7 +100,7 @@ export class AlertsRowComponent {
 
   protected open(alert: Alert) {
     if (alert.target !== 'presupuestos') {
-      this.router.navigateByUrl(alert.target === 'fijos' ? '/tabs/fijos' : '/cuentas');
+      this.router.navigateByUrl(alert.target === 'fijos' ? '/tabs/fijos' : '/tabs/dinero?ver=tarjetas');
       return;
     }
     // Los presupuestos están más abajo en Inicio mismo.

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { AlertController, IonContent, IonIcon, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -9,11 +9,14 @@ import {
   createOutline,
   ellipsisHorizontal,
   searchOutline,
+  swapHorizontal,
   trashOutline,
 } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { DeletedTransaction } from '../../application/use-cases/delete-transaction';
+import { Account, CASH_ACCOUNT_ID, Transfer } from '../../domain/account';
 import { Category, isExpenseType } from '../../domain/category';
+import { DineroFormService } from '../dinero/dinero-form.service';
 import { Transaction } from '../../domain/transaction';
 import { formatDay, formatMoney } from '../format';
 import { DropdownComponent } from '../dropdown.component';
@@ -58,6 +61,10 @@ export class MovimientosPage {
   private readonly alerts = inject(AlertController);
   private readonly toasts = inject(ToastController);
   private readonly undo = inject(UndoService);
+  private readonly dineroForm = inject(DineroFormService);
+
+  /** `?categoria=<id>` en la dirección (desde Reportes) deja puesto ese filtro. */
+  readonly categoria = input<string>();
 
   protected readonly rows = signal<Row[] | null>(null);
   private readonly categories = signal<Category[]>([]);
@@ -74,6 +81,10 @@ export class MovimientosPage {
   protected readonly kindFilter = signal('todos');
   protected readonly categoryFilter = signal<string | null>(null);
   protected readonly categoryMenuOpen = signal(false);
+  protected readonly accounts = signal<Account[]>([]);
+  protected readonly accountFilter = signal<string | null>(null);
+  protected readonly accountMenuOpen = signal(false);
+  private readonly transfers = signal<Transfer[]>([]);
   protected readonly kindOptions: PillOption[] = [
     { value: 'todos', label: 'Todos' },
     { value: 'gasto', label: 'Gastos' },
@@ -94,18 +105,45 @@ export class MovimientosPage {
     () => this.categories().find((c) => c.id === this.categoryFilter())?.name ?? 'Todas las categorías',
   );
 
-  protected readonly filtering = computed(
-    () => !!this.search().trim() || this.kindFilter() !== 'todos' || !!this.categoryFilter(),
+  protected readonly accountFilterLabel = computed(
+    () => this.accounts().find((a) => a.id === this.accountFilter())?.name ?? 'Todas las cuentas',
   );
+
+  protected readonly filtering = computed(
+    () => !!this.search().trim() || this.kindFilter() !== 'todos' || !!this.categoryFilter() || !!this.accountFilter(),
+  );
+
+  /** Transferencias del mes: no son gasto ni ingreso, así que solo se ven sin filtro de tipo ni de categoría. */
+  protected readonly visibleTransfers = computed(() => {
+    if (this.kindFilter() !== 'todos' || this.categoryFilter()) return [];
+    const names = new Map(this.accounts().map((a) => [a.id, a.name]));
+    const account = this.accountFilter();
+    const words = fold(this.search()).split(/\s+/).filter(Boolean);
+    return this.transfers()
+      .filter((t) => !account || t.fromAccountId === account || t.toAccountId === account)
+      .map((t) => {
+        const title = `${names.get(t.fromAccountId) ?? 'Cuenta'} → ${names.get(t.toAccountId) ?? 'Cuenta'}`;
+        return {
+          transfer: t,
+          title,
+          sub: `${t.note ? t.note + ' · ' : ''}${formatDay(t.date)}`,
+          amount: formatMoney(t.amount),
+          haystack: fold(`${title} ${t.note}`),
+        };
+      })
+      .filter((r) => words.every((w) => r.haystack.includes(w)));
+  });
 
   protected readonly visible = computed(() => {
     const words = fold(this.search()).split(/\s+/).filter(Boolean);
     const kind = this.kindFilter();
     const category = this.categoryFilter();
+    const account = this.accountFilter();
     return (this.rows() ?? []).filter(
       (r) =>
         (kind === 'todos' || (kind === 'ingreso') === r.isIncome) &&
         (!category || r.categoryIds.includes(category)) &&
+        (!account || (r.transaction.accountId ?? CASH_ACCOUNT_ID) === account) &&
         words.every((w) => r.haystack.includes(w)),
     );
   });
@@ -125,7 +163,12 @@ export class MovimientosPage {
       createOutline,
       ellipsisHorizontal,
       searchOutline,
+      swapHorizontal,
       trashOutline,
+    });
+    effect(() => {
+      const id = this.categoria();
+      if (id) this.categoryFilter.set(id);
     });
     effect(() => {
       const month = this.monthState.month();
@@ -182,10 +225,20 @@ export class MovimientosPage {
     this.categoryMenuOpen.set(false);
   }
 
+  protected setAccountFilter(id: string | null) {
+    this.accountFilter.set(id);
+    this.accountMenuOpen.set(false);
+  }
+
+  protected editTransfer(t: Transfer) {
+    return this.dineroForm.editTransfer(t);
+  }
+
   protected clearFilters() {
     this.search.set('');
     this.kindFilter.set('todos');
     this.categoryFilter.set(null);
+    this.accountFilter.set(null);
   }
 
   // ---------- selección y edición masiva ----------
@@ -306,11 +359,15 @@ export class MovimientosPage {
   private async load(month: string) {
     const seq = ++this.loadSeq;
     try {
-      const [transactions, categories] = await Promise.all([
+      const [transactions, categories, accounts, transfers] = await Promise.all([
         this.container.transactions.listByMonth(month),
         this.container.categories.list(),
+        this.container.accounts.list(),
+        this.container.accounts.listTransfers(month),
       ]);
       if (seq !== this.loadSeq) return;
+      this.accounts.set(accounts);
+      this.transfers.set(transfers);
       const byId = new Map(categories.map((c) => [c.id, c]));
       this.categories.set(categories);
       this.rows.set(

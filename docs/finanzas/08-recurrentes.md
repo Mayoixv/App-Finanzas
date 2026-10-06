@@ -47,7 +47,7 @@
 
 **Funciones:**
 - [x] [MVP] Hoy se manejan como gasto fijo con la categoría "Suscripciones".
-- [ ] [Después] Total mensual y anual de suscripciones en Fijos.
+- [x] [Después] Total mensual y anual de suscripciones en Fijos.
 - [x] [Después] Periodicidad mensual, trimestral, semestral o anual.
 
 **Campos y datos:** [Después] `frequency` (`mensual`, `trimestral`, `anual`) en `recurring_expenses`. Una suscripción anual genera instancia solo en su mes.

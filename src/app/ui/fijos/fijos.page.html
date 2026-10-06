@@ -44,6 +44,11 @@
         @if (totals().toReceive > 0) {
           <p class="summary-note">Ingresos por recibir: {{ money(totals().toReceive) }}</p>
         }
+        @if (subscriptions(); as sub) {
+          <p class="summary-note">
+            {{ sub.count === 1 ? '1 suscripción' : sub.count + ' suscripciones' }}: {{ money(sub.monthly) }} al mes · {{ money(sub.yearly) }} al año
+          </p>
+        }
       </section>
 
       <ul [class.t-still]="!monthState.animateLists()" class="list">
@@ -82,6 +87,41 @@
                   (click)="pay(row)"
                 >
                   {{ row.isIncome ? 'Marcar como recibido' : 'Marcar como pagado' }}
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (installments().length) {
+      <h2 class="section-title paused-title">Cuotas de deudas</h2>
+      <ul [class.t-still]="!monthState.animateLists()" class="list">
+        @for (c of installments(); track c.view.debt.id) {
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
+            <div class="item-head">
+              <div class="item-text">
+                <span class="item-name">{{ c.view.debt.name }}</span>
+                <span class="item-detail" [class.urgent]="!c.paid && installmentDue(c).urgent">
+                  Cuota {{ c.number }} de {{ c.of }} · {{ c.paid ? 'Pagada' : installmentDue(c).text }}
+                </span>
+              </div>
+              <span class="item-amount">{{ money(c.amount) }}</span>
+            </div>
+            <div class="item-foot">
+              @if (c.paid) {
+                <span class="chip paid">
+                  <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+                  Pagada
+                </span>
+              } @else {
+                <span class="chip pending">
+                  <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+                  Pendiente
+                </span>
+                <button type="button" class="btn-secondary pay" [attr.aria-label]="'Registrar pago de ' + c.view.debt.name" (click)="payInstallment(c)">
+                  Registrar pago
                 </button>
               }
             </div>

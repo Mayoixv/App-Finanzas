@@ -1,5 +1,9 @@
-:host ion-content {
-  --padding-bottom: 168px;
+:host {
+  display: block;
+}
+
+.month {
+  margin: 0 20px 20px;
 }
 
 .notice {
@@ -10,27 +14,26 @@
 }
 
 .hero {
-  margin: 8px 20px 28px;
-  padding: 28px 24px 24px;
+  margin: 0 20px 24px;
+  padding: 20px;
   border-radius: var(--radius-card);
-  background: var(--brand-gradient);
-  box-shadow: 0 24px 56px -20px rgba(106, 61, 240, 0.55);
-  color: #fff;
+  background: var(--surface-soft-card);
+  color: var(--text-on-light);
 }
 
 .hero-label,
 .hero-note {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--muted-on-light);
 }
 
 .hero-amount {
-  margin: 8px 0 12px;
-  font-family: var(--font-display);
-  font-size: clamp(40px, 13vw, 56px);
-  line-height: 1;
+  margin: 6px 0 8px;
+  font-size: clamp(24px, 7vw, 30px);
+  font-weight: 600;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }

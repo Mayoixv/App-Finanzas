@@ -1,4 +1,4 @@
-# 3. Cuentas
+# 3. Cuentas (pestaña "Dinero" › Cuentas)
 
 [← Índice](../../Finanzas_SPEC.md#0-índice)
 

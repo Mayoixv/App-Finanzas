@@ -121,3 +121,19 @@
 .month-detail {
   font-variant-numeric: tabular-nums;
 }
+
+.reports-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  margin-top: 8px;
+  color: var(--violet-400);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-400);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+}

@@ -1,0 +1,32 @@
+<div class="tutorial" role="region" aria-roledescription="recorrido" [attr.aria-label]="'Recorrido de la app, ' + (index() + 1) + ' de ' + slides.length">
+  <div class="top">
+    <span class="count" aria-hidden="true">{{ index() + 1 }} / {{ slides.length }}</span>
+    <button type="button" class="skip" (click)="finished.emit()">Saltar</button>
+  </div>
+
+  @for (s of [slide()]; track s.title) {
+    <div class="slide" aria-live="polite">
+      <span class="icon" aria-hidden="true"><ion-icon [name]="s.icon"></ion-icon></span>
+      <p class="where">{{ s.where }}</p>
+      <h2 class="title">{{ s.title }}</h2>
+      <ul class="points">
+        @for (p of s.points; track p) {
+          <li>{{ p }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="dots" aria-hidden="true">
+    @for (s of slides; track s.title; let i = $index) {
+      <span class="dot" [class.on]="i === index()"></span>
+    }
+  </div>
+
+  <div class="nav">
+    @if (index() > 0) {
+      <button type="button" class="btn-secondary back" (click)="back()">Atrás</button>
+    }
+    <button type="button" class="btn-primary next" (click)="next()">{{ isLast() ? 'Entendido' : 'Siguiente' }}</button>
+  </div>
+</div>

@@ -45,8 +45,8 @@ Pantalla oscura con un solo protagonista: la tarjeta de balance. Desde ella se l
 **Propósito:** saber cuánto se tiene en total: lo que hay en las cuentas menos lo que se debe.
 
 **Funciones:**
-- [ ] [Después] Total = suma de saldos de cuentas activas − saldos de tarjetas − deudas pendientes.
-- [ ] [Después] Gráfica de línea de los últimos 12 meses (saldo al cierre de cada mes).
+- [x] [Después] Total = suma de saldos de cuentas activas − saldos de tarjetas − deudas pendientes (patrimonio, en Inicio y arriba de Dinero).
+- [x] [Después] Gráfica de línea de los últimos 12 meses (saldo al cierre de cada mes), en Reportes.
 
 **Campos y datos:** depende de [Cuentas](03-cuentas.md), [Tarjetas](09-tarjetas.md) y [Deudas](07-deudas.md). No guarda datos propios: se calcula.
 
@@ -64,7 +64,7 @@ Pantalla oscura con un solo protagonista: la tarjeta de balance. Desde ella se l
 
 **Funciones:**
 - [ ] [Después] Barras por semana: entradas contra salidas.
-- [ ] [Después] Proyección del resto del mes con los gastos fijos pendientes y sus fechas de vencimiento.
+- [x] [Después] Proyección del resto del mes con los fijos pendientes (por cobrar y por pagar), en Reportes.
 
 **Campos y datos:** `transactions` del mes e `recurring_instances` pendientes (`due_date`, `amount`).
 

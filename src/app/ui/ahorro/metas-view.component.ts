@@ -1,5 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { AlertController, IonContent, IonIcon } from '@ionic/angular';
+import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -26,12 +26,13 @@ interface View {
 }
 
 @Component({
-  selector: 'app-ahorro',
-  templateUrl: 'ahorro.page.html',
-  styleUrls: ['ahorro.page.scss'],
-  imports: [IonContent, IonIcon, MonthSwitcherComponent, PillToggleComponent, PageSlideComponent],
+  selector: 'app-metas-view',
+  templateUrl: 'metas-view.component.html',
+  styleUrls: ['metas-view.component.scss'],
+  imports: [IonIcon, MonthSwitcherComponent, PillToggleComponent, PageSlideComponent],
 })
-export class AhorroPage {
+/** Sección Metas de la pestaña Dinero: ahorrado del mes, metas y aportes. */
+export class MetasViewComponent {
   private readonly container = inject(APP_CONTAINER);
   private readonly alerts = inject(AlertController);
   private readonly undo = inject(UndoService);

@@ -64,6 +64,36 @@
             }
           </app-dropdown>
         </div>
+        @if (accounts().length > 1) {
+          <div class="anchor">
+            <button
+              type="button"
+              class="select"
+              aria-haspopup="menu"
+              [attr.aria-expanded]="accountMenuOpen()"
+              (click)="accountMenuOpen.set(!accountMenuOpen())"
+            >
+              {{ accountFilterLabel() }}
+              <ion-icon name="chevron-down" aria-hidden="true"></ion-icon>
+            </button>
+            <app-dropdown class="category-menu" origin="top-left" label="Filtrar por cuenta" [(open)]="accountMenuOpen">
+              <button type="button" role="menuitemradio" class="t-menu-item" [attr.aria-checked]="!accountFilter()" (click)="setAccountFilter(null)">
+                Todas las cuentas
+                @if (!accountFilter()) {
+                  <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                }
+              </button>
+              @for (a of accounts(); track a.id) {
+                <button type="button" role="menuitemradio" class="t-menu-item" [attr.aria-checked]="accountFilter() === a.id" (click)="setAccountFilter(a.id)">
+                  {{ a.name }}
+                  @if (accountFilter() === a.id) {
+                    <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                  }
+                </button>
+              }
+            </app-dropdown>
+          </div>
+        }
         @if (filtering()) {
           <p class="filter-summary" aria-live="polite">
             {{ visible().length }} de {{ list.length }} · Neto {{ money(visibleTotal()) }}
@@ -154,6 +184,24 @@
           }
         </ul>
       }
+    }
+
+    @if (visibleTransfers().length && !selecting()) {
+      <h2 class="section-title transfers-title">Transferencias</h2>
+      <ul [class.t-still]="!monthState.animateLists()" class="rows">
+        @for (t of visibleTransfers(); track t.transfer.id) {
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
+            <button type="button" class="row" [attr.aria-label]="'Editar transferencia ' + t.title + ', ' + t.amount" (click)="editTransfer(t.transfer)">
+              <span class="avatar transfer" aria-hidden="true"><ion-icon name="swap-horizontal"></ion-icon></span>
+              <span class="row-text">
+                <span class="row-title">{{ t.title }}</span>
+                <span class="row-sub">{{ t.sub }}</span>
+              </span>
+              <span class="row-amount">{{ t.amount }}</span>
+            </button>
+          </li>
+        }
+      </ul>
     }
   }
 </ion-content>

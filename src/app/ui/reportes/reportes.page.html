@@ -1,0 +1,123 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <button type="button" class="back" aria-label="Volver" (click)="back()">
+      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+      Volver
+    </button>
+    <h1 class="screen-title">Reportes</h1>
+    <p class="subtitle">Hasta {{ monthState.label() }}</p>
+    <button type="button" class="btn-secondary export" [disabled]="exporting()" (click)="exportPdf()">
+      {{ exporting() ? 'Creando PDF…' : 'Exportar ' + monthState.label() + ' a PDF' }}
+    </button>
+    @if (exportError(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+  </header>
+
+  <app-pill-toggle class="range" label="Periodo" [options]="rangeOptions" [(value)]="range"></app-pill-toggle>
+
+  @if (failed()) {
+    <p class="note">No se pudieron preparar los reportes. Vuelve a abrir esta pantalla.</p>
+  } @else if (report(); as r) {
+    @if (r.projection; as p) {
+      <section class="card stat" aria-labelledby="proyeccion-title">
+        <h2 id="proyeccion-title" class="stat-label">Si se cobran y pagan los fijos pendientes, terminas el mes con</h2>
+        <p class="stat-value" [class.negative]="p.projected < 0">{{ money(p.projected) }}</p>
+        <p class="stat-note">
+          Hoy {{ money(p.current) }}
+          @if (p.pendingIncome) {
+            · por cobrar {{ money(p.pendingIncome) }}
+          }
+          @if (p.pendingExpenses) {
+            · por pagar {{ money(p.pendingExpenses) }}
+          }
+        </p>
+      </section>
+    }
+
+    @if (isEmpty()) {
+      <p class="note">Sin movimientos en estos meses. Cuando registres ingresos y gastos, aquí verás cómo cambian.</p>
+    } @else {
+      <section class="card" aria-labelledby="mes-title">
+        <h2 id="mes-title" class="card-title">Ingresos y gastos por mes</h2>
+        <app-column-chart [labels]="labels()" [fullLabels]="fullLabels()" [series]="monthSeries()"></app-column-chart>
+        <button type="button" class="link-button" [attr.aria-expanded]="showTable()" (click)="showTable.set(!showTable())">
+          {{ showTable() ? 'Ocultar tabla' : 'Ver tabla' }}
+        </button>
+        @if (showTable()) {
+          <div class="table-wrap">
+            <table>
+              <caption class="sr-only">Ingresos, gastos, ahorrado y balance por mes</caption>
+              <thead>
+                <tr><th scope="col">Mes</th><th scope="col">Ingresos</th><th scope="col">Gastos</th><th scope="col">Ahorrado</th><th scope="col">Balance</th></tr>
+              </thead>
+              <tbody>
+                @for (s of r.summaries; track s.month; let i = $index) {
+                  <tr>
+                    <th scope="row">{{ labels()[i] }}</th>
+                    <td>{{ money(s.income) }}</td>
+                    <td>{{ money(s.expenses) }}</td>
+                    <td>{{ money(s.saved) }}</td>
+                    <td [class.negative]="s.balance < 0">{{ money(s.balance) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+
+      @if (categoryRows().length) {
+        <section class="card" aria-labelledby="cat-title">
+          <h2 id="cat-title" class="card-title">Gasto por categoría</h2>
+          <p class="card-sub">Toca una para ver cómo cambió mes a mes.</p>
+          <ul class="cats">
+            @for (c of categoryRows(); track c.categoryId) {
+              <li>
+                <button
+                  type="button"
+                  class="cat"
+                  [attr.aria-expanded]="categoryId() === c.categoryId"
+                  [attr.aria-label]="c.name + ', ' + money(c.total) + ', ' + percent(c.share) + ' del gasto'"
+                  (click)="toggleCategory(c.categoryId)"
+                >
+                  <span class="cat-head">
+                    <span class="cat-name">{{ c.name }}</span>
+                    <span class="cat-amount">{{ money(c.total) }}</span>
+                    <span class="cat-share">{{ percent(c.share) }}</span>
+                  </span>
+                  <span class="cat-track" aria-hidden="true"><span class="cat-fill" [style.width.%]="c.width"></span></span>
+                </button>
+                @if (categoryId() === c.categoryId) {
+                  <app-line-chart
+                    class="cat-trend"
+                    [labels]="labels()"
+                    [fullLabels]="fullLabels()"
+                    [values]="c.byMonth"
+                    [name]="'Gasto en ' + c.name"
+                    color="var(--series-gastos)"
+                  ></app-line-chart>
+                  <a class="link-button see-moves" [routerLink]="'/tabs/movimientos'" [queryParams]="{ categoria: c.categoryId }">
+                    Ver sus movimientos de {{ monthState.label() }}
+                  </a>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+
+    <section class="card" aria-labelledby="saldo-title">
+      <h2 id="saldo-title" class="card-title">Saldo en cuentas al cierre</h2>
+      <p class="card-sub">Todas tus cuentas sumadas, con las tarjetas restando.</p>
+      <app-line-chart
+        [labels]="labels()"
+        [fullLabels]="fullLabels()"
+        [values]="r.accountsAtClose"
+        name="Saldo en cuentas"
+        color="var(--series-gastos)"
+      ></app-line-chart>
+    </section>
+  }
+</ion-content>

@@ -24,13 +24,14 @@
   z-index: 1;
   flex: 1;
   height: 48px;
-  padding: 4px 16px;
+  /* Con muchas opciones, quien lo usa achica el relleno y la letra con estas variables. */
+  padding: 4px var(--tab-padding-x, 16px);
   border: 0;
   border-radius: 48px;
   background: transparent;
   color: var(--tabs-text-muted);
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--tab-font-size, 15px);
   font-weight: 600;
   cursor: pointer;
   transition: color var(--tabs-dur) var(--tabs-ease);

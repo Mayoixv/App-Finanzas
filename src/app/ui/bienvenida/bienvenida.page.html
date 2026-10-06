@@ -1,14 +1,41 @@
 <ion-content class="surface-light" [fullscreen]="true">
   <div class="wrap">
-    <p class="progress" aria-live="polite">Paso {{ stepNumber() }} de {{ total }}</p>
+    @if (stepNumber() > 0) {
+      <p class="progress" aria-live="polite">Paso {{ stepNumber() }} de {{ total }}</p>
+    }
 
     @switch (step()) {
-      @case ('hola') {
+      @case ('portada') {
+        <div class="step cover">
+          <img class="cover-icon" src="assets/icon/app-cat.png" alt="" width="160" height="160" />
+          <h1 class="title cover-title">Tu mejor decisión financiera es confiar en nosotros</h1>
+          <p class="text">Finanzas te ayuda a saber en qué se va tu dinero, mes a mes. Todo se queda en este teléfono.</p>
+          <button type="button" class="btn-primary main" (click)="next()">Empezar</button>
+        </div>
+      }
+
+      @case ('nombre') {
         <div class="step">
-        <h1 class="title">Te damos la bienvenida</h1>
-        <p class="text">Anota tus ingresos y gastos, sigue tus gastos fijos y tus metas de ahorro, mes a mes.</p>
-        <p class="text">Todo se guarda solo en este teléfono. No hay cuenta ni nube: para no perder nada, haz respaldos desde Ajustes.</p>
-        <button type="button" class="btn-primary main" (click)="next()">Empezar</button>
+          <h1 class="title">¿Cómo te llamas?</h1>
+          <p class="text">Solo para saludarte en Inicio. Puedes dejarlo en blanco o cambiarlo luego en Ajustes.</p>
+          <div class="field">
+            <ion-input
+              label="Tu nombre"
+              label-placement="stacked"
+              autocapitalize="words"
+              autocomplete="given-name"
+              [maxlength]="40"
+              [value]="name()"
+              (ionInput)="name.set(($event.detail.value ?? '').toString())"
+              (keyup.enter)="saveName()"
+            ></ion-input>
+          </div>
+          @if (error(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+          }
+          <button type="button" class="btn-primary main" [disabled]="busy()" (click)="saveName()">
+            {{ name().trim() ? 'Seguir' : 'Saltar' }}
+          </button>
         </div>
       }
 
@@ -30,6 +57,19 @@
           }
         </div>
         </div>
+      }
+
+      @case ('recorrido') {
+        <div class="step">
+          <h1 class="title">{{ name().trim() ? '¿Te mostramos cómo funciona, ' + name().trim() + '?' : '¿Te mostramos cómo funciona?' }}</h1>
+          <p class="text">Un recorrido corto por lo que puedes hacer en cada sección. También lo encuentras luego en Ajustes.</p>
+          <button type="button" class="btn-primary main" (click)="goTo('tutorial')">Ver el recorrido</button>
+          <button type="button" class="btn-secondary add" (click)="goTo('sueldo')">Saltar</button>
+        </div>
+      }
+
+      @case ('tutorial') {
+        <app-tutorial (finished)="goTo('sueldo')"></app-tutorial>
       }
 
       @case ('sueldo') {

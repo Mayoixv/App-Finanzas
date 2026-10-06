@@ -1,0 +1,132 @@
+// Gráficas de reportes (sobre --surface-soft-card). Reglas de la guía de visualización:
+// un eje, trazos finos, rejilla de 1px sólida y recesiva, texto en tinta (nunca en el color de la serie).
+:host {
+  display: block;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.grid {
+  stroke: rgba(20, 18, 31, 0.1);
+  stroke-width: 1;
+}
+
+.tick {
+  fill: var(--muted-on-light);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.group path {
+  transition: opacity 0.2s ease;
+}
+
+.group.dim path {
+  opacity: 0.4;
+}
+
+.line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.area {
+  opacity: 0.1;
+}
+
+.cursor {
+  stroke: rgba(20, 18, 31, 0.25);
+  stroke-width: 1;
+}
+
+/* El aro del color de la superficie separa el punto de la línea. */
+.dot {
+  stroke: var(--surface-soft-card);
+  stroke-width: 2;
+}
+
+.hit {
+  fill: transparent;
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible {
+    fill: rgba(106, 61, 240, 0.08);
+  }
+}
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  min-height: 44px;
+  margin-bottom: 8px;
+}
+
+.readout-title {
+  width: 100%;
+  font-size: 13px;
+  color: var(--muted-on-light);
+}
+
+.readout-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: var(--text-on-light);
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.readout-name {
+  font-size: 13px;
+  color: var(--muted-on-light);
+}
+
+.key {
+  display: inline-block;
+  flex: none;
+}
+
+.key-bar {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.key-line {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted-on-light);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .group path {
+    transition: none;
+  }
+}

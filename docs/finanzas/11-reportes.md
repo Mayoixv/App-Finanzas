@@ -12,7 +12,7 @@ Pantalla nueva [Después]. Cada gráfica lleva como título la pregunta que resp
 
 **Funciones:**
 - [x] [MVP] Dona del mes en Inicio, con las 5 mayores y "Otras", y leyenda con monto y %.
-- [ ] [Después] Rango de meses (3, 6, 12) y tocar una categoría para ver sus movimientos.
+- [x] [Después] Rango de meses (3, 6, 12) y tocar una categoría para ver su tendencia y abrir sus movimientos en Movimientos.
 
 **Campos y datos:** `expenseBreakdown` sobre los movimientos de categorías `fijo` y `variable`.
 
@@ -29,9 +29,9 @@ Pantalla nueva [Después]. Cada gráfica lleva como título la pregunta que resp
 **Propósito:** ver si se gasta más de lo que entra a lo largo del tiempo.
 
 **Funciones:**
-- [ ] [Después] Barras por mes: ingresos contra gastos, más la línea de balance.
-- [ ] [Después] Tendencia por categoría (línea de 6 meses).
-- [ ] [Después] Flujo de caja y patrimonio neto (ver [Dashboard](01-dashboard.md)).
+- [x] [Después] Barras por mes: ingresos contra gastos, con tabla de ingresos, gastos, ahorrado y balance (el balance va en la tabla, no como segunda serie, para no mezclar escalas en un eje).
+- [x] [Después] Tendencia por categoría (línea de 6 meses).
+- [x] [Después] Flujo de caja y patrimonio neto (ver [Dashboard](01-dashboard.md)).
 
 **Campos y datos:** `summarizeMonth` por mes. No guarda datos.
 

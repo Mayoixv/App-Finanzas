@@ -1,8 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { AlertController, IonContent, IonIcon, ModalController } from '@ionic/angular';
+import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronBack, createOutline } from 'ionicons/icons';
+import { createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { DebtView } from '../../application/use-cases/debts';
 import { amortization, AmortizationRow, DebtPayment, simulateStrategy, StrategyResult } from '../../domain/debts';
@@ -11,6 +10,7 @@ import { currentMonth, formatDay, formatMoney, monthLabel, parseAmount } from '.
 import { MonthState } from '../month-state';
 import { DeudaModalComponent } from './deuda.modal';
 import { PagoModalComponent } from './pago.modal';
+import { DineroFormService } from '../dinero/dinero-form.service';
 
 const SHORT_MONTH = new Intl.DateTimeFormat('es-DO', { month: 'short', year: 'numeric' });
 
@@ -24,14 +24,15 @@ interface Strategies {
 }
 
 @Component({
-  selector: 'app-deudas',
-  templateUrl: 'deudas.page.html',
-  styleUrls: ['deudas.page.scss'],
-  imports: [RouterLink, IonContent, IonIcon],
+  selector: 'app-deudas-view',
+  templateUrl: 'deudas-view.component.html',
+  styleUrls: ['deudas-view.component.scss'],
+  imports: [IonIcon],
 })
-export class DeudasPage {
+/** Sección Deudas de la pestaña Dinero. */
+export class DeudasViewComponent {
   private readonly container = inject(APP_CONTAINER);
-  private readonly modals = inject(ModalController);
+  private readonly forms = inject(DineroFormService);
   private readonly alerts = inject(AlertController);
   protected readonly monthState = inject(MonthState);
 
@@ -70,10 +71,8 @@ export class DeudasPage {
     };
   });
 
-  private loading = false;
-
   constructor() {
-    addIcons({ chevronBack, createOutline });
+    addIcons({ createOutline });
     effect(() => {
       this.monthState.version();
       this.load();
@@ -128,11 +127,11 @@ export class DeudasPage {
   }
 
   protected openDebt(view?: DebtView) {
-    return this.open(DeudaModalComponent, { debt: view?.debt });
+    return this.forms.open(DeudaModalComponent, { debt: view?.debt });
   }
 
   protected openPayment(view: DebtView) {
-    return this.open(PagoModalComponent, { view });
+    return this.forms.open(PagoModalComponent, { view });
   }
 
   protected async confirmDeletePayment(view: DebtView, p: DebtPayment) {
@@ -159,19 +158,7 @@ export class DeudasPage {
     }
   }
 
-  private async open(component: unknown, componentProps: Record<string, unknown>) {
-    // Un doble toque no debe abrir dos formularios.
-    if (this.loading) return;
-    this.loading = true;
-    try {
-      const modal = await this.modals.create({ component: component as never, componentProps });
-      await modal.present();
-      await modal.onWillDismiss();
-      this.monthState.notifyChange();
-    } finally {
-      this.loading = false;
-    }
-  }
+
 
   private async load() {
     try {

@@ -1,7 +1,7 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isCardPayment() ? 'Pagar tarjeta' : 'Transferir' }}</h1>
+      <h1 class="screen-title">{{ transfer ? 'Editar transferencia' : isCardPayment() ? 'Pagar tarjeta' : 'Transferir' }}</h1>
       <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
@@ -59,8 +59,12 @@
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isCardPayment() ? 'Guardar pago' : 'Guardar transferencia' }}
+      {{ transfer ? 'Guardar cambios' : isCardPayment() ? 'Guardar pago' : 'Guardar transferencia' }}
     </button>
+
+    @if (transfer) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar transferencia</button>
+    }
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">

@@ -20,10 +20,14 @@ import { GetMonthRecurringExpenses } from './get-month-recurring-expenses';
 import { GetSavingsOverview } from './get-savings-overview';
 import { GetUpcomingRecurring } from './get-upcoming-recurring';
 import { Onboarding } from './onboarding';
+import { UserProfile } from './user-profile';
 import { GetAlerts } from './get-alerts';
-import { AdjustAccountBalance, ArchiveAccount, DeleteAccount, GetAccountsOverview, GetCardStatuses, SaveAccount, SaveTransfer } from './accounts';
+import { AdjustAccountBalance, ArchiveAccount, DeleteAccount, GetAccountsOverview, GetCardStatuses, GetNetWorth, SaveAccount, SaveTransfer, SetCardMinimum } from './accounts';
 import { UpdateTransaction } from './update-transaction';
 import { GetMonthHistory } from './get-month-history';
+import { GetReport } from './get-report';
+import { GetSubscriptionCost } from './get-subscription-cost';
+import { GetDebtInstallments } from './get-debt-installments';
 import { change } from '../../domain/monthly-summary';
 import { GetNotificationPlan } from './get-notification-plan';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './pause-recurring-expense';
@@ -398,5 +402,108 @@ describe('estado de tarjeta', () => {
       'antes 2026-11-04 40000',
       'hoy 2026-11-05 40000',
     ]);
+  });
+});
+
+describe('patrimonio', () => {
+  it('cuentas − tarjetas − deudas + lo que te deben', async () => {
+    const s = setup();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories);
+    const save = new SaveAccount(accounts, s.ids);
+    await save.execute({ name: 'Banco', type: 'banco', initialBalance: 100_000 });
+    await save.execute({ name: 'Visa', type: 'tarjeta', initialBalance: -20_000, creditLimit: 50_000, cutDay: 1, dueDay: 8 });
+    const debts = new SaveDebt(s.debts, s.ids);
+    await debts.execute({ name: 'Carro', direction: 'debo', principal: 50_000, annualRate: 0, termMonths: null, startDate: '2026-10-01' });
+    await debts.execute({ name: 'Juan', direction: 'me_deben', principal: 5_000, annualRate: 0, termMonths: null, startDate: '2026-10-01' });
+    const net = await new GetNetWorth(new GetAccountsOverview(accounts), new GetDebtsOverview(s.debts)).execute();
+    expect(net).toEqual({ have: 105_000, owe: 70_000, total: 35_000 });
+  });
+});
+
+describe('reportes', () => {
+  it('resume el periodo por mes y por categoría, saldo de cuentas al cierre y proyección del mes', async () => {
+    const s = setup();
+    s.categories.items.set('oci', { id: 'oci', name: 'Ocio', type: 'variable' });
+    const accounts = new InMemoryAccounts(s.transactions, s.categories);
+    const tx = new AddTransaction(s.transactions, s.categories, s.ids, accounts);
+    await tx.execute({ date: '2026-08-01', amount: 50_000, categoryId: 'sal' });
+    await tx.execute({ date: '2026-08-05', amount: 10_000, categoryId: 'com' });
+    await tx.execute({ date: '2026-10-01', amount: 50_000, categoryId: 'sal' });
+    await tx.execute({ date: '2026-10-03', amount: 4_000, categoryId: 'com' });
+    await tx.execute({ date: '2026-10-04', amount: 6_000, categoryId: 'oci' });
+    const add = new AddRecurringExpense(s.recurring, s.categories, s.ids);
+    await add.execute({ name: 'Renta', amount: 20_000, categoryId: 'ren', dueDay: 28, startMonth: '2026-10' });
+    await add.execute({ name: 'Bono', amount: 5_000, categoryId: 'sal', dueDay: 30, startMonth: '2026-10' });
+
+    const report = await new GetReport(s.transactions, s.categories, s.savings, accounts, new GetMonthRecurringExpenses(s.recurring)).execute('2026-10', 3, '2026-10');
+    expect(report.months).toEqual(['2026-08', '2026-09', '2026-10']);
+    expect(report.summaries.map((m) => m.expenses)).toEqual([10_000, 0, 10_000]);
+    expect(report.categories.map((c) => [c.name, c.total, c.byMonth])).toEqual([
+      ['Comida', 14_000, [10_000, 0, 4_000]],
+      ['Ocio', 6_000, [0, 0, 6_000]],
+    ]);
+    expect(report.accountsAtClose).toEqual([40_000, 40_000, 80_000]);
+    expect(report.projection).toEqual({ current: 40_000, pendingIncome: 5_000, pendingExpenses: 20_000, projected: 25_000 });
+
+    const past = await new GetReport(s.transactions, s.categories, s.savings, accounts, new GetMonthRecurringExpenses(s.recurring)).execute('2026-09', 3, '2026-10');
+    expect(past.projection).toBeNull();
+  });
+});
+
+describe('costo de suscripciones', () => {
+  it('pasa cada suscripción a costo mensual y deja fuera las pausadas', async () => {
+    const s = setup();
+    s.categories.items.set('cat-suscripciones', { id: 'cat-suscripciones', name: 'Suscripciones', type: 'fijo' });
+    const add = new AddRecurringExpense(s.recurring, s.categories, s.ids);
+    await add.execute({ name: 'Netflix', amount: 600, categoryId: 'cat-suscripciones', dueDay: 1, startMonth: '2026-10' });
+    await add.execute({ name: 'iCloud anual', amount: 1_200, categoryId: 'cat-suscripciones', dueDay: 1, startMonth: '2026-10', frequency: 12 });
+    const gym = await add.execute({ name: 'Gym', amount: 1_000, categoryId: 'cat-suscripciones', dueDay: 1, startMonth: '2026-10' });
+    await add.execute({ name: 'Renta', amount: 9_000, categoryId: 'ren', dueDay: 1, startMonth: '2026-10' });
+    await new PauseRecurringExpense(s.recurring).execute(gym.id, '2026-10', 2);
+
+    expect(await new GetSubscriptionCost(s.recurring, s.categories).execute('2026-10')).toEqual({ count: 2, monthly: 700, yearly: 8_400 });
+  });
+});
+
+describe('cuotas de deudas en Fijos', () => {
+  it('muestra la cuota del mes con su número y fecha, y la marca pagada si hubo un pago ese mes', async () => {
+    const s = setup();
+    const debt = await new SaveDebt(s.debts, s.ids).execute({
+      name: 'Carro', direction: 'debo', principal: 1_000_000, annualRate: 12, termMonths: 12, startDate: '2026-08-20',
+    });
+    await new SaveDebt(s.debts, s.ids).execute({ name: 'Juan', direction: 'me_deben', principal: 500, annualRate: 0, termMonths: 2, startDate: '2026-08-01' });
+    const installments = new GetDebtInstallments(new GetDebtsOverview(s.debts));
+
+    expect(await installments.execute('2026-08')).toEqual([]);
+    const [oct] = await installments.execute('2026-10');
+    expect(oct).toMatchObject({ number: 2, of: 12, dueDate: '2026-10-20', amount: 88_849, paid: false });
+
+    await new RegisterDebtPayment(s.debts, s.transactions, s.categories, s.ids).execute(debt.id, '2026-10-18', 88_849, false);
+    expect((await installments.execute('2026-10'))[0].paid).toBe(true);
+    expect(await installments.execute('2027-09')).toEqual([]);
+  });
+});
+
+describe('pago mínimo de tarjeta', () => {
+  it('se guarda por estado: al cambiar de corte vuelve a estar vacío', async () => {
+    const s = setup();
+    const settings = new InMemorySettings();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories);
+    const visa = await new SaveAccount(accounts, s.ids).execute({ name: 'Visa', type: 'tarjeta', initialBalance: -30_000, creditLimit: 100_000, cutDay: 15, dueDay: 5 });
+    const cards = new GetCardStatuses(accounts, settings);
+    await new SetCardMinimum(settings).execute(visa.id, '2026-10-15', 1_500);
+    expect((await cards.execute('2026-10-20'))[0].minimum).toBe(1_500);
+    expect((await cards.execute('2026-11-16'))[0].minimum).toBeNull();
+    await expect(new SetCardMinimum(settings).execute(visa.id, '2026-10-15', 0)).rejects.toThrow(ValidationError);
+  });
+});
+
+describe('nombre del usuario', () => {
+  it('se guarda limpio, puede quedar vacío y tiene un largo máximo', async () => {
+    const profile = new UserProfile(new InMemorySettings());
+    expect(await profile.name()).toBe('');
+    expect(await profile.setName('  Ana   Pérez ')).toBe('Ana Pérez');
+    expect(await profile.name()).toBe('Ana Pérez');
+    await expect(profile.setName('x'.repeat(41))).rejects.toThrow(ValidationError);
   });
 });

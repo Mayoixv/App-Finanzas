@@ -2,7 +2,7 @@ import { Account, AccountType, CASH_ACCOUNT_ID, dueDateAfter, isCard, lastCutDat
 import { isValidCents } from '../../domain/money';
 import { daysBetween, IsoDate, isValidIsoDate } from '../../domain/month';
 import { NotFoundError, ValidationError } from '../errors';
-import { IAccountRepository, IdGenerator } from '../ports/repositories';
+import { IAccountRepository, IdGenerator, ISettingsRepository } from '../ports/repositories';
 
 const TYPES: AccountType[] = ['efectivo', 'banco', 'ahorro', 'tarjeta', 'inversion'];
 
@@ -186,10 +186,28 @@ export interface CardStatus {
   currentDebt: number;
   /** Porcentaje del límite usado; null si no tiene límite. */
   utilization: number | null;
+  /** Pago mínimo de este estado, si el usuario lo anotó (lo fija cada banco). */
+  minimum: number | null;
+}
+
+/** Clave del pago mínimo de una tarjeta para el estado que cortó en `cut`. */
+const minimumKey = (accountId: string, cut: IsoDate) => `card_min:${accountId}:${cut}`;
+
+export class SetCardMinimum {
+  constructor(private readonly settings: ISettingsRepository) {}
+
+  /** Guarda (o borra, con null) el pago mínimo del estado que cortó en `cut`. */
+  async execute(accountId: string, cut: IsoDate, amount: number | null): Promise<void> {
+    if (amount !== null && !isValidCents(amount)) throw new ValidationError('El pago mínimo debe ser mayor que cero');
+    await this.settings.set(minimumKey(accountId, cut), amount === null ? '' : String(amount));
+  }
 }
 
 export class GetCardStatuses {
-  constructor(private readonly accounts: IAccountRepository) {}
+  constructor(
+    private readonly accounts: IAccountRepository,
+    private readonly settings?: ISettingsRepository,
+  ) {}
 
   /** Estado de cada tarjeta activa con días de corte y pago. */
   async execute(today: IsoDate): Promise<CardStatus[]> {
@@ -217,8 +235,34 @@ export class GetCardStatuses {
         cycleCharges: Math.max(0, currentDebt - statementDebt + paidSinceCut),
         currentDebt,
         utilization: account.creditLimit ? (currentDebt / account.creditLimit) * 100 : null,
+        minimum: Number((await this.settings?.get(minimumKey(account.id, lastCut))) || 0) || null,
       });
     }
     return out;
+  }
+}
+
+export interface NetWorth {
+  /** Lo que tienes en cuentas (sin tarjetas) más lo que te deben. */
+  have: number;
+  /** Lo que debes: tarjetas más deudas. */
+  owe: number;
+  /** have − owe. */
+  total: number;
+}
+
+/** Patrimonio: cuentas − tarjetas − deudas + préstamos hechos a otros. */
+export class GetNetWorth {
+  constructor(
+    private readonly accounts: GetAccountsOverview,
+    private readonly debts: { execute(): Promise<{ debt: { direction: string }; balance: number }[]> },
+  ) {}
+
+  async execute(): Promise<NetWorth> {
+    const [accounts, debts] = await Promise.all([this.accounts.execute(), this.debts.execute()]);
+    const sum = (dir: string) => debts.filter((d) => d.debt.direction === dir).reduce((s, d) => s + Math.max(0, d.balance), 0);
+    const have = accounts.assets + sum('me_deben');
+    const owe = accounts.cardDebt + sum('debo');
+    return { have, owe, total: have - owe };
   }
 }

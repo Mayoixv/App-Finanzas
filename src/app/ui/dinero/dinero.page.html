@@ -1,0 +1,32 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <h1 class="screen-title">Dinero</h1>
+  </header>
+
+  @if (netWorth(); as n) {
+    <section class="hero" aria-labelledby="patrimonio-label">
+      <p id="patrimonio-label" class="hero-label">Patrimonio</p>
+      <p class="hero-amount">{{ money(n.total) }}</p>
+      <p class="hero-note">Tienes {{ money(n.have) }} · Debes {{ money(n.owe) }}</p>
+    </section>
+  }
+
+  <app-pill-toggle class="sections" label="Sección" [options]="options" [value]="state.section()" (valueChange)="setSection($event)"></app-pill-toggle>
+
+  <div class="section">
+    @switch (state.section()) {
+      @case ('cuentas') {
+        <app-cuentas-view mode="cuentas"></app-cuentas-view>
+      }
+      @case ('tarjetas') {
+        <app-cuentas-view mode="tarjetas"></app-cuentas-view>
+      }
+      @case ('metas') {
+        <app-metas-view></app-metas-view>
+      }
+      @case ('deudas') {
+        <app-deudas-view></app-deudas-view>
+      }
+    }
+  </div>
+</ion-content>

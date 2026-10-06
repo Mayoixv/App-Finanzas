@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowDown, arrowUp, remove } from 'ionicons/icons';
@@ -54,7 +55,7 @@ function line(label: string, current: number, previous: number, prevName: string
   selector: 'app-month-compare',
   templateUrl: 'month-compare.component.html',
   styleUrls: ['month-compare.component.scss'],
-  imports: [IonIcon],
+  imports: [IonIcon, RouterLink],
 })
 export class MonthCompareComponent {
   private readonly container = inject(APP_CONTAINER);

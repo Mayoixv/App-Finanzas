@@ -1,20 +1,5 @@
-:host ion-content {
-  --padding-bottom: 48px;
-}
-
-.back {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 48px;
-  margin: -8px 0 -8px -8px;
-  padding: 0 8px;
-  border-radius: var(--radius-pill);
-  color: var(--violet-600);
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
+:host {
+  display: block;
 }
 
 .notice,

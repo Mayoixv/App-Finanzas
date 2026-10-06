@@ -10,6 +10,8 @@ export interface PaymentReminder {
   key: string;
   /** Un gasto fijo o el pago del estado de una tarjeta. */
   kind: 'fijo' | 'tarjeta';
+  /** Solo tarjetas: pago mínimo anotado para ese estado. */
+  minimum?: number | null;
   name: string;
   amount: number;
   dueDate: IsoDate;
@@ -91,6 +93,7 @@ export class GetNotificationPlan {
         reminders.push({
           key: `tarjeta:${c.account.id}:${c.dueDate}:${when}`,
           kind: 'tarjeta',
+          minimum: c.minimum,
           name: `el pago de ${c.account.name}`,
           amount: c.pending,
           dueDate: c.dueDate,

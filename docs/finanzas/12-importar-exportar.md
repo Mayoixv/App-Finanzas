@@ -11,7 +11,7 @@
 **Funciones:**
 - [x] [MVP] Exportación completa en JSON: todas las tablas, con la versión del esquema (es el respaldo cifrado).
 - [ ] [MVP] Exportar movimientos a CSV (todos o por rango de meses).
-- [ ] [Después] Exportar un mes o un reporte a PDF.
+- [x] [Después] Exportar un mes a PDF (resumen, gasto por categoría y movimientos), desde Reportes.
 
 **Campos y datos:**
 - **JSON:** `{ "app": "finanzas", "schemaVersion": 5, "exportedAt": "...", "categories": [...], "transactions": [...], ... }`. Los montos van en centavos.
@@ -70,3 +70,13 @@
 **Acciones y estados:** elegir el banco y reutilizar su plantilla.
 
 **Casos borde y errores:** el banco cambió el formato del archivo: si las columnas no coinciden, se pide mapear de nuevo.
+
+### Importar consumos desde el correo del banco (idea aprobada, sin implementar)
+
+Propuesta acordada el 2026-10-06 para más adelante:
+
+- [ ] [Después] Iniciar sesión con Google dentro de la app con permiso de solo lectura de Gmail (`gmail.readonly`), sin servidor: la app consulta Gmail directo desde el teléfono.
+- [ ] [Después] Buscar solo los correos del remitente de alertas del banco y extraer monto, comercio, fecha y últimos 4 dígitos de la tarjeta.
+- [ ] [Después] Ponerlos en una lista "Por confirmar"; con un toque se vuelven gasto en la tarjeta correspondiente, con la categoría sugerida por el comercio. Nunca se agregan solos, para evitar duplicados y errores si el banco cambia el formato.
+- [ ] [Después] Requiere que el usuario cree un proyecto en Google Cloud y se registre como usuario de prueba; publicarla para otros exigiría la verificación de Google para ese permiso.
+- Pendiente para decidir: banco o bancos, y un correo de ejemplo para conocer el formato.

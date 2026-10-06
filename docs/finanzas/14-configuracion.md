@@ -46,7 +46,7 @@ Pantalla clara fuera de las pestañas, a la que se entra desde el engranaje de I
 **Propósito:** datos mínimos para personalizar los textos.
 
 **Funciones:**
-- [ ] [Después] Nombre para el saludo ("Hola, {nombre}").
+- [x] [Después] Nombre para el saludo ("Hola, {nombre}"): se pide en la bienvenida y se cambia en Ajustes › Tú.
 - [ ] [Después] Día de cobro habitual, para sugerir el ingreso del mes.
 
 **Campos y datos:** `settings.profile_name` (texto opcional, 40 caracteres como máximo) y `settings.payday` (1-31, opcional).

@@ -15,6 +15,7 @@ import { BudgetsCardComponent } from '../presupuestos/budgets-card.component';
 import { UpcomingCardComponent } from '../fijos/upcoming-card.component';
 import { AlertsRowComponent } from './alerts-row.component';
 import { MonthCompareComponent } from './month-compare.component';
+import { NetWorthCardComponent } from './net-worth-card.component';
 import { BalanceReelComponent } from '../balance-reel.component';
 import { ExpenseDonutComponent } from './expense-donut.component';
 
@@ -49,6 +50,7 @@ interface RecentRow {
     UpcomingCardComponent,
     AlertsRowComponent,
     MonthCompareComponent,
+    NetWorthCardComponent,
   ],
 })
 export class InicioPage {
@@ -57,6 +59,7 @@ export class InicioPage {
   private readonly transactionForm = inject(TransactionFormService);
 
   protected readonly overview = signal<MonthOverview | null>(null);
+  protected readonly userName = signal('');
   protected readonly recent = signal<RecentRow[]>([]);
   protected readonly failed = signal(false);
   protected readonly money = formatMoney;
@@ -85,6 +88,7 @@ export class InicioPage {
   private async load(month: string) {
     const seq = ++this.loadSeq;
     try {
+      this.userName.set(await this.container.profile.name());
       const overview = await this.container.getMonthOverview.execute(month);
       if (seq !== this.loadSeq) return;
       this.overview.set(overview);

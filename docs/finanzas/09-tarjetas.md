@@ -1,4 +1,4 @@
-# 9. Tarjetas de crédito
+# 9. Tarjetas de crédito (pestaña "Dinero" › Tarjetas)
 
 [← Índice](../../Finanzas_SPEC.md#0-índice)
 
@@ -43,7 +43,7 @@ No existe todavía. Depende de [Cuentas](03-cuentas.md): una tarjeta es una cuen
 
 **Funciones:**
 - [x] [Después] Estado del ciclo: compras entre el corte anterior y el actual, total a pagar y fecha límite.
-- [ ] [Después] Pago mínimo (escrito por el usuario según su banco) contra pago total.
+- [x] [Después] Pago mínimo (escrito por el usuario según su banco) contra pago total.
 - [x] [Después] "Pagar" crea una transferencia desde la cuenta elegida.
 
 **Campos y datos:** pago mínimo (centavos) por ciclo, escrito a mano porque cada banco lo calcula distinto.

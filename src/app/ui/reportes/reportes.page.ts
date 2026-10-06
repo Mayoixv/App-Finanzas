@@ -1,0 +1,113 @@
+import { Location } from '@angular/common';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { IonContent, IonIcon } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { chevronBack } from 'ionicons/icons';
+import { APP_CONTAINER } from '../../app.container';
+import { Report } from '../../application/use-cases/get-report';
+import { ColumnChartComponent, ColumnSeries } from '../charts/column-chart.component';
+import { LineChartComponent } from '../charts/line-chart.component';
+import { shortMonth } from '../charts/scale';
+import { currentMonth, formatMoney, formatPercent, monthLabel } from '../format';
+import { MonthState } from '../month-state';
+import { PillOption, PillToggleComponent } from '../pill-toggle.component';
+import { exportMonthPdf } from './month-pdf';
+
+/** Reportes del periodo que termina en el mes visto: por mes, por categoría y saldo de cuentas. */
+@Component({
+  selector: 'app-reportes',
+  templateUrl: 'reportes.page.html',
+  styleUrls: ['reportes.page.scss'],
+  imports: [IonContent, IonIcon, RouterLink, PillToggleComponent, ColumnChartComponent, LineChartComponent],
+})
+export class ReportesPage {
+  private readonly container = inject(APP_CONTAINER);
+  private readonly location = inject(Location);
+  protected readonly monthState = inject(MonthState);
+
+  protected readonly range = signal('6');
+  protected readonly rangeOptions: PillOption[] = [
+    { value: '3', label: '3 meses' },
+    { value: '6', label: '6 meses' },
+    { value: '12', label: '12 meses' },
+  ];
+  protected readonly report = signal<Report | null>(null);
+  protected readonly failed = signal(false);
+  protected readonly showTable = signal(false);
+  protected readonly categoryId = signal<string | null>(null);
+  protected readonly money = formatMoney;
+  protected readonly percent = formatPercent;
+  private loadSeq = 0;
+
+  protected readonly labels = computed(() => (this.report()?.months ?? []).map(shortMonth));
+  protected readonly fullLabels = computed(() => (this.report()?.months ?? []).map(monthLabel));
+  protected readonly isEmpty = computed(() => {
+    const r = this.report();
+    return !!r && r.summaries.every((s) => s.income === 0 && s.expenses === 0 && s.saved === 0);
+  });
+
+  protected readonly monthSeries = computed<ColumnSeries[]>(() => {
+    const s = this.report()?.summaries ?? [];
+    return [
+      { name: 'Ingresos', color: 'var(--series-ingresos)', values: s.map((m) => m.income) },
+      { name: 'Gastos', color: 'var(--series-gastos)', values: s.map((m) => m.expenses) },
+    ];
+  });
+
+  protected readonly categoryRows = computed(() => {
+    const cats = this.report()?.categories ?? [];
+    const total = cats.reduce((s, c) => s + c.total, 0);
+    const top = cats[0]?.total ?? 1;
+    return cats.map((c) => ({ ...c, width: (c.total / top) * 100, share: total ? (c.total / total) * 100 : 0 }));
+  });
+
+  protected readonly selectedCategory = computed(() => this.categoryRows().find((c) => c.categoryId === this.categoryId()) ?? null);
+
+  constructor() {
+    addIcons({ chevronBack });
+    effect(() => {
+      const month = this.monthState.month();
+      const count = Number(this.range());
+      this.monthState.version();
+      this.load(month, count);
+    });
+  }
+
+  protected back() {
+    this.location.back();
+  }
+
+  protected readonly exporting = signal(false);
+  protected readonly exportError = signal('');
+
+  protected async exportPdf() {
+    this.exporting.set(true);
+    this.exportError.set('');
+    try {
+      await exportMonthPdf(this.container, this.monthState.month());
+    } catch (error) {
+      console.error(error);
+      this.exportError.set('No se pudo crear el PDF. Inténtalo de nuevo.');
+    } finally {
+      this.exporting.set(false);
+    }
+  }
+
+  protected toggleCategory(id: string) {
+    this.categoryId.set(this.categoryId() === id ? null : id);
+  }
+
+  private async load(month: string, count: number) {
+    const seq = ++this.loadSeq;
+    try {
+      const report = await this.container.getReport.execute(month, count, currentMonth());
+      if (seq !== this.loadSeq) return;
+      this.report.set(report);
+      this.failed.set(false);
+    } catch (error) {
+      console.error(error);
+      if (seq === this.loadSeq) this.failed.set(true);
+    }
+  }
+}

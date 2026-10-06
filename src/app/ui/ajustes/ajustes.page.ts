@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IonContent, IonIcon, ModalController } from '@ionic/angular';
+import { AlertController, IonContent, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmark, chevronBack, chevronDown, chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -36,6 +36,8 @@ export class AjustesPage {
   private readonly modals = inject(ModalController);
   private readonly monthState = inject(MonthState);
   protected readonly currencyState = inject(CurrencyState);
+  private readonly alerts = inject(AlertController);
+  protected readonly userName = signal('');
 
   protected readonly currencies: { code: Currency; label: string }[] = [
     { code: 'DOP', label: 'Peso dominicano (RD$)' },
@@ -67,6 +69,30 @@ export class AjustesPage {
     });
   }
 
+  protected async editName() {
+    const alert = await this.alerts.create({
+      cssClass: 'app-alert',
+      header: 'Tu nombre',
+      message: 'Solo para saludarte en Inicio. Déjalo vacío para quitarlo.',
+      inputs: [{ name: 'name', type: 'text', value: this.userName(), attributes: { maxlength: 40, autocapitalize: 'words' } }],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Guardar', role: 'confirm' },
+      ],
+    });
+    await alert.present();
+    const { role, data } = await alert.onDidDismiss();
+    if (role !== 'confirm') return;
+    try {
+      this.userName.set(await this.container.profile.setName(String(data?.values?.name ?? '')));
+      this.monthState.notifyChange();
+      this.liveMessage.set('Nombre guardado');
+    } catch (error) {
+      console.error(error);
+      this.liveMessage.set('No se pudo guardar el nombre.');
+    }
+  }
+
   protected async setCurrency(code: Currency) {
     this.currencyOpen.set(false);
     if (code === this.currencyState.currency()) return;
@@ -95,6 +121,7 @@ export class AjustesPage {
   private async load() {
     try {
       this.categories.set(await this.container.categories.list());
+      this.userName.set(await this.container.profile.name());
       this.failed.set(false);
     } catch (error) {
       console.error(error);

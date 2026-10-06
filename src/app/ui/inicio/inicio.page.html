@@ -6,6 +6,9 @@
         <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
       </a>
     </div>
+    @if (userName(); as name) {
+      <p class="greeting">Hola, {{ name }}</p>
+    }
     <app-month-switcher></app-month-switcher>
   </header>
 
@@ -18,6 +21,7 @@
         <p class="empty-text">Toca el botón + para registrar el primero y aquí verás tu balance y en qué se va el gasto.</p>
       </section>
       <app-alerts-row></app-alerts-row>
+      <app-net-worth-card></app-net-worth-card>
     } @else {
       <section class="hero" aria-labelledby="balance-label">
         <p id="balance-label" class="hero-label">Balance de {{ monthState.label() }}</p>
@@ -52,6 +56,7 @@
       </section>
 
       <app-alerts-row></app-alerts-row>
+      <app-net-worth-card></app-net-worth-card>
 
       <section class="card" aria-labelledby="gasto-title">
         <h2 id="gasto-title" class="section-title">¿En qué se va el gasto?</h2>

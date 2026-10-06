@@ -18,6 +18,16 @@ import { filter } from 'rxjs';
 import { SavingsFormService } from '../ahorro/savings-form.service';
 import { RecurringFormService } from '../fijos/recurring-form.service';
 import { TransactionFormService } from '../movimientos/transaction-form.service';
+import { DineroFormService } from '../dinero/dinero-form.service';
+import { DineroSection, DineroState } from '../dinero/dinero-state';
+import { DeudaModalComponent } from '../deudas/deuda.modal';
+
+const DINERO_ADD_LABEL: Record<DineroSection, string> = {
+  cuentas: 'Agregar cuenta',
+  tarjetas: 'Agregar tarjeta de crédito',
+  metas: 'Agregar meta de ahorro',
+  deudas: 'Agregar deuda o préstamo',
+};
 
 interface Tab {
   path: string;
@@ -30,7 +40,7 @@ const TABS: Tab[] = [
   { path: 'inicio', label: 'Inicio', addLabel: 'Agregar movimiento' },
   { path: 'movimientos', label: 'Movimientos', addLabel: 'Agregar movimiento' },
   { path: 'fijos', label: 'Fijos', addLabel: 'Agregar fijo (gasto o ingreso)' },
-  { path: 'ahorro', label: 'Ahorro', addLabel: 'Agregar meta de ahorro' },
+  { path: 'dinero', label: 'Dinero', addLabel: '' },
 ];
 
 @Component({
@@ -44,6 +54,8 @@ export class TabsPage {
   private readonly transactionForm = inject(TransactionFormService);
   private readonly recurringForm = inject(RecurringFormService);
   private readonly savingsForm = inject(SavingsFormService);
+  private readonly dineroForm = inject(DineroFormService);
+  private readonly dinero = inject(DineroState);
 
   protected readonly tabs = TABS;
   protected readonly active = signal(this.indexOf(this.router.url));
@@ -74,14 +86,29 @@ export class TabsPage {
   }
 
   protected addLabel(): string {
-    return TABS[this.active()].addLabel;
+    const tab = TABS[this.active()];
+    return tab.path === 'dinero' ? DINERO_ADD_LABEL[this.dinero.section()] : tab.addLabel;
   }
 
   protected add() {
     const path = TABS[this.active()].path;
     if (path === 'fijos') this.recurringForm.open();
-    else if (path === 'ahorro') this.savingsForm.openGoal();
+    else if (path === 'dinero') this.addInDinero();
     else this.transactionForm.open();
+  }
+
+  /** En Dinero, el + agrega lo de la sección visible. */
+  private addInDinero() {
+    switch (this.dinero.section()) {
+      case 'cuentas':
+        return this.dineroForm.openAccount();
+      case 'tarjetas':
+        return this.dineroForm.openAccount(undefined, 'tarjeta');
+      case 'metas':
+        return this.savingsForm.openGoal();
+      case 'deudas':
+        return this.dineroForm.open(DeudaModalComponent, {});
+    }
   }
 
   protected go(tab: Tab) {

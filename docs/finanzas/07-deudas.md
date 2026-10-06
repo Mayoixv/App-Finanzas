@@ -1,4 +1,4 @@
-# 7. Deudas y préstamos
+# 7. Deudas y préstamos (pestaña "Dinero" › Deudas)
 
 [← Índice](../../Finanzas_SPEC.md#0-índice)
 
@@ -43,7 +43,7 @@ No existe todavía. Todo [Después].
 
 **Funciones:**
 - [x] [Después] Tabla de amortización (sistema francés: cuota fija).
-- [ ] [Después] Próximas cuotas en el flujo de caja y en Fijos.
+- [x] [Después] Próximas cuotas en Fijos (con su número, fecha y "Registrar pago"; suman al por pagar del mes).
 
 **Campos y datos:** calculado desde la deuda. `debt_payments` (`debt_id`, `date`, `amount`, `principal`, `interest`, `transaction_id`).
 

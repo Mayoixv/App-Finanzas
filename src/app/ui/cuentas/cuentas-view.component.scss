@@ -1,28 +1,5 @@
-:host ion-content {
-  --padding-bottom: 48px;
-}
-
-.back {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 48px;
-  margin: -8px 0 -8px -8px;
-  padding: 0 8px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--violet-600);
-  font: inherit;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:focus-visible {
-    outline: 3px solid var(--violet-600);
-    outline-offset: 2px;
-  }
+:host {
+  display: block;
 }
 
 .note {
@@ -30,35 +7,6 @@
   font-size: 14px;
   line-height: 1.45;
   color: var(--muted-on-light);
-}
-
-.totals {
-  display: flex;
-  gap: 12px;
-  margin: 0 20px 16px;
-
-  p {
-    flex: 1;
-    margin: 0;
-    padding: 16px;
-    border-radius: var(--radius-card);
-    background: var(--surface-soft-card);
-  }
-}
-
-.totals-label {
-  display: block;
-  font-size: 14px;
-  color: var(--muted-on-light);
-}
-
-.totals-amount {
-  display: block;
-  margin-top: 4px;
-  font-size: clamp(15px, 4.6vw, 20px);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 .actions {
@@ -182,11 +130,14 @@ li + li .row {
 
 .status-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   font-size: 13px;
   line-height: 1.4;
   color: var(--muted-on-light);
 
-  &.urgent {
+  .urgent {
     color: var(--negative-on-light);
     font-weight: 600;
   }
@@ -198,4 +149,15 @@ li + li .row {
   font-size: 14px;
   border-color: var(--violet-600);
   color: var(--violet-600);
+}
+
+.min-link {
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--violet-600);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
