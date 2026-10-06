@@ -6,7 +6,7 @@ import { UpdateRecurringExpense } from './application/use-cases/update-recurring
 import { UpdateTransaction } from './application/use-cases/update-transaction';
 import { AddSavingsGoal } from './application/use-cases/add-savings-goal';
 import { AddCategory, DeleteCategory, RenameCategory } from './application/use-cases/manage-categories';
-import { CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from './application/use-cases/backup';
+import { AutoBackup, CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from './application/use-cases/backup';
 import { ExportTransactionsCsv } from './application/use-cases/export-csv';
 import { PinLock } from './application/use-cases/pin-lock';
 import { BulkUpdateTransactions } from './application/use-cases/bulk-update-transactions';
@@ -41,6 +41,7 @@ import { GetMonthOverview } from './application/use-cases/get-month-overview';
 import { GetMonthRecurringExpenses } from './application/use-cases/get-month-recurring-expenses';
 import { PayRecurringExpense } from './application/use-cases/pay-recurring-expense';
 import {
+  BackupData,
   IBackupStore,
   IBudgetRepository,
   ICategoryRepository,
@@ -108,6 +109,7 @@ export interface AppContainer {
   openBackup: OpenBackup;
   restoreBackup: RestoreBackup;
   wipeAllData: WipeAllData;
+  autoBackup: AutoBackup;
   exportCsv: ExportTransactionsCsv;
   pinLock: PinLock;
   bulkUpdateTransactions: BulkUpdateTransactions;
@@ -132,6 +134,7 @@ export const uuidGenerator: IdGenerator = { next: () => crypto.randomUUID() };
 
 export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGenerator): AppContainer {
   const getMonthRecurringExpenses = new GetMonthRecurringExpenses(repos.recurring);
+  const createBackup = new CreateBackup(repos.backup);
   const getBudgetStatuses = new GetBudgetStatuses(repos.budgets, repos.transactions);
   const getUpcomingRecurring = new GetUpcomingRecurring(getMonthRecurringExpenses);
   return {
@@ -163,10 +166,11 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     deleteCategory: new DeleteCategory(repos.categories),
     restoreTransaction: new RestoreTransaction(repos.transactions, repos.recurring),
     restoreSavingsContribution: new RestoreSavingsContribution(repos.savings),
-    createBackup: new CreateBackup(repos.backup),
+    createBackup,
     openBackup: new OpenBackup(),
     restoreBackup: new RestoreBackup(repos.backup),
     wipeAllData: new WipeAllData(repos.backup),
+    autoBackup: new AutoBackup(repos.settings, createBackup),
     exportCsv: new ExportTransactionsCsv(repos.transactions, repos.categories),
     pinLock: new PinLock(repos.settings),
     bulkUpdateTransactions: new BulkUpdateTransactions(repos.transactions, repos.categories),
@@ -185,8 +189,18 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
   };
 }
 
-export async function createSqliteContainer(): Promise<AppContainer> {
+/**
+ * Abre la base y la pone al día. Si hay que actualizarla y ya tiene datos, antes entrega una copia
+ * a `saveSafetyCopy` (la interfaz la guarda en un archivo) por si la actualización saliera mal.
+ */
+export async function createSqliteContainer(
+  saveSafetyCopy?: (data: BackupData) => Promise<void>,
+): Promise<AppContainer> {
   const db = await CapacitorSqliteDatabase.open();
+  const backup = new SqliteBackupStore(db);
+  const copy = saveSafetyCopy && (await backup.safetyDump());
+  // Si guardar la copia falla, se actualiza igual: sin actualizar, la app no podría abrir.
+  if (copy) await saveSafetyCopy(copy).catch((e) => console.error('No se pudo guardar la copia previa', e));
   await runMigrations(db);
   return buildContainer({
     categories: new SqliteCategoryRepository(db),
@@ -195,7 +209,7 @@ export async function createSqliteContainer(): Promise<AppContainer> {
     savings: new SqliteSavingsRepository(db),
     budgets: new SqliteBudgetRepository(db),
     settings: new SqliteSettingsRepository(db),
-    backup: new SqliteBackupStore(db),
+    backup,
     debts: new SqliteDebtRepository(db),
   });
 }

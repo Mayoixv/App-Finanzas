@@ -9,9 +9,10 @@ import { setDisplayCurrency } from './app/ui/format';
 import { setInitialLock } from './app/ui/lock/lock-state';
 import { pageTransition, sheetEnter, sheetLeave } from './app/ui/motion';
 import { applyPrivacy, isPrivacyOn } from './app/ui/privacy';
+import { saveSafetyCopy } from './app/ui/backup-files';
 
 async function start() {
-  const container = await createSqliteContainer();
+  const container = await createSqliteContainer(saveSafetyCopy);
   setDisplayCurrency(await container.currencySettings.get());
   setInitialLock(await container.pinLock.isEnabled(), await container.pinLock.length());
   // Antes de mostrar nada, para que el balance no aparezca en la vista de recientes.

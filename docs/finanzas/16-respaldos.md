@@ -13,8 +13,9 @@ Hoy no existe ningún respaldo: si se pierde o se resetea el teléfono, se pierd
 **Funciones:**
 - [x] [MVP] "Crear respaldo": genera la exportación JSON completa ([Exportar](12-importar-exportar.md#exportar)) cifrada con una contraseña y la comparte (Drive, correo, archivos).
 - [x] [MVP] "Restaurar respaldo": elegir el archivo, escribir la contraseña, ver un resumen (cuántos movimientos y de qué meses) y confirmar.
-- [ ] [MVP] Respaldo automático local antes de cada migración que cambie datos.
-- [ ] [Después] Respaldo automático semanal a una carpeta elegida por el usuario (Storage Access Framework de Android).
+- [x] [MVP] Respaldo automático local antes de cada migración que cambie datos (copia JSON en el almacenamiento privado; se guardan las 3 últimas).
+- [x] [Después] Respaldo automático semanal, cifrado con una contraseña elegida una vez, en Documentos/Finanzas (se guardan los 4 últimos).
+- [ ] [Después] Elegir otra carpeta con el selector de Android (Storage Access Framework) y un aviso mensual para sacar una copia del teléfono.
 
 **Campos y datos:**
 - **Archivo:** `.finanzas` = JSON cifrado con AES-256-GCM, clave derivada de la contraseña con PBKDF2 o argon2.

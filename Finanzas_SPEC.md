@@ -252,7 +252,7 @@ Cada menú se desarrolla en su archivo, con la misma plantilla en todos los subm
 - [ ] **[Después] Saldos derivados.** El saldo de una cuenta = saldo inicial + suma de sus movimientos. Nunca se guarda un saldo "a mano" fuera de un ajuste de conciliación, que es en sí un movimiento.
 - [x] **[MVP] Validaciones comunes.** Montos > 0 y enteros en centavos. Fechas que existen en el calendario (`isValidIsoDate`). Categoría obligatoria y existente. Textos recortados.
 - [ ] **[MVP] Cuenta obligatoria** en cada movimiento, cuando exista el menú Cuentas (con "Efectivo" por defecto para los datos viejos).
-- [ ] **[Después] Detección de duplicados.** Advertir (no bloquear) si se guarda un movimiento con la misma fecha, monto y categoría que otro de las últimas 24 h.
+- [x] **[Después] Detección de duplicados.** Advertir (no bloquear) si se guarda un movimiento con la misma fecha, monto y categoría que otro de las últimas 24 h.
 - [x] **[MVP] Resumen mensual.** Balance = ingresos − gastos − ahorrado. % ahorro = ahorrado / ingresos. Calificación: ≥ 20% excelente, ≥ 10% regular, menos es bajo. Sin ingresos no hay porcentaje.
 - [x] **[MVP] Formato regional** `es-DO` para fechas y montos. La zona horaria es la del teléfono. Las fechas se guardan como texto `YYYY-MM-DD` sin hora, así un movimiento nunca "cambia de día" por la zona horaria.
 - [x] **[MVP] Esquema solo por migraciones** numeradas y en una transacción. Ninguna migración publicada se edita.
@@ -314,12 +314,12 @@ erDiagram
 
 La app no tiene backend: no hay servidor, API, contraseñas en línea ni sesiones. Por eso varios puntos del encargo **no aplican hoy**. Quedan descritos para cuando llegue la sincronización opcional, sin inventar un backend.
 
-- [ ] **[MVP] Bloqueo local.** PIN de 4 a 6 dígitos y huella o rostro mediante la biometría de Android. El PIN se guarda solo como hash con salt (PBKDF2 o argon2 del lado del teléfono), nunca en claro. Tras 5 intentos fallidos se espera 30 s, y el tiempo se duplica en cada fallo siguiente. Ver [Seguridad y cuenta](docs/finanzas/15-seguridad.md).
+- [x] **[MVP] Bloqueo local.** PIN de 4 a 6 dígitos y huella o rostro mediante la biometría de Android. El PIN se guarda solo como hash con salt (PBKDF2 o argon2 del lado del teléfono), nunca en claro. Tras 5 intentos fallidos se espera 30 s, y el tiempo se duplica en cada fallo siguiente. Ver [Seguridad y cuenta](docs/finanzas/15-seguridad.md).
 - ~~**[MVP] Cifrado en reposo.**~~ **Descartado (2026-10-05).** El plugin guarda la clave de SQLCipher en preferencias cifradas con una llave del Keystore, y esa llave se perdió una vez en el teléfono del usuario ("CapacitorSQLitePlugin: null"). Sin cifrar, ese fallo solo impidió abrir la app hasta corregirlo; con la base cifrada habría significado perder todos los datos sin recuperación. Los datos ya quedan protegidos por el cifrado del almacenamiento de Android, el aislamiento entre apps, el PIN o la huella, y los respaldos cifrados con contraseña. Se reconsidera solo si antes hay respaldos automáticos.
-- [ ] **[MVP] Respaldos cifrados** con una contraseña elegida por el usuario. Un respaldo nunca sale del teléfono sin cifrar.
+- [x] **[MVP] Respaldos cifrados** con una contraseña elegida por el usuario. Un respaldo nunca sale del teléfono sin cifrar.
 - [x] **Inyección SQL.** Todas las consultas usan parámetros (`?`). Las únicas cadenas concatenadas son las migraciones fijas del código.
 - [x] **XSS.** Angular escapa todo el texto de la interfaz y no se usa `innerHTML` con datos del usuario.
-- [ ] **[MVP] Capturas de pantalla.** Opción para impedir capturas y ocultar el contenido en la vista de apps recientes (`FLAG_SECURE`).
+- [x] **[MVP] Capturas de pantalla.** Opción para impedir capturas y ocultar el contenido en la vista de apps recientes (`FLAG_SECURE`).
 - [x] **Datos sensibles.** No se piden ni guardan números de tarjeta, CVV ni credenciales bancarias. Las tarjetas futuras guardan solo un nombre y, como mucho, los últimos 4 dígitos.
 - [x] **Logs.** `console.error` registra errores técnicos sin montos ni notas.
 - [ ] **[Después] Dependencias.** `npm audit` en CI y actualización trimestral de Angular, Ionic y Capacitor.
@@ -333,7 +333,7 @@ La app no tiene backend: no hay servidor, API, contraseñas en línea ni sesione
 - **Para qué:** únicamente para mostrarle sus propias finanzas.
 - **Por cuánto tiempo:** hasta que el usuario lo borre o desinstale la app.
 - [ ] **[MVP] Derecho a exportar todo:** exportación completa en JSON y CSV (ver [Importar y exportar](docs/finanzas/12-importar-exportar.md)).
-- [ ] **[MVP] Derecho a borrar todo:** "Borrar todos los datos" en Seguridad, con doble confirmación.
+- [x] **[MVP] Derecho a borrar todo:** "Borrar todos los datos" en Seguridad, con doble confirmación.
 - [x] **Sin telemetría ni terceros:** la app no hace llamadas de red. Las fuentes van empaquetadas, sin Google Fonts.
 - [ ] **[MVP] Política de privacidad** de una página dentro de Ayuda, y en la ficha de Play Store si se publica.
 
@@ -414,7 +414,7 @@ Lo que falta:
 - [ ] Cuentas (al menos Efectivo, Banco y Tarjeta) con saldo derivado.
 - [ ] Exportar todo (JSON y CSV) y restaurar desde JSON.
 - [x] Bloqueo con PIN y biometría. (La base de datos cifrada se descartó; ver sección de seguridad.)
-- [ ] Búsqueda por nota y filtro por categoría en Movimientos.
+- [x] Búsqueda por nota y filtro por categoría en Movimientos.
 - [ ] Borrado lógico con "Deshacer" y auditoría.
 - [ ] Onboarding y estado de carga.
 - [ ] APK firmado (release) y CI.

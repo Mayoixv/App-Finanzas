@@ -10,6 +10,18 @@
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
     </li>
+    <li class="select-row">
+      <ion-toggle
+        #autoToggle
+        justify="space-between"
+        [disabled]="!autoBackup.available"
+        [checked]="autoBackup.enabled()"
+        (ionChange)="toggleAutoBackup($event.detail.checked)"
+      >
+        <span class="toggle-title">Respaldo automático semanal</span>
+        <span class="row-sub">{{ autoBackupDetail() }}</span>
+      </ion-toggle>
+    </li>
     <li>
       <button type="button" class="row" (click)="restoreBackup()">
         <span class="row-text">

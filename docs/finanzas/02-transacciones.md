@@ -104,7 +104,7 @@
 **Propósito:** agrupar movimientos que cruzan categorías (por ejemplo, "viaje a Samaná").
 
 **Funciones:**
-- [ ] [Después] Asignar varias etiquetas a un movimiento.
+- [x] [Después] Asignar varias etiquetas a un movimiento.
 - [ ] [Después] Filtrar y sumar por etiqueta.
 
 **Campos y datos:** `tags` (`id`, `name` único), `transaction_tags` (`transaction_id`, `tag_id`).
@@ -140,8 +140,8 @@
 
 **Funciones:**
 - [ ] [Después] Seleccionar varios con pulsación larga.
-- [ ] [Después] Cambiar la categoría o la fecha a todos.
-- [ ] [Después] Eliminar con una confirmación.
+- [x] [Después] Cambiar la categoría o la fecha a todos.
+- [x] [Después] Eliminar con una confirmación.
 
 **Campos y datos:** opera sobre `transactions`; cada cambio queda en `audit_log`.
 

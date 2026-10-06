@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { AlertController, IonIcon, IonSelect, IonSelectOption, IonToggle, LoadingController } from '@ionic/angular';
 import { applyPrivacy, isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
 import { NotificationsService } from '../notifications.service';
+import { AutoBackupService } from '../auto-backup.service';
+import { formatDay } from '../format';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -26,6 +28,15 @@ export class DatosComponent implements OnInit {
   private readonly loading = inject(LoadingController);
   protected readonly lock = inject(LockState);
   private readonly notifications = inject(NotificationsService);
+  protected readonly autoBackup = inject(AutoBackupService);
+  private readonly autoToggle = viewChild<IonToggle>('autoToggle');
+  protected readonly autoBackupDetail = computed(() => {
+    if (!this.autoBackup.available) return 'Disponible en la app del teléfono';
+    if (!this.autoBackup.enabled()) return 'Cada 7 días, cifrado, en Documentos/Finanzas del teléfono';
+    if (this.autoBackup.lastError()) return 'No se pudo guardar el último; se reintenta al abrir la app';
+    const last = this.autoBackup.lastRun();
+    return last ? `Último: ${formatDay(last)} · Documentos/Finanzas` : 'Pendiente; se hace al abrir la app';
+  });
   protected readonly lockOptions = [
     { value: 0, label: 'Al momento' },
     { value: 60, label: 'Tras 1 minuto' },
@@ -48,6 +59,7 @@ export class DatosComponent implements OnInit {
   async ngOnInit() {
     this.pinEnabled.set(await this.container.pinLock.isEnabled());
     this.privacy.set(await isPrivacyOn(this.container.settings));
+    if (this.autoBackup.available) await this.autoBackup.refresh();
     this.biometryAvailable.set(await this.lock.biometryAvailable().catch(() => false));
   }
 
@@ -270,6 +282,34 @@ export class DatosComponent implements OnInit {
     } finally {
       const toggle = this.bioToggle();
       if (toggle) toggle.checked = this.lock.biometricOn();
+    }
+  }
+
+  protected async toggleAutoBackup(on: boolean) {
+    if (on === this.autoBackup.enabled()) return;
+    try {
+      if (!on) {
+        await this.autoBackup.disable();
+        this.status.set('Respaldo automático desactivado. Los archivos ya guardados se quedan en Documentos/Finanzas.');
+        return;
+      }
+      const values = await this.ask(
+        'Respaldo automático',
+        'Elige la contraseña con la que se cifrarán los respaldos semanales. La necesitarás para restaurarlos; si la olvidas, no se pueden abrir.',
+        [
+          { name: 'p1', type: 'password', placeholder: 'Contraseña (mínimo 6)', attributes: { autocomplete: 'new-password' } },
+          { name: 'p2', type: 'password', placeholder: 'Repite la contraseña', attributes: { autocomplete: 'new-password' } },
+        ],
+        'Activar',
+      );
+      if (!values) return;
+      if (values['p1'] !== values['p2']) return this.fail('Las contraseñas no coinciden.');
+      const saved = await this.busy('Creando el primer respaldo…', () => this.autoBackup.enable(values['p1']));
+      if (saved === false) await this.fail('Se activó, pero no se pudo guardar el primer respaldo. Se reintenta al abrir la app.');
+      else if (saved) this.status.set('Respaldo automático activado. El primero ya está en Documentos/Finanzas.');
+    } finally {
+      const toggle = this.autoToggle();
+      if (toggle) toggle.checked = this.autoBackup.enabled();
     }
   }
 }

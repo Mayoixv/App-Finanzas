@@ -53,6 +53,22 @@ export class SqliteBackupStore implements IBackupStore {
     }
   }
 
+  /**
+   * Copia de los datos antes de actualizar la base: solo si ya hay datos y quedan migraciones por aplicar.
+   * Devuelve null si no hace falta (instalación nueva o base al día).
+   */
+  async safetyDump(): Promise<BackupData | null> {
+    const tables = await this.db.all<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'schema_migrations'",
+    );
+    if (tables.length === 0) return null;
+    const done = new Set(
+      (await this.db.all<{ version: number }>('SELECT version FROM schema_migrations')).map((r) => r.version),
+    );
+    if (done.size === 0 || this.migrations.every((m) => done.has(m.version))) return null;
+    return this.dump();
+  }
+
   async wipe(): Promise<void> {
     // Un respaldo vacío de versión 0: se borra todo y se aplican todas las migraciones desde cero.
     await this.replaceWith({ schemaVersion: 0, tables: {} });

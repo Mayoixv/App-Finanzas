@@ -64,7 +64,7 @@
 
 **Funciones:**
 - [x] [MVP] Vencimiento relativo en cada tarjeta ("Vence mañana", "Vence en 2 días", "Venció ayer").
-- [ ] [Después] Notificación local el día anterior y el día del vencimiento, con hora configurable.
+- [x] [Después] Notificación local el día anterior y el día del vencimiento, con hora configurable.
 - [x] [Después] Lista "Próximos 7 días" en Inicio.
 
 **Campos y datos:** `due_date` de la instancia. [Después] `remind_days_before` (0 a 7) por gasto fijo.

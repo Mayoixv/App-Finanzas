@@ -1,5 +1,6 @@
 import { webcrypto } from 'node:crypto';
-import { CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from '../application/use-cases/backup';
+import { AutoBackup, CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from '../application/use-cases/backup';
+import { SqliteSettingsRepository } from './repositories/sqlite-repositories';
 import { ValidationError } from '../application/errors';
 import { MIGRATIONS, runMigrations } from './sqlite/migrations';
 import { SqliteBackupStore } from './sqlite/sqlite-backup-store';
@@ -97,5 +98,37 @@ describe('respaldo', () => {
     expect(categories.map((c) => c.id)).toContain('cat-pago-deudas');
     const [{ version }] = await a.db.all<{ version: number }>('SELECT MAX(version) AS version FROM schema_migrations');
     expect(version).toBe(Math.max(...MIGRATIONS.map((m) => m.version)));
+  });
+
+  it('la copia previa solo se hace si hay datos y migraciones pendientes', async () => {
+    const fresh = new NodeSqliteDatabase();
+    expect(await new SqliteBackupStore(fresh).safetyDump()).toBeNull();
+
+    const old = new NodeSqliteDatabase();
+    await runMigrations(old, MIGRATIONS.filter((m) => m.version <= 5));
+    await old.run("INSERT INTO transactions (id, date, amount, category_id, note) VALUES ('t1', '2026-10-01', 500, 'cat-comida', '')");
+    const copy = await new SqliteBackupStore(old).safetyDump();
+    expect(copy?.schemaVersion).toBe(5);
+    expect(copy?.tables['transactions']).toHaveLength(1);
+
+    await runMigrations(old);
+    expect(await new SqliteBackupStore(old).safetyDump()).toBeNull();
+  });
+
+  it('el respaldo automático toca cada 7 días y se abre con su contraseña', async () => {
+    const a = await dbWith([1250]);
+    const auto = new AutoBackup(new SqliteSettingsRepository(a.db), new CreateBackup(a.store));
+    expect(await auto.isDue('2026-10-05')).toBe(false);
+    await expect(auto.enable('corta')).rejects.toThrow(ValidationError);
+    await auto.enable('semanal1');
+    expect(await auto.isDue('2026-10-05')).toBe(true);
+    const file = await auto.create();
+    await auto.markDone('2026-10-05');
+    expect(await auto.isDue('2026-10-11')).toBe(false);
+    expect(await auto.isDue('2026-10-12')).toBe(true);
+    const { summary } = await new OpenBackup().execute(file, 'semanal1');
+    expect(summary.transactions).toBe(1);
+    await auto.disable();
+    expect(await auto.isDue('2026-10-20')).toBe(false);
   });
 });
