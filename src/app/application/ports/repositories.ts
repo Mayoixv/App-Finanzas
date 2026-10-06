@@ -82,6 +82,8 @@ export interface BackupData {
 export interface IBackupStore {
   dump(): Promise<BackupData>;
   restore(data: BackupData): Promise<void>;
+  /** Deja la base como recién instalada: sin datos ni ajustes, con las categorías por defecto. */
+  wipe(): Promise<void>;
 }
 
 export interface IdGenerator {

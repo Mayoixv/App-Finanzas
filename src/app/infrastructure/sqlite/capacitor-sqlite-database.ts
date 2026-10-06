@@ -56,6 +56,8 @@ export class CapacitorSqliteDatabase implements SqlDatabase {
   }
 
   async batch(statements: SqlStatement[]): Promise<void> {
+    // El plugin rechaza una lista vacía ("Must provide a non-empty set"); no hay nada que hacer.
+    if (statements.length === 0) return;
     await this.serial(() => this.conn.executeSet(
       statements.map((s) =>
         typeof s === 'string' ? { statement: s, values: [] } : { statement: s.sql, values: s.params },

@@ -12,9 +12,9 @@ La app no tiene cuentas en línea. La seguridad es del teléfono hacia adentro. 
 
 **Funciones:**
 - [x] [MVP] Activar un PIN de 4 a 6 dígitos.
-- [ ] [MVP] Desbloqueo con huella o rostro (biometría de Android), con el PIN como respaldo.
-- [ ] [MVP] Bloquear al abrir y al volver de segundo plano tras 1 minuto (configurable: inmediato, 1, 5 o 15 minutos).
-- [ ] [MVP] Ocultar el contenido en la vista de apps recientes e impedir capturas (`FLAG_SECURE`), con un interruptor.
+- [x] [MVP] Desbloqueo con huella o rostro (biometría de Android), con el PIN como respaldo.
+- [x] [MVP] Bloquear al abrir y al volver de segundo plano tras 1 minuto (configurable: inmediato, 1, 5 o 15 minutos).
+- [x] [MVP] Ocultar el contenido en la vista de apps recientes e impedir capturas (`FLAG_SECURE`), con un interruptor.
 
 **Campos y datos:**
 - En `settings`: `pin_hash` y `pin_salt` (PBKDF2-SHA256, 310,000 iteraciones, o argon2id), `biometric_enabled`, `lock_after_seconds` y `secure_screen`.
@@ -35,8 +35,8 @@ La app no tiene cuentas en línea. La seguridad es del teléfono hacia adentro. 
 **Propósito:** empezar de cero o entregar el teléfono sin dejar rastro.
 
 **Funciones:**
-- [ ] [MVP] "Borrar todos los datos" con doble confirmación (escribir "BORRAR").
-- [ ] [MVP] Ofrecer exportar antes de borrar.
+- [x] [MVP] "Borrar todos los datos" con doble confirmación (escribir "BORRAR").
+- [x] [MVP] Ofrecer exportar antes de borrar.
 
 **Campos y datos:** borra el archivo de la base de datos y las preferencias, y recrea la base con las migraciones (vuelven las categorías por defecto).
 

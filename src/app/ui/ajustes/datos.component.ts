@@ -1,10 +1,12 @@
 import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
 import { AlertController, IonIcon, IonSelect, IonSelectOption, IonToggle, LoadingController } from '@ionic/angular';
-import { isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
+import { applyPrivacy, isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
+import { NotificationsService } from '../notifications.service';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { ValidationError } from '../../application/errors';
+import { WIPE_CONFIRMATION } from '../../application/use-cases/backup';
 import { fileDate, pickTextFile, saveFile } from '../file-io';
 import { monthLabel } from '../format';
 import { LockState } from '../lock/lock-state';
@@ -23,6 +25,7 @@ export class DatosComponent implements OnInit {
   private readonly alerts = inject(AlertController);
   private readonly loading = inject(LoadingController);
   protected readonly lock = inject(LockState);
+  private readonly notifications = inject(NotificationsService);
   protected readonly lockOptions = [
     { value: 0, label: 'Al momento' },
     { value: 60, label: 'Tras 1 minuto' },
@@ -48,7 +51,8 @@ export class DatosComponent implements OnInit {
     this.biometryAvailable.set(await this.lock.biometryAvailable().catch(() => false));
   }
 
-  protected async createBackup() {
+  /** Devuelve true si el respaldo se creó y se entregó para guardar. */
+  protected async createBackup(): Promise<boolean> {
     const values = await this.ask(
       'Crear respaldo',
       'Elige una contraseña para cifrar el respaldo. Si la olvidas, el respaldo no se puede abrir.',
@@ -58,13 +62,56 @@ export class DatosComponent implements OnInit {
       ],
       'Crear',
     );
-    if (!values) return;
-    if (values['p1'] !== values['p2']) return this.fail('Las contraseñas no coinciden.');
-    await this.busy('Cifrando respaldo…', async () => {
+    if (!values) return false;
+    if (values['p1'] !== values['p2']) {
+      await this.fail('Las contraseñas no coinciden.');
+      return false;
+    }
+    const done = await this.busy('Cifrando respaldo…', async () => {
       const file = await this.container.createBackup.execute(values['p1']);
       await saveFile(`finanzas-respaldo-${fileDate()}.finanzas`, file, 'application/json');
       this.status.set('Respaldo creado. Guárdalo fuera del teléfono (Drive, correo).');
+      return true;
     });
+    return done === true;
+  }
+
+  protected async wipeAll() {
+    const warning = await this.alerts.create({
+      cssClass: 'app-alert',
+      header: 'Borrar todos los datos',
+      message:
+        'Se borran tus movimientos, fijos, metas, presupuestos, deudas y ajustes, incluido el PIN. No se puede deshacer. Conviene crear un respaldo antes.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Seguir sin respaldo', role: 'continue' },
+        { text: 'Crear respaldo', role: 'backup' },
+      ],
+    });
+    await warning.present();
+    const { role } = await warning.onDidDismiss();
+    if (role === 'backup') {
+      if (!(await this.createBackup())) return;
+    } else if (role !== 'continue') {
+      return;
+    }
+
+    const values = await this.ask(
+      'Confirmar borrado',
+      `Escribe ${WIPE_CONFIRMATION} para borrar todo.`,
+      [{ name: 'w', type: 'text', placeholder: WIPE_CONFIRMATION, attributes: { autocapitalize: 'characters', autocomplete: 'off' } }],
+      'Borrar todo',
+    );
+    if (!values) return;
+    const done = await this.busy('Borrando…', async () => {
+      await this.container.wipeAllData.execute(values['w']);
+      // Ya sin datos: que no quede ningún aviso programado ni la pantalla protegida.
+      if (this.notifications.available) await this.notifications.disable();
+      await applyPrivacy(false);
+      return true;
+    });
+    // La app arranca de cero: bienvenida, sin PIN.
+    if (done) location.replace('/');
   }
 
   protected async restoreBackup() {

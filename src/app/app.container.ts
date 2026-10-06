@@ -6,7 +6,7 @@ import { UpdateRecurringExpense } from './application/use-cases/update-recurring
 import { UpdateTransaction } from './application/use-cases/update-transaction';
 import { AddSavingsGoal } from './application/use-cases/add-savings-goal';
 import { AddCategory, DeleteCategory, RenameCategory } from './application/use-cases/manage-categories';
-import { CreateBackup, OpenBackup, RestoreBackup } from './application/use-cases/backup';
+import { CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from './application/use-cases/backup';
 import { ExportTransactionsCsv } from './application/use-cases/export-csv';
 import { PinLock } from './application/use-cases/pin-lock';
 import { BulkUpdateTransactions } from './application/use-cases/bulk-update-transactions';
@@ -107,6 +107,7 @@ export interface AppContainer {
   createBackup: CreateBackup;
   openBackup: OpenBackup;
   restoreBackup: RestoreBackup;
+  wipeAllData: WipeAllData;
   exportCsv: ExportTransactionsCsv;
   pinLock: PinLock;
   bulkUpdateTransactions: BulkUpdateTransactions;
@@ -165,6 +166,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     createBackup: new CreateBackup(repos.backup),
     openBackup: new OpenBackup(),
     restoreBackup: new RestoreBackup(repos.backup),
+    wipeAllData: new WipeAllData(repos.backup),
     exportCsv: new ExportTransactionsCsv(repos.transactions, repos.categories),
     pinLock: new PinLock(repos.settings),
     bulkUpdateTransactions: new BulkUpdateTransactions(repos.transactions, repos.categories),

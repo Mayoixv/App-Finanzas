@@ -53,6 +53,11 @@ export class SqliteBackupStore implements IBackupStore {
     }
   }
 
+  async wipe(): Promise<void> {
+    // Un respaldo vacío de versión 0: se borra todo y se aplican todas las migraciones desde cero.
+    await this.replaceWith({ schemaVersion: 0, tables: {} });
+  }
+
   /**
    * Recrea el esquema hasta la versión del respaldo, carga sus filas y aplica las migraciones que falten.
    * Así un respaldo viejo pasa por las mismas conversiones que una base vieja (por ejemplo, a centavos).

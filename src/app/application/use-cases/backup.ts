@@ -52,3 +52,18 @@ export class RestoreBackup {
     return this.store.restore(data);
   }
 }
+
+/** Palabra que hay que escribir para confirmar el borrado total. */
+export const WIPE_CONFIRMATION = 'BORRAR';
+
+export class WipeAllData {
+  constructor(private readonly store: IBackupStore) {}
+
+  /** Borra todos los datos y ajustes (también el PIN). Exige escribir BORRAR para que no pase por un toque. */
+  async execute(confirmation: string): Promise<void> {
+    if (confirmation.trim().toUpperCase() !== WIPE_CONFIRMATION) {
+      throw new ValidationError(`Escribe ${WIPE_CONFIRMATION} para confirmar.`);
+    }
+    return this.store.wipe();
+  }
+}

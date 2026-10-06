@@ -1,5 +1,5 @@
 import { webcrypto } from 'node:crypto';
-import { CreateBackup, OpenBackup, RestoreBackup } from '../application/use-cases/backup';
+import { CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from '../application/use-cases/backup';
 import { ValidationError } from '../application/errors';
 import { MIGRATIONS, runMigrations } from './sqlite/migrations';
 import { SqliteBackupStore } from './sqlite/sqlite-backup-store';
@@ -81,5 +81,21 @@ describe('respaldo', () => {
   it('rechaza respaldos de una versión más nueva de la app', async () => {
     const b = await dbWith([]);
     await expect(b.store.restore({ schemaVersion: 999, tables: {} })).rejects.toThrow('versión más nueva');
+  });
+
+  it('borrar todo deja la base como recién instalada y exige escribir BORRAR', async () => {
+    const a = await dbWith([1250, 99]);
+    await a.db.run("INSERT INTO settings (key, value) VALUES ('pin_hash', 'x')");
+    const wipe = new WipeAllData(a.store);
+    await expect(wipe.execute('borra')).rejects.toThrow(ValidationError);
+    expect(await a.repo.listAll()).toHaveLength(2);
+
+    await wipe.execute(' borrar ');
+    expect(await a.repo.listAll()).toEqual([]);
+    expect(await a.db.all('SELECT * FROM settings')).toEqual([]);
+    const categories = await a.db.all<{ id: string }>('SELECT id FROM categories');
+    expect(categories.map((c) => c.id)).toContain('cat-pago-deudas');
+    const [{ version }] = await a.db.all<{ version: number }>('SELECT MAX(version) AS version FROM schema_migrations');
+    expect(version).toBe(Math.max(...MIGRATIONS.map((m) => m.version)));
   });
 });
