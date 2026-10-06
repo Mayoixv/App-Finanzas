@@ -51,9 +51,12 @@ function reminderOf(r: PaymentReminder, hour: number): LocalNotificationSchema |
   return {
     id: idOf(r.key),
     title: r.when === 'antes' ? `Mañana vence ${r.name}` : `Hoy vence ${r.name}`,
-    body: `${formatMoney(r.amount)} · Márcalo como pagado en Fijos.`,
+    body:
+      r.kind === 'tarjeta'
+        ? `Te falta ${formatMoney(r.amount)} del estado. Págalo desde Cuentas para no pagar intereses.`
+        : `${formatMoney(r.amount)} · Márcalo como pagado en Fijos.`,
     schedule: { at, allowWhileIdle: true },
-    extra: { target: '/tabs/fijos' },
+    extra: { target: r.kind === 'tarjeta' ? '/cuentas' : '/tabs/fijos' },
   };
 }
 

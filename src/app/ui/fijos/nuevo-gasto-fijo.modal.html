@@ -78,6 +78,22 @@
       </ion-select>
     </div>
 
+    @if (accounts().length > 1) {
+      <div class="field">
+        <ion-select
+          [label]="kind() === 'ingreso' ? 'Se cobra en' : 'Se paga con'"
+          label-placement="stacked"
+          cancelText="Cancelar"
+          [value]="accountId()"
+          (ionChange)="accountId.set($event.detail.value)"
+        >
+          @for (a of accounts(); track a.id) {
+            <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    }
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }

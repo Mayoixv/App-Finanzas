@@ -42,6 +42,22 @@
       ></ion-input>
     </div>
 
+    @if (accounts().length > 1) {
+      <div class="field">
+        <ion-select
+          [label]="kind() === 'ingreso' ? 'Entra a' : 'Sale de'"
+          label-placement="stacked"
+          cancelText="Cancelar"
+          [value]="accountId()"
+          (ionChange)="accountId.set($event.detail.value)"
+        >
+          @for (a of accounts(); track a.id) {
+            <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    }
+
     <button type="button" class="link-button" [attr.aria-pressed]="splitOn()" (click)="toggleSplit()">
       {{ splitOn() ? 'No dividir' : 'Dividir en varias categorías' }}
     </button>

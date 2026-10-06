@@ -1,0 +1,114 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <button type="button" class="back" aria-label="Volver" (click)="back()">
+      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+      Volver
+    </button>
+    <h1 class="screen-title">Cuentas</h1>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  @if (failed()) {
+    <p class="note">No se pudieron leer las cuentas. Vuelve a abrir esta pantalla.</p>
+  } @else if (overview(); as o) {
+    <section class="totals" aria-label="Totales">
+      <p><span class="totals-label">Tienes</span> <span class="totals-amount">{{ money(o.assets) }}</span></p>
+      @if (cards().length) {
+        <p><span class="totals-label">Debes en tarjetas</span> <span class="totals-amount">{{ money(o.cardDebt) }}</span></p>
+      }
+    </section>
+
+    <div class="actions">
+      @if (canTransfer()) {
+        <button type="button" class="btn-secondary action" (click)="openTransfer()">
+          <ion-icon name="swap-horizontal" aria-hidden="true"></ion-icon>
+          Transferir o pagar tarjeta
+        </button>
+      }
+      <button type="button" class="btn-primary action" (click)="openAccount()">Agregar cuenta o tarjeta</button>
+    </div>
+
+    <h2 class="section-title list-title">Cuentas</h2>
+    <ul [class.t-still]="!monthState.animateLists()" class="rows">
+      @for (r of accounts(); track r.view.account.id) {
+        <li animate.enter="t-row-enter" animate.leave="t-row-leave">
+          <button type="button" class="row" [attr.aria-label]="'Editar ' + r.name + ', saldo ' + r.balance" (click)="openAccount(r.view)">
+            <span class="row-text">
+              <span class="row-title">{{ r.name }}</span>
+              <span class="row-sub">{{ r.detail }}</span>
+            </span>
+            <span class="row-amount" [class.negative]="r.negative">{{ r.balance }}</span>
+            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+      }
+    </ul>
+
+    @if (cards().length) {
+      <h2 class="section-title list-title">Tarjetas de crédito</h2>
+      <ul [class.t-still]="!monthState.animateLists()" class="rows">
+        @for (r of cards(); track r.view.account.id) {
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave">
+            <button type="button" class="row" [attr.aria-label]="'Editar ' + r.name + ', debes ' + r.balance" (click)="openAccount(r.view)">
+              <span class="row-text">
+                <span class="row-title">{{ r.name }}</span>
+                <span class="row-sub" [class.warn]="r.highUse">{{ r.detail }}</span>
+              </span>
+              <span class="row-amount">{{ r.balance }}</span>
+              <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            </button>
+            @if (r.statusText) {
+              <div class="card-status">
+                <span class="status-text" [class.urgent]="r.urgent">{{ r.statusText }}</span>
+                @if (r.status && r.status.currentDebt > 0) {
+                  <button type="button" class="btn-secondary pay" [attr.aria-label]="'Pagar ' + r.name" (click)="payCard(r)">Pagar</button>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+
+    <h2 class="section-title list-title">Transferencias de {{ monthName }}</h2>
+    @if (transfers().length) {
+      <ul [class.t-still]="!monthState.animateLists()" class="rows">
+        @for (t of transfers(); track t.id) {
+          <li animate.enter="t-row-enter" animate.leave="t-row-leave">
+            <button type="button" class="row" [attr.aria-label]="'Eliminar transferencia de ' + money(t.amount) + ', ' + transferText(t)" (click)="confirmDeleteTransfer(t)">
+              <span class="row-text">
+                <span class="row-title">{{ transferText(t) }}</span>
+                <span class="row-sub">{{ day(t.date) }}{{ t.note ? ' · ' + t.note : '' }}</span>
+              </span>
+              <span class="row-amount">{{ money(t.amount) }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="note">Sin transferencias este mes.</p>
+    }
+
+    @if (archived().length) {
+      <button type="button" class="link-button" [attr.aria-expanded]="showArchived()" (click)="showArchived.set(!showArchived())">
+        {{ showArchived() ? 'Ocultar archivadas' : 'Ver archivadas (' + archived().length + ')' }}
+      </button>
+      @if (showArchived()) {
+        <ul class="rows">
+          @for (r of archived(); track r.view.account.id) {
+            <li>
+              <button type="button" class="row" [attr.aria-label]="'Editar ' + r.name" (click)="openAccount(r.view)">
+                <span class="row-text">
+                  <span class="row-title">{{ r.name }}</span>
+                  <span class="row-sub">Archivada · {{ r.detail }}</span>
+                </span>
+                <span class="row-amount">{{ r.balance }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</ion-content>

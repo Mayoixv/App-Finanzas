@@ -16,6 +16,8 @@ export interface RecurringExpense {
   /** Primer mes en que corre; antes de él no genera instancias. */
   startMonth: MonthKey;
   frequency?: Frequency;
+  /** Cuenta con que se paga o se cobra; sin valor, la última usada. */
+  accountId?: string | null;
   /** Último mes en pausa ('YYYY-MM'); hasta ese mes inclusive no genera instancias. */
   pausedUntil?: MonthKey | null;
 }

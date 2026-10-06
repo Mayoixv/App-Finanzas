@@ -11,9 +11,9 @@ No existe todavía. Depende de [Cuentas](03-cuentas.md): una tarjeta es una cuen
 **Propósito:** saber cuánto se debe en cada tarjeta y cuánto cupo queda.
 
 **Funciones:**
-- [ ] [Después] Fecha de corte, fecha de pago y límite.
-- [ ] [Después] Utilización = deuda actual / límite, con aviso desde el 30%.
-- [ ] [Después] Las compras con tarjeta son gastos de esa cuenta (cuentan en el mes de la compra, no del pago).
+- [x] [Después] Fecha de corte, fecha de pago y límite.
+- [x] [Después] Utilización = deuda actual / límite, con aviso desde el 30%.
+- [x] [Después] Las compras con tarjeta son gastos de esa cuenta (cuentan en el mes de la compra, no del pago).
 
 **Campos y datos:**
 
@@ -42,9 +42,9 @@ No existe todavía. Depende de [Cuentas](03-cuentas.md): una tarjeta es una cuen
 **Propósito:** pagar lo correcto a tiempo.
 
 **Funciones:**
-- [ ] [Después] Estado del ciclo: compras entre el corte anterior y el actual, total a pagar y fecha límite.
+- [x] [Después] Estado del ciclo: compras entre el corte anterior y el actual, total a pagar y fecha límite.
 - [ ] [Después] Pago mínimo (escrito por el usuario según su banco) contra pago total.
-- [ ] [Después] "Pagar" crea una transferencia desde la cuenta elegida.
+- [x] [Después] "Pagar" crea una transferencia desde la cuenta elegida.
 
 **Campos y datos:** pago mínimo (centavos) por ciclo, escrito a mano porque cada banco lo calcula distinto.
 

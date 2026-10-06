@@ -1,9 +1,11 @@
+import { CASH_ACCOUNT_ID } from '../../domain/account';
 import { isExpenseType } from '../../domain/category';
 import { isValidCents } from '../../domain/money';
 import { isValidIsoDate } from '../../domain/month';
 import { normalizeTags, Transaction, TransactionSplit } from '../../domain/transaction';
 import { NotFoundError, ValidationError } from '../errors';
 import {
+  IAccountRepository,
   ICategoryRepository,
   IdGenerator,
   ITransactionRepository,
@@ -17,6 +19,8 @@ export interface AddTransactionInput {
   tags?: string[];
   /** Al menos dos partes que sumen el monto, todas del mismo tipo (gasto o ingreso) que la categoría. */
   splits?: TransactionSplit[];
+  /** Sin valor, Efectivo (o la que ya tenía, al editar). */
+  accountId?: string;
 }
 
 /** Reglas comunes al crear y al editar un movimiento. */
@@ -59,7 +63,20 @@ export function buildTransaction(id: string, input: AddTransactionInput): Transa
     note: input.note?.trim() ?? '',
     tags: normalizeTags(input.tags ?? []),
     splits,
+    accountId: input.accountId ?? CASH_ACCOUNT_ID,
   };
+}
+
+/** La cuenta debe existir; en un movimiento nuevo, además, no estar archivada. */
+export async function validateAccount(
+  accountId: string | undefined,
+  accounts: IAccountRepository | undefined,
+  allowArchived: boolean,
+): Promise<void> {
+  if (!accountId || !accounts) return;
+  const account = await accounts.get(accountId);
+  if (!account) throw new NotFoundError('Cuenta');
+  if (account.archived && !allowArchived) throw new ValidationError('Esa cuenta está archivada; elige otra');
 }
 
 export class AddTransaction {
@@ -67,10 +84,12 @@ export class AddTransaction {
     private readonly transactions: ITransactionRepository,
     private readonly categories: ICategoryRepository,
     private readonly ids: IdGenerator,
+    private readonly accounts?: IAccountRepository,
   ) {}
 
   async execute(input: AddTransactionInput): Promise<Transaction> {
     await validateTransactionInput(input, this.categories);
+    await validateAccount(input.accountId, this.accounts, false);
     const transaction = buildTransaction(this.ids.next(), input);
     await this.transactions.save(transaction);
     return transaction;

@@ -14,7 +14,7 @@
 - [x] [MVP] Duplicar: abre un movimiento nuevo con los mismos datos y la fecha propuesta.
 - [x] [MVP] Eliminar con confirmación. Si era el pago de un gasto fijo, ese fijo vuelve a Pendiente.
 - [x] [MVP] Lista del mes ordenada de más reciente a más antigua, con ingresos en verde y signo `+`.
-- [ ] [MVP] Cuenta de origen o destino (ver [Cuentas](03-cuentas.md)).
+- [x] [MVP] Cuenta de origen o destino (ver [Cuentas](03-cuentas.md)).
 - [x] [Después] Recordar la última categoría usada por tipo.
 
 **Campos y datos:**
@@ -48,7 +48,7 @@
 **Propósito:** mover dinero entre cuentas propias sin que cuente como ingreso ni gasto.
 
 **Funciones:**
-- [ ] [Después] Crear transferencia: cuenta origen, cuenta destino, monto, fecha y nota.
+- [x] [Después] Crear transferencia: cuenta origen, cuenta destino, monto, fecha y nota.
 - [ ] [Después] Editar y eliminar las dos partes juntas.
 
 **Campos y datos:** `transfer_id` compartido por dos movimientos (salida en origen, entrada en destino). Monto en centavos > 0. Origen distinto de destino.

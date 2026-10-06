@@ -1,6 +1,8 @@
+import { CARD_UTILIZATION_WARNING } from '../../domain/account';
 import { budgetLevel } from '../../domain/budget';
 import { daysBetween, IsoDate, monthOf } from '../../domain/month';
 import { ICategoryRepository } from '../ports/repositories';
+import { GetCardStatuses } from './accounts';
 import { GetBudgetStatuses } from './get-budget-statuses';
 import { GetUpcomingRecurring } from './get-upcoming-recurring';
 
@@ -16,6 +18,10 @@ export interface Alerts {
   exceeded: string[];
   /** Presupuestos desde el 85% sin pasarse. */
   nearLimit: string[];
+  /** Tarjetas con pago pendiente que vence en 3 días o menos, o ya venció. */
+  cardsDue: string[];
+  /** Tarjetas que usan el 30% del límite o más. */
+  cardsHighUse: string[];
 }
 
 /** Lo que pide atención hoy: fijos vencidos o por vencer y presupuestos del mes en aviso. */
@@ -24,13 +30,15 @@ export class GetAlerts {
     private readonly upcoming: GetUpcomingRecurring,
     private readonly budgets: GetBudgetStatuses,
     private readonly categories: ICategoryRepository,
+    private readonly cards: GetCardStatuses,
   ) {}
 
   async execute(today: IsoDate): Promise<Alerts> {
-    const [items, statuses, categories] = await Promise.all([
+    const [items, statuses, categories, cards] = await Promise.all([
       this.upcoming.execute(today, DUE_SOON_DAYS),
       this.budgets.execute(monthOf(today)),
       this.categories.list(),
+      this.cards.execute(today),
     ]);
     const types = new Map(categories.map((c) => [c.id, c.type]));
     const names = new Map(categories.map((c) => [c.id, c.name]));
@@ -43,6 +51,10 @@ export class GetAlerts {
       dueSoon: payments.filter((i) => daysBetween(today, i.instance.dueDate) >= 0).map((i) => i.expense.name),
       exceeded: budgetNames('exceeded'),
       nearLimit: budgetNames('warning'),
+      cardsDue: cards.filter((c) => c.pending > 0 && c.daysToDue <= DUE_SOON_DAYS).map((c) => c.account.name),
+      cardsHighUse: cards
+        .filter((c) => (c.utilization ?? 0) >= CARD_UTILIZATION_WARNING)
+        .map((c) => c.account.name),
     };
   }
 }

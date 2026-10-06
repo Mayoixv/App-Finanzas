@@ -3,6 +3,7 @@ import { provideIonicAngular } from '@ionic/angular';
 import { APP_CONTAINER, buildContainer } from '../../app.container';
 import {
   InMemoryBudgets,
+  InMemoryAccounts,
   InMemoryCategories,
   InMemoryDebts,
   InMemoryRecurring,
@@ -16,15 +17,18 @@ import { MonthState } from '../month-state';
 import { FijosPage } from './fijos.page';
 
 async function render(withData: boolean) {
+  const categories = new InMemoryCategories();
+  const transactions = new InMemoryTransactions();
   const repos = {
-    categories: new InMemoryCategories(),
-    transactions: new InMemoryTransactions(),
+    categories,
+    transactions,
     recurring: new InMemoryRecurring(),
     savings: new InMemorySavings(),
     budgets: new InMemoryBudgets(),
     settings: new InMemorySettings(),
     backup: { dump: () => Promise.reject(), restore: () => Promise.reject(), wipe: () => Promise.reject() },
     debts: new InMemoryDebts(),
+    accounts: new InMemoryAccounts(transactions, categories),
   };
   repos.categories.items.set('ren', { id: 'ren', name: 'Alquiler', type: 'fijo' });
   const container = buildContainer(repos, new SequentialIds());

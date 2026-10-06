@@ -14,6 +14,8 @@ export interface Transaction {
   /** Si está dividido, es la categoría de la parte más grande (la que se muestra en la lista). */
   categoryId: string;
   note: string;
+  /** Cuenta de la que sale (gasto) o a la que entra (ingreso). Sin valor, Efectivo. */
+  accountId?: string;
   /** Etiquetas libres para agrupar movimientos de distintas categorías (por ejemplo, un viaje). */
   tags?: string[];
   /** Si existe, el monto se reparte entre estas categorías y las partes suman el total exacto. */

@@ -1,0 +1,20 @@
+@use '../sheet';
+
+.hint {
+  margin: -6px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted-on-light);
+}
+
+.days {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.archive {
+  width: 100%;
+  border-color: var(--violet-600);
+  color: var(--violet-600);
+}

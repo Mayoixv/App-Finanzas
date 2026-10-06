@@ -10,6 +10,8 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { addOutline, cameraOutline, close } from 'ionicons/icons';
+import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
+import { accountChoices, accountLabel, rememberAccount } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
 import { ValidationError } from '../../application/errors';
 import { Category, isExpenseType } from '../../domain/category';
@@ -60,6 +62,9 @@ export class NuevaTransaccionModalComponent implements OnInit {
   private readonly categories = signal<Category[]>([]);
   protected readonly kind = signal<Kind>('gasto');
   protected readonly categoryId = signal<string | null>(null);
+  protected readonly accounts = signal<Account[]>([]);
+  protected readonly accountId = signal(CASH_ACCOUNT_ID);
+  protected readonly accountLabel = accountLabel;
   protected readonly amount = signal('');
   protected readonly date = signal(defaultDateFor(inject(MonthState).month()));
   protected readonly note = signal('');
@@ -125,6 +130,9 @@ export class NuevaTransaccionModalComponent implements OnInit {
     this.categories.set(categories);
 
     const t = this.transaction ?? this.copyOf;
+    const choices = await accountChoices(this.container, t?.accountId);
+    this.accounts.set(choices.accounts);
+    this.accountId.set(choices.selected);
     if (!t) {
       await this.applyLastCategory();
       return;
@@ -212,6 +220,7 @@ export class NuevaTransaccionModalComponent implements OnInit {
       categoryId,
       note: this.note(),
       tags: normalizeTags(this.tags()),
+      accountId: this.accountId(),
       splits: this.splitOn()
         ? this.parts().map((p) => ({ categoryId: p.categoryId!, amount: parseAmount(p.amount) ?? 0 }))
         : [],
@@ -229,6 +238,7 @@ export class NuevaTransaccionModalComponent implements OnInit {
         await this.container.transactions.saveAttachment({ id: p.id, transactionId: saved.id, data: p.data });
       }
       if (!this.splitOn()) await this.container.settings.set(lastCategoryKey(this.kind()), categoryId);
+      await rememberAccount(this.container, this.accountId());
       this.saved.set(true);
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(null, 'saved');

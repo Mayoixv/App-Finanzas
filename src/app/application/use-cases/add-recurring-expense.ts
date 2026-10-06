@@ -14,6 +14,7 @@ export interface RecurringExpenseFields {
   categoryId: string;
   dueDay: number;
   frequency?: Frequency;
+  accountId?: string | null;
 }
 
 /** Reglas comunes al crear y al editar un gasto fijo. Devuelve el nombre ya recortado. */
@@ -60,6 +61,7 @@ export class AddRecurringExpense {
       active: true,
       startMonth: input.startMonth,
       frequency: input.frequency ?? 1,
+      accountId: input.accountId ?? null,
     };
     await this.recurring.save(expense);
     return expense;

@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { alertCircle, chevronForward, timeOutline, trendingUpOutline } from 'ionicons/icons';
+import { alertCircle, cardOutline, chevronForward, timeOutline, trendingUpOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { Alerts } from '../../application/use-cases/get-alerts';
 import { currentMonth, todayIso } from '../format';
@@ -13,7 +13,7 @@ interface Alert {
   icon: string;
   tone: 'danger' | 'warning';
   text: string;
-  target: 'fijos' | 'presupuestos';
+  target: 'fijos' | 'presupuestos' | 'cuentas';
 }
 
 /** "Luz", "Luz y Agua", "Luz, Agua y 2 más". */
@@ -42,6 +42,15 @@ function toAlerts(a: Alerts): Alert[] {
       target: 'fijos',
     });
   }
+  if (a.cardsDue.length) {
+    out.push({
+      key: 'cards-due',
+      icon: 'card-outline',
+      tone: 'danger',
+      text: `Paga ${a.cardsDue.length === 1 ? 'la tarjeta' : 'las tarjetas'} ${names(a.cardsDue)}: el pago vence pronto`,
+      target: 'cuentas',
+    });
+  }
   if (a.exceeded.length) {
     out.push({ key: 'exceeded', icon: 'alert-circle', tone: 'danger', text: `Te pasaste en ${names(a.exceeded)}`, target: 'presupuestos' });
   }
@@ -52,6 +61,15 @@ function toAlerts(a: Alerts): Alert[] {
       tone: 'warning',
       text: `Cerca del límite: ${names(a.nearLimit)}`,
       target: 'presupuestos',
+    });
+  }
+  if (a.cardsHighUse.length) {
+    out.push({
+      key: 'cards-use',
+      icon: 'card-outline',
+      tone: 'warning',
+      text: `Usas el 30% o más del límite: ${names(a.cardsHighUse)}`,
+      target: 'cuentas',
     });
   }
   return out;
@@ -73,7 +91,7 @@ export class AlertsRowComponent {
   protected readonly visible = computed(() => this.monthState.month() === currentMonth() && this.alerts().length > 0);
 
   constructor() {
-    addIcons({ alertCircle, chevronForward, timeOutline, trendingUpOutline });
+    addIcons({ alertCircle, cardOutline, chevronForward, timeOutline, trendingUpOutline });
     effect(() => {
       this.monthState.version();
       this.load();
@@ -81,8 +99,8 @@ export class AlertsRowComponent {
   }
 
   protected open(alert: Alert) {
-    if (alert.target === 'fijos') {
-      this.router.navigateByUrl('/tabs/fijos');
+    if (alert.target !== 'presupuestos') {
+      this.router.navigateByUrl(alert.target === 'fijos' ? '/tabs/fijos' : '/cuentas');
       return;
     }
     // Los presupuestos están más abajo en Inicio mismo.

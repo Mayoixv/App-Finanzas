@@ -1,5 +1,6 @@
 import { ValidationError } from '../errors';
 import {
+  InMemoryAccounts,
   InMemoryBudgets,
   InMemoryCategories,
   InMemoryDebts,
@@ -20,6 +21,8 @@ import { GetSavingsOverview } from './get-savings-overview';
 import { GetUpcomingRecurring } from './get-upcoming-recurring';
 import { Onboarding } from './onboarding';
 import { GetAlerts } from './get-alerts';
+import { AdjustAccountBalance, ArchiveAccount, DeleteAccount, GetAccountsOverview, GetCardStatuses, SaveAccount, SaveTransfer } from './accounts';
+import { UpdateTransaction } from './update-transaction';
 import { GetMonthHistory } from './get-month-history';
 import { change } from '../../domain/monthly-summary';
 import { GetNotificationPlan } from './get-notification-plan';
@@ -221,8 +224,11 @@ describe('alertas de Inicio', () => {
       new GetUpcomingRecurring(recurring),
       new GetBudgetStatuses(s.budgets, s.transactions),
       s.categories,
+      new GetCardStatuses(new InMemoryAccounts(s.transactions, s.categories)),
     );
     expect(await alerts.execute('2026-10-10')).toEqual({
+      cardsDue: [],
+      cardsHighUse: [],
       overdue: ['Luz'],
       dueSoon: ['Internet'],
       exceeded: ['Comida'],
@@ -245,6 +251,7 @@ describe('plan de notificaciones', () => {
       new GetMonthRecurringExpenses(s.recurring),
       new GetBudgetStatuses(s.budgets, s.transactions),
       s.categories,
+      new GetCardStatuses(new InMemoryAccounts(s.transactions, s.categories)),
     ).execute('2026-10-29');
 
     // Renta de octubre ya pasó; la de noviembre se avisa el 31 y el 1. Sin recordatorios del sueldo.
@@ -274,5 +281,122 @@ describe('comparación mes a mes', () => {
     expect(history.map((h) => [h.month, h.expenses])).toEqual([['2026-10', 12_000], ['2026-09', 10_000], ['2026-08', 0]]);
     expect(change(history[0].expenses, history[1].expenses)).toEqual({ diff: 2_000, percent: 20 });
     expect(change(5, 0)).toEqual({ diff: 5, percent: null });
+  });
+});
+
+describe('cuentas y transferencias', () => {
+  function accountsSetup() {
+    const s = setup();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories);
+    return {
+      ...s,
+      accounts,
+      save: new SaveAccount(accounts, s.ids),
+      add: new AddTransaction(s.transactions, s.categories, s.ids, accounts),
+      overview: new GetAccountsOverview(accounts),
+    };
+  }
+
+  it('el saldo sale del saldo inicial, los movimientos y las transferencias', async () => {
+    const s = accountsSetup();
+    const banco = await s.save.execute({ name: 'Banco', type: 'banco', initialBalance: 10_000 });
+    await s.add.execute({ date: '2026-10-01', amount: 50_000, categoryId: 'sal', accountId: banco.id });
+    await s.add.execute({ date: '2026-10-02', amount: 2_000, categoryId: 'com' });
+    await new SaveTransfer(s.accounts, s.ids).execute({ date: '2026-10-03', amount: 5_000, fromAccountId: banco.id, toAccountId: 'acc-efectivo' });
+
+    const view = await s.overview.execute();
+    const balance = (id: string) => view.accounts.find((a) => a.account.id === id)?.balance;
+    expect(balance(banco.id)).toBe(55_000);
+    expect(balance('acc-efectivo')).toBe(3_000);
+    expect(view.assets).toBe(58_000);
+    // Antes de la transferencia, el efectivo estaba en −2,000.
+    expect((await s.accounts.balances('2026-10-02')).get('acc-efectivo')).toBe(-2_000);
+  });
+
+  it('tarjetas: piden límite y días; la deuda se suma aparte de lo que tienes', async () => {
+    const s = accountsSetup();
+    await expect(s.save.execute({ name: 'Visa', type: 'tarjeta', initialBalance: 0 })).rejects.toThrow(ValidationError);
+    const visa = await s.save.execute({ name: 'Visa', type: 'tarjeta', initialBalance: 0, creditLimit: 100_000, cutDay: 15, dueDay: 5 });
+    await s.add.execute({ date: '2026-10-05', amount: 30_000, categoryId: 'com', accountId: visa.id });
+    const view = await s.overview.execute();
+    expect(view.cardDebt).toBe(30_000);
+    expect(view.assets).toBe(0);
+    // Un banco no guarda datos de tarjeta aunque lleguen.
+    const banco = await s.save.execute({ name: 'Banco', type: 'banco', initialBalance: 0, creditLimit: 5, cutDay: 1, dueDay: 1 });
+    expect(banco.creditLimit).toBeNull();
+  });
+
+  it('ajustar saldo cambia el inicial sin crear movimientos; borrar solo cuentas vacías', async () => {
+    const s = accountsSetup();
+    const banco = await s.save.execute({ name: 'Banco', type: 'banco', initialBalance: 0 });
+    await s.add.execute({ date: '2026-10-01', amount: 1_000, categoryId: 'com', accountId: banco.id });
+    await new AdjustAccountBalance(s.accounts).execute(banco.id, 20_000);
+    expect((await s.accounts.balances()).get(banco.id)).toBe(20_000);
+    expect(s.transactions.items.size).toBe(1);
+
+    await expect(new DeleteAccount(s.accounts).execute(banco.id)).rejects.toThrow('Archívala');
+    await expect(new DeleteAccount(s.accounts).execute('acc-efectivo')).rejects.toThrow(ValidationError);
+    await new ArchiveAccount(s.accounts).execute(banco.id, true);
+    await expect(s.add.execute({ date: '2026-10-02', amount: 1, categoryId: 'com', accountId: banco.id })).rejects.toThrow('archivada');
+    const vacia = await s.save.execute({ name: 'Vieja', type: 'ahorro', initialBalance: 0 });
+    await new DeleteAccount(s.accounts).execute(vacia.id);
+    expect(await s.accounts.get(vacia.id)).toBeUndefined();
+  });
+
+  it('editar un movimiento sin decir la cuenta la conserva; transferencias validan cuentas', async () => {
+    const s = accountsSetup();
+    const banco = await s.save.execute({ name: 'Banco', type: 'banco', initialBalance: 0 });
+    const t = await s.add.execute({ date: '2026-10-01', amount: 1_000, categoryId: 'com', accountId: banco.id });
+    const edited = await new UpdateTransaction(s.transactions, s.categories, s.accounts).execute(t.id, { date: '2026-10-01', amount: 2_000, categoryId: 'com' });
+    expect(edited.accountId).toBe(banco.id);
+
+    const transfer = new SaveTransfer(s.accounts, s.ids);
+    await expect(transfer.execute({ date: '2026-10-01', amount: 1, fromAccountId: banco.id, toAccountId: banco.id })).rejects.toThrow('distintas');
+    await expect(transfer.execute({ date: '2026-10-01', amount: 1, fromAccountId: banco.id, toAccountId: 'nope' })).rejects.toThrow();
+  });
+});
+
+describe('estado de tarjeta', () => {
+  it('separa lo que se debía al corte, lo pagado desde entonces y los cargos del ciclo', async () => {
+    const s = setup();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories);
+    const add = new AddTransaction(s.transactions, s.categories, s.ids, accounts);
+    const visa = await new SaveAccount(accounts, s.ids).execute({ name: 'Visa', type: 'tarjeta', initialBalance: 0, creditLimit: 100_000, cutDay: 15, dueDay: 5 });
+    await add.execute({ date: '2026-09-20', amount: 20_000, categoryId: 'com', accountId: visa.id });
+    await add.execute({ date: '2026-10-10', amount: 15_000, categoryId: 'com', accountId: visa.id });
+    await add.execute({ date: '2026-10-18', amount: 5_000, categoryId: 'com', accountId: visa.id });
+    await new SaveTransfer(accounts, s.ids).execute({ date: '2026-10-20', amount: 10_000, fromAccountId: 'acc-efectivo', toAccountId: visa.id });
+
+    const [card] = await new GetCardStatuses(accounts).execute('2026-10-25');
+    expect(card).toMatchObject({
+      lastCut: '2026-10-15',
+      dueDate: '2026-11-05',
+      daysToDue: 11,
+      statementDebt: 35_000,
+      paidSinceCut: 10_000,
+      pending: 25_000,
+      cycleCharges: 5_000,
+      currentDebt: 30_000,
+      utilization: 30,
+    });
+  });
+
+  it('las alertas y las notificaciones avisan del pago de la tarjeta y del uso alto', async () => {
+    const s = setup();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories);
+    const visa = await new SaveAccount(accounts, s.ids).execute({ name: 'Visa', type: 'tarjeta', initialBalance: 0, creditLimit: 100_000, cutDay: 15, dueDay: 5 });
+    await new AddTransaction(s.transactions, s.categories, s.ids, accounts).execute({ date: '2026-10-10', amount: 40_000, categoryId: 'com', accountId: visa.id });
+    const cards = new GetCardStatuses(accounts);
+    const recurring = new GetMonthRecurringExpenses(s.recurring);
+    const budgets = new GetBudgetStatuses(s.budgets, s.transactions);
+
+    const alerts = await new GetAlerts(new GetUpcomingRecurring(recurring), budgets, s.categories, cards).execute('2026-11-03');
+    expect(alerts).toMatchObject({ cardsDue: ['Visa'], cardsHighUse: ['Visa'] });
+
+    const plan = await new GetNotificationPlan(recurring, budgets, s.categories, cards).execute('2026-11-03');
+    expect(plan.reminders.filter((r) => r.kind === 'tarjeta').map((r) => `${r.when} ${r.date} ${r.amount}`)).toEqual([
+      'antes 2026-11-04 40000',
+      'hoy 2026-11-05 40000',
+    ]);
   });
 });

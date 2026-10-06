@@ -31,6 +31,13 @@ export function parseAmount(text: string): Cents | null {
   return cents > 0 ? cents : null;
 }
 
+/** Como parseAmount pero para saldos: vacío es 0 y se admite negativo (un sobregiro). null si no es un número. */
+export function parseBalance(text: string): Cents | null {
+  if (!text.trim()) return 0;
+  const value = Number(text.trim());
+  return Number.isFinite(value) ? Math.round(value * 100) : null;
+}
+
 /** Centavos al texto que se precarga en un campo al editar: 125050 pasa a "1250.5". */
 export function amountToInput(cents: Cents): string {
   return String(cents / 100);

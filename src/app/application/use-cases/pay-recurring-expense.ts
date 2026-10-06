@@ -1,3 +1,4 @@
+import { CASH_ACCOUNT_ID } from '../../domain/account';
 import { MonthKey } from '../../domain/month';
 import { markPaid, RecurringExpenseInstance } from '../../domain/recurring-expense';
 import { NotFoundError, ValidationError } from '../errors';
@@ -37,6 +38,7 @@ export class PayRecurringExpense {
       amount: instance.amount,
       categoryId: expense.categoryId,
       note: expense.name,
+      accountId: expense.accountId ?? CASH_ACCOUNT_ID,
     });
 
     const paid = markPaid(instance, transactionId);

@@ -2,6 +2,7 @@ import { NodeSqliteDatabase } from './testing/node-sqlite-database';
 import { Migration, MIGRATIONS, runMigrations } from './sqlite/migrations';
 import {
   SqliteBudgetRepository,
+  SqliteAccountRepository,
   SqliteCategoryRepository,
   SqliteDebtRepository,
   SqliteRecurringExpenseRepository,
@@ -179,7 +180,7 @@ describe('etiquetas, divisiones y fotos en SQLite', () => {
     };
     await repo.save(t);
     await repo.saveAttachment({ id: 'f', transactionId: 't', data: 'data:image/jpeg;base64,AAA' });
-    expect(await repo.get('t')).toEqual({ ...t, attachmentCount: 1 });
+    expect(await repo.get('t')).toEqual({ ...t, attachmentCount: 1, accountId: 'acc-efectivo' });
     expect((await repo.listByMonth('2026-10'))[0].splits).toHaveLength(2);
 
     await repo.save({ ...t, splits: [] });
@@ -220,5 +221,35 @@ describe('migración 7 en SQLite', () => {
     await debts.delete('d');
     expect(await debts.listPayments()).toEqual([]);
     expect((await new SqliteCategoryRepository(db).get('cat-pago-deudas'))?.type).toBe('fijo');
+  });
+});
+
+describe('migración 8: cuentas', () => {
+  it('pasa los movimientos existentes a Efectivo y calcula saldos con ingresos, gastos y transferencias', async () => {
+    const db = new NodeSqliteDatabase();
+    await runMigrations(db, MIGRATIONS.filter((m) => m.version <= 7));
+    await db.run("INSERT INTO transactions (id, date, amount, category_id, note) VALUES ('viejo', '2026-09-01', 70000, 'cat-salario', '')");
+    await db.run("INSERT INTO transactions (id, date, amount, category_id, note) VALUES ('viejo2', '2026-09-02', 20000, 'cat-comida', '')");
+    await runMigrations(db);
+
+    const tx = new SqliteTransactionRepository(db);
+    expect((await tx.get('viejo'))?.accountId).toBe('acc-efectivo');
+
+    const accounts = new SqliteAccountRepository(db);
+    expect((await accounts.list()).map((a) => a.name)).toEqual(['Efectivo']);
+    await accounts.save({ id: 'b', name: 'Banco', type: 'banco', initialBalance: 1000, archived: false });
+    await accounts.save({ id: 'v', name: 'Visa', type: 'tarjeta', initialBalance: 0, creditLimit: 50000, cutDay: 15, dueDay: 5, archived: false });
+    await tx.save({ id: 'compra', date: '2026-10-03', amount: 3000, categoryId: 'cat-comida', note: '', accountId: 'v' });
+    await accounts.saveTransfer({ id: 'tr', date: '2026-10-04', amount: 500, fromAccountId: 'acc-efectivo', toAccountId: 'b', note: 'depósito' });
+
+    const balances = await accounts.balances();
+    expect(balances.get('acc-efectivo')).toBe(70000 - 20000 - 500);
+    expect(balances.get('b')).toBe(1500);
+    expect(balances.get('v')).toBe(-3000);
+    expect((await accounts.balances('2026-10-03')).get('b')).toBe(1000);
+    expect(await accounts.listTransfers('2026-10')).toHaveLength(1);
+    expect(await accounts.isInUse('v')).toBe(true);
+    expect((await accounts.get('v'))?.creditLimit).toBe(50000);
+    expect((await accounts.list()).map((a) => a.id)[0]).toBe('acc-efectivo');
   });
 });

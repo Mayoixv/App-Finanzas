@@ -11,10 +11,10 @@ No existe todavía. Es la base de transferencias, tarjetas y patrimonio, así qu
 **Propósito:** saber dónde está el dinero (efectivo, banco, ahorros, tarjeta, inversión) y cuánto hay en cada lugar.
 
 **Funciones:**
-- [ ] [MVP] Crear, editar y listar cuentas con su saldo actual.
-- [ ] [MVP] Cuenta "Efectivo" creada por la migración, a la que se asignan todos los movimientos existentes.
-- [ ] [MVP] Elegir la cuenta al registrar un movimiento (por defecto, la última usada).
-- [ ] [Después] Cuentas de inversión con saldo actualizado a mano (sin cotizaciones en línea).
+- [x] [MVP] Crear, editar y listar cuentas con su saldo actual.
+- [x] [MVP] Cuenta "Efectivo" creada por la migración, a la que se asignan todos los movimientos existentes.
+- [x] [MVP] Elegir la cuenta al registrar un movimiento (por defecto, la última usada).
+- [x] [Después] Cuentas de inversión con saldo actualizado a mano (sin cotizaciones en línea): tipo "Inversión" y "Saldo de hoy" al editarla.
 
 **Campos y datos:**
 
@@ -39,7 +39,7 @@ No existe todavía. Es la base de transferencias, tarjetas y patrimonio, así qu
 **Propósito:** igualar el saldo de la app con el del banco.
 
 **Funciones:**
-- [ ] [Después] "Conciliar": el usuario escribe el saldo real y la app crea un movimiento de ajuste por la diferencia.
+- [x] [Después] "Conciliar": el usuario escribe el saldo real y la app ajusta el saldo inicial por la diferencia (sin crear un movimiento, para que no cuente como ingreso o gasto del mes).
 
 **Campos y datos:** saldo real (centavos) y fecha. El ajuste usa la categoría especial "Ajuste de saldo", que no cuenta como ingreso ni gasto.
 
@@ -54,7 +54,7 @@ No existe todavía. Es la base de transferencias, tarjetas y patrimonio, así qu
 **Propósito:** dejar de ver cuentas cerradas sin perder su historial.
 
 **Funciones:**
-- [ ] [Después] Archivar y desarchivar.
+- [x] [Después] Archivar y desarchivar.
 
 **Campos y datos:** `archived_at`.
 

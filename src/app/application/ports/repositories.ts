@@ -2,6 +2,7 @@ import { Budget } from '../../domain/budget';
 import { Category } from '../../domain/category';
 import { MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
+import { Account, Transfer } from '../../domain/account';
 import { Debt, DebtPayment } from '../../domain/debts';
 import { SavingsContribution, SavingsGoal } from '../../domain/savings';
 import { Attachment, Transaction } from '../../domain/transaction';
@@ -55,6 +56,21 @@ export interface IBudgetRepository {
   listByMonth(month: MonthKey): Promise<Budget[]>;
   save(budget: Budget): Promise<void>;
   delete(id: string): Promise<void>;
+}
+
+export interface IAccountRepository {
+  list(): Promise<Account[]>;
+  get(id: string): Promise<Account | undefined>;
+  save(account: Account): Promise<void>;
+  delete(id: string): Promise<void>;
+  /** Si tiene movimientos, transferencias o fijos asociados (entonces no se borra: se archiva). */
+  isInUse(id: string): Promise<boolean>;
+  /** Saldo calculado de cada cuenta: inicial + ingresos − gastos ± transferencias, hasta `upTo` inclusive si llega. */
+  balances(upTo?: string): Promise<Map<string, number>>;
+  listTransfers(month?: string): Promise<Transfer[]>;
+  getTransfer(id: string): Promise<Transfer | undefined>;
+  saveTransfer(transfer: Transfer): Promise<void>;
+  deleteTransfer(id: string): Promise<void>;
 }
 
 export interface IDebtRepository {

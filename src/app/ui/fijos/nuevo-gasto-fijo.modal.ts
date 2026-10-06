@@ -10,6 +10,8 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
+import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
+import { accountChoices, accountLabel } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
 import { NotFoundError, ValidationError } from '../../application/errors';
 import { Category } from '../../domain/category';
@@ -44,6 +46,9 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     this.allCategories().filter((c) => c.type === (this.kind() === 'ingreso' ? 'ingreso' : 'fijo')),
   );
   protected readonly frequency = signal<Frequency>(1);
+  protected readonly accounts = signal<Account[]>([]);
+  protected readonly accountId = signal(CASH_ACCOUNT_ID);
+  protected readonly accountLabel = accountLabel;
   protected readonly frequencies: { value: Frequency; label: string }[] = [
     { value: 1, label: 'Cada mes' },
     { value: 3, label: 'Cada 3 meses' },
@@ -82,6 +87,9 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   async ngOnInit() {
     const all = await this.container.categories.list();
     this.allCategories.set(all);
+    const choices = await accountChoices(this.container, this.expense?.accountId);
+    this.accounts.set(choices.accounts);
+    this.accountId.set(choices.selected);
 
     const e = this.expense;
     if (e) {
@@ -157,6 +165,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
         categoryId,
         dueDay: Number(this.dueDay()),
         frequency: this.frequency(),
+        accountId: this.accountId(),
       };
       if (this.expense) {
         await this.container.updateRecurringExpense.execute(

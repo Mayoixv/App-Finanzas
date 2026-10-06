@@ -1,0 +1,72 @@
+<ion-content class="surface-light">
+  <div class="sheet" [class.is-saved]="saved()">
+    <header class="sheet-head">
+      <h1 class="screen-title">{{ isCardPayment() ? 'Pagar tarjeta' : 'Transferir' }}</h1>
+      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    <div class="field">
+      <ion-select label="Desde" label-placement="stacked" cancelText="Cancelar" placeholder="Elige una cuenta" [value]="from()" (ionChange)="from.set($event.detail.value)">
+        @for (a of accounts(); track a.id) {
+          <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
+        }
+      </ion-select>
+    </div>
+
+    <div class="field">
+      <ion-select label="Hacia" label-placement="stacked" cancelText="Cancelar" placeholder="Elige una cuenta" [value]="to()" (ionChange)="to.set($event.detail.value)">
+        @for (a of accounts(); track a.id) {
+          @if (a.id !== from()) {
+            <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
+          }
+        }
+      </ion-select>
+    </div>
+
+    <div class="field">
+      <ion-input
+        label="Monto ({{ currency() }})"
+        label-placement="stacked"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        placeholder="0.00"
+        [value]="amount()"
+        (ionInput)="amount.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    <div class="field">
+      <ion-input label="Fecha" label-placement="stacked" type="date" [value]="date()" (ionInput)="date.set(($event.detail.value ?? '').toString())"></ion-input>
+    </div>
+
+    <div class="field">
+      <ion-input
+        label="Nota (opcional)"
+        label-placement="stacked"
+        placeholder="Depósito, retiro del cajero"
+        [value]="note()"
+        (ionInput)="note.set(($event.detail.value ?? '').toString())"
+      ></ion-input>
+    </div>
+
+    <p class="hint">Una transferencia mueve dinero entre tus cuentas: no cuenta como ingreso ni como gasto del mes.</p>
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
+      {{ isCardPayment() ? 'Guardar pago' : 'Guardar transferencia' }}
+    </button>
+  </div>
+
+  <div class="done" [class.visible]="saved()" aria-live="polite">
+    @if (saved()) {
+      <app-success-check state="in"></app-success-check>
+      <p class="done-text">{{ isCardPayment() ? 'Pago guardado' : 'Transferencia guardada' }}</p>
+    }
+  </div>
+</ion-content>

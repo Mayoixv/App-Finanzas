@@ -6,6 +6,7 @@ import { SqlDatabase, SqlStatement } from './sql-database';
 /** Tablas con datos del usuario, de padres a hijos (orden válido para insertar con claves foráneas). */
 const TABLES = [
   'categories',
+  'accounts',
   'transactions',
   'transaction_splits',
   'attachments',
@@ -17,6 +18,7 @@ const TABLES = [
   'settings',
   'debts',
   'debt_payments',
+  'transfers',
 ];
 
 type Row = Record<string, string | number | null>;

@@ -2,11 +2,13 @@ import { Budget } from '../../domain/budget';
 import { Category } from '../../domain/category';
 import { monthOf, MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
+import { Account, CASH_ACCOUNT_ID, Transfer } from '../../domain/account';
 import { Debt, DebtPayment } from '../../domain/debts';
 import { SavingsContribution, SavingsGoal } from '../../domain/savings';
 import { Attachment, Transaction } from '../../domain/transaction';
 import {
   IBudgetRepository,
+  IAccountRepository,
   ICategoryRepository,
   IDebtRepository,
   IdGenerator,
@@ -127,6 +129,48 @@ export class InMemoryDebts implements IDebtRepository {
   }
   async savePayment(p: DebtPayment) { this.payments.set(p.id, p); }
   async deletePayment(id: string) { this.payments.delete(id); }
+}
+
+export class InMemoryAccounts implements IAccountRepository {
+  items = new Map<string, Account>([
+    [CASH_ACCOUNT_ID, { id: CASH_ACCOUNT_ID, name: 'Efectivo', type: 'efectivo', initialBalance: 0, archived: false }],
+  ]);
+  transfers = new Map<string, Transfer>();
+  constructor(
+    private readonly transactions: InMemoryTransactions,
+    private readonly categories: InMemoryCategories,
+  ) {}
+  async list() { return [...this.items.values()]; }
+  async get(id: string) { return this.items.get(id); }
+  async save(a: Account) { this.items.set(a.id, a); }
+  async delete(id: string) { this.items.delete(id); }
+  async isInUse(id: string) {
+    return (
+      [...this.transactions.items.values()].some((t) => (t.accountId ?? CASH_ACCOUNT_ID) === id) ||
+      [...this.transfers.values()].some((t) => t.fromAccountId === id || t.toAccountId === id)
+    );
+  }
+  async balances(upTo = '9999-12-31') {
+    const out = new Map([...this.items.values()].map((a) => [a.id, a.initialBalance]));
+    for (const t of this.transactions.items.values()) {
+      if (t.date > upTo) continue;
+      const id = t.accountId ?? CASH_ACCOUNT_ID;
+      const sign = this.categories.items.get(t.categoryId)?.type === 'ingreso' ? 1 : -1;
+      out.set(id, (out.get(id) ?? 0) + sign * t.amount);
+    }
+    for (const t of this.transfers.values()) {
+      if (t.date > upTo) continue;
+      out.set(t.fromAccountId, (out.get(t.fromAccountId) ?? 0) - t.amount);
+      out.set(t.toAccountId, (out.get(t.toAccountId) ?? 0) + t.amount);
+    }
+    return out;
+  }
+  async listTransfers(month?: string) {
+    return [...this.transfers.values()].filter((t) => !month || t.date.startsWith(month)).sort((a, b) => b.date.localeCompare(a.date));
+  }
+  async getTransfer(id: string) { return this.transfers.get(id); }
+  async saveTransfer(t: Transfer) { this.transfers.set(t.id, t); }
+  async deleteTransfer(id: string) { this.transfers.delete(id); }
 }
 
 export class SequentialIds implements IdGenerator {

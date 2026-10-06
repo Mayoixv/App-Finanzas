@@ -1,4 +1,5 @@
 import {
+  IAccountRepository,
   IBudgetRepository,
   ICategoryRepository,
   IDebtRepository,
@@ -8,6 +9,7 @@ import {
   ITransactionRepository,
 } from '../../application/ports/repositories';
 import { Budget } from '../../domain/budget';
+import { Account, AccountType, CASH_ACCOUNT_ID, Transfer } from '../../domain/account';
 import { Category, CategoryType } from '../../domain/category';
 import { Debt, DebtDirection, DebtPayment } from '../../domain/debts';
 import { MonthKey } from '../../domain/month';
@@ -68,6 +70,7 @@ interface TransactionRow {
   category_id: string;
   note: string;
   tags: string;
+  account_id: string;
 }
 
 // ponytail: etiquetas en una columna separada por comas; tabla propia si algún día hay que renombrarlas en bloque.
@@ -77,6 +80,7 @@ const toTransaction = (r: TransactionRow): Transaction => ({
   amount: r.amount,
   categoryId: r.category_id,
   note: r.note,
+  accountId: r.account_id,
   tags: r.tags ? r.tags.split(',') : [],
   splits: [],
   attachmentCount: 0,
@@ -112,10 +116,10 @@ export class SqliteTransactionRepository implements ITransactionRepository {
   async save(t: Transaction): Promise<void> {
     await this.db.batch([
       {
-        sql: `INSERT INTO transactions (id, date, amount, category_id, note, tags) VALUES (?, ?, ?, ?, ?, ?)
-              ON CONFLICT(id) DO UPDATE SET date = excluded.date, amount = excluded.amount,
+        sql: `INSERT INTO transactions (id, date, amount, category_id, note, tags, account_id) VALUES (?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT(id) DO UPDATE SET date = excluded.date, amount = excluded.amount, account_id = excluded.account_id,
                 category_id = excluded.category_id, note = excluded.note, tags = excluded.tags`,
-        params: [t.id, t.date, t.amount, t.categoryId, t.note, (t.tags ?? []).join(',')],
+        params: [t.id, t.date, t.amount, t.categoryId, t.note, (t.tags ?? []).join(','), t.accountId ?? CASH_ACCOUNT_ID],
       },
       { sql: 'DELETE FROM transaction_splits WHERE transaction_id = ?', params: [t.id] },
       ...(t.splits ?? []).map((s) => ({
@@ -181,6 +185,7 @@ interface RecurringRow {
   start_month: string;
   frequency: number;
   paused_until: string | null;
+  account_id: string | null;
 }
 
 interface InstanceRow {
@@ -202,6 +207,7 @@ const toRecurring = (r: RecurringRow): RecurringExpense => ({
   startMonth: r.start_month,
   frequency: (r.frequency ?? 1) as Frequency,
   pausedUntil: r.paused_until,
+  accountId: r.account_id,
 });
 
 const toInstance = (r: InstanceRow): RecurringExpenseInstance => ({
@@ -229,13 +235,13 @@ export class SqliteRecurringExpenseRepository implements IRecurringExpenseReposi
   async save(e: RecurringExpense): Promise<void> {
     await this.db.run(
       `INSERT INTO recurring_expenses
-         (id, name, amount, category_id, due_day, active, start_month, frequency, paused_until)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         (id, name, amount, category_id, due_day, active, start_month, frequency, paused_until, account_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET name = excluded.name, amount = excluded.amount,
          category_id = excluded.category_id, due_day = excluded.due_day, active = excluded.active,
          start_month = excluded.start_month, frequency = excluded.frequency,
-         paused_until = excluded.paused_until`,
-      [e.id, e.name, e.amount, e.categoryId, e.dueDay, e.active ? 1 : 0, e.startMonth, e.frequency ?? 1, e.pausedUntil ?? null],
+         paused_until = excluded.paused_until, account_id = excluded.account_id`,
+      [e.id, e.name, e.amount, e.categoryId, e.dueDay, e.active ? 1 : 0, e.startMonth, e.frequency ?? 1, e.pausedUntil ?? null, e.accountId ?? null],
     );
   }
 
@@ -518,5 +524,129 @@ export class SqliteDebtRepository implements IDebtRepository {
 
   async deletePayment(id: string): Promise<void> {
     await this.db.run('DELETE FROM debt_payments WHERE id = ?', [id]);
+  }
+}
+
+interface AccountRow {
+  id: string;
+  name: string;
+  type: AccountType;
+  initial_balance: number;
+  credit_limit: number | null;
+  cut_day: number | null;
+  due_day: number | null;
+  archived: number;
+}
+
+interface TransferRow {
+  id: string;
+  date: string;
+  amount: number;
+  from_account: string;
+  to_account: string;
+  note: string;
+}
+
+const toAccount = (r: AccountRow): Account => ({
+  id: r.id,
+  name: r.name,
+  type: r.type,
+  initialBalance: r.initial_balance,
+  creditLimit: r.credit_limit,
+  cutDay: r.cut_day,
+  dueDay: r.due_day,
+  archived: r.archived === 1,
+});
+
+const toTransfer = (r: TransferRow): Transfer => ({
+  id: r.id,
+  date: r.date,
+  amount: r.amount,
+  fromAccountId: r.from_account,
+  toAccountId: r.to_account,
+  note: r.note,
+});
+
+export class SqliteAccountRepository implements IAccountRepository {
+  constructor(private readonly db: SqlDatabase) {}
+
+  async list(): Promise<Account[]> {
+    // Efectivo primero, luego por tipo y nombre.
+    return (
+      await this.db.all<AccountRow>(`SELECT * FROM accounts ORDER BY id <> 'acc-efectivo', type, name`)
+    ).map(toAccount);
+  }
+
+  async get(id: string): Promise<Account | undefined> {
+    const rows = await this.db.all<AccountRow>('SELECT * FROM accounts WHERE id = ?', [id]);
+    return rows[0] && toAccount(rows[0]);
+  }
+
+  async save(a: Account): Promise<void> {
+    await this.db.run(
+      `INSERT INTO accounts (id, name, type, initial_balance, credit_limit, cut_day, due_day, archived)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET name = excluded.name, type = excluded.type,
+         initial_balance = excluded.initial_balance, credit_limit = excluded.credit_limit,
+         cut_day = excluded.cut_day, due_day = excluded.due_day, archived = excluded.archived`,
+      [a.id, a.name, a.type, a.initialBalance, a.creditLimit ?? null, a.cutDay ?? null, a.dueDay ?? null, a.archived ? 1 : 0],
+    );
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.db.run('DELETE FROM accounts WHERE id = ?', [id]);
+  }
+
+  async isInUse(id: string): Promise<boolean> {
+    const rows = await this.db.all<{ used: number }>(
+      `SELECT EXISTS (SELECT 1 FROM transactions WHERE account_id = ?)
+           OR EXISTS (SELECT 1 FROM transfers WHERE from_account = ? OR to_account = ?)
+           OR EXISTS (SELECT 1 FROM recurring_expenses WHERE account_id = ?) AS used`,
+      [id, id, id, id],
+    );
+    return rows[0]?.used === 1;
+  }
+
+  async balances(upTo?: string): Promise<Map<string, number>> {
+    const until = upTo ?? '9999-12-31';
+    const rows = await this.db.all<{ id: string; balance: number }>(
+      `SELECT a.id, a.initial_balance
+         + COALESCE((SELECT SUM(CASE WHEN c.type = 'ingreso' THEN t.amount ELSE -t.amount END)
+                     FROM transactions t JOIN categories c ON c.id = t.category_id
+                     WHERE t.account_id = a.id AND t.date <= ?), 0)
+         + COALESCE((SELECT SUM(amount) FROM transfers WHERE to_account = a.id AND date <= ?), 0)
+         - COALESCE((SELECT SUM(amount) FROM transfers WHERE from_account = a.id AND date <= ?), 0) AS balance
+       FROM accounts a`,
+      [until, until, until],
+    );
+    return new Map(rows.map((r) => [r.id, r.balance]));
+  }
+
+  async listTransfers(month?: string): Promise<Transfer[]> {
+    const rows = month
+      ? await this.db.all<TransferRow>(
+          'SELECT * FROM transfers WHERE date >= ? AND date <= ? ORDER BY date DESC, id',
+          [`${month}-01`, `${month}-31`],
+        )
+      : await this.db.all<TransferRow>('SELECT * FROM transfers ORDER BY date DESC, id');
+    return rows.map(toTransfer);
+  }
+
+  async getTransfer(id: string): Promise<Transfer | undefined> {
+    const rows = await this.db.all<TransferRow>('SELECT * FROM transfers WHERE id = ?', [id]);
+    return rows[0] && toTransfer(rows[0]);
+  }
+
+  async saveTransfer(t: Transfer): Promise<void> {
+    await this.db.run(
+      `INSERT INTO transfers (id, date, amount, from_account, to_account, note) VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET date = excluded.date, amount = excluded.amount,
+         from_account = excluded.from_account, to_account = excluded.to_account, note = excluded.note`,
+      [t.id, t.date, t.amount, t.fromAccountId, t.toAccountId, t.note],
+    );
+  }
+
+  async deleteTransfer(id: string): Promise<void> {
+    await this.db.run('DELETE FROM transfers WHERE id = ?', [id]);
   }
 }

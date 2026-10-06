@@ -160,6 +160,37 @@ export const MIGRATIONS: Migration[] = [
       `INSERT OR IGNORE INTO categories (id, name, type) VALUES ('cat-pago-deudas', 'Pago de deudas', 'fijo')`,
     ],
   },
+  {
+    version: 8,
+    name: 'cuentas y transferencias',
+    statements: [
+      `CREATE TABLE accounts (
+         id              TEXT PRIMARY KEY,
+         name            TEXT NOT NULL,
+         type            TEXT NOT NULL CHECK (type IN ('efectivo', 'banco', 'ahorro', 'tarjeta', 'inversion')),
+         initial_balance INTEGER NOT NULL DEFAULT 0,
+         credit_limit    INTEGER CHECK (credit_limit > 0),
+         cut_day         INTEGER CHECK (cut_day BETWEEN 1 AND 31),
+         due_day         INTEGER CHECK (due_day BETWEEN 1 AND 31),
+         archived        INTEGER NOT NULL DEFAULT 0
+       )`,
+      `INSERT OR IGNORE INTO accounts (id, name, type) VALUES ('acc-efectivo', 'Efectivo', 'efectivo')`,
+      // SQLite no deja agregar una columna con REFERENCES y un valor por defecto no nulo: la cuenta la valida la app.
+      `ALTER TABLE transactions ADD COLUMN account_id TEXT NOT NULL DEFAULT 'acc-efectivo'`,
+      `CREATE INDEX idx_transactions_account ON transactions(account_id)`,
+      `ALTER TABLE recurring_expenses ADD COLUMN account_id TEXT`,
+      `CREATE TABLE transfers (
+         id           TEXT PRIMARY KEY,
+         date         TEXT NOT NULL,
+         amount       INTEGER NOT NULL CHECK (amount > 0),
+         from_account TEXT NOT NULL REFERENCES accounts(id),
+         to_account   TEXT NOT NULL REFERENCES accounts(id),
+         note         TEXT NOT NULL DEFAULT '',
+         CHECK (from_account <> to_account)
+       )`,
+      `CREATE INDEX idx_transfers_date ON transfers(date)`,
+    ],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

@@ -13,7 +13,7 @@ No existe todavía. Solo notificaciones **locales** (plugin `@capacitor/local-no
 **Funciones:**
 - [x] [Después] Gasto fijo por vencer (el día anterior y el mismo día).
 - [x] [Después] Presupuesto al 85% y al 100% (una vez por umbral, categoría y mes).
-- [ ] [Después] Pago de tarjeta por vencer.
+- [x] [Después] Pago de tarjeta por vencer.
 - [x] [Después] Recordatorio diario opcional para registrar gastos ("¿Registraste tus gastos de hoy?"). No suena si ya se anotó algo ese día.
 - [x] [Después] Preferencias: activar o desactivar cada tipo, hora de los fijos y hora del recordatorio diario.
 - [ ] [Después] Horas de silencio.

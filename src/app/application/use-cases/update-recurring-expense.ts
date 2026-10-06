@@ -30,6 +30,7 @@ export class UpdateRecurringExpense {
       categoryId: input.categoryId,
       dueDay: input.dueDay,
       frequency: input.frequency ?? current.frequency ?? 1,
+      accountId: input.accountId !== undefined ? input.accountId : (current.accountId ?? null),
     };
     await this.recurring.save(updated);
 
