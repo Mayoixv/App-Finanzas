@@ -20,6 +20,17 @@ import { CurrencyState } from '../currency-state';
 import { amountToInput, parseAmount } from '../format';
 import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
+import { DayPickerComponent, LAST_DAY } from '../day-picker.component';
+import { paymentName } from '../../application/use-cases/add-recurring-expense';
+
+/** Cuántas veces se cobra al mes un ingreso. Cada cobro se guarda como un fijo aparte. */
+type PayMode = 'una' | 'quincenal' | 'otra';
+interface Payment {
+  day: number | null;
+  amount: string;
+}
+/** Más de 4 cobros al mes ya es otra cosa (semanal): no se ofrece. */
+const MAX_PAYMENTS = 4;
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -28,7 +39,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-nuevo-gasto-fijo',
   templateUrl: 'nuevo-gasto-fijo.modal.html',
   styleUrls: ['nuevo-gasto-fijo.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
+  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent, DayPickerComponent],
 })
 export class NuevoGastoFijoModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);
@@ -63,20 +74,26 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected readonly name = signal('');
   protected readonly amount = signal('');
   protected readonly categoryId = signal<string | null>(null);
-  protected readonly dueDay = signal('');
+  protected readonly dueDay = signal<number | null>(null);
+  protected readonly payMode = signal<PayMode>('una');
+  protected readonly payments = signal<Payment[]>([]);
+  protected readonly maxPayments = MAX_PAYMENTS;
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
   protected readonly currency = inject(CurrencyState).currency;
   protected readonly isEdit = signal(false);
   protected readonly monthLabel = this.monthState.label;
+  /** Varios cobros solo al crear un ingreso; luego cada cobro se edita por separado. */
+  protected readonly multi = computed(() => this.kind() === 'ingreso' && !this.isEdit() && this.payMode() !== 'una');
 
   protected readonly canSave = computed(
     () =>
       this.name().trim() !== '' &&
-      parseAmount(this.amount()) !== null &&
       this.categoryId() !== null &&
-      Number(this.dueDay()) >= 1 &&
+      (this.multi()
+        ? this.payments().every((p) => p.day !== null && parseAmount(p.amount) !== null)
+        : this.dueDay() !== null && parseAmount(this.amount()) !== null) &&
       !this.saving(),
   );
 
@@ -97,7 +114,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       this.name.set(e.name);
       this.amount.set(amountToInput(e.amount));
       this.categoryId.set(e.categoryId);
-      this.dueDay.set(String(e.dueDay));
+      this.dueDay.set(e.dueDay);
       this.frequency.set(e.frequency ?? 1);
       if (all.find((c) => c.id === e.categoryId)?.type === 'ingreso') this.kind.set('ingreso');
     }
@@ -106,6 +123,25 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected setKind(kind: 'gasto' | 'ingreso') {
     this.kind.set(kind);
     this.categoryId.set(null);
+  }
+
+  protected setPayMode(mode: PayMode) {
+    this.payMode.set(mode);
+    const amount = this.amount();
+    if (mode === 'quincenal') this.payments.set([{ day: 15, amount }, { day: LAST_DAY, amount: '' }]);
+    if (mode === 'otra') this.payments.set([{ day: this.dueDay(), amount }, { day: null, amount: '' }]);
+  }
+
+  protected updatePayment(index: number, change: Partial<Payment>) {
+    this.payments.update((list) => list.map((p, i) => (i === index ? { ...p, ...change } : p)));
+  }
+
+  protected addPayment() {
+    this.payments.update((list) => [...list, { day: null, amount: '' }]);
+  }
+
+  protected removePayment(index: number) {
+    this.payments.update((list) => list.filter((_, i) => i !== index));
   }
 
   protected async pause() {
@@ -159,11 +195,24 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     this.saving.set(true);
     this.error.set(null);
     try {
+      if (this.multi()) {
+        await this.container.addRecurringExpenses.execute(
+          this.payments().map((p) => ({
+            name: paymentName(this.name(), p.day ?? 0),
+            amount: parseAmount(p.amount) ?? 0,
+            categoryId,
+            dueDay: p.day ?? 0,
+            accountId: this.accountId(),
+            startMonth: this.monthState.month(),
+          })),
+        );
+        return await this.showSaved();
+      }
       const fields = {
         name: this.name(),
         amount: parseAmount(this.amount()) ?? 0,
         categoryId,
-        dueDay: Number(this.dueDay()),
+        dueDay: this.dueDay() ?? 0,
         frequency: this.frequency(),
         accountId: this.accountId(),
       };
@@ -179,9 +228,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
           startMonth: this.monthState.month(),
         });
       }
-      this.saved.set(true);
-      await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
-      await this.modalCtrl.dismiss(null, 'saved');
+      await this.showSaved();
     } catch (e) {
       this.error.set(
         e instanceof ValidationError || e instanceof NotFoundError
@@ -190,6 +237,12 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       );
       this.saving.set(false);
     }
+  }
+
+  private async showSaved() {
+    this.saved.set(true);
+    await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
+    await this.modalCtrl.dismiss(null, 'saved');
   }
 
   protected async confirmDelete() {

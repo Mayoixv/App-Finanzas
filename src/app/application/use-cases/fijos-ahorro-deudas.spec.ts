@@ -10,7 +10,7 @@ import {
   InMemoryTransactions,
   SequentialIds,
 } from '../testing/in-memory';
-import { AddRecurringExpense } from './add-recurring-expense';
+import { AddRecurringExpense, AddRecurringExpenses, paymentName } from './add-recurring-expense';
 import { AddSavingsContribution } from './add-savings-contribution';
 import { AddSavingsGoal } from './add-savings-goal';
 import { AddTransaction } from './add-transaction';
@@ -505,5 +505,31 @@ describe('nombre del usuario', () => {
     expect(await profile.setName('  Ana   Pérez ')).toBe('Ana Pérez');
     expect(await profile.name()).toBe('Ana Pérez');
     await expect(profile.setName('x'.repeat(41))).rejects.toThrow(ValidationError);
+  });
+});
+
+describe('sueldo con varios cobros', () => {
+  it('quincenal: un fijo por cobro con su día y su monto, y ambos aparecen cada mes', async () => {
+    const s = setup();
+    const base = { categoryId: 'sal', startMonth: '2026-10' };
+    await new AddRecurringExpenses(s.recurring, s.categories, s.ids).execute([
+      { ...base, name: paymentName('Sueldo', 15), amount: 2_500_000, dueDay: 15 },
+      { ...base, name: paymentName('Sueldo', 31), amount: 2_750_000, dueDay: 31 },
+    ]);
+    const list = new GetMonthRecurringExpenses(s.recurring);
+    const feb = await list.execute('2027-02');
+    expect(feb.map((i) => `${i.expense.name} ${i.instance.dueDate} ${i.instance.amount}`)).toEqual([
+      'Sueldo · día 15 2027-02-15 2500000',
+      'Sueldo · fin de mes 2027-02-28 2750000',
+    ]);
+  });
+
+  it('si un cobro no es válido no guarda ninguno, y no deja dos cobros el mismo día', async () => {
+    const s = setup();
+    const add = new AddRecurringExpenses(s.recurring, s.categories, s.ids);
+    const base = { name: 'Sueldo', categoryId: 'sal', startMonth: '2026-10', amount: 100 };
+    await expect(add.execute([{ ...base, dueDay: 15 }, { ...base, dueDay: 15 }])).rejects.toThrow('mismo día');
+    await expect(add.execute([{ ...base, dueDay: 15 }, { ...base, dueDay: 30, amount: 0 }])).rejects.toThrow(ValidationError);
+    expect(await s.recurring.list()).toEqual([]);
   });
 });

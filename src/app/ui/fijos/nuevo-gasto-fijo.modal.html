@@ -23,19 +23,6 @@
     </div>
 
     <div class="field">
-      <ion-input
-        label="Monto ({{ currency() }})"
-        label-placement="stacked"
-        type="number"
-        inputmode="decimal"
-        min="0"
-        placeholder="0.00"
-        [value]="amount()"
-        (ionInput)="amount.set(($event.detail.value ?? '').toString())"
-      ></ion-input>
-    </div>
-
-    <div class="field">
       <ion-select
         label="Categoría"
         label-placement="stacked"
@@ -50,33 +37,80 @@
       </ion-select>
     </div>
 
-    <div class="field">
-      <ion-input
-        [label]="kind() === 'ingreso' ? 'Día del mes en que cobras (1 a 31)' : 'Día del mes en que vence (1 a 31)'"
-        label-placement="stacked"
-        type="number"
-        inputmode="numeric"
-        min="1"
-        max="31"
-        placeholder="Ej. 5"
-        [value]="dueDay()"
-        (ionInput)="dueDay.set(($event.detail.value ?? '').toString())"
-      ></ion-input>
-    </div>
+    @if (kind() === 'ingreso' && !isEdit()) {
+      <p class="group-label" id="pay-mode">¿Cada cuánto cobras?</p>
+      <div class="kind three" role="radiogroup" aria-labelledby="pay-mode">
+        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'una'" (click)="setPayMode('una')">Una vez</button>
+        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'quincenal'" (click)="setPayMode('quincenal')">Quincenal</button>
+        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'otra'" (click)="setPayMode('otra')">Otra</button>
+      </div>
+    }
 
-    <div class="field">
-      <ion-select
-        label="Se repite"
-        label-placement="stacked"
-        cancelText="Cancelar"
-        [value]="frequency()"
-        (ionChange)="frequency.set($event.detail.value)"
-      >
-        @for (f of frequencies; track f.value) {
-          <ion-select-option [value]="f.value">{{ f.label }}</ion-select-option>
-        }
-      </ion-select>
-    </div>
+    @if (multi()) {
+      @for (p of payments(); track $index; let i = $index) {
+        <div class="payment-row t-row-enter">
+          <div class="payment-head">
+            <span class="payment-title">{{ i + 1 }}.º cobro</span>
+            @if (payMode() === 'otra' && payments().length > 2) {
+              <button type="button" class="remove" [attr.aria-label]="'Quitar cobro ' + (i + 1)" (click)="removePayment(i)">
+                <ion-icon name="close" aria-hidden="true"></ion-icon>
+              </button>
+            }
+          </div>
+          <app-day-picker label="Día de cobro" [value]="p.day" (valueChange)="updatePayment(i, { day: $event })"></app-day-picker>
+          <ion-input
+            label="Monto ({{ currency() }})"
+            label-placement="stacked"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            placeholder="0.00"
+            [value]="p.amount"
+            (ionInput)="updatePayment(i, { amount: ($event.detail.value ?? '').toString() })"
+          ></ion-input>
+        </div>
+      }
+      @if (payMode() === 'otra' && payments().length < maxPayments) {
+        <button type="button" class="btn-secondary add-payment" (click)="addPayment()">+ Agregar otro cobro</button>
+      }
+    } @else {
+      <div class="field">
+        <ion-input
+          label="Monto ({{ currency() }})"
+          label-placement="stacked"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          placeholder="0.00"
+          [value]="amount()"
+          (ionInput)="amount.set(($event.detail.value ?? '').toString())"
+        ></ion-input>
+      </div>
+
+      <div class="field">
+        <app-day-picker
+          [label]="kind() === 'ingreso' ? 'Día de cobro' : 'Día en que vence'"
+          [value]="dueDay()"
+          (valueChange)="dueDay.set($event)"
+        ></app-day-picker>
+      </div>
+    }
+
+    @if (!multi()) {
+      <div class="field">
+        <ion-select
+          label="Se repite"
+          label-placement="stacked"
+          cancelText="Cancelar"
+          [value]="frequency()"
+          (ionChange)="frequency.set($event.detail.value)"
+        >
+          @for (f of frequencies; track f.value) {
+            <ion-select-option [value]="f.value">{{ f.label }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    }
 
     @if (accounts().length > 1) {
       <div class="field">

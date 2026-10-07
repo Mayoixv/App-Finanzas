@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { AddRecurringExpense } from './application/use-cases/add-recurring-expense';
+import { AddRecurringExpense, AddRecurringExpenses } from './application/use-cases/add-recurring-expense';
 import { DeleteTransaction, RestoreTransaction } from './application/use-cases/delete-transaction';
 import { RemoveRecurringExpense } from './application/use-cases/remove-recurring-expense';
 import { UpdateRecurringExpense } from './application/use-cases/update-recurring-expense';
@@ -103,6 +103,7 @@ export interface AppContainer {
   updateTransaction: UpdateTransaction;
   deleteTransaction: DeleteTransaction;
   addRecurringExpense: AddRecurringExpense;
+  addRecurringExpenses: AddRecurringExpenses;
   updateRecurringExpense: UpdateRecurringExpense;
   removeRecurringExpense: RemoveRecurringExpense;
   getMonthOverview: GetMonthOverview;
@@ -181,6 +182,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     updateTransaction: new UpdateTransaction(repos.transactions, repos.categories, repos.accounts),
     deleteTransaction: new DeleteTransaction(repos.transactions, repos.recurring),
     addRecurringExpense: new AddRecurringExpense(repos.recurring, repos.categories, ids),
+    addRecurringExpenses: new AddRecurringExpenses(repos.recurring, repos.categories, ids),
     updateRecurringExpense: new UpdateRecurringExpense(repos.recurring, repos.categories),
     removeRecurringExpense: new RemoveRecurringExpense(repos.recurring),
     getMonthOverview: new GetMonthOverview(repos.transactions, repos.categories, repos.savings),

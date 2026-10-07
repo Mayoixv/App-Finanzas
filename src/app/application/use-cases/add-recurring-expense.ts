@@ -67,3 +67,31 @@ export class AddRecurringExpense {
     return expense;
   }
 }
+
+/** Nombre de cada cobro cuando un ingreso se cobra varias veces al mes: "Sueldo · día 15", "Sueldo · fin de mes". */
+export function paymentName(base: string, dueDay: number): string {
+  return `${base.trim()} · ${dueDay === 31 ? 'fin de mes' : `día ${dueDay}`}`;
+}
+
+/**
+ * Varios fijos de una vez (por ejemplo, un sueldo quincenal: un fijo por cobro, cada uno con su día y su monto).
+ * Valida todos antes de guardar: si uno no es válido, no se guarda ninguno.
+ */
+export class AddRecurringExpenses {
+  constructor(
+    private readonly recurring: IRecurringExpenseRepository,
+    private readonly categories: ICategoryRepository,
+    private readonly ids: IdGenerator,
+  ) {}
+
+  async execute(inputs: AddRecurringExpenseInput[]): Promise<RecurringExpense[]> {
+    if (inputs.length === 0) throw new ValidationError('Agrega al menos un cobro');
+    const days = inputs.map((i) => i.dueDay);
+    if (new Set(days).size !== days.length) throw new ValidationError('Hay dos cobros el mismo día');
+    for (const input of inputs) await validateRecurringInput(input, this.categories);
+    const add = new AddRecurringExpense(this.recurring, this.categories, this.ids);
+    const saved: RecurringExpense[] = [];
+    for (const input of inputs) saved.push(await add.execute(input));
+    return saved;
+  }
+}

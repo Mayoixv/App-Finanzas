@@ -13,3 +13,47 @@
   border-color: var(--violet-600);
   color: var(--violet-600);
 }
+
+.group-label {
+  margin: 4px 0 -4px;
+  font-size: 14px;
+  color: var(--muted-on-light);
+}
+
+.kind.three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.payment-row {
+  padding: 8px 16px 4px;
+  border-radius: var(--radius-card);
+  background: var(--surface-soft-card);
+}
+
+.payment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.payment-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-right: -12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted-on-light);
+  cursor: pointer;
+}
+
+.add-payment {
+  width: 100%;
+}
