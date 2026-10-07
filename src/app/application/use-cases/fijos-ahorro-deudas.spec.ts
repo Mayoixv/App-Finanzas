@@ -52,11 +52,11 @@ function setup() {
 }
 
 describe('fijos: ingresos, frecuencia y pausa', () => {
-  it('acepta sueldo fijo (categoría de ingreso) pero no categorías variables', async () => {
+  it('acepta sueldo fijo (ingreso) y un monto fijo al mes en una categoría variable, como Comida', async () => {
     const s = setup();
     const add = new AddRecurringExpense(s.recurring, s.categories, s.ids);
     await expect(add.execute({ name: 'Sueldo', amount: 6_000_000, categoryId: 'sal', dueDay: 30, startMonth: '2026-10' })).resolves.toBeTruthy();
-    await expect(add.execute({ name: 'Súper', amount: 100, categoryId: 'com', dueDay: 1, startMonth: '2026-10' })).rejects.toThrow(ValidationError);
+    await expect(add.execute({ name: 'Comida del mes', amount: 1_500_000, categoryId: 'com', dueDay: 1, startMonth: '2026-10' })).resolves.toBeTruthy();
   });
 
   it('un fijo anual solo aparece en su mes; uno trimestral cada 3 meses', async () => {

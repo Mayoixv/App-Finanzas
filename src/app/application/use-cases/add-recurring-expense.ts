@@ -30,7 +30,6 @@ export async function validateRecurringInput(
   }
   const category = await categories.get(input.categoryId);
   if (!category) throw new NotFoundError('Categoría');
-  if (category.type === 'variable') throw new ValidationError('Elige una categoría de gasto fijo o de ingreso');
   if (input.frequency !== undefined && !FREQUENCIES.includes(input.frequency)) {
     throw new ValidationError('Frecuencia inválida');
   }

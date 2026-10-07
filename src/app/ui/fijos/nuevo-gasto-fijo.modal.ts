@@ -55,7 +55,14 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   /** Un fijo puede ser un gasto (alquiler) o un ingreso (sueldo); lo decide su categoría. */
   protected readonly kind = signal<'gasto' | 'ingreso'>('gasto');
   protected readonly categories = computed(() =>
-    this.allCategories().filter((c) => c.type === (this.kind() === 'ingreso' ? 'ingreso' : 'fijo')),
+    // Un gasto fijo puede ser de cualquier categoría de gasto (por ejemplo RD$15,000 de comida al mes);
+    // primero las de gasto fijo, luego las variables.
+    this.kind() === 'ingreso'
+      ? this.allCategories().filter((c) => c.type === 'ingreso')
+      : [
+          ...this.allCategories().filter((c) => c.type === 'fijo'),
+          ...this.allCategories().filter((c) => c.type === 'variable'),
+        ],
   );
   protected readonly frequency = signal<Frequency>(1);
   protected readonly accounts = signal<Account[]>([]);

@@ -149,14 +149,13 @@ describe('AddRecurringExpense', () => {
     expect(await s.recurring.get(e.id)).toEqual(e);
   });
 
-  it('rechaza datos inválidos y categorías que no son de gasto fijo', async () => {
+  it('rechaza datos inválidos y categorías que no existen', async () => {
     const s = setup();
     const uc = new AddRecurringExpense(s.recurring, s.categories, s.ids);
     await expect(uc.execute({ ...valid, name: '  ' })).rejects.toThrow(ValidationError);
     await expect(uc.execute({ ...valid, amount: 0 })).rejects.toThrow(ValidationError);
     await expect(uc.execute({ ...valid, dueDay: 32 })).rejects.toThrow(ValidationError);
     await expect(uc.execute({ ...valid, dueDay: 1.5 })).rejects.toThrow(ValidationError);
-    await expect(uc.execute({ ...valid, categoryId: 'com' })).rejects.toThrow(ValidationError);
     await expect(uc.execute({ ...valid, categoryId: 'x' })).rejects.toThrow(NotFoundError);
   });
 

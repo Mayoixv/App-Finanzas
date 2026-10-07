@@ -16,7 +16,7 @@
       <ion-input
         label="Nombre"
         label-placement="stacked"
-        [placeholder]="kind() === 'ingreso' ? 'Sueldo, alquiler que cobras' : 'Alquiler, internet, suscripción'"
+        [placeholder]="kind() === 'ingreso' ? 'Sueldo, alquiler que cobras' : 'Alquiler, comida del mes, internet'"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
