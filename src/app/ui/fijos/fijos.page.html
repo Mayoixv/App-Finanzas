@@ -62,16 +62,16 @@
       <ul [class.t-still]="!monthState.animateLists()" class="list">
         @for (row of list; track row.id) {
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
-            <div class="item-head" [class.income]="row.isIncome">
-              <div class="item-text">
+            <!-- Toda la fila abre la edición: una zona táctil grande en vez de un lápiz pequeño. -->
+            <button type="button" class="item-head item-main" [class.income]="row.isIncome" (click)="edit(row)">
+              <span class="sr-only">Editar</span>
+              <span class="avatar" [style.background]="row.color" aria-hidden="true"><ion-icon [name]="row.icon"></ion-icon></span>
+              <span class="item-text">
                 <span class="item-name">{{ row.name }}</span>
                 <span class="item-detail" [class.urgent]="row.urgent">{{ row.detail }}</span>
-              </div>
+              </span>
               <span class="item-amount">{{ row.amount }}</span>
-              <button type="button" class="edit" [attr.aria-label]="'Editar ' + row.name" (click)="edit(row)">
-                <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
-              </button>
-            </div>
+            </button>
 
             <div class="item-foot">
               @if (row.paid) {
@@ -94,7 +94,7 @@
                   [disabled]="payingId() === row.id"
                   (click)="pay(row)"
                 >
-                  {{ row.isIncome ? 'Marcar como recibido' : 'Marcar como pagado' }}
+                  {{ row.isIncome ? 'Recibido' : 'Pagar' }}
                 </button>
               }
             </div>

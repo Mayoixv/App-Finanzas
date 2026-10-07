@@ -31,13 +31,7 @@
     </div>
 
     <div class="field">
-      <ion-input
-        label="Para cuándo (opcional)"
-        label-placement="stacked"
-        type="date"
-        [value]="targetDate()"
-        (ionInput)="targetDate.set(($event.detail.value ?? '').toString())"
-      ></ion-input>
+      <app-date-field label="Para cuándo (opcional)" [optional]="true" [(value)]="targetDate"></app-date-field>
     </div>
     @if (targetDate()) {
       <button type="button" class="link-button" (click)="targetDate.set('')">Quitar fecha</button>

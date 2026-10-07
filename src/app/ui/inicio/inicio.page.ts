@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular';
@@ -71,6 +72,7 @@ export class InicioPage {
   protected readonly percent = formatPercent;
   protected readonly ratingText = RATING_TEXT;
   /** Cada carga lleva un número; si el usuario cambió de mes mientras tanto, la respuesta vieja se descarta. */
+  protected readonly categories = signal<Category[]>([]);
   private loadSeq = 0;
 
   constructor() {
@@ -94,9 +96,13 @@ export class InicioPage {
     const seq = ++this.loadSeq;
     try {
       this.userName.set(await this.container.profile.name());
-      const overview = await this.container.getMonthOverview.execute(month);
+      const [overview, categories] = await Promise.all([
+        this.container.getMonthOverview.execute(month),
+        this.container.categories.list(),
+      ]);
       if (seq !== this.loadSeq) return;
       this.overview.set(overview);
+      this.categories.set(categories);
       this.recent.set(
         overview.recent.map(({ transaction: t, category }) => {
           const isIncome = category?.type === 'ingreso';

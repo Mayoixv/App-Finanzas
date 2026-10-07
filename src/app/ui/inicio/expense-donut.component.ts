@@ -1,9 +1,11 @@
 import { Component, computed, input } from '@angular/core';
 import { ExpenseSlice } from '../../domain/expense-breakdown';
+import { Category } from '../../domain/category';
+import { lookOf } from '../category-look';
 import { formatMoney, formatPercent } from '../format';
 
-/** Tonos de la familia violeta más dos acentos (design.md); sin verde ni rojo, que solo significan dinero. */
-export const DONUT_COLORS = ['#8f6bff', '#c9b8ff', '#6a3df0', '#ffb84d', '#4dd6e0', '#7d7898'];
+/** Color de "Otras" y de las categorías que ya no existen. */
+const OTHER_COLOR = '#7d7898';
 const MAX_SLICES = 6;
 
 const RADIUS = 80;
@@ -19,7 +21,7 @@ export interface DonutArc {
   dashOffset: number;
 }
 
-type Slice = Pick<ExpenseSlice, 'name' | 'amount' | 'percent'>;
+type Slice = Pick<ExpenseSlice, 'name' | 'amount' | 'percent'> & { categoryId?: string };
 
 /** Agrupa lo que pasa del quinto lugar en "Otras" para que la leyenda siga legible. */
 export function groupSlices(slices: Slice[]): Slice[] {
@@ -29,6 +31,7 @@ export function groupSlices(slices: Slice[]): Slice[] {
   return [
     ...head,
     {
+      categoryId: undefined,
       name: 'Otras',
       amount: rest.reduce((s, r) => s + r.amount, 0),
       percent: rest.reduce((s, r) => s + r.percent, 0),
@@ -43,6 +46,8 @@ export function groupSlices(slices: Slice[]): Slice[] {
 })
 export class ExpenseDonutComponent {
   readonly slices = input.required<ExpenseSlice[]>();
+  /** Para pintar cada arco con el color que el usuario eligió para su categoría. */
+  readonly categories = input<Category[]>([]);
 
   protected readonly money = formatMoney;
   protected readonly percent = formatPercent;
@@ -51,15 +56,17 @@ export class ExpenseDonutComponent {
 
   protected readonly arcs = computed<DonutArc[]>(() => {
     const grouped = groupSlices(this.slices());
+    const byId = new Map(this.categories().map((c) => [c.id, c]));
     let consumed = 0;
-    return grouped.map((slice, i) => {
+    return grouped.map((slice) => {
+      const category = slice.categoryId ? byId.get(slice.categoryId) : undefined;
       const length = (slice.percent / 100) * CIRCUMFERENCE;
       const dash = grouped.length > 1 ? Math.max(length - GAP, 0.5) : length;
       const arc: DonutArc = {
         name: slice.name,
         amount: slice.amount,
         percent: slice.percent,
-        color: DONUT_COLORS[i % DONUT_COLORS.length],
+        color: category ? lookOf(category).color : OTHER_COLOR,
         dashArray: `${dash} ${CIRCUMFERENCE - dash}`,
         dashOffset: -consumed,
       };

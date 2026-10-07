@@ -62,13 +62,7 @@
     </div>
 
     <div class="field">
-      <ion-input
-        label="Fecha del préstamo"
-        label-placement="stacked"
-        type="date"
-        [value]="startDate()"
-        (ionInput)="startDate.set(($event.detail.value ?? '').toString())"
-      ></ion-input>
+      <app-date-field label="Fecha del préstamo" [(value)]="startDate"></app-date-field>
     </div>
 
     @if (preview(); as text) {

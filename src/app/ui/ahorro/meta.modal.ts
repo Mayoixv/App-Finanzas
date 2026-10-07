@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { DateFieldComponent } from '../select/date-field.component';
 import { AlertController, IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -16,7 +17,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-meta-modal',
   templateUrl: 'meta.modal.html',
   styleUrls: ['meta.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, SuccessCheckComponent],
+  imports: [DateFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class MetaModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

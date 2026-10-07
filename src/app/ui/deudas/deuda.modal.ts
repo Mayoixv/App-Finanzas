@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { DateFieldComponent } from '../select/date-field.component';
 import { AlertController, IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -16,7 +17,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-deuda-modal',
   templateUrl: 'deuda.modal.html',
   styleUrls: ['deuda.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, SuccessCheckComponent],
+  imports: [DateFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class DeudaModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

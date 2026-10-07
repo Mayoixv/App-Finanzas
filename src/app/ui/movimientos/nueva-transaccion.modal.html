@@ -103,13 +103,7 @@
     }
 
     <div class="field">
-      <ion-input
-        label="Fecha"
-        label-placement="stacked"
-        type="date"
-        [value]="date()"
-        (ionInput)="date.set(($event.detail.value ?? '').toString())"
-      ></ion-input>
+      <app-date-field label="Fecha" [(value)]="date"></app-date-field>
     </div>
 
     <div class="field">

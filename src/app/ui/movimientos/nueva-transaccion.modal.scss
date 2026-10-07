@@ -6,7 +6,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 4px;
   border: 0;
   background: transparent;
@@ -52,8 +52,8 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -72,7 +72,7 @@
 
 .remaining {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--positive-on-light);
 
@@ -93,8 +93,8 @@
 
 .photo-open {
   display: block;
-  width: 76px;
-  height: 76px;
+  width: 96px;
+  height: 96px;
   padding: 0;
   border: 0;
   border-radius: 12px;
@@ -130,14 +130,14 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  width: 76px;
-  height: 76px;
+  width: 96px;
+  height: 96px;
   border: 1.5px dashed var(--muted-on-light);
   border-radius: 12px;
   background: transparent;
   color: var(--muted-on-light);
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 600;
   text-align: center;
   cursor: pointer;

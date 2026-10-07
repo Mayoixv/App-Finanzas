@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { DateFieldComponent } from '../select/date-field.component';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { AlertController, IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -19,7 +20,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-transferencia-modal',
   templateUrl: 'transferencia.modal.html',
   styleUrls: ['transferencia.modal.scss'],
-  imports: [SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
+  imports: [DateFieldComponent, SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class TransferenciaModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

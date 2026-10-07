@@ -34,7 +34,7 @@
 .more {
   display: grid;
   place-items: center;
-  width: 44px;
+  width: 48px;
   height: 48px;
   margin-right: -12px;
   border: 0;
@@ -117,7 +117,7 @@
 
 .row-sub {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted-on-light);
 }
 
@@ -155,7 +155,7 @@
 }
 
 .head-action {
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 4px;
   border: 0;
   background: transparent;
@@ -197,7 +197,7 @@
   input {
     flex: 1;
     min-width: 0;
-    height: 44px;
+    height: 48px;
     border: 0;
     background: transparent;
     color: var(--text-on-light);
@@ -251,7 +251,7 @@
   flex-wrap: wrap;
   gap: 4px 12px;
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--muted-on-light);
   font-variant-numeric: tabular-nums;
 }
@@ -261,13 +261,13 @@
 }
 
 .link {
-  min-height: 44px;
+  min-height: 48px;
   padding: 0;
   border: 0;
   background: transparent;
   color: var(--violet-600);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -281,8 +281,8 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 2px solid var(--muted-on-light);
   color: #fff;
@@ -312,7 +312,7 @@
   border-radius: var(--radius-pill);
   background: var(--surface-soft-chip);
   color: var(--violet-600);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -334,19 +334,19 @@
 
   .count {
     flex: 1;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
   }
 
   button {
-    min-height: 44px;
+    min-height: 48px;
     padding: 0 10px;
     border: 0;
     border-radius: 12px;
     background: transparent;
     color: #c9b8ff;
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
 
@@ -377,4 +377,47 @@
 .avatar.cat {
   color: #fff;
   font-size: 22px;
+}
+
+/* El título comparte línea con el monto; el subtítulo y las etiquetas usan todo el ancho debajo,
+   así "Supermercado · 2 oct" no se parte a mitad de palabra con la letra de 15 px. */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  // Las filas 1fr de arriba y abajo se llevan el alto sobrante del círculo: el texto queda junto y centrado.
+  grid-template-rows: 1fr auto auto auto 1fr;
+  grid-template-areas:
+    'avatar . .'
+    'avatar title amount'
+    'avatar sub sub'
+    'avatar tags tags'
+    'avatar . .';
+  column-gap: 12px;
+  row-gap: 0;
+}
+
+.row > .avatar,
+.row > .check {
+  grid-area: avatar;
+  align-self: center;
+}
+
+.row-text {
+  display: contents;
+}
+
+.row-title {
+  grid-area: title;
+}
+
+.row-sub {
+  grid-area: sub;
+}
+
+.row-tags {
+  grid-area: tags;
+}
+
+.row-amount {
+  grid-area: amount;
 }

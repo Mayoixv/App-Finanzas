@@ -4,7 +4,7 @@
 
 .note {
   margin: 0 20px 24px;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.45;
   color: var(--muted-on-light);
 }
@@ -87,7 +87,7 @@ li + li .row {
 
 .row-sub {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.35;
   color: var(--muted-on-light);
 }
@@ -133,7 +133,7 @@ li + li .row {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.4;
   color: var(--muted-on-light);
 
@@ -144,9 +144,9 @@ li + li .row {
 }
 
 .pay {
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 18px;
-  font-size: 14px;
+  font-size: 15px;
   border-color: var(--violet-600);
   color: var(--violet-600);
 }

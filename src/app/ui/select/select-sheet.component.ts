@@ -14,6 +14,9 @@ import { SelectOption } from './select-field.component';
       <div class="picker">
         <div class="grab" aria-hidden="true"></div>
         <h2 class="picker-title" id="picker-title">{{ title }}</h2>
+        @if (note) {
+          <p class="picker-note">{{ note }}</p>
+        }
         <ul class="options" role="listbox" aria-labelledby="picker-title">
           @for (o of options; track $index; let i = $index) {
             <li class="opt" [style.--i]="i">
@@ -58,6 +61,12 @@ import { SelectOption } from './select-field.component';
       font-size: 17px;
       font-weight: 600;
       color: var(--text-on-light);
+    }
+    .picker-note {
+      margin: -4px 12px 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      color: var(--muted-on-light);
     }
     .options {
       margin: 0;
@@ -157,6 +166,8 @@ export class SelectSheetComponent<T> {
   @Input() options: SelectOption<T>[] = [];
   @Input() value: T | null = null;
   @Input() action?: string;
+  /** Explicación corta bajo el título. */
+  @Input() note?: string;
 
   constructor() {
     addIcons({ add, checkmark });

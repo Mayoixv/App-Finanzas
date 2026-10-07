@@ -1,0 +1,39 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <a routerLink="/ajustes" class="back" aria-label="Volver a Ajustes">
+      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+      Ajustes
+    </a>
+    <h1 class="screen-title">Categorías</h1>
+  </header>
+
+  <section class="block" aria-label="Categorías">
+    <p class="note">Toca una para cambiar su nombre, ícono o color, u ocultarla.</p>
+    @if (failed()) {
+      <p class="note">No se pudieron leer las categorías. Vuelve a abrir Ajustes.</p>
+    } @else {
+      @for (g of groups(); track g.type) {
+        <h3 class="group-title">{{ g.title }}</h3>
+        <ul class="rows">
+          @for (c of g.items; track c.id) {
+            <li>
+              <button type="button" class="row" [attr.aria-label]="'Editar categoría ' + c.name + (c.hidden ? ', oculta' : '')" (click)="openCategory(c)">
+                <span class="cat-dot" [class.is-hidden]="c.hidden" [style.background]="look(c).color" aria-hidden="true">
+                  <ion-icon [name]="look(c).icon"></ion-icon>
+                </span>
+                <span class="row-title" [class.is-hidden]="c.hidden">{{ c.name }}</span>
+                @if (c.hidden) {
+                  <span class="hidden-tag">Oculta</span>
+                }
+                <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+              </button>
+            </li>
+          } @empty {
+            <li class="row-empty">Sin categorías de este tipo.</li>
+          }
+        </ul>
+      }
+      <button type="button" class="btn-secondary add" (click)="openCategory()">Agregar categoría</button>
+    }
+  </section>
+</ion-content>

@@ -62,7 +62,7 @@
       <section class="card" aria-labelledby="gasto-title">
         <h2 id="gasto-title" class="section-title">¿En qué se va el gasto?</h2>
         @if (o.breakdown.length > 0) {
-          <app-expense-donut [slices]="o.breakdown"></app-expense-donut>
+          <app-expense-donut [slices]="o.breakdown" [categories]="categories()"></app-expense-donut>
         } @else {
           <p class="card-empty">Aún no registras gastos en {{ monthState.label() }}.</p>
         }

@@ -417,3 +417,35 @@ ion-modal.select-modal {
     contain: content;
   }
 }
+
+/* Confirmaciones con varias opciones (cssClass "app-alert choices"): botones píldora apilados; la que borra, en rojo. */
+ion-alert.app-alert.choices div.alert-button-group {
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 20px 20px;
+}
+
+ion-alert.app-alert.choices button.alert-button {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  border: 1.5px solid var(--violet-600);
+  border-radius: var(--radius-pill);
+  color: var(--violet-600);
+  font-weight: 600;
+  text-transform: none;
+
+  .alert-button-inner {
+    justify-content: center;
+  }
+
+  &.danger {
+    border-color: var(--negative-on-light);
+    color: var(--negative-on-light);
+  }
+
+  &.alert-button-role-cancel {
+    border-color: transparent;
+    color: var(--muted-on-light);
+  }
+}

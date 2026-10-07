@@ -17,7 +17,7 @@ import { MonthState } from '../month-state';
       <button type="button" class="card" [attr.aria-label]="'Patrimonio ' + money(n.total) + '. Ver cuentas'" (click)="open()">
         <span class="text">
           <span class="label">Patrimonio</span>
-          <span class="amount" [class.negative]="n.total < 0">{{ money(n.total) }}</span>
+          <span class="amount">{{ money(n.total) }}</span>
           <span class="sub">Tienes {{ money(n.have) }} · Debes {{ money(n.owe) }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
@@ -55,16 +55,13 @@ import { MonthState } from '../month-state';
     }
     .label,
     .sub {
-      font-size: 14px;
+      font-size: 15px;
       color: var(--muted);
     }
     .amount {
       font-size: 22px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-    }
-    .amount.negative {
-      color: var(--negative);
     }
     ion-icon {
       flex: none;

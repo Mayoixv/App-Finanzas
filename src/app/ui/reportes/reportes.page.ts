@@ -1,5 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Category } from '../../domain/category';
+import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -53,6 +55,7 @@ export class ReportesPage {
   protected readonly failed = signal(false);
   protected readonly showTable = signal(false);
   protected readonly categoryId = signal<string | null>(null);
+  private readonly categories = signal<Category[]>([]);
   protected readonly money = formatMoney;
   protected readonly percent = formatPercent;
   private loadSeq = 0;
@@ -93,8 +96,10 @@ export class ReportesPage {
     const cats = this.report()?.categories ?? [];
     const total = cats.reduce((s, c) => s + c.total, 0);
     const top = cats[0]?.total ?? 1;
+    const byId = new Map(this.categories().map((c) => [c.id, c]));
     return cats.map((c) => ({
       ...c,
+      color: lookOf(byId.get(c.categoryId) ?? { type: 'variable' }).color,
       width: (c.total / top) * 100,
       share: total ? (c.total / total) * 100 : 0,
     }));
@@ -150,6 +155,7 @@ export class ReportesPage {
       );
       if (seq !== this.loadSeq) return;
       this.report.set(report);
+      this.categories.set(await this.container.categories.list());
       this.failed.set(false);
     } catch (error) {
       console.error(error);

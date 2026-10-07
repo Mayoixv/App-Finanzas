@@ -87,7 +87,7 @@
                     <span class="cat-amount">{{ money(c.total) }}</span>
                     <span class="cat-share">{{ percent(c.share) }}</span>
                   </span>
-                  <span class="cat-track" aria-hidden="true"><span class="cat-fill" [style.width.%]="c.width"></span></span>
+                  <span class="cat-track" aria-hidden="true"><span class="cat-fill" [style.width.%]="c.width" [style.background]="c.color"></span></span>
                 </button>
                 @if (categoryId() === c.categoryId) {
                   <app-line-chart
@@ -96,7 +96,7 @@
                     [fullLabels]="fullLabels()"
                     [values]="c.byMonth"
                     [name]="'Gasto en ' + c.name"
-                    color="var(--series-gastos)"
+                    [color]="c.color"
                   ></app-line-chart>
                   <a class="link-button see-moves" [routerLink]="'/tabs/movimientos'" [queryParams]="{ categoria: c.categoryId }">
                     Ver sus movimientos de {{ monthState.label() }}

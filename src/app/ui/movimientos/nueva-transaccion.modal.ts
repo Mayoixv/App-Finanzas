@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { DateFieldComponent } from '../select/date-field.component';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { CategoryFieldComponent } from '../select/category-field.component';
 import {
@@ -46,7 +47,7 @@ interface Photo {
   selector: 'app-nueva-transaccion',
   templateUrl: 'nueva-transaccion.modal.html',
   styleUrls: ['nueva-transaccion.modal.scss'],
-  imports: [SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
+  imports: [DateFieldComponent, SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class NuevaTransaccionModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

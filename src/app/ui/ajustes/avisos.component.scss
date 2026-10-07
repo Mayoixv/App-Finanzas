@@ -34,6 +34,7 @@ ion-select {
 }
 
 ion-toggle {
+  min-height: 48px;
   --track-background-checked: var(--violet-600);
   padding: 8px 0;
 }
@@ -50,7 +51,7 @@ ion-select {
 
 .sub {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.35;
   color: var(--muted-on-light);
   white-space: normal;
@@ -58,7 +59,7 @@ ion-select {
 
 .note {
   margin: 12px 0 0;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.45;
   color: var(--muted-on-light);
 }
@@ -66,6 +67,6 @@ ion-select {
 .error {
   margin: 8px 0 0;
   color: var(--negative-on-light);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
 }

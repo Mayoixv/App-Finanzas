@@ -18,7 +18,7 @@
 
 .tick {
   fill: var(--muted-on-light);
-  font-size: 11px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -73,7 +73,7 @@
 
 .readout-title {
   width: 100%;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted-on-light);
 }
 
@@ -90,7 +90,7 @@
 }
 
 .readout-name {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted-on-light);
 }
 
@@ -115,7 +115,7 @@
   display: flex;
   gap: 16px;
   margin-top: 8px;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted-on-light);
 }
 

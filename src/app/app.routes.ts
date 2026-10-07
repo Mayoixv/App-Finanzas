@@ -28,6 +28,10 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'ajustes/categorias',
+    loadComponent: () => import('./ui/ajustes/categorias.page').then((m) => m.CategoriasPage),
+  },
+  {
     path: 'ajustes',
     loadComponent: () => import('./ui/ajustes/ajustes.page').then((m) => m.AjustesPage),
   },

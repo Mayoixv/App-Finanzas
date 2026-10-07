@@ -20,7 +20,8 @@ export function displayCurrency(): Currency {
 /** Recibe centavos: formatMoney(1250) muestra RD$12.50. */
 export function formatMoney(cents: Cents): string {
   const text = `${SYMBOLS[currency]}${number.format(Math.abs(cents) / 100)}`;
-  return cents < 0 ? `-${text}` : text;
+  // El signo menos tipográfico (−), el mismo de las filas de gasto; el PDF lo cambia por '-'.
+  return cents < 0 ? `−${text}` : text;
 }
 
 /** Convierte lo escrito en un campo de monto a centavos; null si no es un monto válido mayor que cero. */

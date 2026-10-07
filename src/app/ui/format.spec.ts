@@ -72,7 +72,7 @@ describe('montos en centavos', () => {
     expect(formatMoney(125050)).toBe('RD$1,250.50');
     setDisplayCurrency('USD');
     expect(formatMoney(125050)).toBe('US$1,250.50');
-    expect(formatMoney(-5)).toBe('-US$0.05');
+    expect(formatMoney(-5)).toBe('−US$0.05');
   });
 });
 

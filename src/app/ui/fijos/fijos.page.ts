@@ -1,9 +1,10 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { Category } from '../../domain/category';
+import { lookOf } from '../category-look';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   checkmarkCircleOutline,
-  createOutline,
   timeOutline,
 } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -49,6 +50,8 @@ interface Row {
   detail: string;
   urgent: boolean;
   dueDate: string;
+  icon: string;
+  color: string;
 }
 
 interface Totals {
@@ -102,7 +105,7 @@ export class FijosPage {
   protected readonly percent = formatPercent;
 
   constructor() {
-    addIcons({ checkmarkCircleOutline, createOutline, timeOutline });
+    addIcons({ checkmarkCircleOutline, timeOutline });
     effect(() => {
       const month = this.monthState.month();
       this.monthState.version();
@@ -187,12 +190,11 @@ export class FijosPage {
       this.installments.set(installments);
       this.subscriptions.set(subscriptions.count > 0 ? subscriptions : null);
       const today = todayIso();
-      const incomeIds = new Set(
-        categories.filter((c) => c.type === 'ingreso').map((c) => c.id),
-      );
+      const byId = new Map(categories.map((c) => [c.id, c]));
+      const incomeIds = new Set(categories.filter((c) => c.type === 'ingreso').map((c) => c.id));
       this.rows.set(
         items.map((item) =>
-          toRow(item, today, incomeIds.has(item.expense.categoryId)),
+          toRow(item, today, byId.get(item.expense.categoryId)),
         ),
       );
       this.paused.set(paused);
@@ -234,8 +236,9 @@ export class FijosPage {
 function toRow(
   { expense, instance }: MonthRecurringExpense,
   today: string,
-  isIncome: boolean,
+  category: Category | undefined,
 ): Row {
+  const isIncome = category?.type === 'ingreso';
   const paid = instance.status === 'pagado';
   const due = paid
     ? {
@@ -254,5 +257,6 @@ function toRow(
     detail: every ? `${due.text} · ${every}` : due.text,
     urgent: due.urgent,
     dueDate: instance.dueDate,
+    ...lookOf(category ?? { type: isIncome ? 'ingreso' : 'fijo' }),
   };
 }

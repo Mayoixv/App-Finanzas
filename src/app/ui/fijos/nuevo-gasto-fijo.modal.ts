@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { SelectSheetComponent } from '../select/select-sheet.component';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { CategoryFieldComponent } from '../select/category-field.component';
 import {
@@ -151,25 +152,20 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected async pause() {
     const e = this.expense;
     if (!e) return;
-    const alert = await this.alerts.create({
-      cssClass: 'app-alert',
-      header: 'Pausar',
-      message: `¿Por cuánto tiempo, desde ${this.monthState.label()}? Lo pendiente de esos meses se quita; lo ya pagado se queda.`,
-      inputs: [1, 2, 3, 6].map((n) => ({
-        type: 'radio' as const,
-        label: n === 1 ? '1 mes' : `${n} meses`,
-        value: n,
-        checked: n === 1,
-      })),
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Pausar', role: 'confirm' },
-      ],
+    const sheet = await this.modalCtrl.create({
+      component: SelectSheetComponent,
+      componentProps: {
+        title: `Pausar desde ${this.monthState.label()}`,
+        note: 'Lo pendiente de esos meses se quita; lo ya pagado se queda.',
+        options: [1, 2, 3, 6].map((n) => ({ value: n, label: n === 1 ? '1 mes' : `${n} meses` })),
+      },
+      cssClass: 'select-modal',
     });
-    await alert.present();
-    const { role, data } = await alert.onDidDismiss();
-    if (role !== 'confirm') return;
-    await this.run(() => this.container.pauseRecurringExpense.execute(e.id, this.monthState.month(), Number(data?.values ?? 1)));
+    await sheet.present();
+    // onDidDismiss: hasta que la hoja termine de cerrarse sigue siendo la ventana de arriba, y run() cierra el formulario.
+    const { role, data } = await sheet.onDidDismiss<number>();
+    if (role !== 'select' || !data) return;
+    await this.run(() => this.container.pauseRecurringExpense.execute(e.id, this.monthState.month(), data));
   }
 
   protected async resume() {
@@ -255,12 +251,12 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     const label = this.monthState.label();
     const month = label.charAt(0).toLocaleLowerCase('es') + label.slice(1);
     const alert = await this.alerts.create({
-      cssClass: 'app-alert',
+      cssClass: 'app-alert choices',
       header: `Eliminar ${e.name}`,
       message: `Los pagos ya registrados se quedan en Movimientos.`,
       buttons: [
         { text: `Solo ${month}`, role: 'month' },
-        { text: 'Este mes y los siguientes', role: 'forward' },
+        { text: 'Este mes y los siguientes', role: 'forward', cssClass: 'danger' },
         { text: 'Cancelar', role: 'cancel' },
       ],
     });

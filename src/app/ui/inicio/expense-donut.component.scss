@@ -68,7 +68,7 @@ svg {
 
 .center-label {
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted);
 }
 
@@ -83,7 +83,12 @@ svg {
 
 .legend li {
   display: grid;
-  grid-template-columns: 12px 1fr auto 52px;
+  // Dos líneas: nombre y monto arriba, porcentaje debajo; así nada se sale a 360 px.
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  grid-template-areas:
+    'swatch name value'
+    '. share share';
+  row-gap: 2px;
   align-items: center;
   gap: 12px;
   font-size: 15px;
@@ -99,9 +104,29 @@ svg {
   font-variant-numeric: tabular-nums;
 }
 
+.swatch {
+  grid-area: swatch;
+}
+
+.name {
+  grid-area: name;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  grid-area: value;
+}
+
 .share {
-  text-align: right;
-  font-size: 13px;
+  grid-area: share;
+  font-size: 15px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+.arc,
+.swatch {
+  filter: brightness(1.15);
 }

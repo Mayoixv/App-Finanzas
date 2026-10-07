@@ -9,7 +9,6 @@ import {
 } from '../../application/use-cases/get-savings-overview';
 import { MonthlySummary, SavingsRating } from '../../domain/monthly-summary';
 import { formatDay, formatMoney, formatPercent, monthLabel } from '../format';
-import { MonthSwitcherComponent } from '../month-switcher.component';
 import { PageSlideComponent } from '../page-slide.component';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { MonthState } from '../month-state';
@@ -36,7 +35,6 @@ interface View {
   imports: [
     LoadingComponent,
     IonIcon,
-    MonthSwitcherComponent,
     PillToggleComponent,
     PageSlideComponent,
   ],

@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, signal } from '@angular/core';
+import { DateFieldComponent } from '../select/date-field.component';
 import { IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -17,7 +18,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-aporte-modal',
   templateUrl: 'aporte.modal.html',
   styleUrls: ['aporte.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, SuccessCheckComponent],
+  imports: [DateFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class AporteModalComponent {
   private readonly container = inject(APP_CONTAINER);
