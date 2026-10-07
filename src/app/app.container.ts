@@ -5,7 +5,7 @@ import { RemoveRecurringExpense } from './application/use-cases/remove-recurring
 import { UpdateRecurringExpense } from './application/use-cases/update-recurring-expense';
 import { UpdateTransaction } from './application/use-cases/update-transaction';
 import { AddSavingsGoal } from './application/use-cases/add-savings-goal';
-import { AddCategory, DeleteCategory, RenameCategory } from './application/use-cases/manage-categories';
+import { AddCategory, DeleteCategory, UpdateCategory } from './application/use-cases/manage-categories';
 import {
   AdjustAccountBalance,
   ArchiveAccount,
@@ -121,7 +121,7 @@ export interface AppContainer {
   copyBudgets: CopyBudgets;
   currencySettings: CurrencySettings;
   addCategory: AddCategory;
-  renameCategory: RenameCategory;
+  updateCategory: UpdateCategory;
   deleteCategory: DeleteCategory;
   restoreTransaction: RestoreTransaction;
   restoreSavingsContribution: RestoreSavingsContribution;
@@ -204,7 +204,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     copyBudgets: new CopyBudgets(repos.budgets, ids),
     currencySettings: new CurrencySettings(repos.settings),
     addCategory: new AddCategory(repos.categories, ids),
-    renameCategory: new RenameCategory(repos.categories),
+    updateCategory: new UpdateCategory(repos.categories),
     deleteCategory: new DeleteCategory(repos.categories),
     restoreTransaction: new RestoreTransaction(repos.transactions, repos.recurring),
     restoreSavingsContribution: new RestoreSavingsContribution(repos.savings),

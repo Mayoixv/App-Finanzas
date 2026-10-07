@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
-import { AlertController, IonIcon, IonSelect, IonSelectOption, IonToggle, LoadingController } from '@ionic/angular';
+import { SelectFieldComponent } from '../select/select-field.component';
+import { AlertController, IonIcon, IonToggle, LoadingController } from '@ionic/angular';
 import { applyPrivacy, isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
 import { NotificationsService } from '../notifications.service';
 import { AutoBackupService } from '../auto-backup.service';
@@ -20,7 +21,7 @@ type Values = Record<string, string>;
   selector: 'app-datos',
   templateUrl: 'datos.component.html',
   styleUrls: ['datos.component.scss'],
-  imports: [IonIcon, IonSelect, IonSelectOption, IonToggle],
+  imports: [SelectFieldComponent, IonIcon, IonToggle],
 })
 export class DatosComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

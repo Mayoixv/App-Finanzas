@@ -10,6 +10,7 @@ import { CurrencyState } from '../currency-state';
 import { DropdownComponent } from '../dropdown.component';
 import { MonthState } from '../month-state';
 import { CategoriaModalComponent } from './categoria.modal';
+import { lookOf } from '../category-look';
 import { DatosComponent } from './datos.component';
 import { AvisosComponent } from './avisos.component';
 import { APP_VERSION } from '../../version';
@@ -47,6 +48,7 @@ export class AjustesPage {
     { code: 'USD', label: 'Dólar estadounidense (US$)' },
   ];
 
+  protected readonly look = lookOf;
   private readonly categories = signal<Category[] | null>(null);
   protected readonly failed = signal(false);
   protected readonly liveMessage = signal('');

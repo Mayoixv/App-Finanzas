@@ -75,8 +75,14 @@
         <ul class="rows">
           @for (c of g.items; track c.id) {
             <li>
-              <button type="button" class="row" [attr.aria-label]="'Editar categoría ' + c.name" (click)="openCategory(c)">
-                <span class="row-title">{{ c.name }}</span>
+              <button type="button" class="row" [attr.aria-label]="'Editar categoría ' + c.name + (c.hidden ? ', oculta' : '')" (click)="openCategory(c)">
+                <span class="cat-dot" [class.is-hidden]="c.hidden" [style.background]="look(c).color" aria-hidden="true">
+                  <ion-icon [name]="look(c).icon"></ion-icon>
+                </span>
+                <span class="row-title" [class.is-hidden]="c.hidden">{{ c.name }}</span>
+                @if (c.hidden) {
+                  <span class="hidden-tag">Oculta</span>
+                }
                 <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
               </button>
             </li>

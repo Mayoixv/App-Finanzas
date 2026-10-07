@@ -28,24 +28,61 @@ function monthRange(month: MonthKey): [string, string] {
   return [`${month}-01`, `${month}-31`];
 }
 
+interface CategoryRow {
+  id: string;
+  name: string;
+  type: CategoryType;
+  icon: string | null;
+  color: string | null;
+  hidden: number;
+}
+
+function toCategory(r: CategoryRow): Category {
+  return { id: r.id, name: r.name, type: r.type, icon: r.icon ?? undefined, color: r.color ?? undefined, hidden: r.hidden === 1 };
+}
+
 export class SqliteCategoryRepository implements ICategoryRepository {
   constructor(private readonly db: SqlDatabase) {}
 
   async list(): Promise<Category[]> {
-    return this.db.all<Category>('SELECT id, name, type FROM categories ORDER BY name');
+    return (await this.db.all<CategoryRow>('SELECT * FROM categories ORDER BY name')).map(toCategory);
   }
 
   async get(id: string): Promise<Category | undefined> {
-    const rows = await this.db.all<Category>('SELECT id, name, type FROM categories WHERE id = ?', [id]);
-    return rows[0];
+    const rows = await this.db.all<CategoryRow>('SELECT * FROM categories WHERE id = ?', [id]);
+    return rows[0] && toCategory(rows[0]);
   }
 
   async save(c: Category): Promise<void> {
     await this.db.run(
-      `INSERT INTO categories (id, name, type) VALUES (?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET name = excluded.name, type = excluded.type`,
-      [c.id, c.name, c.type satisfies CategoryType],
+      `INSERT INTO categories (id, name, type, icon, color, hidden) VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET name = excluded.name, type = excluded.type, icon = excluded.icon,
+         color = excluded.color, hidden = excluded.hidden`,
+      [c.id, c.name, c.type satisfies CategoryType, c.icon ?? null, c.color ?? null, c.hidden ? 1 : 0],
     );
+  }
+
+  async deleteMovingTo(id: string, toId: string): Promise<void> {
+    const p = { from: id, to: toId };
+    await this.db.batch([
+      // Un movimiento dividido que ya tenía parte en la categoría destino: se suman las dos partes.
+      {
+        sql: `UPDATE transaction_splits SET amount = amount + (
+                SELECT s.amount FROM transaction_splits s
+                WHERE s.transaction_id = transaction_splits.transaction_id AND s.category_id = ?)
+              WHERE category_id = ? AND transaction_id IN (SELECT transaction_id FROM transaction_splits WHERE category_id = ?)`,
+        params: [p.from, p.to, p.from],
+      },
+      {
+        sql: `DELETE FROM transaction_splits WHERE category_id = ?
+              AND transaction_id IN (SELECT transaction_id FROM transaction_splits WHERE category_id = ?)`,
+        params: [p.from, p.to],
+      },
+      { sql: 'UPDATE transaction_splits SET category_id = ? WHERE category_id = ?', params: [p.to, p.from] },
+      { sql: 'UPDATE transactions SET category_id = ? WHERE category_id = ?', params: [p.to, p.from] },
+      { sql: 'UPDATE recurring_expenses SET category_id = ? WHERE category_id = ?', params: [p.to, p.from] },
+      { sql: 'DELETE FROM categories WHERE id = ?', params: [p.from] },
+    ]);
   }
 
   async delete(id: string): Promise<void> {

@@ -12,6 +12,9 @@ export const ACCOUNT_TYPE_LABEL: Record<Account['type'], string> = {
 };
 
 /** Etiqueta para elegir la cuenta: "Visa · Tarjeta de crédito". Efectivo va solo. */
+/** Opciones para app-select-field. */
+export const accountOptions = (accounts: Account[]) => accounts.map((a) => ({ value: a.id, label: accountLabel(a) }));
+
 export const accountLabel = (a: Account) => (a.id === CASH_ACCOUNT_ID ? a.name : `${a.name} · ${ACCOUNT_TYPE_LABEL[a.type]}`);
 
 /**

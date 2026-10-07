@@ -17,18 +17,13 @@
         <p class="hint">Todas tus categorías de gasto ya tienen presupuesto en {{ monthState.label() }}.</p>
       }
       <div class="field">
-        <ion-select
-          label="Categoría"
-          label-placement="stacked"
+        <app-category-field
           placeholder="Elige una categoría de gasto"
-          cancelText="Cancelar"
-          [value]="categoryId()"
-          (ionChange)="categoryId.set($event.detail.value)"
-        >
-          @for (c of categories(); track c.id) {
-            <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
-          }
-        </ion-select>
+          [categories]="categories()"
+          newType="variable"
+          [(value)]="categoryId"
+          (created)="categories.update((list) => [...list, $event])"
+        ></app-category-field>
       </div>
     }
 

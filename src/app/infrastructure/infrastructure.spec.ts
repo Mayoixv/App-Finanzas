@@ -53,7 +53,7 @@ describe('repositorios SQLite', () => {
     const repo = new SqliteCategoryRepository(await freshDb());
     await repo.save({ id: 'c1', name: 'Comida', type: 'variable' });
     await repo.save({ id: 'c1', name: 'Supermercado', type: 'variable' });
-    expect(await repo.get('c1')).toEqual({ id: 'c1', name: 'Supermercado', type: 'variable' });
+    expect(await repo.get('c1')).toMatchObject({ id: 'c1', name: 'Supermercado', type: 'variable' });
     await repo.delete('c1');
     expect(await repo.get('c1')).toBeUndefined();
   });
@@ -333,5 +333,34 @@ describe('fijo eliminado que reaparecía (beta)', () => {
     expect(await db.all('SELECT recurring_expense_id, month, status FROM recurring_instances')).toEqual([
       { recurring_expense_id: 'r', month: '2026-10', status: 'pagado' },
     ]);
+  });
+});
+
+describe('categorías personalizadas (migración 10)', () => {
+  it('conserva las categorías del usuario, da ícono a las de la app y no repite nombres', async () => {
+    const db = new NodeSqliteDatabase();
+    await runMigrations(db, MIGRATIONS.filter((m) => m.version <= 9));
+    await db.run("INSERT INTO categories (id, name, type) VALUES ('u1', 'luz', 'fijo')");
+    await runMigrations(db);
+    const cats = await new SqliteCategoryRepository(db).list();
+    expect(cats.filter((c) => c.name.toLowerCase() === 'luz')).toEqual([{ id: 'u1', name: 'luz', type: 'fijo', icon: undefined, color: undefined, hidden: false }]);
+    expect(cats.find((c) => c.id === 'cat-comida')).toMatchObject({ icon: 'restaurant-outline', hidden: false });
+    expect(cats.some((c) => c.id === 'cat-supermercado')).toBe(true);
+  });
+
+  it('borrar una categoría pasa todo a la otra sin dejar nada huérfano', async () => {
+    const db = new NodeSqliteDatabase();
+    await runMigrations(db);
+    const cats = new SqliteCategoryRepository(db);
+    await cats.save({ id: 'u1', name: 'Mascotas', type: 'variable' });
+    await db.run("INSERT INTO transactions (id, date, amount, category_id, note, account_id) VALUES ('t1', '2026-10-01', 500, 'u1', '', 'acc-efectivo')");
+    await db.run("INSERT INTO transactions (id, date, amount, category_id, note, account_id) VALUES ('t2', '2026-10-02', 900, 'cat-comida', '', 'acc-efectivo')");
+    await db.run("INSERT INTO transaction_splits (transaction_id, category_id, amount) VALUES ('t2', 'cat-comida', 600), ('t2', 'u1', 300)");
+    await db.run("INSERT INTO recurring_expenses (id, name, amount, category_id, due_day, active, start_month) VALUES ('r', 'Vet', 100, 'u1', 3, 1, '2026-10')");
+    await cats.deleteMovingTo('u1', 'cat-comida');
+    expect(await db.all("SELECT category_id FROM transactions WHERE id = 't1'")).toEqual([{ category_id: 'cat-comida' }]);
+    expect(await db.all('SELECT category_id, amount FROM transaction_splits')).toEqual([{ category_id: 'cat-comida', amount: 900 }]);
+    expect(await db.all('SELECT category_id FROM recurring_expenses')).toEqual([{ category_id: 'cat-comida' }]);
+    expect(await cats.get('u1')).toBeUndefined();
   });
 });

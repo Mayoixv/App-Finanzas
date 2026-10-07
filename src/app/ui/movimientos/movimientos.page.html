@@ -129,7 +129,7 @@
                     }
                   </span>
                 } @else {
-                  <span class="avatar" [class.income]="row.isIncome" aria-hidden="true">{{ row.initial }}</span>
+                  <span class="avatar cat" [style.background]="row.color" aria-hidden="true"><ion-icon [name]="row.icon"></ion-icon></span>
                 }
                 <span class="row-text">
                   <span class="row-title">{{ row.title }}</span>

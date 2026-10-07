@@ -1,17 +1,17 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { SelectFieldComponent } from '../select/select-field.component';
+import { CategoryFieldComponent } from '../select/category-field.component';
 import {
   IonContent,
   IonIcon,
   IonInput,
-  IonSelect,
-  IonSelectOption,
   AlertController,
   ModalController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
-import { accountChoices, accountLabel } from '../cuentas/account-choices';
+import { accountChoices, accountOptions } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
 import { NotFoundError, ValidationError } from '../../application/errors';
 import { Category } from '../../domain/category';
@@ -39,7 +39,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-nuevo-gasto-fijo',
   templateUrl: 'nuevo-gasto-fijo.modal.html',
   styleUrls: ['nuevo-gasto-fijo.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent, DayPickerComponent],
+  imports: [SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent, DayPickerComponent],
 })
 export class NuevoGastoFijoModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);
@@ -59,7 +59,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected readonly frequency = signal<Frequency>(1);
   protected readonly accounts = signal<Account[]>([]);
   protected readonly accountId = signal(CASH_ACCOUNT_ID);
-  protected readonly accountLabel = accountLabel;
+  protected readonly accountOptions = computed(() => accountOptions(this.accounts()));
   protected readonly frequencies: { value: Frequency; label: string }[] = [
     { value: 1, label: 'Cada mes' },
     { value: 3, label: 'Cada 3 meses' },
@@ -118,6 +118,10 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       this.frequency.set(e.frequency ?? 1);
       if (all.find((c) => c.id === e.categoryId)?.type === 'ingreso') this.kind.set('ingreso');
     }
+  }
+
+  protected addCategory(c: Category) {
+    this.allCategories.update((list) => [...list, c]);
   }
 
   protected setKind(kind: 'gasto' | 'ingreso') {

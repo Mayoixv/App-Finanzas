@@ -79,7 +79,7 @@
           @for (row of recent(); track row.id) {
             <li animate.enter="t-row-enter" animate.leave="t-row-leave">
               <button type="button" class="row" [attr.aria-label]="'Editar ' + row.title + ', ' + row.amount" (click)="edit(row)">
-                <span class="avatar" [class.income]="row.isIncome" aria-hidden="true">{{ row.initial }}</span>
+                <span class="avatar cat" [style.background]="row.color" aria-hidden="true"><ion-icon [name]="row.icon"></ion-icon></span>
                 <span class="row-text">
                   <span class="row-title">{{ row.title }}</span>
                   <span class="row-sub">{{ row.subtitle }}</span>

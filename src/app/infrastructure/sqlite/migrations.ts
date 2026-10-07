@@ -210,6 +210,56 @@ export const MIGRATIONS: Migration[] = [
       `ALTER TABLE recurring_instances_new RENAME TO recurring_instances`,
     ],
   },
+  {
+    version: 10,
+    name: 'categorías con ícono, color y ocultas; más categorías comunes',
+    statements: [
+      `ALTER TABLE categories ADD COLUMN icon TEXT`,
+      `ALTER TABLE categories ADD COLUMN color TEXT`,
+      `ALTER TABLE categories ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0`,
+      `UPDATE categories SET icon = 'cash-outline', color = '#0f8a5f' WHERE id = 'cat-salario'`,
+      `UPDATE categories SET icon = 'wallet-outline', color = '#0e7490' WHERE id = 'cat-otros-ingresos'`,
+      `UPDATE categories SET icon = 'home-outline', color = '#6639ec' WHERE id = 'cat-alquiler'`,
+      `UPDATE categories SET icon = 'construct-outline', color = '#475569' WHERE id = 'cat-servicios'`,
+      `UPDATE categories SET icon = 'play-circle-outline', color = '#be185d' WHERE id = 'cat-suscripciones'`,
+      `UPDATE categories SET icon = 'card-outline', color = '#b91c1c' WHERE id = 'cat-pago-deudas'`,
+      `UPDATE categories SET icon = 'restaurant-outline', color = '#c2410c' WHERE id = 'cat-comida'`,
+      `UPDATE categories SET icon = 'bus-outline', color = '#2563eb' WHERE id = 'cat-transporte'`,
+      `UPDATE categories SET icon = 'medkit-outline', color = '#be185d' WHERE id = 'cat-salud'`,
+      `UPDATE categories SET icon = 'game-controller-outline', color = '#6639ec' WHERE id = 'cat-ocio'`,
+      `UPDATE categories SET icon = 'pricetag-outline', color = '#475569' WHERE id = 'cat-otros-gastos'`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-luz', 'Luz', 'fijo', 'flash-outline', '#a16207'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-luz' OR lower(name) = lower('Luz'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-agua', 'Agua', 'fijo', 'water-outline', '#2563eb'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-agua' OR lower(name) = lower('Agua'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-internet', 'Internet y cable', 'fijo', 'wifi-outline', '#0e7490'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-internet' OR lower(name) = lower('Internet y cable'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-telefono', 'Teléfono', 'fijo', 'phone-portrait-outline', '#6639ec'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-telefono' OR lower(name) = lower('Teléfono'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-seguros', 'Seguros', 'fijo', 'shield-checkmark-outline', '#0f8a5f'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-seguros' OR lower(name) = lower('Seguros'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-educacion', 'Educación', 'fijo', 'school-outline', '#c2410c'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-educacion' OR lower(name) = lower('Educación'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-supermercado', 'Supermercado', 'variable', 'cart-outline', '#0f8a5f'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-supermercado' OR lower(name) = lower('Supermercado'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-gasolina', 'Gasolina', 'variable', 'car-outline', '#a16207'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-gasolina' OR lower(name) = lower('Gasolina'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-ropa', 'Ropa', 'variable', 'shirt-outline', '#be185d'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-ropa' OR lower(name) = lower('Ropa'))`,
+      `INSERT INTO categories (id, name, type, icon, color)
+       SELECT 'cat-hogar', 'Hogar', 'variable', 'bed-outline', '#0e7490'
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-hogar' OR lower(name) = lower('Hogar'))`,
+    ],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

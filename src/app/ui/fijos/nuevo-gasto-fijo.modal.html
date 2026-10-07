@@ -23,18 +23,12 @@
     </div>
 
     <div class="field">
-      <ion-select
-        label="Categoría"
-        label-placement="stacked"
-        placeholder="Elige una categoría"
-        cancelText="Cancelar"
-        [value]="categoryId()"
-        (ionChange)="categoryId.set($event.detail.value)"
-      >
-        @for (c of categories(); track c.id) {
-          <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
-        }
-      </ion-select>
+      <app-category-field
+        [categories]="categories()"
+        [newType]="kind() === 'ingreso' ? 'ingreso' : 'fijo'"
+        [(value)]="categoryId"
+        (created)="addCategory($event)"
+      ></app-category-field>
     </div>
 
     @if (kind() === 'ingreso' && !isEdit()) {
@@ -98,33 +92,18 @@
 
     @if (!multi()) {
       <div class="field">
-        <ion-select
-          label="Se repite"
-          label-placement="stacked"
-          cancelText="Cancelar"
-          [value]="frequency()"
-          (ionChange)="frequency.set($event.detail.value)"
-        >
-          @for (f of frequencies; track f.value) {
-            <ion-select-option [value]="f.value">{{ f.label }}</ion-select-option>
-          }
-        </ion-select>
+        <app-select-field label="Se repite" [options]="frequencies" [value]="frequency()" (valueChange)="frequency.set($event!)"></app-select-field>
       </div>
     }
 
     @if (accounts().length > 1) {
       <div class="field">
-        <ion-select
+        <app-select-field
           [label]="kind() === 'ingreso' ? 'Se cobra en' : 'Se paga con'"
-          label-placement="stacked"
-          cancelText="Cancelar"
+          [options]="accountOptions()"
           [value]="accountId()"
-          (ionChange)="accountId.set($event.detail.value)"
-        >
-          @for (a of accounts(); track a.id) {
-            <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
-          }
-        </ion-select>
+          (valueChange)="accountId.set($event!)"
+        ></app-select-field>
       </div>
     }
 

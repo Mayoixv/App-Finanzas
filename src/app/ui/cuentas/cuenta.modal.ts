@@ -1,5 +1,6 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
-import { AlertController, IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, ModalController } from '@ionic/angular';
+import { SelectFieldComponent } from '../select/select-field.component';
+import { AlertController, IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -18,7 +19,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-cuenta-modal',
   templateUrl: 'cuenta.modal.html',
   styleUrls: ['cuenta.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
+  imports: [SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class CuentaModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

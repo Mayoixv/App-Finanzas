@@ -8,21 +8,11 @@
     </header>
 
     <div class="field">
-      <ion-select label="Desde" label-placement="stacked" cancelText="Cancelar" placeholder="Elige una cuenta" [value]="from()" (ionChange)="from.set($event.detail.value)">
-        @for (a of accounts(); track a.id) {
-          <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
-        }
-      </ion-select>
+      <app-select-field label="Desde" placeholder="Elige una cuenta" [options]="accountOptions()" [(value)]="from"></app-select-field>
     </div>
 
     <div class="field">
-      <ion-select label="Hacia" label-placement="stacked" cancelText="Cancelar" placeholder="Elige una cuenta" [value]="to()" (ionChange)="to.set($event.detail.value)">
-        @for (a of accounts(); track a.id) {
-          @if (a.id !== from()) {
-            <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
-          }
-        }
-      </ion-select>
+      <app-select-field label="Hacia" placeholder="Elige una cuenta" [options]="toOptions()" [(value)]="to"></app-select-field>
     </div>
 
     <div class="field">

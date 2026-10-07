@@ -8,7 +8,7 @@ import {
 import { InMemorySettings } from '../testing/in-memory';
 import { AddSavingsContribution } from './add-savings-contribution';
 import { CurrencySettings } from './currency-settings';
-import { AddCategory, DeleteCategory, RenameCategory } from './manage-categories';
+import { AddCategory, DeleteCategory, UpdateCategory } from './manage-categories';
 import { AddSavingsGoal } from './add-savings-goal';
 import { CopyBudgets } from './copy-budgets';
 import { DeleteSavingsGoal } from './delete-savings-goal';
@@ -135,18 +135,29 @@ describe('categorías', () => {
     await expect(add.execute({ name: '  ', type: 'fijo' })).rejects.toThrow(ValidationError);
     await expect(add.execute({ name: 'X', type: 'otro' as never })).rejects.toThrow(ValidationError);
 
-    const rename = new RenameCategory(s.categories);
-    await rename.execute(c.id, 'mascotas');
+    const update = new UpdateCategory(s.categories);
+    await update.execute(c.id, { name: 'mascotas' });
     expect((await s.categories.get(c.id))?.name).toBe('mascotas');
-    await expect(rename.execute(c.id, 'Salario')).rejects.toThrow('Ya tienes una categoría');
+    await expect(update.execute(c.id, { name: 'Salario' })).rejects.toThrow('Ya tienes una categoría');
+    await update.execute(c.id, { icon: 'paw-outline', color: '#0e7490', hidden: true });
+    expect(await s.categories.get(c.id)).toMatchObject({ name: 'mascotas', icon: 'paw-outline', hidden: true });
   });
 
-  it('no deja eliminar una categoría en uso', async () => {
+  it('una categoría en uso solo se borra pasando sus movimientos a otra del mismo tipo', async () => {
     const s = setup();
     s.categories.inUse.add('com');
     const del = new DeleteCategory(s.categories);
-    await expect(del.execute('com')).rejects.toThrow(ValidationError);
-    await del.execute('ren');
-    expect(await s.categories.get('ren')).toBeUndefined();
+    await expect(del.execute('com')).rejects.toThrow('Elige a qué categoría');
+    await expect(del.execute('com', 'sal')).rejects.toThrow('mismo tipo');
+    await s.categories.save({ id: 'sup', name: 'Supermercado', type: 'variable' });
+    await del.execute('com', 'sup');
+    expect(s.categories.movedTo.get('com')).toBe('sup');
+    expect(await s.categories.get('com')).toBeUndefined();
+  });
+
+  it('las categorías de la app no se borran', async () => {
+    const s = setup();
+    await s.categories.save({ id: 'cat-salario', name: 'Sueldo base', type: 'ingreso' });
+    await expect(new DeleteCategory(s.categories).execute('cat-salario')).rejects.toThrow('ocultarla');
   });
 });

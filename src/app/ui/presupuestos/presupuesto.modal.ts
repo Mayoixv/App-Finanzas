@@ -1,12 +1,11 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { CategoryFieldComponent } from '../select/category-field.component';
 import {
   AlertController,
   IonContent,
   IonIcon,
   IonInput,
   IonToggle,
-  IonSelect,
-  IonSelectOption,
   ModalController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -27,7 +26,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-presupuesto-modal',
   templateUrl: 'presupuesto.modal.html',
   styleUrls: ['presupuesto.modal.scss'],
-  imports: [IonToggle, IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
+  imports: [CategoryFieldComponent, IonToggle, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class PresupuestoModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);

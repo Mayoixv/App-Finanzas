@@ -403,3 +403,17 @@ ion-toast.app-toast::part(button) {
     }
   }
 }
+
+/* Hoja de selección (app-select-field): solo la altura que necesita, pegada abajo y con esquinas de design.md. */
+ion-modal.select-modal {
+  --height: auto;
+  --border-radius: var(--radius-card) var(--radius-card) 0 0;
+  --backdrop-opacity: 0.45;
+  align-items: flex-end;
+
+  .ion-page {
+    position: relative;
+    display: block;
+    contain: content;
+  }
+}

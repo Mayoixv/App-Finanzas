@@ -249,3 +249,9 @@ li + li .row {
   font-weight: 500;
   color: var(--muted);
 }
+
+/* Círculo con el ícono y el color de la categoría (los elige el usuario en Ajustes). */
+.avatar.cat {
+  color: #fff;
+  font-size: 22px;
+}

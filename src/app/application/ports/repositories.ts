@@ -14,6 +14,8 @@ export interface ICategoryRepository {
   delete(id: string): Promise<void>;
   /** true si algún movimiento o gasto fijo usa la categoría (no se puede borrar sin perder datos). */
   isInUse(id: string): Promise<boolean>;
+  /** Pasa a `toId` todo lo que usa `id` (movimientos, divisiones y fijos) y la borra, todo o nada. */
+  deleteMovingTo(id: string, toId: string): Promise<void>;
 }
 
 export interface ITransactionRepository {

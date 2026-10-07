@@ -1,17 +1,17 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { SelectFieldComponent } from '../select/select-field.component';
+import { CategoryFieldComponent } from '../select/category-field.component';
 import {
   IonContent,
   IonIcon,
   IonInput,
-  IonSelect,
-  IonSelectOption,
   AlertController,
   ModalController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { addOutline, cameraOutline, close } from 'ionicons/icons';
 import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
-import { accountChoices, accountLabel, rememberAccount } from '../cuentas/account-choices';
+import { accountChoices, accountOptions, rememberAccount } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
 import { ValidationError } from '../../application/errors';
 import { Category, isExpenseType } from '../../domain/category';
@@ -46,7 +46,7 @@ interface Photo {
   selector: 'app-nueva-transaccion',
   templateUrl: 'nueva-transaccion.modal.html',
   styleUrls: ['nueva-transaccion.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
+  imports: [SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class NuevaTransaccionModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);
@@ -64,7 +64,7 @@ export class NuevaTransaccionModalComponent implements OnInit {
   protected readonly categoryId = signal<string | null>(null);
   protected readonly accounts = signal<Account[]>([]);
   protected readonly accountId = signal(CASH_ACCOUNT_ID);
-  protected readonly accountLabel = accountLabel;
+  protected readonly accountOptions = computed(() => accountOptions(this.accounts()));
   protected readonly amount = signal('');
   protected readonly date = signal(defaultDateFor(inject(MonthState).month()));
   protected readonly note = signal('');
@@ -178,6 +178,10 @@ export class NuevaTransaccionModalComponent implements OnInit {
     ]);
   }
 
+  protected addCategory(c: Category) {
+    this.categories.update((list) => [...list, c]);
+  }
+
   protected updatePart(index: number, change: Partial<Part>) {
     this.parts.update((list) => list.map((p, i) => (i === index ? { ...p, ...change } : p)));
   }
@@ -282,7 +286,7 @@ export class NuevaTransaccionModalComponent implements OnInit {
   /** Propone la categoría usada la última vez para este tipo, si todavía existe. */
   private async applyLastCategory() {
     const last = await this.container.settings.get(lastCategoryKey(this.kind()));
-    if (last && this.options().some((c) => c.id === last)) this.categoryId.set(last);
+    if (last && this.options().some((c) => c.id === last && !c.hidden)) this.categoryId.set(last);
   }
 
   /** Avisa (no bloquea) si ya hay un movimiento con la misma fecha, monto y categoría. */

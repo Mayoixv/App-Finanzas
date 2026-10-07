@@ -1,28 +1,27 @@
 import { Component, inject, signal, viewChild } from '@angular/core';
-import { IonSelect, IonSelectOption, IonToggle } from '@ionic/angular';
+import { SelectFieldComponent } from '../select/select-field.component';
+import { IonToggle } from '@ionic/angular';
 import { NotificationPrefs, NotificationsService } from '../notifications.service';
 
 /** Horas que se ofrecen, de 6:00 a 22:00. */
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6);
 
 /** Sección "Avisos" de Ajustes: activar las notificaciones, elegir cuáles y a qué hora. */
+const hourLabel = (h: number) => `${h}:00`;
+
 @Component({
   selector: 'app-avisos',
   templateUrl: 'avisos.component.html',
   styleUrls: ['avisos.component.scss'],
-  imports: [IonToggle, IonSelect, IonSelectOption],
+  imports: [SelectFieldComponent, IonToggle],
 })
 export class AvisosComponent {
   protected readonly notifications = inject(NotificationsService);
   protected readonly busy = signal(false);
   protected readonly error = signal('');
-  protected readonly hours = HOURS;
-  protected readonly allHours = Array.from({ length: 24 }, (_, i) => i);
+  protected readonly hourOptions = HOURS.map((h) => ({ value: h, label: hourLabel(h) }));
+  protected readonly allHourOptions = Array.from({ length: 24 }, (_, h) => ({ value: h, label: hourLabel(h) }));
   private readonly mainToggle = viewChild<IonToggle>('main');
-
-  protected hourLabel(h: number): string {
-    return `${h}:00`;
-  }
 
   protected async toggle(on: boolean) {
     if (on === this.notifications.enabled()) return;

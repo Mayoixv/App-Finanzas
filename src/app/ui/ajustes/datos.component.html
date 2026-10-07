@@ -76,17 +76,13 @@
         </li>
       }
       <li class="select-row">
-        <ion-select
+        <app-select-field
           label="Volver a pedirlo tras salir"
-          interface="action-sheet"
-          cancelText="Cancelar"
+          [inline]="true"
+          [options]="lockOptions"
           [value]="lock.lockAfterSeconds()"
-          (ionChange)="setLockAfter($event.detail.value)"
-        >
-          @for (o of lockOptions; track o.value) {
-            <ion-select-option [value]="o.value">{{ o.label }}</ion-select-option>
-          }
-        </ion-select>
+          (valueChange)="setLockAfter($event!)"
+        ></app-select-field>
       </li>
       <li>
         <button type="button" class="row" (click)="disablePin()">

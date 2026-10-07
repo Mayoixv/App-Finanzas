@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -29,7 +30,9 @@ const RATING_TEXT: Record<SavingsRating, string> = {
 interface RecentRow {
   id: string;
   transaction: Transaction;
-  initial: string;
+  /** Ícono y color de la categoría, para el círculo de la fila. */
+  icon: string;
+  color: string;
   title: string;
   subtitle: string;
   amount: string;
@@ -101,7 +104,7 @@ export class InicioPage {
           return {
             id: t.id,
             transaction: t,
-            initial: name.charAt(0).toUpperCase(),
+            ...lookOf(category ?? { type: isIncome ? 'ingreso' : 'variable' }),
             title: t.note || name,
             subtitle: `${name} · ${formatDay(t.date)}`,
             amount: `${isIncome ? '+' : '−'}${formatMoney(t.amount)}`,

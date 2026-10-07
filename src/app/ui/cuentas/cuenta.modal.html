@@ -9,17 +9,7 @@
 
     @if (!isCash()) {
       <div class="field">
-        <ion-select
-          label="Tipo"
-          label-placement="stacked"
-          cancelText="Cancelar"
-          [value]="type()"
-          (ionChange)="type.set($event.detail.value)"
-        >
-          @for (t of types; track t.value) {
-            <ion-select-option [value]="t.value">{{ t.label }}</ion-select-option>
-          }
-        </ion-select>
+        <app-select-field label="Tipo" [options]="types" [value]="type()" (valueChange)="type.set($event!)"></app-select-field>
       </div>
     }
 

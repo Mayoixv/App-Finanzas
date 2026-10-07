@@ -6,6 +6,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { lookOf } from '../category-look';
 import {
   AlertController,
   IonContent,
@@ -46,7 +47,9 @@ const BOTTOM_BAR_SPACE = 100;
 interface Row {
   id: string;
   transaction: Transaction;
-  initial: string;
+  /** Ícono y color de la categoría, para el círculo de la fila. */
+  icon: string;
+  color: string;
   title: string;
   subtitle: string;
   amount: string;
@@ -488,7 +491,7 @@ function toRow(t: Transaction, byId: Map<string, Category>): Row {
   return {
     id: t.id,
     transaction: t,
-    initial: categoryName.charAt(0).toUpperCase(),
+    ...lookOf(category ?? { type: isIncome ? 'ingreso' : 'variable' }),
     title: t.note || categoryName,
     subtitle: `${split ? `${categoryName} y ${t.splits!.length - 1} más` : categoryName} · ${formatDay(t.date)}`,
     amount: `${isIncome ? '+' : '−'}${formatMoney(t.amount)}`,

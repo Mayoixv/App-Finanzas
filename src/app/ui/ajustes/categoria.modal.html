@@ -7,7 +7,12 @@
       </button>
     </header>
 
-    @if (isEdit()) {
+    <div class="preview" aria-hidden="true">
+      <span class="preview-dot" [style.background]="look().color"><ion-icon [name]="look().icon"></ion-icon></span>
+      <span class="preview-name">{{ name().trim() || 'Nombre' }}</span>
+    </div>
+
+    @if (isEdit() || newType) {
       <p class="fixed-type">
         <span class="fixed-label">Tipo</span>
         {{ typeLabel[type()] }}
@@ -26,11 +31,52 @@
       <ion-input
         label="Nombre"
         label-placement="stacked"
-        placeholder="Mascotas, educación, propinas"
+        placeholder="Mascotas, gimnasio, propinas"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
     </div>
+
+    <p class="group-label" id="icon-label">Ícono</p>
+    <div class="icons" role="radiogroup" aria-labelledby="icon-label">
+      @for (i of icons; track i) {
+        <button
+          type="button"
+          role="radio"
+          class="icon-choice"
+          [attr.aria-checked]="look().icon === i"
+          [attr.aria-label]="iconLabel[i]"
+          [style.--c]="look().color"
+          (click)="icon.set(i)"
+        >
+          <ion-icon [name]="i" aria-hidden="true"></ion-icon>
+        </button>
+      }
+    </div>
+
+    <p class="group-label" id="color-label">Color</p>
+    <div class="colors" role="radiogroup" aria-labelledby="color-label">
+      @for (c of colors; track c; let n = $index) {
+        <button
+          type="button"
+          role="radio"
+          class="color-choice"
+          [attr.aria-checked]="look().color === c"
+          [attr.aria-label]="'Color ' + (n + 1)"
+          [style.background]="c"
+          (click)="color.set(c)"
+        ></button>
+      }
+    </div>
+
+    @if (isEdit()) {
+      <div class="field toggle-field">
+        <ion-toggle justify="space-between" [checked]="hidden()" (ionChange)="hidden.set($event.detail.checked)">
+          <span class="toggle-title">Ocultar</span>
+          <span class="toggle-sub">No aparece al elegir. Sus movimientos no cambian.</span>
+        </ion-toggle>
+      </div>
+    }
 
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
@@ -40,8 +86,27 @@
       {{ isEdit() ? 'Guardar cambios' : 'Guardar categoría' }}
     </button>
 
-    @if (isEdit()) {
-      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar categoría</button>
+    @if (isEdit() && !builtIn()) {
+      @if (moveOptions(); as options) {
+        <div class="move" role="group" aria-labelledby="move-title">
+          <p class="move-title" id="move-title">Tiene movimientos o fijos. ¿A qué categoría los pasamos?</p>
+          @if (options.length === 0) {
+            <p class="hint">Crea otra categoría de este tipo primero, u ocúltala.</p>
+          } @else {
+            <div class="field">
+              <app-select-field label="Pasar a" placeholder="Elige una categoría" [options]="options" [(value)]="moveTo"></app-select-field>
+            </div>
+            <button type="button" class="delete" [disabled]="!moveTo() || saving()" (click)="delete()">
+              Pasar y eliminar
+            </button>
+          }
+        </div>
+      } @else {
+        <button type="button" class="delete" [disabled]="saving()" (click)="startDelete()">Eliminar categoría</button>
+      }
+    }
+    @if (builtIn()) {
+      <p class="hint">Es una categoría de la app: puedes cambiarla u ocultarla, pero no borrarla.</p>
     }
   </div>
 

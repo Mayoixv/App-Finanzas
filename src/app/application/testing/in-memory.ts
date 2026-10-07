@@ -28,6 +28,8 @@ export class InMemoryCategories implements ICategoryRepository {
   /** Los tests marcan aquí qué categorías simulan estar en uso. */
   inUse = new Set<string>();
   async isInUse(id: string) { return this.inUse.has(id); }
+  movedTo = new Map<string, string>();
+  async deleteMovingTo(id: string, toId: string) { this.movedTo.set(id, toId); this.items.delete(id); }
 }
 
 export class InMemoryTransactions implements ITransactionRepository {

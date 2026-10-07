@@ -14,18 +14,12 @@
 
     @if (!splitOn()) {
       <div class="field">
-        <ion-select
-          label="Categoría"
-          label-placement="stacked"
-          placeholder="Elige una categoría"
-          cancelText="Cancelar"
-          [value]="categoryId()"
-          (ionChange)="categoryId.set($event.detail.value)"
-        >
-          @for (c of options(); track c.id) {
-            <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
-          }
-        </ion-select>
+        <app-category-field
+          [categories]="options()"
+          [newType]="kind() === 'ingreso' ? 'ingreso' : 'variable'"
+          [(value)]="categoryId"
+          (created)="addCategory($event)"
+        ></app-category-field>
       </div>
     }
 
@@ -44,17 +38,12 @@
 
     @if (accounts().length > 1) {
       <div class="field">
-        <ion-select
+        <app-select-field
           [label]="kind() === 'ingreso' ? 'Entra a' : 'Sale de'"
-          label-placement="stacked"
-          cancelText="Cancelar"
+          [options]="accountOptions()"
           [value]="accountId()"
-          (ionChange)="accountId.set($event.detail.value)"
-        >
-          @for (a of accounts(); track a.id) {
-            <ion-select-option [value]="a.id">{{ accountLabel(a) }}</ion-select-option>
-          }
-        </ion-select>
+          (valueChange)="accountId.set($event!)"
+        ></app-select-field>
       </div>
     }
 
@@ -68,18 +57,14 @@
         @for (part of parts(); track $index; let i = $index) {
           <div class="part">
             <div class="field part-category">
-              <ion-select
+              <app-category-field
                 [label]="'Parte ' + (i + 1)"
-                label-placement="stacked"
-                placeholder="Categoría"
-                cancelText="Cancelar"
+                [categories]="options()"
+                [newType]="kind() === 'ingreso' ? 'ingreso' : 'variable'"
                 [value]="part.categoryId"
-                (ionChange)="updatePart(i, { categoryId: $event.detail.value })"
-              >
-                @for (c of options(); track c.id) {
-                  <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
-                }
-              </ion-select>
+                (valueChange)="updatePart(i, { categoryId: $event })"
+                (created)="addCategory($event)"
+              ></app-category-field>
             </div>
             <div class="field part-amount">
               <ion-input

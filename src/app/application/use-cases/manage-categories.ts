@@ -1,4 +1,4 @@
-import { Category, CategoryType } from '../../domain/category';
+import { Category, CategoryType, isBuiltIn } from '../../domain/category';
 import { NotFoundError, ValidationError } from '../errors';
 import { ICategoryRepository, IdGenerator } from '../ports/repositories';
 
@@ -19,48 +19,65 @@ async function validName(
   return trimmed;
 }
 
+export interface CategoryLook {
+  icon?: string;
+  color?: string;
+}
+
 export class AddCategory {
   constructor(
     private readonly categories: ICategoryRepository,
     private readonly ids: IdGenerator,
   ) {}
 
-  async execute(input: { name: string; type: CategoryType }): Promise<Category> {
+  async execute(input: { name: string; type: CategoryType } & CategoryLook): Promise<Category> {
     if (!TYPES.includes(input.type)) throw new ValidationError('Tipo de categoría inválido');
     const category: Category = {
       id: this.ids.next(),
       name: await validName(input.name, this.categories),
       type: input.type,
+      icon: input.icon,
+      color: input.color,
     };
     await this.categories.save(category);
     return category;
   }
 }
 
-/** Solo cambia el nombre: cambiar el tipo alteraría el sentido de los movimientos ya registrados. */
-export class RenameCategory {
+/** Cambia nombre, ícono, color u ocultarla. El tipo no cambia: alteraría el sentido de los movimientos ya registrados. */
+export class UpdateCategory {
   constructor(private readonly categories: ICategoryRepository) {}
 
-  async execute(id: string, name: string): Promise<Category> {
+  async execute(id: string, changes: { name?: string; hidden?: boolean } & CategoryLook): Promise<Category> {
     const current = await this.categories.get(id);
     if (!current) throw new NotFoundError('Categoría');
-    const renamed = { ...current, name: await validName(name, this.categories, id) };
-    await this.categories.save(renamed);
-    return renamed;
+    const updated: Category = {
+      ...current,
+      ...changes,
+      name: changes.name === undefined ? current.name : await validName(changes.name, this.categories, id),
+    };
+    await this.categories.save(updated);
+    return updated;
   }
 }
 
 export class DeleteCategory {
   constructor(private readonly categories: ICategoryRepository) {}
 
-  /** Solo si nada la usa. Sus presupuestos se borran con ella. */
-  async execute(id: string): Promise<void> {
-    if (!(await this.categories.get(id))) throw new NotFoundError('Categoría');
-    if (await this.categories.isInUse(id)) {
-      throw new ValidationError(
-        'Esta categoría tiene movimientos o gastos fijos. Cámbiales la categoría o bórralos antes de eliminarla.',
-      );
-    }
-    await this.categories.delete(id);
+  /**
+   * Las de la app no se borran (se ocultan). Una propia que se usa necesita `moveTo`: otra categoría del mismo tipo
+   * que recibe sus movimientos y fijos, para que nada quede sin categoría. Sus presupuestos se borran con ella.
+   */
+  async execute(id: string, moveTo?: string): Promise<void> {
+    const category = await this.categories.get(id);
+    if (!category) throw new NotFoundError('Categoría');
+    if (isBuiltIn(category)) throw new ValidationError('Las categorías de la app no se borran. Puedes ocultarla.');
+    if (!(await this.categories.isInUse(id))) return this.categories.delete(id);
+
+    if (!moveTo) throw new ValidationError('Elige a qué categoría pasar sus movimientos');
+    const target = await this.categories.get(moveTo);
+    if (!target || target.id === id) throw new NotFoundError('Categoría');
+    if (target.type !== category.type) throw new ValidationError('Elige una categoría del mismo tipo');
+    await this.categories.deleteMovingTo(id, moveTo);
   }
 }

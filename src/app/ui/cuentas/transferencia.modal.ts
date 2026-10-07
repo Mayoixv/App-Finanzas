@@ -1,5 +1,6 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
-import { AlertController, IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, ModalController } from '@ionic/angular';
+import { SelectFieldComponent } from '../select/select-field.component';
+import { AlertController, IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -9,7 +10,7 @@ import { UndoService } from '../undo.service';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, parseAmount, todayIso } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
-import { accountLabel } from './account-choices';
+import { accountOptions } from './account-choices';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -18,7 +19,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   selector: 'app-transferencia-modal',
   templateUrl: 'transferencia.modal.html',
   styleUrls: ['transferencia.modal.scss'],
-  imports: [IonContent, IonIcon, IonInput, IonSelect, IonSelectOption, SuccessCheckComponent],
+  imports: [SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class TransferenciaModalComponent implements OnInit {
   private readonly container = inject(APP_CONTAINER);
@@ -42,7 +43,8 @@ export class TransferenciaModalComponent implements OnInit {
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
   protected readonly currency = inject(CurrencyState).currency;
-  protected readonly accountLabel = accountLabel;
+  protected readonly accountOptions = computed(() => accountOptions(this.accounts()));
+  protected readonly toOptions = computed(() => this.accountOptions().filter((o) => o.value !== this.from()));
 
   /** Pagar una tarjeta es una transferencia hacia ella: se dice así para que se entienda. */
   protected readonly isCardPayment = computed(() => {
