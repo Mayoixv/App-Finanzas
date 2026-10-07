@@ -12,8 +12,15 @@
   } @else if (rows(); as list) {
     @if (list.length === 0) {
       <section class="empty">
-        <p class="empty-title">Aún no tienes gastos fijos en {{ monthState.label() }}.</p>
-        <p class="empty-text">Toca el botón + para agregar el primero: alquiler, internet, una suscripción.</p>
+        @if (hasAny()) {
+          <p class="empty-title">Nada que pagar en {{ monthState.label() }}</p>
+          <p class="empty-text">Tus fijos de otros meses no tocan este mes.</p>
+          <button type="button" class="btn-primary empty-action" (click)="add()">Agregar pago fijo</button>
+        } @else {
+          <p class="empty-title">Agrega tu primer pago fijo</p>
+          <p class="empty-text">Alquiler, luz, internet o tu sueldo. Lo anotas una vez y aparece cada mes.</p>
+          <button type="button" class="btn-primary empty-action" (click)="add()">Agregar pago fijo</button>
+        }
       </section>
     } @else {
       <section class="summary" aria-labelledby="pendiente-label">

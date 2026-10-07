@@ -42,6 +42,11 @@ export class GetMonthRecurringExpenses {
     return result.sort((a, b) => a.instance.dueDate.localeCompare(b.instance.dueDate));
   }
 
+  /** Si hay algún fijo activo, aunque no toque ese mes (para el mensaje cuando el mes está vacío). */
+  async hasActive(): Promise<boolean> {
+    return (await this.recurring.list()).some((e) => e.active);
+  }
+
   /** Plantillas activas en pausa ese mes, para poder reanudarlas aunque no tengan instancia. */
   async pausedIn(month: MonthKey): Promise<RecurringExpense[]> {
     return (await this.recurring.list()).filter(

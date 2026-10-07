@@ -86,6 +86,8 @@ export class FijosPage {
     percentPaid: 0,
   });
   protected readonly paused = signal<RecurringExpense[]>([]);
+  /** Si el usuario ya tiene algún fijo activo (aunque no le toque este mes). */
+  protected readonly hasAny = signal(false);
   protected readonly subscriptions = signal<SubscriptionCost | null>(null);
   protected readonly installments = signal<DebtInstallment[]>([]);
   private readonly dineroForm = inject(DineroFormService);
@@ -106,6 +108,10 @@ export class FijosPage {
       this.monthState.version();
       this.load(month);
     });
+  }
+
+  protected add() {
+    this.form.open();
   }
 
   protected edit(row: Row) {
@@ -168,13 +174,14 @@ export class FijosPage {
   private async load(month: string) {
     const seq = ++this.loadSeq;
     try {
-      const [items, paused, categories, subscriptions, installments] =
+      const [items, paused, categories, subscriptions, installments, all] =
         await Promise.all([
           this.container.getMonthRecurringExpenses.execute(month),
           this.container.getMonthRecurringExpenses.pausedIn(month),
           this.container.categories.list(),
           this.container.getSubscriptionCost.execute(month),
           this.container.getDebtInstallments.execute(month),
+          this.container.getMonthRecurringExpenses.hasActive(),
         ]);
       if (seq !== this.loadSeq) return;
       this.installments.set(installments);
@@ -189,6 +196,7 @@ export class FijosPage {
         ),
       );
       this.paused.set(paused);
+      this.hasAny.set(all);
 
       // El resumen es de gastos; los ingresos fijos se cuentan aparte como "por recibir".
       const expenses = items.filter(

@@ -60,7 +60,8 @@ async function render(withData: boolean) {
 describe('FijosPage', () => {
   it('sin gastos fijos invita a agregar el primero', async () => {
     const { el } = await render(false);
-    expect(el.textContent).toContain('Aún no tienes gastos fijos');
+    expect(el.textContent).toContain('Agrega tu primer pago fijo');
+    expect(el.querySelector('.empty-action')?.textContent).toContain('Agregar pago fijo');
   });
 
   it('muestra el gasto pendiente y al marcarlo pagado crea la transacción y actualiza el estado', async () => {

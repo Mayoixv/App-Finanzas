@@ -197,6 +197,12 @@
   line-height: 1.5;
 }
 
+.empty-action {
+  position: relative;
+  margin-top: 28px;
+  padding-inline: 32px;
+}
+
 .edit {
   flex: none;
   display: grid;
