@@ -8,11 +8,15 @@
     </header>
 
     <div class="field">
-      <app-select-field label="Desde" placeholder="Elige una cuenta" [options]="accountOptions()" [(value)]="from"></app-select-field>
+      <app-select-field label="Sale de" placeholder="Elige una cuenta" [options]="accountOptions()" [(value)]="from"></app-select-field>
     </div>
 
+    <button type="button" class="swap" aria-label="Intercambiar: que salga de la otra cuenta" [disabled]="!from() || !to()" (click)="swap()">
+      <ion-icon name="swap-vertical" aria-hidden="true"></ion-icon>
+    </button>
+
     <div class="field">
-      <app-select-field label="Hacia" placeholder="Elige una cuenta" [options]="toOptions()" [(value)]="to"></app-select-field>
+      <app-select-field label="Entra a" placeholder="Elige una cuenta" [options]="toOptions()" [(value)]="to"></app-select-field>
     </div>
 
     <div class="field">
@@ -27,6 +31,20 @@
         (ionInput)="amount.set(($event.detail.value ?? '').toString())"
       ></ion-input>
     </div>
+
+    @if (preview(); as rows) {
+      <dl class="preview" aria-live="polite">
+        @for (r of rows; track r.name) {
+          <div class="preview-row">
+            <dt>{{ r.name }}</dt>
+            <dd><span>{{ money(r.before) }}</span><span class="arrow" aria-label="pasa a">→</span><strong [class.negative]="r.after < 0">{{ money(r.after) }}</strong></dd>
+          </div>
+        }
+      </dl>
+      @if (warning(); as w) {
+        <p class="warning" role="alert">{{ w }}</p>
+      }
+    }
 
     <div class="field">
       <app-date-field label="Fecha" [(value)]="date"></app-date-field>

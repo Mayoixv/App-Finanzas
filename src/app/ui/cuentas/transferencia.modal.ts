@@ -3,13 +3,13 @@ import { DateFieldComponent } from '../select/date-field.component';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { AlertController, IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { close } from 'ionicons/icons';
+import { close, swapVertical } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { NotFoundError, ValidationError } from '../../application/errors';
 import { Account, isCard, Transfer } from '../../domain/account';
 import { UndoService } from '../undo.service';
 import { CurrencyState } from '../currency-state';
-import { amountToInput, parseAmount, todayIso } from '../format';
+import { amountToInput, formatMoney, parseAmount, todayIso } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
 import { accountOptions } from './account-choices';
 
@@ -44,7 +44,30 @@ export class TransferenciaModalComponent implements OnInit {
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
   protected readonly currency = inject(CurrencyState).currency;
+  protected readonly money = formatMoney;
+  /** Saldo de cada cuenta sin esta transferencia (al editar se descuenta lo que ya movía). */
+  private readonly balances = signal(new Map<string, number>());
   protected readonly accountOptions = computed(() => accountOptions(this.accounts()));
+
+  /** Cómo quedan las dos cuentas, para ver antes de guardar que el dinero va en la dirección correcta. */
+  protected readonly preview = computed(() => {
+    const from = this.accounts().find((a) => a.id === this.from());
+    const to = this.accounts().find((a) => a.id === this.to());
+    const amount = parseAmount(this.amount());
+    if (!from || !to || from.id === to.id || amount === null) return null;
+    const before = (a: Account) => this.balances().get(a.id) ?? a.initialBalance;
+    return [
+      { account: from, name: from.name, before: before(from), after: before(from) - amount },
+      { account: to, name: to.name, before: before(to), after: before(to) + amount },
+    ];
+  });
+
+  /** No bloquea (puede ser un sobregiro real), pero avisa: casi siempre es que se eligieron al revés. */
+  protected readonly warning = computed(() => {
+    const out = this.preview()?.[0];
+    if (!out || isCard(out.account) || out.after >= 0) return null;
+    return `${out.name} quedaría en ${formatMoney(out.after)}. Revisa que "Sale de" y "Entra a" estén bien.`;
+  });
   protected readonly toOptions = computed(() => this.accountOptions().filter((o) => o.value !== this.from()));
 
   /** Pagar una tarjeta es una transferencia hacia ella: se dice así para que se entienda. */
@@ -58,7 +81,7 @@ export class TransferenciaModalComponent implements OnInit {
   );
 
   constructor() {
-    addIcons({ close });
+    addIcons({ close, swapVertical });
   }
 
   async ngOnInit() {
@@ -68,6 +91,12 @@ export class TransferenciaModalComponent implements OnInit {
       (a) => !a.archived || a.id === t?.fromAccountId || a.id === t?.toAccountId,
     );
     this.accounts.set(active);
+    const balances = await this.container.accounts.balances();
+    if (t) {
+      balances.set(t.fromAccountId, (balances.get(t.fromAccountId) ?? 0) + t.amount);
+      balances.set(t.toAccountId, (balances.get(t.toAccountId) ?? 0) - t.amount);
+    }
+    this.balances.set(balances);
     if (t) {
       this.from.set(t.fromAccountId);
       this.to.set(t.toAccountId);
@@ -105,6 +134,12 @@ export class TransferenciaModalComponent implements OnInit {
       this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
       this.saving.set(false);
     }
+  }
+
+  protected swap() {
+    const from = this.from();
+    this.from.set(this.to());
+    this.to.set(from);
   }
 
   protected cancel() {
