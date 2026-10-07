@@ -191,6 +191,25 @@ export const MIGRATIONS: Migration[] = [
       `CREATE INDEX idx_transfers_date ON transfers(date)`,
     ],
   },
+  {
+    version: 9,
+    name: 'fijos omitidos un mes',
+    statements: [
+      `CREATE TABLE recurring_instances_new (
+         recurring_expense_id TEXT NOT NULL REFERENCES recurring_expenses(id) ON DELETE CASCADE,
+         month                TEXT NOT NULL,
+         due_date             TEXT NOT NULL,
+         amount               REAL NOT NULL,
+         status               TEXT NOT NULL CHECK (status IN ('pagado', 'pendiente', 'omitido')),
+         transaction_id       TEXT REFERENCES transactions(id) ON DELETE SET NULL,
+         PRIMARY KEY (recurring_expense_id, month)
+       )`,
+      `INSERT INTO recurring_instances_new (recurring_expense_id, month, due_date, amount, status, transaction_id)
+       SELECT recurring_expense_id, month, due_date, amount, status, transaction_id FROM recurring_instances`,
+      `DROP TABLE recurring_instances`,
+      `ALTER TABLE recurring_instances_new RENAME TO recurring_instances`,
+    ],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

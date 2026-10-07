@@ -1,4 +1,8 @@
 import { NodeSqliteDatabase } from './testing/node-sqlite-database';
+import { AddRecurringExpense } from '../application/use-cases/add-recurring-expense';
+import { GetMonthRecurringExpenses } from '../application/use-cases/get-month-recurring-expenses';
+import { PayRecurringExpense } from '../application/use-cases/pay-recurring-expense';
+import { RemoveRecurringExpense } from '../application/use-cases/remove-recurring-expense';
 import { Migration, MIGRATIONS, runMigrations } from './sqlite/migrations';
 import {
   SqliteBudgetRepository,
@@ -251,5 +255,83 @@ describe('migración 8: cuentas', () => {
     expect(await accounts.isInUse('v')).toBe(true);
     expect((await accounts.get('v'))?.creditLimit).toBe(50000);
     expect((await accounts.list()).map((a) => a.id)[0]).toBe('acc-efectivo');
+  });
+});
+
+describe('fijo eliminado que reaparecía (beta)', () => {
+  async function setup() {
+    const db = new NodeSqliteDatabase();
+    await runMigrations(db);
+    const recurring = new SqliteRecurringExpenseRepository(db);
+    const transactions = new SqliteTransactionRepository(db);
+    const ids = { n: 0, next() { return `id-${++this.n}`; } };
+    const categories = new SqliteCategoryRepository(db);
+    const add = new AddRecurringExpense(recurring, categories, ids);
+    // "Abrir la app" = leer el mes con un caso de uso nuevo sobre la misma base.
+    const open = (month: string) => new GetMonthRecurringExpenses(recurring).execute(month);
+    const names = async (month: string) => (await open(month)).map((i) => `${i.expense.name}:${i.instance.status}`);
+    return { db, recurring, transactions, ids, add, open, names, remove: new RemoveRecurringExpense(recurring) };
+  }
+
+  it('crear, eliminar y volver a abrir: no reaparece', async () => {
+    const s = await setup();
+    const e = await s.add.execute({ name: 'Alquiler', amount: 1_500_000, categoryId: 'cat-alquiler', dueDay: 5, startMonth: '2026-10' });
+    await s.open('2026-10');
+    await s.open('2026-11');
+    expect(await s.remove.execute(e.id, '2026-10', 'forward')).toBe('deleted');
+    expect(await s.names('2026-10')).toEqual([]);
+    expect(await s.names('2026-11')).toEqual([]);
+  });
+
+  it('pagado y luego eliminado en el mismo mes: sale de Fijos y el pago sigue en Movimientos', async () => {
+    const s = await setup();
+    const e = await s.add.execute({ name: 'Luz', amount: 200_000, categoryId: 'cat-servicios', dueDay: 3, startMonth: '2026-10' });
+    await s.open('2026-10');
+    await new PayRecurringExpense(s.recurring, s.transactions, s.ids).execute({ recurringExpenseId: e.id, month: '2026-10', paidDate: '2026-10-03' });
+    await s.remove.execute(e.id, '2026-10', 'forward');
+    expect(await s.names('2026-10')).toEqual([]);
+    expect((await s.transactions.listByMonth('2026-10')).map((t) => t.note)).toEqual(['Luz']);
+  });
+
+  it('eliminado mirando un mes posterior: no queda pendiente el mes anterior; lo pagado antes se conserva', async () => {
+    const s = await setup();
+    const e = await s.add.execute({ name: 'Internet', amount: 150_000, categoryId: 'cat-servicios', dueDay: 20, startMonth: '2026-09' });
+    await s.open('2026-09');
+    await new PayRecurringExpense(s.recurring, s.transactions, s.ids).execute({ recurringExpenseId: e.id, month: '2026-09', paidDate: '2026-09-20' });
+    await s.open('2026-10');
+    await s.open('2026-11');
+    expect(await s.remove.execute(e.id, '2026-11', 'forward')).toBe('ended');
+    expect(await s.names('2026-09')).toEqual(['Internet:pagado']);
+    expect(await s.names('2026-10')).toEqual([]);
+    expect(await s.names('2026-12')).toEqual([]);
+  });
+
+  it('solo este mes: ese mes no aparece ni se vuelve a crear, el siguiente sí', async () => {
+    const s = await setup();
+    const e = await s.add.execute({ name: 'Gym', amount: 90_000, categoryId: 'cat-servicios', dueDay: 1, startMonth: '2026-10' });
+    await s.open('2026-10');
+    expect(await s.remove.execute(e.id, '2026-10', 'month')).toBe('skipped');
+    expect(await s.names('2026-10')).toEqual([]);
+    expect(await s.names('2026-11')).toEqual(['Gym:pendiente']);
+  });
+
+  it('una lectura que empezó antes de eliminar no puede volver a crearlo', async () => {
+    const s = await setup();
+    const e = await s.add.execute({ name: 'Agua', amount: 80_000, categoryId: 'cat-servicios', dueDay: 9, startMonth: '2026-10' });
+    // Inicio y las notificaciones leen el mes a la vez que se elimina.
+    await Promise.all([s.open('2026-10'), s.remove.execute(e.id, '2026-10', 'forward'), s.open('2026-10')]);
+    expect(await s.names('2026-10')).toEqual([]);
+    expect(await s.db.all('SELECT * FROM recurring_instances')).toEqual([]);
+  });
+
+  it('la migración 9 conserva los pagos de los fijos', async () => {
+    const db = new NodeSqliteDatabase();
+    await runMigrations(db, MIGRATIONS.filter((m) => m.version <= 8));
+    await db.run("INSERT INTO recurring_expenses (id, name, amount, category_id, due_day, active, start_month) VALUES ('r', 'Luz', 100, 'cat-servicios', 3, 1, '2026-10')");
+    await db.run("INSERT INTO recurring_instances (recurring_expense_id, month, due_date, amount, status) VALUES ('r', '2026-10', '2026-10-03', 100, 'pagado')");
+    await runMigrations(db);
+    expect(await db.all('SELECT recurring_expense_id, month, status FROM recurring_instances')).toEqual([
+      { recurring_expense_id: 'r', month: '2026-10', status: 'pagado' },
+    ]);
   });
 });

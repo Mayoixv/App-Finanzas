@@ -270,11 +270,14 @@ export class SqliteRecurringExpenseRepository implements IRecurringExpenseReposi
 
   async insertInstanceIfMissing(i: RecurringExpenseInstance): Promise<void> {
     await this.db.run(
+      // Con la condición dentro de la misma instrucción, una lectura que empezó antes de eliminar el fijo no
+      // puede volver a crearlo después.
       `INSERT INTO recurring_instances
          (recurring_expense_id, month, due_date, amount, status, transaction_id)
-       VALUES (?, ?, ?, ?, ?, ?)
+       SELECT ?, ?, ?, ?, ?, ?
+       WHERE EXISTS (SELECT 1 FROM recurring_expenses WHERE id = ? AND active = 1)
        ON CONFLICT(recurring_expense_id, month) DO NOTHING`,
-      [i.recurringExpenseId, i.month, i.dueDate, i.amount, i.status, i.transactionId ?? null],
+      [i.recurringExpenseId, i.month, i.dueDate, i.amount, i.status, i.transactionId ?? null, i.recurringExpenseId],
     );
   }
 

@@ -37,7 +37,7 @@ export class GetMonthRecurringExpenses {
     const result: MonthRecurringExpense[] = [];
     for (const instance of instances) {
       const expense = byId.get(instance.recurringExpenseId);
-      if (expense) result.push({ expense, instance });
+      if (expense && instance.status !== 'omitido') result.push({ expense, instance });
     }
     return result.sort((a, b) => a.instance.dueDate.localeCompare(b.instance.dueDate));
   }

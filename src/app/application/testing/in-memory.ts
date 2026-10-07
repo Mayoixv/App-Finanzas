@@ -67,7 +67,7 @@ export class InMemoryRecurring implements IRecurringExpenseRepository {
     const exists = this.instances.some(
       (i) => i.recurringExpenseId === instance.recurringExpenseId && i.month === instance.month,
     );
-    if (!exists) this.instances.push(instance);
+    if (!exists && this.items.get(instance.recurringExpenseId)?.active) this.instances.push(instance);
   }
   async listInstancesOf(expenseId: string) {
     return this.instances

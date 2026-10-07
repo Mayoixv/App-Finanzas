@@ -22,7 +22,8 @@ export interface RecurringExpense {
   pausedUntil?: MonthKey | null;
 }
 
-export type PaymentStatus = 'pagado' | 'pendiente';
+/** 'omitido': el usuario quitó el fijo solo ese mes; la fila evita que se vuelva a crear. */
+export type PaymentStatus = 'pagado' | 'pendiente' | 'omitido';
 
 /** Instancia mensual de una plantilla. */
 export interface RecurringExpenseInstance {
@@ -54,7 +55,6 @@ export function markPaid(
   return { ...instance, status: 'pagado', transactionId };
 }
 
-/** Si la plantilla genera instancia en ese mes: desde su inicio, cada `frequency` meses y fuera de una pausa. */
 /** Si el fijo ya empezó y no está en pausa ese mes (sin mirar la frecuencia). */
 export function isRunningIn(expense: RecurringExpense, month: MonthKey): boolean {
   return month >= expense.startMonth && !(expense.pausedUntil && month <= expense.pausedUntil);
@@ -64,6 +64,7 @@ export function isPausedIn(expense: RecurringExpense, month: MonthKey): boolean 
   return month >= expense.startMonth && !!expense.pausedUntil && month <= expense.pausedUntil;
 }
 
+/** Si la plantilla genera instancia en ese mes: desde su inicio, cada `frequency` meses y fuera de una pausa. */
 export function isDueIn(expense: RecurringExpense, month: MonthKey): boolean {
   return isRunningIn(expense, month) && monthsBetween(expense.startMonth, month) % (expense.frequency ?? 1) === 0;
 }

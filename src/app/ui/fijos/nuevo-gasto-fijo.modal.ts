@@ -195,23 +195,26 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected async confirmDelete() {
     const e = this.expense;
     if (!e) return;
+    const label = this.monthState.label();
+    const month = label.charAt(0).toLocaleLowerCase('es') + label.slice(1);
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar fijo',
-      message: `${e.name} dejará de aparecer desde ${this.monthState.label()} en adelante. Los pagos ya registrados se conservan.`,
+      header: `Eliminar ${e.name}`,
+      message: `Los pagos ya registrados se quedan en Movimientos.`,
       buttons: [
+        { text: `Solo ${month}`, role: 'month' },
+        { text: 'Este mes y los siguientes', role: 'forward' },
         { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
       ],
     });
     await alert.present();
     const { role } = await alert.onDidDismiss();
-    if (role !== 'destructive') return;
+    if (role !== 'month' && role !== 'forward') return;
 
     this.saving.set(true);
     this.error.set(null);
     try {
-      await this.container.removeRecurringExpense.execute(e.id, this.monthState.month());
+      await this.container.removeRecurringExpense.execute(e.id, this.monthState.month(), role);
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (err) {
       console.error(err);
@@ -219,4 +222,5 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       this.saving.set(false);
     }
   }
+
 }
