@@ -63,14 +63,11 @@
         <div class="step">
           <h1 class="title">{{ name().trim() ? '¿Te mostramos cómo funciona, ' + name().trim() + '?' : '¿Te mostramos cómo funciona?' }}</h1>
           <p class="text">Un recorrido corto por lo que puedes hacer en cada sección. También lo encuentras luego en Ajustes.</p>
-          <button type="button" class="btn-primary main" (click)="goTo('tutorial')">Ver el recorrido</button>
+          <button type="button" class="btn-primary main" [disabled]="busy()" (click)="finish(true)">Ver el recorrido</button>
           <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="finish()">Saltar</button>
         </div>
       }
 
-      @case ('tutorial') {
-        <app-tutorial (finished)="finish()"></app-tutorial>
-      }
     }
   </div>
 </ion-content>

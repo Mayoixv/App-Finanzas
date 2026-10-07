@@ -1,5 +1,6 @@
 <ion-app>
   <!-- Bloqueada, el contenido de detrás queda inaccesible para el teclado y los lectores de pantalla. -->
   <ion-router-outlet [attr.inert]="lock.locked() ? '' : null"></ion-router-outlet>
+  <app-tour></app-tour>
   <app-lock-screen></app-lock-screen>
 </ion-app>

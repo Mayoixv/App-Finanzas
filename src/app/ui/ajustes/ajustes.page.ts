@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TourService } from '../tour/tour.service';
 import { AlertController, IonContent, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmark, chevronBack, chevronDown, chevronForward } from 'ionicons/icons';
@@ -39,6 +40,7 @@ export class AjustesPage {
   private readonly monthState = inject(MonthState);
   protected readonly currencyState = inject(CurrencyState);
   private readonly alerts = inject(AlertController);
+  protected readonly tour = inject(TourService);
   protected readonly userName = signal('');
   protected readonly showPrivacy = signal(false);
   protected readonly version = APP_VERSION;

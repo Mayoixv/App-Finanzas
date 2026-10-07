@@ -1,0 +1,174 @@
+:host {
+  --tour-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+// Bloquea los toques fuera del elemento resaltado (en los pasos de acción deja un hueco sobre él).
+.catcher {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+// El oscurecido es la sombra enorme del hueco: así el hueco puede moverse suave de un elemento a otro.
+.hole {
+  position: fixed;
+  z-index: 1001;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 2px var(--violet-400),
+    0 0 0 200vmax rgba(10, 10, 18, 0.74);
+  pointer-events: none;
+  transition:
+    left 0.4s var(--tour-ease),
+    top 0.4s var(--tour-ease),
+    width 0.4s var(--tour-ease),
+    height 0.4s var(--tour-ease),
+    opacity 0.2s ease;
+  animation: t-tour-fade 0.3s ease both;
+
+  &:not(.ready) {
+    box-shadow: 0 0 0 200vmax rgba(10, 10, 18, 0.74);
+  }
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card {
+  position: fixed;
+  z-index: 1002;
+  left: 16px;
+  right: 16px;
+  bottom: calc(var(--ion-safe-area-bottom, 0px) + 16px);
+  display: flex;
+  flex-direction: column;
+  max-height: 46vh;
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-glow);
+  background: var(--ink-800);
+  color: var(--text-on-dark);
+  box-shadow: 0 24px 48px -16px rgba(10, 10, 18, 0.7);
+  animation: t-tour-card 0.4s var(--tour-ease) both;
+  outline: none;
+
+  &.top {
+    top: calc(var(--ion-safe-area-top, 0px) + 16px);
+    bottom: auto;
+  }
+}
+
+// El texto tiene su propio espacio y desplazamiento; el pie nunca lo tapa.
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 20px 8px;
+  animation: t-tour-text 0.32s var(--tour-ease) both;
+}
+
+.progress {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--violet-400);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.text {
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text-on-dark);
+}
+
+.foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.skip {
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back,
+.next {
+  min-height: 48px;
+  padding: 0 20px;
+}
+
+.back {
+  border-color: var(--violet-400);
+  color: var(--text-on-dark);
+}
+
+.skip:focus-visible,
+.back:focus-visible,
+.next:focus-visible {
+  outline: 3px solid var(--violet-400);
+  outline-offset: 2px;
+}
+
+@keyframes t-tour-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes t-tour-card {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+@keyframes t-tour-text {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hole,
+  .card,
+  .content {
+    animation: none;
+    transition: none;
+  }
+}

@@ -32,10 +32,6 @@ export const routes: Routes = [
     loadComponent: () => import('./ui/ajustes/ajustes.page').then((m) => m.AjustesPage),
   },
   {
-    path: 'tutorial',
-    loadComponent: () => import('./ui/tutorial/tutorial.page').then((m) => m.TutorialPage),
-  },
-  {
     path: 'reportes',
     loadComponent: () => import('./ui/reportes/reportes.page').then((m) => m.ReportesPage),
   },

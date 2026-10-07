@@ -19,10 +19,10 @@
         </button>
       </li>
       <li>
-        <a routerLink="/tutorial" class="row">
-          <span class="row-title">Ver el recorrido de la app</span>
+        <button type="button" class="row" (click)="tour.start()">
+          <span class="row-title">Ver recorrido otra vez</span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </a>
+        </button>
       </li>
     </ul>
   </section>
