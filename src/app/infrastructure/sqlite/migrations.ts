@@ -260,6 +260,19 @@ export const MIGRATIONS: Migration[] = [
        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE id = 'cat-hogar' OR lower(name) = lower('Hogar'))`,
     ],
   },
+  {
+    version: 11,
+    name: 'presupuestos con varias categorías',
+    statements: [
+      `ALTER TABLE budgets ADD COLUMN name TEXT`,
+      // Solo las categorías extra; la principal sigue en budgets.category_id, así los presupuestos de antes no cambian.
+      `CREATE TABLE budget_categories (
+         budget_id   TEXT NOT NULL REFERENCES budgets(id) ON DELETE CASCADE,
+         category_id TEXT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+         PRIMARY KEY (budget_id, category_id)
+       )`,
+    ],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

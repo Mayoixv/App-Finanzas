@@ -1,3 +1,4 @@
+import { budgetCategoryIds } from '../../domain/budget';
 import { MonthKey } from '../../domain/month';
 import { IBudgetRepository, IdGenerator } from '../ports/repositories';
 
@@ -13,11 +14,13 @@ export class CopyBudgets {
       this.budgets.listByMonth(fromMonth),
       this.budgets.listByMonth(toMonth),
     ]);
-    const taken = new Set(target.map((b) => b.categoryId));
+    const taken = new Set(target.flatMap(budgetCategoryIds));
     let copied = 0;
     for (const b of source) {
-      if (taken.has(b.categoryId)) continue;
-      await this.budgets.save({ id: this.ids.next(), categoryId: b.categoryId, month: toMonth, limit: b.limit, rollover: b.rollover });
+      // Si alguna de sus categorías ya tiene presupuesto en el mes destino, se deja: no se cuenta dos veces.
+      if (budgetCategoryIds(b).some((id) => taken.has(id))) continue;
+      await this.budgets.save({ ...b, id: this.ids.next(), month: toMonth });
+      budgetCategoryIds(b).forEach((id) => taken.add(id));
       copied++;
     }
     return copied;

@@ -1,7 +1,12 @@
-import { Budget, budgetStatus, BudgetStatus } from '../../domain/budget';
+import { Budget, budgetCategoryIds, budgetStatus, BudgetStatus } from '../../domain/budget';
 import { addMonths, MonthKey } from '../../domain/month';
 import { expandSplits } from '../../domain/transaction';
 import { IBudgetRepository, ITransactionRepository } from '../ports/repositories';
+
+/** Lo gastado en todas las categorías del presupuesto. */
+function spentIn(budget: Budget, spent: Map<string, number>): number {
+  return budgetCategoryIds(budget).reduce((sum, id) => sum + (spent.get(id) ?? 0), 0);
+}
 
 /** Hasta cuántos meses hacia atrás se encadena el rollover. */
 const MAX_CARRY_MONTHS = 12;
@@ -23,7 +28,7 @@ export class GetBudgetStatuses {
     const result: BudgetWithStatus[] = [];
     for (const budget of budgets) {
       const carry = budget.rollover ? await this.leftover(budget.categoryId, addMonths(month, -1), MAX_CARRY_MONTHS) : 0;
-      result.push({ budget, status: budgetStatus(budget, spent.get(budget.categoryId) ?? 0, carry) });
+      result.push({ budget, status: budgetStatus(budget, spentIn(budget, spent), carry) });
     }
     return result;
   }
@@ -34,7 +39,7 @@ export class GetBudgetStatuses {
     const budget = (await this.budgets.listByMonth(month)).find((b) => b.categoryId === categoryId);
     if (!budget?.rollover) return 0;
     const carry = await this.leftover(categoryId, addMonths(month, -1), depth - 1);
-    return budget.limit + carry - ((await this.spentByCategory(month)).get(categoryId) ?? 0);
+    return budget.limit + carry - spentIn(budget, await this.spentByCategory(month));
   }
 
   private async spentByCategory(month: MonthKey): Promise<Map<string, number>> {

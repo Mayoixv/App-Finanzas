@@ -12,11 +12,12 @@ import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { NotFoundError, ValidationError } from '../../application/errors';
-import { Budget } from '../../domain/budget';
+import { Budget, budgetCategoryIds, budgetName } from '../../domain/budget';
 import { Category, isExpenseType } from '../../domain/category';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, parseAmount } from '../format';
 import { MonthState } from '../month-state';
+import { lookOf } from '../category-look';
 import { SuccessCheckComponent } from '../success-check.component';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
@@ -34,12 +35,23 @@ export class PresupuestoModalComponent implements OnInit {
   private readonly alerts = inject(AlertController);
   protected readonly monthState = inject(MonthState);
 
-  /** Si llega, se edita el límite de este presupuesto (la categoría no cambia). */
+  /** Si llega, se edita este presupuesto. */
   @Input() budget?: Budget;
+  /** Categorías que ya están en otro presupuesto del mes. */
   @Input() taken: string[] = [];
 
-  protected readonly categories = signal<Category[]>([]);
-  protected readonly categoryId = signal<string | null>(null);
+  /** Categorías de gasto que se pueden usar (sin las de otros presupuestos). */
+  private readonly available = signal<Category[]>([]);
+  /** Las elegidas para este presupuesto, la principal primero. */
+  protected readonly chosen = signal<Category[]>([]);
+  /** Lo que se puede agregar todavía: sin las ya elegidas. */
+  protected readonly categories = computed(() => {
+    const ids = new Set(this.chosen().map((c) => c.id));
+    return this.available().filter((c) => !ids.has(c.id));
+  });
+  /** El campo "Agregar categoría" vuelve a vacío tras cada elección. */
+  protected readonly adding = signal<string | null>(null);
+  protected readonly name = signal('');
   protected readonly limit = signal('');
   protected readonly rollover = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -47,10 +59,14 @@ export class PresupuestoModalComponent implements OnInit {
   protected readonly saved = signal(false);
   protected readonly currency = inject(CurrencyState).currency;
   protected readonly isEdit = signal(false);
-  protected readonly categoryName = signal('');
+  protected readonly look = lookOf;
+  protected readonly autoName = computed(() => {
+    const names = this.chosen().map((c) => c.name);
+    return names.length < 2 ? '' : `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`;
+  });
 
   protected readonly canSave = computed(
-    () => this.categoryId() !== null && parseAmount(this.limit()) !== null && !this.saving(),
+    () => this.chosen().length > 0 && parseAmount(this.limit()) !== null && !this.saving(),
   );
 
   constructor() {
@@ -59,16 +75,41 @@ export class PresupuestoModalComponent implements OnInit {
 
   async ngOnInit() {
     const all = await this.container.categories.list();
-    if (this.budget) {
+    const taken = new Set(this.taken);
+    const own = new Set(this.budget ? budgetCategoryIds(this.budget) : []);
+    this.available.set(all.filter((c) => isExpenseType(c.type) && (!taken.has(c.id) || own.has(c.id))));
+    const b = this.budget;
+    if (b) {
       this.isEdit.set(true);
-      this.categoryId.set(this.budget.categoryId);
-      this.limit.set(amountToInput(this.budget.limit));
-      this.rollover.set(!!this.budget.rollover);
-      this.categoryName.set(all.find((c) => c.id === this.budget!.categoryId)?.name ?? 'Categoría');
-    } else {
-      const taken = new Set(this.taken);
-      this.categories.set(all.filter((c) => isExpenseType(c.type) && !taken.has(c.id)));
+      const byId = new Map(all.map((c) => [c.id, c]));
+      this.chosen.set(budgetCategoryIds(b).map((id) => byId.get(id)).filter((c): c is Category => !!c));
+      this.name.set(b.name ?? '');
+      this.limit.set(amountToInput(b.limit));
+      this.rollover.set(!!b.rollover);
     }
+  }
+
+  protected add(id: string | null) {
+    const category = this.available().find((c) => c.id === id);
+    if (category) this.chosen.update((list) => [...list, category]);
+    // Se limpia en el siguiente ciclo, para que el campo vuelva a "Agregar otra categoría".
+    setTimeout(() => this.adding.set(null));
+  }
+
+  protected created(category: Category) {
+    this.available.update((list) => [...list, category]);
+    this.chosen.update((list) => [...list, category]);
+    setTimeout(() => this.adding.set(null));
+  }
+
+  protected remove(id: string) {
+    this.chosen.update((list) => list.filter((c) => c.id !== id));
+  }
+
+  /** Nombre para mostrar en mensajes. */
+  private displayName(): string {
+    const b = this.budget;
+    return b ? budgetName(b, new Map(this.chosen().map((c) => [c.id, c.name]))) : '';
   }
 
   protected cancel() {
@@ -76,13 +117,14 @@ export class PresupuestoModalComponent implements OnInit {
   }
 
   protected async save() {
-    const categoryId = this.categoryId();
-    if (!categoryId) return;
+    if (this.chosen().length === 0) return;
     this.saving.set(true);
     this.error.set(null);
     try {
       await this.container.setBudget.execute({
-        categoryId,
+        id: this.budget?.id,
+        categoryIds: this.chosen().map((c) => c.id),
+        name: this.chosen().length > 1 ? this.name() : '',
         month: this.budget?.month ?? this.monthState.month(),
         limit: parseAmount(this.limit()) ?? 0,
         rollover: this.rollover(),
@@ -106,7 +148,7 @@ export class PresupuestoModalComponent implements OnInit {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
       header: 'Eliminar presupuesto',
-      message: `Se quitará el límite de ${this.categoryName()} en ${this.monthState.label()}. Tus gastos no cambian.`,
+      message: `Se quitará el límite de ${this.displayName()} en ${this.monthState.label()}. Tus gastos no cambian.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         { text: 'Eliminar', role: 'destructive' },

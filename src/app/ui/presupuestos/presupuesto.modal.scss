@@ -28,3 +28,68 @@
   color: var(--ink-950);
   font-size: 15px;
 }
+
+.group-label {
+  margin: 4px 0 -6px;
+  font-size: 15px;
+  color: var(--muted-on-light);
+}
+
+.chosen {
+  margin: 0;
+  padding: 4px 8px 4px 16px;
+  list-style: none;
+  border-radius: var(--radius-field);
+  background: var(--surface-soft-card);
+}
+
+.chosen-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+
+  & + & {
+    border-top: 1px solid rgba(20, 18, 31, 0.08);
+  }
+}
+
+.dot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 16px;
+}
+
+.chosen-name {
+  flex: 1;
+  font-size: 16px;
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted-on-light);
+  font-size: 20px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-600);
+    outline-offset: -3px;
+  }
+}
+
+// El texto del interruptor es largo: que baje de línea en vez de cortarse.
+.rollover::part(label) {
+  white-space: normal;
+  line-height: 1.35;
+}

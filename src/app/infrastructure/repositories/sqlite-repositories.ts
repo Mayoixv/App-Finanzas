@@ -433,16 +433,26 @@ interface BudgetRow {
   month: string;
   limit_amount: number;
   rollover: number;
+  name: string | null;
 }
 
 export class SqliteBudgetRepository implements IBudgetRepository {
   constructor(private readonly db: SqlDatabase) {}
 
   async listByMonth(month: MonthKey): Promise<Budget[]> {
-    const rows = await this.db.all<BudgetRow>('SELECT * FROM budgets WHERE month = ?', [month]);
+    const [rows, extras] = await Promise.all([
+      this.db.all<BudgetRow>('SELECT * FROM budgets WHERE month = ?', [month]),
+      this.db.all<{ budget_id: string; category_id: string }>(
+        `SELECT bc.budget_id, bc.category_id FROM budget_categories bc
+           JOIN budgets b ON b.id = bc.budget_id WHERE b.month = ? ORDER BY bc.rowid`,
+        [month],
+      ),
+    ]);
     return rows.map((r) => ({
       id: r.id,
       categoryId: r.category_id,
+      extraCategoryIds: extras.filter((e) => e.budget_id === r.id).map((e) => e.category_id),
+      name: r.name ?? undefined,
       month: r.month,
       limit: r.limit_amount,
       rollover: r.rollover === 1,
@@ -450,12 +460,20 @@ export class SqliteBudgetRepository implements IBudgetRepository {
   }
 
   async save(b: Budget): Promise<void> {
-    await this.db.run(
-      `INSERT INTO budgets (id, category_id, month, limit_amount, rollover) VALUES (?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET category_id = excluded.category_id, month = excluded.month,
-         limit_amount = excluded.limit_amount, rollover = excluded.rollover`,
-      [b.id, b.categoryId, b.month, b.limit, b.rollover ? 1 : 0],
-    );
+    // Todo o nada: el presupuesto y la lista de sus categorías extra.
+    await this.db.batch([
+      {
+        sql: `INSERT INTO budgets (id, category_id, month, limit_amount, rollover, name) VALUES (?, ?, ?, ?, ?, ?)
+              ON CONFLICT(id) DO UPDATE SET category_id = excluded.category_id, month = excluded.month,
+                limit_amount = excluded.limit_amount, rollover = excluded.rollover, name = excluded.name`,
+        params: [b.id, b.categoryId, b.month, b.limit, b.rollover ? 1 : 0, b.name?.trim() || null],
+      },
+      { sql: 'DELETE FROM budget_categories WHERE budget_id = ?', params: [b.id] },
+      ...(b.extraCategoryIds ?? []).map((categoryId) => ({
+        sql: 'INSERT INTO budget_categories (budget_id, category_id) VALUES (?, ?)',
+        params: [b.id, categoryId],
+      })),
+    ]);
   }
 
   async delete(id: string): Promise<void> {

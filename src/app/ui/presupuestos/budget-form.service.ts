@@ -11,7 +11,7 @@ export class BudgetFormService {
   private readonly monthState = inject(MonthState);
   private isOpen = false;
 
-  /** `taken`: categorías que ya tienen presupuesto este mes, para no ofrecerlas al crear uno nuevo. */
+  /** `taken`: categorías que ya están en otro presupuesto del mes, para no ofrecerlas. */
   async open(budget: Budget | undefined, taken: string[]) {
     if (this.isOpen) return;
     this.isOpen = true;

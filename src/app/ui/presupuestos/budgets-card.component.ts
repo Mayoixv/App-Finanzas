@@ -3,7 +3,7 @@ import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { Budget, budgetLevel, BudgetStatus } from '../../domain/budget';
+import { Budget, budgetCategoryIds, budgetLevel, budgetName, BudgetStatus } from '../../domain/budget';
 import { formatMoney, monthLabel, shiftMonth } from '../format';
 import { MonthState } from '../month-state';
 import { BudgetFormService } from './budget-form.service';
@@ -51,11 +51,13 @@ export class BudgetsCardComponent {
   }
 
   protected add() {
-    this.form.open(undefined, (this.rows() ?? []).map((r) => r.budget.categoryId));
+    this.form.open(undefined, (this.rows() ?? []).flatMap((r) => budgetCategoryIds(r.budget)));
   }
 
   protected edit(row: BudgetRow) {
-    this.form.open(row.budget, []);
+    // Las categorías de los demás presupuestos del mes no se ofrecen: cada una cuenta en uno solo.
+    const others = (this.rows() ?? []).filter((r) => r.budget.id !== row.budget.id);
+    this.form.open(row.budget, others.flatMap((r) => budgetCategoryIds(r.budget)));
   }
 
   protected async copyPrevious() {
@@ -83,7 +85,7 @@ export class BudgetsCardComponent {
       const names = new Map(categories.map((c) => [c.id, c.name]));
       this.rows.set(
         statuses
-          .map(({ budget, status }) => toRow(budget, status, names.get(budget.categoryId)))
+          .map(({ budget, status }) => toRow(budget, status, budgetName(budget, names)))
           .sort((a, b) => b.spent / Math.max(b.limit, 1) - a.spent / Math.max(a.limit, 1)),
       );
       this.previousCount.set(previousStatuses.length);
@@ -96,7 +98,7 @@ export class BudgetsCardComponent {
   }
 }
 
-function toRow(budget: Budget, status: BudgetStatus, name = 'Categoría'): BudgetRow {
+function toRow(budget: Budget, status: BudgetStatus, name: string): BudgetRow {
   const { spent, limit, remaining, carry } = status;
   const percent = limit > 0 ? (spent / limit) * 100 : spent > 0 ? 100 : 0;
   const state = budgetLevel(status);

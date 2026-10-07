@@ -364,3 +364,21 @@ describe('categorías personalizadas (migración 10)', () => {
     expect(await cats.get('u1')).toBeUndefined();
   });
 });
+
+describe('presupuestos con varias categorías (migración 11)', () => {
+  it('conserva los presupuestos de antes y guarda las categorías extra', async () => {
+    const db = new NodeSqliteDatabase();
+    await runMigrations(db, MIGRATIONS.filter((m) => m.version <= 10));
+    await db.run("INSERT INTO budgets (id, category_id, month, limit_amount, rollover) VALUES ('b1', 'cat-comida', '2026-10', 500, 1)");
+    await runMigrations(db);
+    const repo = new SqliteBudgetRepository(db);
+    expect(await repo.listByMonth('2026-10')).toEqual([
+      { id: 'b1', categoryId: 'cat-comida', extraCategoryIds: [], name: undefined, month: '2026-10', limit: 500, rollover: true },
+    ]);
+    await repo.save({ id: 'b1', categoryId: 'cat-comida', extraCategoryIds: ['cat-supermercado'], name: 'Comida y súper', month: '2026-10', limit: 900 });
+    expect((await repo.listByMonth('2026-10'))[0]).toMatchObject({ extraCategoryIds: ['cat-supermercado'], name: 'Comida y súper', limit: 900 });
+    // Si se borra una categoría extra, el presupuesto sigue con las demás.
+    await db.run("DELETE FROM categories WHERE id = 'cat-supermercado'");
+    expect((await repo.listByMonth('2026-10'))[0].extraCategoryIds).toEqual([]);
+  });
+});

@@ -1,4 +1,4 @@
-import { budgetLevel } from '../../domain/budget';
+import { budgetLevel, budgetName } from '../../domain/budget';
 import { addDays, addMonths, IsoDate, monthOf } from '../../domain/month';
 import { ICategoryRepository } from '../ports/repositories';
 import { GetCardStatuses } from './accounts';
@@ -109,7 +109,7 @@ export class GetNotificationPlan {
       if (level === 'ok') continue;
       budgets.push({
         key: `presupuesto:${budget.categoryId}:${month}:${level}`,
-        name: names.get(budget.categoryId) ?? 'Categoría',
+        name: budgetName(budget, names),
         level,
         spent: status.spent,
         limit: status.limit,

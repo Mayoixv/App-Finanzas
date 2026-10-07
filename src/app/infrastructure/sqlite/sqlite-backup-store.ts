@@ -15,6 +15,7 @@ const TABLES = [
   'savings_goals',
   'savings_contributions',
   'budgets',
+  'budget_categories',
   'settings',
   'debts',
   'debt_payments',

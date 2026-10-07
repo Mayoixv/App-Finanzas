@@ -2,11 +2,28 @@ import { MonthKey } from './month';
 
 export interface Budget {
   id: string;
+  /** Categoría principal; con ella se encadena el rollover entre meses. */
   categoryId: string;
+  /** Más categorías que comparten el mismo límite (por ejemplo Comida y Supermercado). */
+  extraCategoryIds?: string[];
+  /** Nombre propio; sin él se muestran los nombres de sus categorías. */
+  name?: string;
   month: MonthKey;
   limit: number;
   /** Lo que sobre (o falte) pasa al mes siguiente si ese mes también tiene rollover. */
   rollover?: boolean;
+}
+
+/** Todas las categorías del presupuesto, la principal primero. */
+export function budgetCategoryIds(budget: Budget): string[] {
+  return [budget.categoryId, ...(budget.extraCategoryIds ?? [])];
+}
+
+/** "Comida", "Comida y Supermercado", "Comida, Supermercado y Gasolina", o el nombre que le puso el usuario. */
+export function budgetName(budget: Budget, categoryNames: Map<string, string>): string {
+  if (budget.name?.trim()) return budget.name.trim();
+  const names = budgetCategoryIds(budget).map((id) => categoryNames.get(id) ?? 'Categoría');
+  return names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`;
 }
 
 export interface BudgetStatus {

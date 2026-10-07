@@ -32,6 +32,8 @@ import { change } from '../../domain/monthly-summary';
 import { GetNotificationPlan } from './get-notification-plan';
 import { PauseRecurringExpense, ResumeRecurringExpense } from './pause-recurring-expense';
 import { SetBudget } from './set-budget';
+import { CopyBudgets } from './copy-budgets';
+import { budgetName } from '../../domain/budget';
 import { UpdateRecurringExpense } from './update-recurring-expense';
 
 function setup() {
@@ -531,5 +533,45 @@ describe('sueldo con varios cobros', () => {
     await expect(add.execute([{ ...base, dueDay: 15 }, { ...base, dueDay: 15 }])).rejects.toThrow('mismo día');
     await expect(add.execute([{ ...base, dueDay: 15 }, { ...base, dueDay: 30, amount: 0 }])).rejects.toThrow(ValidationError);
     expect(await s.recurring.list()).toEqual([]);
+  });
+});
+
+describe('presupuesto con varias categorías', () => {
+  function withSuper() {
+    const s = setup();
+    s.categories.items.set('sup', { id: 'sup', name: 'Supermercado', type: 'variable' });
+    s.categories.items.set('gas', { id: 'gas', name: 'Gasolina', type: 'variable' });
+    return s;
+  }
+
+  it('suma lo gastado en todas sus categorías contra un solo límite', async () => {
+    const s = withSuper();
+    const b = await new SetBudget(s.budgets, s.categories, s.ids).execute({ categoryIds: ['com', 'sup'], month: '2026-10', limit: 1_500_000 });
+    const add = new AddTransaction(s.transactions, s.categories, s.ids);
+    await add.execute({ date: '2026-10-02', amount: 900_000, categoryId: 'com' });
+    await add.execute({ date: '2026-10-03', amount: 800_000, categoryId: 'sup' });
+    await add.execute({ date: '2026-10-04', amount: 500_000, categoryId: 'gas' });
+    const [st] = await new GetBudgetStatuses(s.budgets, s.transactions).execute('2026-10');
+    expect(st.status).toMatchObject({ spent: 1_700_000, remaining: -200_000, exceeded: true });
+    const names = new Map([...s.categories.items.values()].map((c) => [c.id, c.name]));
+    expect(budgetName(b, names)).toBe('Comida y Supermercado');
+    expect(budgetName({ ...b, name: 'Comida y súper' }, names)).toBe('Comida y súper');
+  });
+
+  it('una categoría no puede estar en dos presupuestos del mismo mes', async () => {
+    const s = withSuper();
+    const set = new SetBudget(s.budgets, s.categories, s.ids);
+    await set.execute({ categoryIds: ['com', 'sup'], month: '2026-10', limit: 100 });
+    await expect(set.execute({ categoryIds: ['gas', 'sup'], month: '2026-10', limit: 100 })).rejects.toThrow('Supermercado ya está en otro presupuesto');
+    // Al editar el mismo presupuesto sí se puede volver a guardar con sus categorías.
+    const [b] = await s.budgets.listByMonth('2026-10');
+    await expect(set.execute({ id: b.id, categoryIds: ['com', 'sup', 'gas'], month: '2026-10', limit: 200 })).resolves.toMatchObject({ extraCategoryIds: ['sup', 'gas'] });
+  });
+
+  it('copiar al mes siguiente lleva todas sus categorías y su nombre', async () => {
+    const s = withSuper();
+    await new SetBudget(s.budgets, s.categories, s.ids).execute({ categoryIds: ['com', 'sup'], name: 'Comida y súper', month: '2026-10', limit: 100 });
+    expect(await new CopyBudgets(s.budgets, s.ids).execute('2026-10', '2026-11')).toBe(1);
+    expect((await s.budgets.listByMonth('2026-11'))[0]).toMatchObject({ categoryId: 'com', extraCategoryIds: ['sup'], name: 'Comida y súper' });
   });
 });

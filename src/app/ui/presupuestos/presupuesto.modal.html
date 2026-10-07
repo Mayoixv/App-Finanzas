@@ -7,23 +7,44 @@
       </button>
     </header>
 
-    @if (isEdit()) {
-      <p class="fixed-category">
-        <span class="fixed-label">Categoría</span>
-        {{ categoryName() }}
-      </p>
-    } @else {
-      @if (categories().length === 0) {
-        <p class="hint">Todas tus categorías de gasto ya tienen presupuesto en {{ monthState.label() }}.</p>
-      }
+    <p class="group-label" id="cats-label">Categorías</p>
+    @if (chosen().length) {
+      <ul class="chosen" aria-labelledby="cats-label">
+        @for (c of chosen(); track c.id) {
+          <li class="chosen-row t-row-enter">
+            <span class="dot" [style.background]="look(c).color" aria-hidden="true"><ion-icon [name]="look(c).icon"></ion-icon></span>
+            <span class="chosen-name">{{ c.name }}</span>
+            <button type="button" class="remove" [attr.aria-label]="'Quitar ' + c.name" (click)="remove(c.id)">
+              <ion-icon name="close" aria-hidden="true"></ion-icon>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+    @if (categories().length === 0 && chosen().length === 0) {
+      <p class="hint">Todas tus categorías de gasto ya tienen presupuesto en {{ monthState.label() }}.</p>
+    }
+    <div class="field">
+      <app-category-field
+        [label]="chosen().length ? 'Agregar otra categoría' : 'Categoría'"
+        [placeholder]="chosen().length ? 'Comparten el mismo límite' : 'Elige una categoría de gasto'"
+        [categories]="categories()"
+        newType="variable"
+        [value]="adding()"
+        (valueChange)="add($event)"
+        (created)="created($event)"
+      ></app-category-field>
+    </div>
+
+    @if (chosen().length > 1) {
       <div class="field">
-        <app-category-field
-          placeholder="Elige una categoría de gasto"
-          [categories]="categories()"
-          newType="variable"
-          [(value)]="categoryId"
-          (created)="categories.update((list) => [...list, $event])"
-        ></app-category-field>
+        <ion-input
+          label="Nombre (opcional)"
+          label-placement="stacked"
+          [placeholder]="autoName()"
+          [value]="name()"
+          (ionInput)="name.set(($event.detail.value ?? '').toString())"
+        ></ion-input>
       </div>
     }
 
@@ -48,7 +69,7 @@
     >
       Pasar lo que sobre (o falte) al mes siguiente
     </ion-toggle>
-    <p class="hint">Solo se arrastra entre meses que tengan esta opción activa en la misma categoría.</p>
+    <p class="hint">Solo se arrastra entre meses que tengan esta opción activa en el mismo presupuesto.</p>
 
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>

@@ -1,5 +1,5 @@
 import { CARD_UTILIZATION_WARNING } from '../../domain/account';
-import { budgetLevel } from '../../domain/budget';
+import { budgetLevel, budgetName } from '../../domain/budget';
 import { daysBetween, IsoDate, monthOf } from '../../domain/month';
 import { ICategoryRepository } from '../ports/repositories';
 import { GetCardStatuses } from './accounts';
@@ -45,7 +45,7 @@ export class GetAlerts {
     // Un ingreso fijo sin cobrar no es una alerta de pago.
     const payments = items.filter((i) => types.get(i.expense.categoryId) !== 'ingreso');
     const budgetNames = (level: string) =>
-      statuses.filter((b) => budgetLevel(b.status) === level).map((b) => names.get(b.budget.categoryId) ?? 'Categoría');
+      statuses.filter((b) => budgetLevel(b.status) === level).map((b) => budgetName(b.budget, names));
     return {
       overdue: payments.filter((i) => daysBetween(today, i.instance.dueDate) < 0).map((i) => i.expense.name),
       dueSoon: payments.filter((i) => daysBetween(today, i.instance.dueDate) >= 0).map((i) => i.expense.name),
