@@ -10,6 +10,7 @@ interface Row {
   name: string;
   detail: string;
   urgent: boolean;
+  overdue: boolean;
   amount: string;
   isIncome: boolean;
   month: string;
@@ -65,6 +66,7 @@ function toRow({ expense, instance }: MonthRecurringExpense, today: string, isIn
     name: expense.name,
     detail: due.text,
     urgent: due.urgent,
+    overdue: !isIncome && due.overdue,
     amount: `${isIncome ? '+' : ''}${formatMoney(instance.amount)}`,
     isIncome,
     month: instance.month,

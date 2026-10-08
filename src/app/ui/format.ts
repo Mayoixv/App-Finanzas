@@ -84,6 +84,8 @@ export interface DueLabel {
   text: string;
   /** Vencido o a 3 días o menos: se resalta en ámbar. */
   urgent: boolean;
+  /** Ya pasó la fecha: un pago vencido se marca en rojo (un cobro atrasado sigue en ámbar). */
+  overdue: boolean;
 }
 
 /** Texto de vencimiento de un gasto fijo pendiente, relativo a hoy. */
@@ -93,11 +95,11 @@ export function dueLabel(dueDate: IsoDate, today: IsoDate, income = false): DueL
   const diff = daysBetween(today, dueDate);
   if (diff < 0) {
     const n = -diff;
-    return { text: n === 1 ? `${past} ayer` : `${past} hace ${n} días`, urgent: true };
+    return { text: n === 1 ? `${past} ayer` : `${past} hace ${n} días`, urgent: true, overdue: true };
   }
-  if (diff === 0) return { text: `${now} hoy`, urgent: true };
-  if (diff === 1) return { text: `${now} mañana`, urgent: true };
-  if (diff <= 3) return { text: `${now} en ${diff} días`, urgent: true };
-  if (diff <= 7) return { text: `${now} en ${diff} días`, urgent: false };
-  return { text: `${now} el ${formatDay(dueDate)}`, urgent: false };
+  if (diff === 0) return { text: `${now} hoy`, urgent: true, overdue: false };
+  if (diff === 1) return { text: `${now} mañana`, urgent: true, overdue: false };
+  if (diff <= 3) return { text: `${now} en ${diff} días`, urgent: true, overdue: false };
+  if (diff <= 7) return { text: `${now} en ${diff} días`, urgent: false, overdue: false };
+  return { text: `${now} el ${formatDay(dueDate)}`, urgent: false, overdue: false };
 }

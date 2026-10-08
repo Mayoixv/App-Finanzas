@@ -59,8 +59,12 @@ li + li .row {
   color: var(--muted);
 
   &.urgent {
-    color: var(--warning);
+    color: var(--pending);
     font-weight: 500;
+  }
+
+  &.overdue {
+    color: var(--overdue);
   }
 }
 

@@ -68,25 +68,39 @@
               <span class="avatar" [style.background]="row.color" aria-hidden="true"><ion-icon [name]="row.icon"></ion-icon></span>
               <span class="item-text">
                 <span class="item-name">{{ row.name }}</span>
-                <span class="item-detail" [class.urgent]="row.urgent">{{ row.detail }}</span>
+                <span class="item-detail" [class.urgent]="row.urgent" [class.overdue]="row.overdue">{{ row.detail }}</span>
               </span>
               <span class="item-amount">{{ row.amount }}</span>
             </button>
 
             <div class="item-foot">
               @if (row.paid) {
-                <span class="chip paid">
-                  <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-                  {{ row.isIncome ? 'Recibido' : 'Pagado' }}
-                </span>
+                @if (row.isIncome) {
+                  <span class="status-chip received">
+                    <ion-icon name="arrow-down-circle-outline" aria-hidden="true"></ion-icon>
+                    Recibido
+                  </span>
+                } @else {
+                  <span class="status-chip paid">
+                    <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+                    Pagado
+                  </span>
+                }
                 @if (flashId() === row.id) {
                   <app-success-check state="in"></app-success-check>
                 }
               } @else {
-                <span class="chip pending">
-                  <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
-                  Pendiente
-                </span>
+                @if (row.overdue) {
+                  <span class="status-chip overdue">
+                    <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+                    Vencido
+                  </span>
+                } @else {
+                  <span class="status-chip pending">
+                    <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+                    Pendiente
+                  </span>
+                }
                 <button
                   type="button"
                   class="btn-secondary pay"
@@ -111,7 +125,7 @@
             <div class="item-head">
               <div class="item-text">
                 <span class="item-name">{{ c.view.debt.name }}</span>
-                <span class="item-detail" [class.urgent]="!c.paid && installmentDue(c).urgent">
+                <span class="item-detail" [class.urgent]="!c.paid && installmentDue(c).urgent" [class.overdue]="!c.paid && installmentDue(c).overdue">
                   Cuota {{ c.number }} de {{ c.of }} · {{ c.paid ? 'Pagada' : installmentDue(c).text }}
                 </span>
               </div>
@@ -119,12 +133,17 @@
             </div>
             <div class="item-foot">
               @if (c.paid) {
-                <span class="chip paid">
+                <span class="status-chip paid">
                   <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
                   Pagada
                 </span>
+              } @else if (installmentDue(c).overdue) {
+                <span class="status-chip overdue">
+                  <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+                  Vencida
+                </span>
               } @else {
-                <span class="chip pending">
+                <span class="status-chip pending">
                   <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
                   Pendiente
                 </span>

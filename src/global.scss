@@ -449,3 +449,45 @@ ion-alert.app-alert.choices button.alert-button {
     color: var(--muted-on-light);
   }
 }
+
+/* Chip de estado de un pago o cobro: color + ícono + texto (design.md, sección 2). */
+.status-chip {
+  --c: var(--pending);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  color: var(--c);
+  font-size: 15px;
+  font-weight: 600;
+
+  &.received {
+    --c: var(--received);
+  }
+  &.paid {
+    --c: var(--paid);
+  }
+  &.pending {
+    --c: var(--pending);
+  }
+  &.overdue {
+    --c: var(--overdue);
+  }
+}
+
+.surface-light .status-chip {
+  --c: var(--pending-on-light);
+  background: color-mix(in srgb, var(--c) 8%, transparent);
+
+  &.received {
+    --c: var(--received-on-light);
+  }
+  &.paid {
+    --c: var(--paid-on-light);
+  }
+  &.overdue {
+    --c: var(--overdue-on-light);
+  }
+}

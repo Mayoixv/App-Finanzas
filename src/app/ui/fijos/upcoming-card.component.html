@@ -7,7 +7,7 @@
           <button type="button" class="row" [attr.aria-label]="r.name + ', ' + r.detail + ', ' + r.amount + '. Ver en Fijos'" (click)="open(r)">
             <span class="row-text">
               <span class="row-title">{{ r.name }}</span>
-              <span class="row-sub" [class.urgent]="r.urgent">{{ r.detail }}</span>
+              <span class="row-sub" [class.urgent]="r.urgent" [class.overdue]="r.overdue">{{ r.detail }}</span>
             </span>
             <span class="row-amount" [class.income]="r.isIncome">{{ r.amount }}</span>
           </button>

@@ -20,6 +20,15 @@
   --negative: #ff5470;
   --negative-on-light: #b01e39;
   --warning: #ffb84d;
+  // Estados de un pago o cobro (design.md, sección 2). Cada chip lleva además ícono y texto.
+  --received: var(--positive); // Recibido: dinero que entró
+  --paid: #b49dff; // Pagado: salió y ya se cumplió (más claro que --violet-400 para llegar a 4.5:1 sobre su chip)
+  --pending: var(--warning); // Pendiente: aún no ocurre
+  --overdue: var(--negative); // Vencido: debía pagarse y no se marcó
+  --received-on-light: var(--positive-on-light);
+  --paid-on-light: var(--violet-600);
+  --pending-on-light: #8a5300;
+  --overdue-on-light: var(--negative-on-light);
 
   --brand-gradient: linear-gradient(160deg, #8f6bff 0%, #6a3df0 45%, #2a1478 100%);
   --brand-glow: radial-gradient(circle at 50% 0%, rgba(143, 107, 255, 0.55), transparent 65%);

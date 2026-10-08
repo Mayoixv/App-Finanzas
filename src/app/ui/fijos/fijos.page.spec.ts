@@ -67,14 +67,15 @@ describe('FijosPage', () => {
   it('muestra el gasto pendiente y al marcarlo pagado crea la transacción y actualiza el estado', async () => {
     const { el, settle, repos } = await render(true);
     expect(el.textContent).toContain('Renta');
-    expect(el.textContent).toContain('Pendiente');
+    // Venció hace 3 días: el chip dice Vencido, en rojo.
+    expect(el.querySelector('.status-chip.overdue')?.textContent).toContain('Vencido');
     expect(el.textContent).toContain('15,000.00');
 
     (el.querySelector('button.pay') as HTMLButtonElement).click();
     await settle();
     await settle();
 
-    expect(el.querySelector('.chip.paid')?.textContent).toContain('Pagado');
+    expect(el.querySelector('.status-chip.paid')?.textContent).toContain('Pagado');
     expect(el.textContent).toContain('Todo pagado');
     const saved = await repos.transactions.listByMonth(currentMonth());
     expect(saved).toHaveLength(1);

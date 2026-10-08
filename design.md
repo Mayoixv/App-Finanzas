@@ -31,6 +31,18 @@ tipografía son estimados a ojo desde una captura, así que ajústalos si el res
 | `--negative` | `#FF5470` | Gastos pasados de presupuesto, balance negativo |
 | `--warning` | `#FFB84D` | Gasto fijo pendiente cerca del vencimiento |
 
+Estados de un pago o cobro (chip `.status-chip` en `global.scss`; siempre con ícono y texto, nunca solo color):
+
+| Token | Valor | Estado | Ícono |
+|---|---|---|---|
+| `--received` | `--positive` (`#2BD07F`) | Recibido: dinero que entró | flecha de entrada |
+| `--paid` | `#B49DFF` | Pagado: salió y ya se cumplió | check |
+| `--pending` | `--warning` (`#FFB84D`) | Pendiente: aún no ocurre (o un cobro atrasado) | reloj |
+| `--overdue` | `--negative` (`#FF5470`) | Vencido: un pago que debía hacerse y no se marcó | alerta |
+
+`--paid` es más claro que `--violet-400` para llegar a 4.5:1 sobre su chip oscuro. En fondo claro se usan las
+variantes `--*-on-light` (`#0A6F40`, `#6639EC`, `#8A5300`, `#B01E39`) con el chip al 8 % en vez de 16 %.
+
 Degradado de marca: `linear-gradient(160deg, #8F6BFF 0%, #6A3DF0 45%, #2A1478 100%)`.
 Brillo: `radial-gradient(circle at 50% 0%, rgba(143,107,255,.55), transparent 65%)` detrás del elemento principal.
 Verde y rojo solo significan dinero que entra o sale. No los uses como decoración.
@@ -65,7 +77,7 @@ Largo de línea menor a 80 caracteres. Las mayúsculas se reservan para titulare
   total en el centro con la fuente condensada.
 - **Barra de progreso de ahorro**: pista `rgba(255,255,255,.12)`, relleno con degradado violeta, el porcentaje al final.
 - **Fila de transacción**: ícono en círculo, nombre, nota en `--muted`, monto alineado a la derecha.
-  Gasto fijo con chip "Pagado" (verde) o "Pendiente" (ámbar).
+  Gasto fijo con chip de estado: "Recibido" (verde), "Pagado" (violeta), "Pendiente" (ámbar) o "Vencido" (rojo).
 - **Barra inferior**: 4 pestañas (Inicio, Mes, Ahorros, Resumen), píldora flotante oscura con la pestaña
   activa resaltada en violeta.
 

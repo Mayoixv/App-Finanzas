@@ -39,15 +39,15 @@ describe('dueLabel', () => {
   const today = '2026-10-10';
 
   it('marca como urgente lo vencido o a 3 días o menos', () => {
-    expect(dueLabel('2026-10-07', today)).toEqual({ text: 'Venció hace 3 días', urgent: true });
-    expect(dueLabel('2026-10-09', today)).toEqual({ text: 'Venció ayer', urgent: true });
-    expect(dueLabel('2026-10-10', today)).toEqual({ text: 'Vence hoy', urgent: true });
-    expect(dueLabel('2026-10-11', today)).toEqual({ text: 'Vence mañana', urgent: true });
-    expect(dueLabel('2026-10-13', today)).toEqual({ text: 'Vence en 3 días', urgent: true });
+    expect(dueLabel('2026-10-07', today)).toEqual({ text: 'Venció hace 3 días', urgent: true, overdue: true });
+    expect(dueLabel('2026-10-09', today)).toEqual({ text: 'Venció ayer', urgent: true, overdue: true });
+    expect(dueLabel('2026-10-10', today)).toEqual({ text: 'Vence hoy', urgent: true, overdue: false });
+    expect(dueLabel('2026-10-11', today)).toEqual({ text: 'Vence mañana', urgent: true, overdue: false });
+    expect(dueLabel('2026-10-13', today)).toEqual({ text: 'Vence en 3 días', urgent: true, overdue: false });
   });
 
   it('lo lejano no es urgente y pasados 7 días muestra la fecha', () => {
-    expect(dueLabel('2026-10-14', today)).toEqual({ text: 'Vence en 4 días', urgent: false });
+    expect(dueLabel('2026-10-14', today)).toEqual({ text: 'Vence en 4 días', urgent: false, overdue: false });
     expect(dueLabel('2026-10-25', today).urgent).toBe(false);
     expect(dueLabel('2026-10-25', today).text).toMatch(/^Vence el 25/);
     expect(dueLabel('2026-10-09', today, true).text).toBe('Debió cobrarse ayer');

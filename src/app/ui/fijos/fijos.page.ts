@@ -3,10 +3,7 @@ import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import {
-  checkmarkCircleOutline,
-  timeOutline,
-} from 'ionicons/icons';
+import { alertCircleOutline, arrowDownCircleOutline, checkmarkCircleOutline, timeOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { MonthRecurringExpense } from '../../application/use-cases/get-month-recurring-expenses';
 import { SubscriptionCost } from '../../application/use-cases/get-subscription-cost';
@@ -49,6 +46,8 @@ interface Row {
   paid: boolean;
   detail: string;
   urgent: boolean;
+  /** Pago (no cobro) con la fecha ya pasada y sin marcar. */
+  overdue: boolean;
   dueDate: string;
   icon: string;
   color: string;
@@ -105,7 +104,7 @@ export class FijosPage {
   protected readonly percent = formatPercent;
 
   constructor() {
-    addIcons({ checkmarkCircleOutline, timeOutline });
+    addIcons({ checkmarkCircleOutline, timeOutline, alertCircleOutline, arrowDownCircleOutline });
     effect(() => {
       const month = this.monthState.month();
       this.monthState.version();
@@ -244,6 +243,7 @@ function toRow(
     ? {
         text: `${isIncome ? 'Cobro' : 'Vencimiento'} ${formatDay(instance.dueDate)}`,
         urgent: false,
+        overdue: false,
       }
     : dueLabel(instance.dueDate, today, isIncome);
   const every = FREQUENCY_LABEL[expense.frequency ?? 1];
@@ -256,6 +256,7 @@ function toRow(
     paid,
     detail: every ? `${due.text} · ${every}` : due.text,
     urgent: due.urgent,
+    overdue: !isIncome && due.overdue,
     dueDate: instance.dueDate,
     ...lookOf(category ?? { type: isIncome ? 'ingreso' : 'fijo' }),
   };
