@@ -1,3 +1,4 @@
+import { TiltDirective } from '../tilt.directive';
 import {
   Component,
   computed,
@@ -42,6 +43,14 @@ interface Row {
   statusText?: string;
   urgent?: boolean;
   highUse?: boolean;
+  /** Solo tarjetas, para dibujarlas como tarjeta física. */
+  card?: {
+    last4: string | null;
+    /** Porcentaje del límite usado (0–100) para la barra. */
+    usedPercent: number | null;
+    usedText: string | null;
+    days: string;
+  };
 }
 
 /** Secciones Cuentas y Tarjetas de la pestaña Dinero (misma carga, distinto contenido). */
@@ -49,7 +58,7 @@ interface Row {
   selector: 'app-cuentas-view',
   templateUrl: 'cuentas-view.component.html',
   styleUrls: ['cuentas-view.component.scss'],
-  imports: [LoadingComponent, IonIcon],
+  imports: [LoadingComponent, IonIcon, TiltDirective],
 })
 export class CuentasViewComponent {
   private readonly container = inject(APP_CONTAINER);
@@ -192,8 +201,18 @@ function toRow(view: AccountView): Row {
     const used = Math.max(0, -view.balance);
     detail = `Usado ${formatPercent((used / a.creditLimit) * 100)} de ${formatMoney(a.creditLimit)} · corte día ${a.cutDay}, pago día ${a.dueDay}`;
   }
+  const owed = Math.max(0, -view.balance);
+  const card = isCard(a)
+    ? {
+        last4: a.cardLast4 ?? null,
+        usedPercent: a.creditLimit ? Math.min(100, (owed / a.creditLimit) * 100) : null,
+        usedText: a.creditLimit ? `${formatPercent((owed / a.creditLimit) * 100)} de ${formatMoney(a.creditLimit)}` : null,
+        days: `Corte día ${a.cutDay} · Pago día ${a.dueDay}`,
+      }
+    : undefined;
   return {
     view,
+    card,
     name: a.name,
     detail,
     // En una tarjeta se muestra lo que se debe, sin signo.

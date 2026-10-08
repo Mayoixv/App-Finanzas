@@ -46,24 +46,6 @@ li + li .row {
   border-top: 1px solid rgba(20, 18, 31, 0.08);
 }
 
-/* Tarjetas: cada una en su propio bloque, porque son tarjetas distintas (no filas de una misma lista). */
-.rows.cards {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0;
-  background: transparent;
-
-  > li {
-    padding: 4px 16px;
-    border-radius: var(--radius-card);
-    background: var(--surface-soft-card);
-  }
-
-  li + li .row {
-    border-top: 0;
-  }
-}
 
 .row {
   display: flex;
@@ -179,4 +161,112 @@ li + li .row {
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Tarjetas de crédito como tarjeta física (design.md 10.6). El degradado empieza en --violet-600 y no en el
+   --violet-400 de la marca, para que el texto blanco llegue a 4.5:1 también en la esquina clara. */
+.credit-cards {
+  list-style: none;
+  margin: 0 20px 28px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* El brillo violeta va en el contenedor, fuera de la tarjeta: overflow: hidden lo recortaría. */
+.card-wrap {
+  border-radius: 24px;
+  box-shadow: 0 18px 40px -18px rgba(106, 61, 240, 0.65);
+}
+
+.credit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  min-height: 190px;
+  padding: 20px 22px;
+  border: 0;
+  background: linear-gradient(160deg, #6639ec 0%, #4b25c4 55%, #2a1478 100%);
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-600);
+    outline-offset: 3px;
+  }
+}
+
+.cc-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cc-name {
+  font-size: 17px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cc-last4 {
+  flex: none;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.9;
+}
+
+.cc-label {
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.cc-amount {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-bar {
+  display: block;
+  height: 6px;
+  margin: 12px 0 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+}
+
+.cc-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #fff;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.high {
+    background: var(--warning);
+  }
+}
+
+.cc-meta {
+  font-size: 15px;
+  opacity: 0.9;
+
+  &.high {
+    color: var(--warning);
+    opacity: 1;
+    font-weight: 600;
+  }
+}
+
+.credit-cards .card-status {
+  padding: 12px 4px 0;
 }
