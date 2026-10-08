@@ -43,15 +43,21 @@
     border-color: var(--violet-600);
   }
 
+  // Etiqueta flotante: dentro del campo vacío y, al tocarlo, sube pequeña con una animación corta (no desaparece).
+  // --highlight-color-focused también pinta la etiqueta enfocada: debe ser visible. La línea de abajo se quita
+  // (--highlight-height) porque el borde violeta del campo ya marca cuál está activo.
   ion-input,
+  ion-textarea,
   ion-select {
     --color: var(--text-on-light);
     --placeholder-color: var(--muted-on-light);
     --placeholder-opacity: 1;
-    --highlight-color-focused: transparent;
+    --highlight-color-focused: var(--violet-600);
+    --highlight-height: 0;
     min-height: 56px;
     font-size: 16px;
   }
+
 }
 
 .error {

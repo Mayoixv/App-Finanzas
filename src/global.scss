@@ -507,3 +507,15 @@ ion-alert.app-alert.choices button.alert-button {
 .title-row > app-help-button {
   margin-right: -8px;
 }
+
+/* Etiqueta flotante de los campos de formulario: gris como la de los selectores, violeta mientras se escribe.
+   Va aquí y no en _sheet.scss porque Ionic crea .label-text-wrapper y el aislamiento de Angular no le llega. */
+.field ion-input .label-text-wrapper,
+.field ion-textarea .label-text-wrapper {
+  color: var(--muted-on-light);
+}
+
+.field ion-input.has-focus .label-text-wrapper,
+.field ion-textarea.has-focus .label-text-wrapper {
+  color: var(--violet-600);
+}

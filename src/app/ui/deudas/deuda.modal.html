@@ -15,7 +15,7 @@
     <div class="field">
       <ion-input
         label="Nombre"
-        label-placement="stacked"
+        label-placement="floating"
         [placeholder]="direction() === 'debo' ? 'Préstamo del carro, tarjeta' : 'Nombre de quien te debe'"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
@@ -25,7 +25,7 @@
     <div class="field">
       <ion-input
         label="Monto prestado ({{ currency() }})"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         min="0"
@@ -38,7 +38,7 @@
     <div class="field">
       <ion-input
         label="Tasa de interés anual % (opcional)"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         min="0"
@@ -51,7 +51,7 @@
     <div class="field">
       <ion-input
         label="Plazo en meses (opcional)"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="numeric"
         min="1"

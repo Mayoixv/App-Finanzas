@@ -26,7 +26,7 @@
     <div class="field">
       <ion-input
         label="Monto ({{ currency() }})"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         min="0"
@@ -69,7 +69,7 @@
             <div class="field part-amount">
               <ion-input
                 label="Monto"
-                label-placement="stacked"
+                label-placement="floating"
                 type="number"
                 inputmode="decimal"
                 min="0"
@@ -109,7 +109,7 @@
     <div class="field">
       <ion-input
         label="Nota (opcional)"
-        label-placement="stacked"
+        label-placement="floating"
         [value]="note()"
         (ionInput)="note.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -118,7 +118,7 @@
     <div class="field">
       <ion-input
         label="Etiquetas (opcional, separadas por coma)"
-        label-placement="stacked"
+        label-placement="floating"
         placeholder="viaje, trabajo"
         [value]="tags()"
         (ionInput)="tags.set(($event.detail.value ?? '').toString())"

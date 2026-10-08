@@ -15,7 +15,7 @@
     <div class="field">
       <ion-input
         label="Nombre"
-        label-placement="stacked"
+        label-placement="floating"
         [placeholder]="kind() === 'ingreso' ? 'Sueldo, alquiler que cobras' : 'Alquiler, comida del mes, internet'"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
@@ -54,7 +54,7 @@
           <app-day-picker label="Día de cobro" [value]="p.day" (valueChange)="updatePayment(i, { day: $event })"></app-day-picker>
           <ion-input
             label="Monto ({{ currency() }})"
-            label-placement="stacked"
+            label-placement="floating"
             type="number"
             inputmode="decimal"
             min="0"
@@ -71,7 +71,7 @@
       <div class="field">
         <ion-input
           label="Monto ({{ currency() }})"
-          label-placement="stacked"
+          label-placement="floating"
           type="number"
           inputmode="decimal"
           min="0"

@@ -22,7 +22,7 @@
     <div class="field">
       <ion-input
         label="Monto ({{ currency() }})"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         min="0"
@@ -53,7 +53,7 @@
     <div class="field">
       <ion-input
         label="Nota (opcional)"
-        label-placement="stacked"
+        label-placement="floating"
         placeholder="Depósito, retiro del cajero"
         [value]="note()"
         (ionInput)="note.set(($event.detail.value ?? '').toString())"

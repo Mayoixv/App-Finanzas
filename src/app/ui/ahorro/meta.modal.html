@@ -10,7 +10,7 @@
     <div class="field">
       <ion-input
         label="Nombre"
-        label-placement="stacked"
+        label-placement="floating"
         placeholder="Fondo de emergencia, viaje, inicial del carro"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
@@ -20,7 +20,7 @@
     <div class="field">
       <ion-input
         label="Cuánto quieres juntar ({{ currency() }})"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         min="0"

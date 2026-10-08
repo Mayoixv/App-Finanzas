@@ -40,7 +40,7 @@
       <div class="field">
         <ion-input
           label="Nombre (opcional)"
-          label-placement="stacked"
+          label-placement="floating"
           [placeholder]="autoName()"
           [value]="name()"
           (ionInput)="name.set(($event.detail.value ?? '').toString())"
@@ -51,7 +51,7 @@
     <div class="field">
       <ion-input
         label="Límite para {{ monthState.label() }} ({{ currency() }})"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         min="0"

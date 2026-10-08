@@ -30,7 +30,7 @@
     <div class="field">
       <ion-input
         label="Nombre"
-        label-placement="stacked"
+        label-placement="floating"
         placeholder="Mascotas, gimnasio, propinas"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"

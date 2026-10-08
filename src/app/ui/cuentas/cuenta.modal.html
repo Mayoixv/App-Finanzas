@@ -16,7 +16,7 @@
     <div class="field">
       <ion-input
         label="Nombre"
-        label-placement="stacked"
+        label-placement="floating"
         [placeholder]="isCard() ? 'Visa Popular, Mastercard BHD' : 'Cuenta de ahorro, nómina'"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
@@ -26,7 +26,7 @@
     <div class="field">
       <ion-input
         [label]="(isCard() ? 'Lo que debes hoy' : 'Saldo de hoy') + ' (' + currency() + ')'"
-        label-placement="stacked"
+        label-placement="floating"
         type="number"
         inputmode="decimal"
         placeholder="0.00"
@@ -42,7 +42,7 @@
       <div class="field">
         <ion-input
           label="Límite de crédito ({{ currency() }})"
-          label-placement="stacked"
+          label-placement="floating"
           type="number"
           inputmode="decimal"
           min="0"
@@ -55,7 +55,7 @@
         <div class="field">
           <ion-input
             label="Día de corte"
-            label-placement="stacked"
+            label-placement="floating"
             type="number"
             inputmode="numeric"
             min="1"
@@ -68,7 +68,7 @@
         <div class="field">
           <ion-input
             label="Día de pago"
-            label-placement="stacked"
+            label-placement="floating"
             type="number"
             inputmode="numeric"
             min="1"
@@ -85,7 +85,7 @@
       <div class="field">
         <ion-input
           [label]="isCard() ? 'Últimos 4 dígitos de la tarjeta (opcional)' : 'Últimos 4 dígitos de su tarjeta de débito (opcional)'"
-          label-placement="stacked"
+          label-placement="floating"
           type="text"
           inputmode="numeric"
           maxlength="4"
