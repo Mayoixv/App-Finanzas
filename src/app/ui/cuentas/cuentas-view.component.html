@@ -16,7 +16,7 @@
   }
 
   @if (rows().length) {
-    <ul [class.t-still]="!monthState.animateLists()" class="rows">
+    <ul [class.t-still]="!monthState.animateLists()" class="rows" [class.cards]="mode() === 'tarjetas'">
       @for (r of rows(); track r.view.account.id) {
         <li animate.enter="t-row-enter" animate.leave="t-row-leave">
           <button
