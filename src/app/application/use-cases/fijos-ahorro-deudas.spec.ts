@@ -418,7 +418,8 @@ describe('patrimonio', () => {
     await debts.execute({ name: 'Carro', direction: 'debo', principal: 50_000, annualRate: 0, termMonths: null, startDate: '2026-10-01' });
     await debts.execute({ name: 'Juan', direction: 'me_deben', principal: 5_000, annualRate: 0, termMonths: null, startDate: '2026-10-01' });
     const net = await new GetNetWorth(new GetAccountsOverview(accounts), new GetDebtsOverview(s.debts)).execute();
-    expect(net).toEqual({ have: 105_000, owe: 70_000, total: 35_000 });
+    // Disponible es solo lo de las cuentas: lo que te deben va aparte.
+    expect(net).toEqual({ available: 100_000, owedToMe: 5_000, have: 105_000, owe: 70_000, total: 35_000 });
   });
 });
 

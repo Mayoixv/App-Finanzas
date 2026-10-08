@@ -254,7 +254,11 @@ export class GetCardStatuses {
 }
 
 export interface NetWorth {
-  /** Lo que tienes en cuentas (sin tarjetas) más lo que te deben. */
+  /** Disponible: saldo de cuentas y efectivo, sin tarjetas. Lo que te deben no cuenta: todavía no se puede usar. */
+  available: number;
+  /** Lo que te deben (deudas "me deben" pendientes). */
+  owedToMe: number;
+  /** available + owedToMe. */
   have: number;
   /** Lo que debes: tarjetas más deudas. */
   owe: number;
@@ -272,8 +276,9 @@ export class GetNetWorth {
   async execute(): Promise<NetWorth> {
     const [accounts, debts] = await Promise.all([this.accounts.execute(), this.debts.execute()]);
     const sum = (dir: DebtDirection) => debts.filter((d) => d.debt.direction === dir).reduce((s, d) => s + Math.max(0, d.balance), 0);
-    const have = accounts.assets + sum('me_deben');
+    const owedToMe = sum('me_deben');
+    const have = accounts.assets + owedToMe;
     const owe = accounts.cardDebt + sum('debo');
-    return { have, owe, total: have - owe };
+    return { available: accounts.assets, owedToMe, have, owe, total: have - owe };
   }
 }
