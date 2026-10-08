@@ -2,9 +2,12 @@
   <header class="screen-head">
     <div class="title-row">
       <h1 class="screen-title">Inicio</h1>
-      <a routerLink="/ajustes" class="settings" aria-label="Ajustes: moneda y categorías">
-        <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
-      </a>
+      <span class="head-icons">
+        <app-help-button topic="inicio"></app-help-button>
+        <a routerLink="/ajustes" class="settings" aria-label="Ajustes: moneda y categorías">
+          <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
+        </a>
+      </span>
     </div>
     @if (userName(); as name) {
       <p class="greeting">Hola, {{ name }}</p>

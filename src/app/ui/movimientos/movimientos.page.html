@@ -2,13 +2,16 @@
   <header class="screen-head">
     <div class="title-row">
       <h1 class="screen-title">Movimientos</h1>
-      @if (rows()?.length) {
-        @if (selecting()) {
-          <button type="button" class="head-action" (click)="stopSelecting()">Listo</button>
-        } @else {
-          <button type="button" class="head-action" (click)="startSelecting()">Seleccionar</button>
+      <span class="head-icons">
+        @if (rows()?.length) {
+          @if (selecting()) {
+            <button type="button" class="head-action" (click)="stopSelecting()">Listo</button>
+          } @else {
+            <button type="button" class="head-action" (click)="startSelecting()">Seleccionar</button>
+          }
         }
-      }
+        <app-help-button topic="movimientos"></app-help-button>
+      </span>
     </div>
     <app-month-switcher></app-month-switcher>
   </header>

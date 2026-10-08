@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { HelpButtonComponent } from '../help/help-button.component';
 import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
@@ -44,7 +45,7 @@ interface RecentRow {
   selector: 'app-inicio',
   templateUrl: 'inicio.page.html',
   styleUrls: ['inicio.page.scss'],
-  imports: [
+  imports: [HelpButtonComponent, 
     LoadingComponent,
     RouterLink,
     IonContent,

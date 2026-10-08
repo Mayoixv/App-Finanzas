@@ -491,3 +491,19 @@ ion-alert.app-alert.choices button.alert-button {
     --c: var(--overdue-on-light);
   }
 }
+
+/* Íconos a la derecha del título (ayuda, ajustes, Seleccionar). */
+.head-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: -8px;
+
+  .settings {
+    margin-right: 0;
+  }
+}
+
+.title-row > app-help-button {
+  margin-right: -8px;
+}

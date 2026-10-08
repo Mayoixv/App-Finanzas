@@ -1,4 +1,5 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
+import { HelpButtonComponent } from '../help/help-button.component';
 import { MonthSwitcherComponent } from '../month-switcher.component';
 import { IonContent } from '@ionic/angular';
 import { APP_CONTAINER } from '../../app.container';
@@ -16,7 +17,7 @@ import { DINERO_SECTIONS, DineroSection, DineroState } from './dinero-state';
   selector: 'app-dinero',
   templateUrl: 'dinero.page.html',
   styleUrls: ['dinero.page.scss'],
-  imports: [MonthSwitcherComponent, IonContent, PillToggleComponent, CuentasViewComponent, MetasViewComponent, DeudasViewComponent],
+  imports: [HelpButtonComponent, MonthSwitcherComponent, IonContent, PillToggleComponent, CuentasViewComponent, MetasViewComponent, DeudasViewComponent],
 })
 export class DineroPage {
   private readonly container = inject(APP_CONTAINER);

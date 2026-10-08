@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { HelpButtonComponent } from '../help/help-button.component';
 import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { IonContent, IonIcon } from '@ionic/angular';
@@ -66,7 +67,7 @@ interface Totals {
   selector: 'app-fijos',
   templateUrl: 'fijos.page.html',
   styleUrls: ['fijos.page.scss'],
-  imports: [
+  imports: [HelpButtonComponent, 
     LoadingComponent,
     IonContent,
     IonIcon,

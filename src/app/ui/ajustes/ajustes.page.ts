@@ -1,9 +1,11 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TourService } from '../tour/tour.service';
+import { HelpService } from '../help/help-button.component';
+import { HELP, HELP_TOPICS, HelpTopic } from '../help/help.content';
 import { AlertController, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmark, chevronBack, chevronDown, chevronForward } from 'ionicons/icons';
+import { checkmark, chevronBack, chevronDown, chevronForward, helpCircleOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { Currency } from '../../domain/currency';
 import { CurrencyState } from '../currency-state';
@@ -25,6 +27,11 @@ export class AjustesPage {
   protected readonly currencyState = inject(CurrencyState);
   private readonly alerts = inject(AlertController);
   protected readonly tour = inject(TourService);
+  protected readonly help = inject(HelpService);
+  protected readonly helpTopics = HELP_TOPICS;
+  protected helpTitle(t: HelpTopic) {
+    return HELP[t].title;
+  }
   protected readonly userName = signal('');
   protected readonly showPrivacy = signal(false);
   protected readonly version = APP_VERSION;
@@ -42,7 +49,7 @@ export class AjustesPage {
   );
 
   constructor() {
-    addIcons({ checkmark, chevronBack, chevronDown, chevronForward });
+    addIcons({ checkmark, chevronBack, chevronDown, chevronForward, helpCircleOutline });
     effect(() => {
       this.monthState.version();
       this.load();

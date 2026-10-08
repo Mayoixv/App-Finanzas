@@ -18,12 +18,26 @@
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
       </li>
+    </ul>
+  </section>
+
+  <section class="block" aria-labelledby="ayuda-title">
+    <h2 id="ayuda-title" class="section-title">Ayuda</h2>
+    <ul class="rows">
       <li>
         <button type="button" class="row" (click)="tour.start()">
           <span class="row-title">Ver recorrido otra vez</span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
       </li>
+      @for (t of helpTopics; track t) {
+        <li>
+          <button type="button" class="row" [attr.aria-label]="'Ayuda sobre ' + helpTitle(t)" (click)="help.open(t)">
+            <span class="row-title">{{ helpTitle(t) }}</span>
+            <ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+      }
     </ul>
   </section>
 

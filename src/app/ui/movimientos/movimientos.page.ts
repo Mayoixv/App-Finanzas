@@ -6,6 +6,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { HelpButtonComponent } from '../help/help-button.component';
 import { lookOf } from '../category-look';
 import {
   AlertController,
@@ -72,7 +73,7 @@ const fold = (text: string) =>
   selector: 'app-movimientos',
   templateUrl: 'movimientos.page.html',
   styleUrls: ['movimientos.page.scss'],
-  imports: [
+  imports: [HelpButtonComponent, 
     LoadingComponent,
     IonContent,
     IonIcon,

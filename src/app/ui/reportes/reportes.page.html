@@ -4,7 +4,10 @@
       <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
       Volver
     </button>
-    <h1 class="screen-title">Reportes</h1>
+    <div class="title-row">
+      <h1 class="screen-title">Reportes</h1>
+      <app-help-button topic="reportes"></app-help-button>
+    </div>
     <p class="subtitle">Hasta {{ monthState.label() }}</p>
     <button type="button" class="btn-secondary export" [disabled]="exporting()" (click)="exportPdf()">
       {{ exporting() ? 'Creando PDF…' : 'Exportar ' + monthState.label() + ' a PDF' }}

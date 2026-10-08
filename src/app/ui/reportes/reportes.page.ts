@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { HelpButtonComponent } from '../help/help-button.component';
 import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
@@ -30,7 +31,7 @@ import { LoadingComponent } from '../loading.component';
   selector: 'app-reportes',
   templateUrl: 'reportes.page.html',
   styleUrls: ['reportes.page.scss'],
-  imports: [
+  imports: [HelpButtonComponent, 
     LoadingComponent,
     IonContent,
     IonIcon,

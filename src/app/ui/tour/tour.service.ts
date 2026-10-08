@@ -1,4 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
+import { HELP } from '../help/help.content';
 
 export interface TourStep {
   /** Pantalla donde está el elemento. */
@@ -12,44 +13,44 @@ export interface TourStep {
   action?: boolean;
 }
 
-/** Recorrido por las pantallas reales. Lo que se crea en él es dato real del usuario. */
+/** Recorrido por las pantallas reales, con los textos de la ayuda (help.content.ts). Lo que se crea en él es dato real del usuario. */
 export const TOUR_STEPS: TourStep[] = [
   {
     route: '/tabs/inicio',
     target: 'app-inicio .hero, app-inicio .empty',
     title: 'Tu mes en un vistazo',
-    text: 'Mira tu balance: lo que entró menos lo que gastaste y ahorraste.',
+    text: HELP.inicio.points[0],
   },
   {
     route: '/tabs/inicio',
     target: 'app-inicio app-month-switcher',
     title: 'Cambia de mes',
-    text: 'Toca las flechas o el nombre del mes. Cada mes muestra solo sus movimientos.',
+    text: HELP.inicio.points[1],
   },
   {
     route: '/tabs/inicio',
     target: 'app-tabs .add-button',
     title: 'Anota un gasto',
-    text: 'Toca + para anotar un gasto o un ingreso. Toma unos segundos.',
+    text: HELP.inicio.points[2],
   },
   {
     route: '/tabs/fijos',
     target: 'app-fijos .empty-action, app-tabs .add-button',
     title: 'Agrega tu primer pago fijo',
-    text: 'Tócalo y anota tu alquiler, la luz o tu sueldo. Se repite cada mes.',
+    text: HELP.fijos.points[0],
     action: true,
   },
   {
     route: '/tabs/dinero',
     target: 'app-dinero .hero',
     title: 'Tu dinero',
-    text: 'Revisa tus cuentas, tarjetas, metas de ahorro y deudas en un solo lugar.',
+    text: HELP.cuentas.points[0],
   },
   {
     route: '/reportes',
     target: 'app-reportes .screen-head',
     title: 'Reportes',
-    text: 'Compara tus meses y mira en qué se va el gasto. Llegas desde Inicio.',
+    text: HELP.reportes.points[0],
   },
 ];
 
