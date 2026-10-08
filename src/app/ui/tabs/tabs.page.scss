@@ -29,24 +29,28 @@
   -webkit-backdrop-filter: blur(20px);
 }
 
+// Cinco pestañas: ícono arriba y nombre corto debajo, para que quepan a 360 px.
 .t-tab {
   position: relative;
   z-index: 1;
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-width: 0;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 2px;
   appearance: none;
   border: 0;
   background: transparent;
-  height: 48px;
-  padding: 4px 10px;
-  border-radius: 48px;
+  height: 56px;
+  padding: 4px 2px;
+  border-radius: 28px;
   color: var(--tabs-text-muted);
   font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   cursor: pointer;
   transition: color var(--tabs-dur) var(--tabs-ease);
@@ -62,15 +66,30 @@
   }
 }
 
+.t-tab ion-icon {
+  font-size: 22px;
+  transition: transform var(--tabs-dur) var(--tabs-ease);
+}
+
+.t-tab[aria-selected='true'] ion-icon {
+  transform: translateY(-1px) scale(1.06);
+}
+
+.t-tab-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .t-tabs-pill {
   position: absolute;
   top: 4px;
   left: 0;
   z-index: 0;
-  height: 48px;
+  height: 56px;
   width: 0;
   background: var(--tabs-pill-bg);
-  border-radius: 48px;
+  border-radius: 28px;
   transform: translateX(0);
   transition: transform var(--tabs-dur) var(--tabs-ease), width var(--tabs-dur) var(--tabs-ease);
   will-change: transform, width;
@@ -80,7 +99,7 @@
 .add-button {
   position: fixed;
   right: 20px;
-  bottom: calc(var(--ion-safe-area-bottom, 0px) + 92px);
+  bottom: calc(var(--ion-safe-area-bottom, 0px) + 100px);
   z-index: 10;
   width: 56px;
   min-height: 56px;

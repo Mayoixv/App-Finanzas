@@ -13,7 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { IonIcon, IonRouterOutlet } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
+import { add, flagOutline, homeOutline, listOutline, repeatOutline, walletOutline } from 'ionicons/icons';
 import { filter } from 'rxjs';
 import { SavingsFormService } from '../ahorro/savings-form.service';
 import { RecurringFormService } from '../fijos/recurring-form.service';
@@ -21,26 +21,34 @@ import { TransactionFormService } from '../movimientos/transaction-form.service'
 import { DineroFormService } from '../dinero/dinero-form.service';
 import { DineroSection, DineroState } from '../dinero/dinero-state';
 import { DeudaModalComponent } from '../deudas/deuda.modal';
+import { PlanesSection, PlanesState } from '../planes/planes.page';
 
 const DINERO_ADD_LABEL: Record<DineroSection, string> = {
   cuentas: 'Agregar cuenta',
   tarjetas: 'Agregar tarjeta de crédito',
+};
+
+const PLANES_ADD_LABEL: Record<PlanesSection, string> = {
   metas: 'Agregar meta de ahorro',
   deudas: 'Agregar deuda o préstamo',
 };
 
 interface Tab {
   path: string;
+  /** Nombre corto bajo el ícono; `name` es el completo, para lectores de pantalla. */
   label: string;
+  name: string;
+  icon: string;
   /** Qué agrega el botón + cuando esta pestaña está activa. */
   addLabel: string;
 }
 
 const TABS: Tab[] = [
-  { path: 'inicio', label: 'Inicio', addLabel: 'Agregar movimiento' },
-  { path: 'movimientos', label: 'Movimientos', addLabel: 'Agregar movimiento' },
-  { path: 'fijos', label: 'Fijos', addLabel: 'Agregar fijo (gasto o ingreso)' },
-  { path: 'dinero', label: 'Dinero', addLabel: '' },
+  { path: 'inicio', label: 'Inicio', name: 'Inicio', icon: 'home-outline', addLabel: 'Agregar movimiento' },
+  { path: 'movimientos', label: 'Movim.', name: 'Movimientos', icon: 'list-outline', addLabel: 'Agregar movimiento' },
+  { path: 'fijos', label: 'Fijos', name: 'Fijos', icon: 'repeat-outline', addLabel: 'Agregar fijo (gasto o ingreso)' },
+  { path: 'dinero', label: 'Dinero', name: 'Dinero', icon: 'wallet-outline', addLabel: '' },
+  { path: 'planes', label: 'Planes', name: 'Planes: metas y deudas', icon: 'flag-outline', addLabel: '' },
 ];
 
 @Component({
@@ -56,6 +64,7 @@ export class TabsPage {
   private readonly savingsForm = inject(SavingsFormService);
   private readonly dineroForm = inject(DineroFormService);
   private readonly dinero = inject(DineroState);
+  private readonly planes = inject(PlanesState);
 
   protected readonly tabs = TABS;
   protected readonly active = signal(this.indexOf(this.router.url));
@@ -65,7 +74,7 @@ export class TabsPage {
   private ready = false;
 
   constructor() {
-    addIcons({ add });
+    addIcons({ add, flagOutline, homeOutline, listOutline, repeatOutline, walletOutline });
 
     this.router.events
       .pipe(
@@ -87,28 +96,31 @@ export class TabsPage {
 
   protected addLabel(): string {
     const tab = TABS[this.active()];
-    return tab.path === 'dinero' ? DINERO_ADD_LABEL[this.dinero.section()] : tab.addLabel;
+    if (tab.path === 'dinero') return DINERO_ADD_LABEL[this.dinero.section()];
+    if (tab.path === 'planes') return PLANES_ADD_LABEL[this.planes.section()];
+    return tab.addLabel;
   }
 
   protected add() {
     const path = TABS[this.active()].path;
     if (path === 'fijos') this.recurringForm.open();
     else if (path === 'dinero') this.addInDinero();
+    else if (path === 'planes') this.addInPlanes();
     else this.transactionForm.open();
   }
 
   /** En Dinero, el + agrega lo de la sección visible. */
   private addInDinero() {
-    switch (this.dinero.section()) {
-      case 'cuentas':
-        return this.dineroForm.openAccount();
-      case 'tarjetas':
-        return this.dineroForm.openAccount(undefined, 'tarjeta');
-      case 'metas':
-        return this.savingsForm.openGoal();
-      case 'deudas':
-        return this.dineroForm.open(DeudaModalComponent, {});
-    }
+    return this.dinero.section() === 'tarjetas'
+      ? this.dineroForm.openAccount(undefined, 'tarjeta')
+      : this.dineroForm.openAccount();
+  }
+
+  /** En Planes, una meta o una deuda según la sección visible. */
+  private addInPlanes() {
+    return this.planes.section() === 'metas'
+      ? this.savingsForm.openGoal()
+      : this.dineroForm.open(DeudaModalComponent, {});
   }
 
   protected go(tab: Tab) {

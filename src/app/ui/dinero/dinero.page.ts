@@ -4,20 +4,18 @@ import { MonthSwitcherComponent } from '../month-switcher.component';
 import { IonContent } from '@ionic/angular';
 import { APP_CONTAINER } from '../../app.container';
 import { NetWorth } from '../../application/use-cases/accounts';
-import { MetasViewComponent } from '../ahorro/metas-view.component';
 import { CuentasViewComponent } from '../cuentas/cuentas-view.component';
-import { DeudasViewComponent } from '../deudas/deudas-view.component';
 import { formatMoney } from '../format';
 import { MonthState } from '../month-state';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { DINERO_SECTIONS, DineroSection, DineroState } from './dinero-state';
 
-/** Pestaña Dinero: patrimonio arriba y, debajo, cuentas, tarjetas, metas de ahorro o deudas. */
+/** Pestaña Dinero: patrimonio arriba y, debajo, cuentas (con el efectivo) o tarjetas. Metas y deudas están en Planes. */
 @Component({
   selector: 'app-dinero',
   templateUrl: 'dinero.page.html',
   styleUrls: ['dinero.page.scss'],
-  imports: [HelpButtonComponent, MonthSwitcherComponent, IonContent, PillToggleComponent, CuentasViewComponent, MetasViewComponent, DeudasViewComponent],
+  imports: [HelpButtonComponent, MonthSwitcherComponent, IonContent, PillToggleComponent, CuentasViewComponent],
 })
 export class DineroPage {
   private readonly container = inject(APP_CONTAINER);
@@ -32,8 +30,6 @@ export class DineroPage {
   protected readonly options: PillOption[] = [
     { value: 'cuentas', label: 'Cuentas' },
     { value: 'tarjetas', label: 'Tarjetas' },
-    { value: 'metas', label: 'Metas' },
-    { value: 'deudas', label: 'Deudas' },
   ];
 
   constructor() {

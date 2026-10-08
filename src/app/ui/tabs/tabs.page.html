@@ -9,9 +9,11 @@
       class="t-tab"
       role="tab"
       [attr.aria-selected]="active() === i"
+      [attr.aria-label]="tab.name"
       (click)="go(tab)"
     >
-      {{ tab.label }}
+      <ion-icon [name]="tab.icon" aria-hidden="true"></ion-icon>
+      <span class="t-tab-label">{{ tab.label }}</span>
     </button>
   }
 </nav>

@@ -23,7 +23,11 @@ export const routes: Routes = [
         loadComponent: () => import('./ui/dinero/dinero.page').then((m) => m.DineroPage),
       },
       // Direcciones viejas: llevan a la sección correspondiente de Dinero.
-      { path: 'ahorro', redirectTo: '/tabs/dinero?ver=metas' },
+      {
+        path: 'planes',
+        loadComponent: () => import('./ui/planes/planes.page').then((m) => m.PlanesPage),
+      },
+      { path: 'ahorro', redirectTo: '/tabs/planes?ver=metas' },
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
     ],
   },
@@ -48,6 +52,6 @@ export const routes: Routes = [
     loadComponent: () => import('./ui/bienvenida/bienvenida.page').then((m) => m.BienvenidaPage),
   },
   { path: 'cuentas', redirectTo: '/tabs/dinero?ver=cuentas' },
-  { path: 'deudas', redirectTo: '/tabs/dinero?ver=deudas' },
+  { path: 'deudas', redirectTo: '/tabs/planes?ver=deudas' },
   { path: '', redirectTo: 'tabs', pathMatch: 'full' },
 ];

@@ -47,6 +47,12 @@ export const TOUR_STEPS: TourStep[] = [
     text: HELP.cuentas.points[0],
   },
   {
+    route: '/tabs/planes',
+    target: 'app-planes .sections',
+    title: 'Metas y deudas',
+    text: HELP.metas.points[0],
+  },
+  {
     route: '/reportes',
     target: 'app-reportes .screen-head',
     title: 'Reportes',

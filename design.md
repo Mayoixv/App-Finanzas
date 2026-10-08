@@ -78,8 +78,10 @@ Largo de línea menor a 80 caracteres. Las mayúsculas se reservan para titulare
 - **Barra de progreso de ahorro**: pista `rgba(255,255,255,.12)`, relleno con degradado violeta, el porcentaje al final.
 - **Fila de transacción**: ícono en círculo, nombre, nota en `--muted`, monto alineado a la derecha.
   Gasto fijo con chip de estado: "Recibido" (verde), "Pagado" (violeta), "Pendiente" (ámbar) o "Vencido" (rojo).
-- **Barra inferior**: 4 pestañas (Inicio, Mes, Ahorros, Resumen), píldora flotante oscura con la pestaña
-  activa resaltada en violeta.
+- **Barra inferior**: 5 pestañas (Inicio, Movimientos, Fijos, Dinero, Planes), píldora flotante oscura con la pestaña
+  activa resaltada en violeta. Cada pestaña lleva su ícono arriba y un nombre corto debajo (12 px, solo en esta barra)
+  para que las cinco quepan a 360 px; el nombre completo va en `aria-label`. Dinero: Cuentas | Tarjetas.
+  Planes: Metas | Deudas.
 
 ## 5. Layout
 
