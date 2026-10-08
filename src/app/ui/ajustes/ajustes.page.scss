@@ -202,3 +202,21 @@ li + li .row {
     font-weight: 600;
   }
 }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  border-top: 1px solid rgba(20, 18, 31, 0.08);
+
+  ion-toggle {
+    flex: 1;
+    --track-background-checked: var(--violet-600);
+    padding: 8px 0;
+    font-size: 16px;
+  }
+}
+
+.toggle-row + li .row {
+  border-top: 1px solid rgba(20, 18, 31, 0.08);
+}

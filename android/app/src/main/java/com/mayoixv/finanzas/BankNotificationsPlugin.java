@@ -24,9 +24,52 @@ import java.nio.charset.StandardCharsets;
 @CapacitorPlugin(name = "BankNotifications")
 public class BankNotificationsPlugin extends Plugin {
 
+    /** Pantalla a abrir cuando la app arrancó desde la notificación "Compra por confirmar". */
+    private String pendingRoute;
+
     @Override
     public void load() {
         BankNotificationListener.plugin = this;
+        pendingRoute = routeOf(getActivity().getIntent());
+    }
+
+    /** Con la app ya abierta, tocar la notificación avisa a la app para que navegue. */
+    @Override
+    protected void handleOnNewIntent(Intent intent) {
+        super.handleOnNewIntent(intent);
+        String route = routeOf(intent);
+        if (route == null) return;
+        JSObject data = new JSObject();
+        data.put("route", route);
+        notifyListeners("open", data);
+    }
+
+    private static String routeOf(Intent intent) {
+        if (intent == null) return null;
+        String route = intent.getStringExtra(PurchaseNotifier.EXTRA_ROUTE);
+        intent.removeExtra(PurchaseNotifier.EXTRA_ROUTE);
+        return route;
+    }
+
+    @PluginMethod
+    public void takeRoute(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("route", pendingRoute);
+        pendingRoute = null;
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void getNotifyPurchases(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("enabled", PurchaseNotifier.enabled(getContext()));
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void setNotifyPurchases(PluginCall call) {
+        PurchaseNotifier.setEnabled(getContext(), Boolean.TRUE.equals(call.getBoolean("enabled", true)));
+        call.resolve();
     }
 
     @Override

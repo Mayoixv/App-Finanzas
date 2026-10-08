@@ -88,6 +88,11 @@
             <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
           </button>
         </li>
+        <li class="toggle-row">
+          <ion-toggle justify="space-between" [checked]="bank.notifyPurchases()" (ionChange)="bank.setNotifyPurchases($event.detail.checked)">
+            Avisarme de cada compra
+          </ion-toggle>
+        </li>
         <li>
           <a routerLink="/por-confirmar" class="row">
             <span class="row-title">Por confirmar</span>

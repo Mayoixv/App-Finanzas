@@ -33,8 +33,8 @@ ion-select {
   color: var(--text-on-light);
 }
 
+// Sin min-height: Ionic no estira su contenido y el texto quedaría arriba. Con el relleno ya mide más de 48 px.
 ion-toggle {
-  min-height: 48px;
   --track-background-checked: var(--violet-600);
   padding: 8px 0;
 }

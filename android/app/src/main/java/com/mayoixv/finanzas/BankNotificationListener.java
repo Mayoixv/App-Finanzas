@@ -55,6 +55,7 @@ public class BankNotificationListener extends NotificationListenerService {
             item.put("receivedAt", isoNow());
             item.put("package", sbn.getPackageName());
             save(item);
+            PurchaseNotifier.maybeNotify(this, all);
             BankNotificationsPlugin p = plugin;
             if (p != null) p.onPosted();
         } catch (Exception e) {
