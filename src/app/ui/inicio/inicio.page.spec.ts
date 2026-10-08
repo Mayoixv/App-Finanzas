@@ -5,6 +5,7 @@ import { APP_CONTAINER, buildContainer } from '../../app.container';
 import {
   InMemoryBudgets,
   InMemoryAccounts,
+  InMemoryBankImports,
   InMemoryCategories,
   InMemoryDebts,
   InMemoryRecurring,
@@ -31,6 +32,7 @@ async function render(withData: boolean) {
     backup: { dump: () => Promise.reject(), restore: () => Promise.reject(), wipe: () => Promise.reject() },
     debts: new InMemoryDebts(),
     accounts: new InMemoryAccounts(transactions, categories),
+    bankImports: new InMemoryBankImports(),
   };
   repos.categories.items.set('sal', { id: 'sal', name: 'Salario', type: 'ingreso' });
   repos.categories.items.set('com', { id: 'com', name: 'Comida', type: 'variable' });

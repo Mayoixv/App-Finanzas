@@ -9,6 +9,7 @@ const TABLES = [
   'accounts',
   'transactions',
   'transaction_splits',
+  'bank_imports',
   'attachments',
   'recurring_expenses',
   'recurring_instances',

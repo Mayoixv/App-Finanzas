@@ -273,6 +273,29 @@ export const MIGRATIONS: Migration[] = [
        )`,
     ],
   },
+  {
+    version: 12,
+    name: 'compras importadas de las notificaciones del banco',
+    statements: [
+      `ALTER TABLE accounts ADD COLUMN card_last4 TEXT`,
+      `CREATE TABLE bank_imports (
+         id             TEXT PRIMARY KEY,
+         key            TEXT NOT NULL UNIQUE,
+         bank           TEXT NOT NULL,
+         kind           TEXT NOT NULL CHECK (kind IN ('compra', 'reverso')),
+         amount         INTEGER NOT NULL CHECK (amount > 0),
+         currency       TEXT NOT NULL,
+         merchant       TEXT NOT NULL,
+         date           TEXT NOT NULL,
+         last4          TEXT NOT NULL,
+         status         TEXT NOT NULL CHECK (status IN ('pendiente', 'confirmado', 'descartado')),
+         received_at    TEXT NOT NULL,
+         transaction_id TEXT REFERENCES transactions(id) ON DELETE SET NULL,
+         category_id    TEXT REFERENCES categories(id) ON DELETE SET NULL
+       )`,
+      `CREATE INDEX idx_bank_imports_status ON bank_imports(status)`,
+    ],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

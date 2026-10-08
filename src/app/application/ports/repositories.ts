@@ -3,6 +3,7 @@ import { Category } from '../../domain/category';
 import { MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
 import { Account, Transfer } from '../../domain/account';
+import { BankImport } from '../../domain/bank-alert';
 import { Debt, DebtPayment } from '../../domain/debts';
 import { SavingsContribution, SavingsGoal } from '../../domain/savings';
 import { Attachment, Transaction } from '../../domain/transaction';
@@ -58,6 +59,17 @@ export interface IBudgetRepository {
   listByMonth(month: MonthKey): Promise<Budget[]>;
   save(budget: Budget): Promise<void>;
   delete(id: string): Promise<void>;
+}
+
+export interface IBankImportRepository {
+  /** Los que esperan confirmación, del más reciente al más antiguo. */
+  listPending(): Promise<BankImport[]>;
+  get(id: string): Promise<BankImport | undefined>;
+  /** Guarda uno nuevo; false si ya había uno con la misma clave (no se duplica). */
+  insertIfNew(item: BankImport): Promise<boolean>;
+  save(item: BankImport): Promise<void>;
+  /** La categoría con que se confirmó la última compra de ese comercio. */
+  lastCategoryFor(merchantPrefix: string): Promise<string | null>;
 }
 
 export interface IAccountRepository {

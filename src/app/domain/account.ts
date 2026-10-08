@@ -23,6 +23,8 @@ export interface Account {
   dueDay?: number | null;
   /** Archivada: no aparece para elegir en movimientos nuevos, pero conserva su historial. */
   archived: boolean;
+  /** Últimos 4 dígitos de la tarjeta (de crédito, o de débito de una cuenta), para asignar las compras importadas. */
+  cardLast4?: string | null;
 }
 
 /** Dinero que pasa de una cuenta a otra: no es ingreso ni gasto. */

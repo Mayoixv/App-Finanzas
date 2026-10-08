@@ -98,6 +98,20 @@ function qikDate(text: string): IsoDate | null {
   return m ? `${m[3]}-${pad(m[1])}-${pad(m[2])}` : null;
 }
 
+export type BankImportStatus = 'pendiente' | 'confirmado' | 'descartado';
+
+/** Un aviso guardado en "Por confirmar". */
+export interface BankImport extends BankAlert {
+  id: string;
+  key: string;
+  status: BankImportStatus;
+  /** Cuándo llegó la notificación (ISO). */
+  receivedAt: string;
+  /** Al confirmar: el movimiento creado y la categoría elegida (sirve para sugerir la próxima vez). */
+  transactionId?: string | null;
+  categoryId?: string | null;
+}
+
 /**
  * Clave para no registrar dos veces la misma compra (por ejemplo el correo y la notificación de la app del banco).
  * El comercio se recorta porque cada aviso lo escribe un poco distinto.

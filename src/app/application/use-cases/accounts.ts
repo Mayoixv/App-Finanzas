@@ -15,6 +15,8 @@ export interface AccountFields {
   creditLimit?: number | null;
   cutDay?: number | null;
   dueDay?: number | null;
+  /** Últimos 4 dígitos de su tarjeta (crédito o débito); vacío si no se usa para importar compras. */
+  cardLast4?: string | null;
 }
 
 const validDay = (d: number | null | undefined) => typeof d === 'number' && Number.isInteger(d) && d >= 1 && d <= 31;
@@ -34,6 +36,11 @@ export class SaveAccount {
     if (!TYPES.includes(input.type)) throw new ValidationError('Tipo de cuenta inválido');
     if (!Number.isInteger(input.initialBalance)) throw new ValidationError('Saldo inicial inválido');
     if (id === CASH_ACCOUNT_ID && input.type !== 'efectivo') throw new ValidationError('Efectivo no puede cambiar de tipo');
+    const last4 = input.cardLast4?.trim() || null;
+    if (last4 && !/^\d{4}$/.test(last4)) throw new ValidationError('Escribe los últimos 4 dígitos de la tarjeta');
+    if (last4 && (await this.accounts.list()).some((a) => a.id !== id && a.cardLast4 === last4)) {
+      throw new ValidationError('Otra cuenta ya usa esos 4 dígitos');
+    }
     const card = isCard(input);
     if (card) {
       if (!isValidCents(input.creditLimit ?? 0)) throw new ValidationError('Escribe el límite de la tarjeta');
@@ -49,6 +56,7 @@ export class SaveAccount {
       cutDay: card ? input.cutDay : null,
       dueDay: card ? input.dueDay : null,
       archived: current?.archived ?? false,
+      cardLast4: input.type === 'efectivo' ? null : last4,
     };
     await this.accounts.save(account);
     return account;

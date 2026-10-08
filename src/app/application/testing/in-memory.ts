@@ -1,5 +1,6 @@
 import { Budget } from '../../domain/budget';
 import { Category } from '../../domain/category';
+import { BankImport } from '../../domain/bank-alert';
 import { monthOf, MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
 import { Account, CASH_ACCOUNT_ID, Transfer } from '../../domain/account';
@@ -9,6 +10,7 @@ import { Attachment, Transaction } from '../../domain/transaction';
 import {
   IBudgetRepository,
   IAccountRepository,
+  IBankImportRepository,
   ICategoryRepository,
   IDebtRepository,
   IdGenerator,
@@ -178,4 +180,22 @@ export class InMemoryAccounts implements IAccountRepository {
 export class SequentialIds implements IdGenerator {
   private n = 0;
   next() { return `id-${++this.n}`; }
+}
+
+export class InMemoryBankImports implements IBankImportRepository {
+  items = new Map<string, BankImport>();
+  async listPending() {
+    return [...this.items.values()].filter((i) => i.status === 'pendiente').sort((a, b) => b.date.localeCompare(a.date));
+  }
+  async get(id: string) { return this.items.get(id); }
+  async insertIfNew(i: BankImport) {
+    if ([...this.items.values()].some((x) => x.key === i.key)) return false;
+    this.items.set(i.id, i);
+    return true;
+  }
+  async save(i: BankImport) { this.items.set(i.id, i); }
+  async lastCategoryFor(prefix: string) {
+    const done = [...this.items.values()].filter((i) => i.status === 'confirmado' && i.categoryId && i.merchant.toUpperCase().startsWith(prefix.toUpperCase()));
+    return done.at(-1)?.categoryId ?? null;
+  }
 }
