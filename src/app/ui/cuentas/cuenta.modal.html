@@ -81,6 +81,22 @@
       </div>
     }
 
+    @if (!isCash()) {
+      <div class="field">
+        <ion-input
+          [label]="isCard() ? 'Últimos 4 dígitos de la tarjeta (opcional)' : 'Últimos 4 dígitos de su tarjeta de débito (opcional)'"
+          label-placement="stacked"
+          type="text"
+          inputmode="numeric"
+          maxlength="4"
+          placeholder="Ej. 8462"
+          [value]="cardLast4()"
+          (ionInput)="cardLast4.set(($event.detail.value ?? '').toString())"
+        ></ion-input>
+      </div>
+      <p class="hint">Con ellos, las compras que la app lee de los avisos del banco se asignan solas a esta cuenta.</p>
+    }
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }

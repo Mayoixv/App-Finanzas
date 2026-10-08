@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TourService } from '../tour/tour.service';
+import { BankNotificationsService } from '../importar/bank-notifications.service';
 import { HelpService } from '../help/help-button.component';
 import { HELP, HELP_TOPICS, HelpTopic } from '../help/help.content';
 import { AlertController, IonContent, IonIcon } from '@ionic/angular';
@@ -27,6 +28,7 @@ export class AjustesPage {
   protected readonly currencyState = inject(CurrencyState);
   private readonly alerts = inject(AlertController);
   protected readonly tour = inject(TourService);
+  protected readonly bank = inject(BankNotificationsService);
   protected readonly help = inject(HelpService);
   protected readonly helpTopics = HELP_TOPICS;
   protected helpTitle(t: HelpTopic) {

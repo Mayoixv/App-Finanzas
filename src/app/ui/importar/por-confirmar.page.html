@@ -1,0 +1,41 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <button type="button" class="back" aria-label="Volver" (click)="back()">
+      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+      Volver
+    </button>
+    <h1 class="screen-title">Por confirmar</h1>
+    <p class="subtitle">Compras leídas de los avisos de tu banco. Confirma cada una o descártala si ya la anotaste.</p>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
+
+  @if (items(); as list) {
+    @if (list.length) {
+      <ul class="list">
+        @for (p of list; track p.item.id) {
+          <li animate.leave="t-row-leave">
+            <app-import-row
+              [pending]="p"
+              [categories]="categories()"
+              [accounts]="accounts()"
+              (done)="onDone($event)"
+              (categoryCreated)="addCategory($event)"
+            ></app-import-row>
+          </li>
+        }
+      </ul>
+    } @else {
+      <section class="empty">
+        <span class="empty-icon" aria-hidden="true"><ion-icon name="receipt-outline"></ion-icon></span>
+        <p class="empty-title">Nada por confirmar</p>
+        @if (bank.available && !bank.enabled()) {
+          <p class="empty-text">Activa en Ajustes la lectura de avisos del banco y aquí aparecerán tus compras.</p>
+          <a routerLink="/ajustes" class="btn-secondary empty-action">Ir a Ajustes</a>
+        } @else {
+          <p class="empty-text">Cuando llegue un aviso de compra de tu banco, aparecerá aquí para confirmarlo.</p>
+        }
+      </section>
+    }
+  }
+</ion-content>

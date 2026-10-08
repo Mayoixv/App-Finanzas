@@ -192,3 +192,13 @@ li + li .row {
 .row ion-icon.flipped {
   transform: rotate(180deg);
 }
+
+.bank-state {
+  font-size: 15px;
+  color: var(--muted-on-light);
+
+  &.on {
+    color: var(--violet-600);
+    font-weight: 600;
+  }
+}

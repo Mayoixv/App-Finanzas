@@ -33,6 +33,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+        <!-- Lee las notificaciones de Gmail y del banco para "Por confirmar". Solo funciona si el usuario lo activa. -->
+        <service
+            android:name=".BankNotificationListener"
+            android:exported="false"
+            android:label="Finanzas: compras del banco"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
     </application>
 
     <!-- Permissions -->

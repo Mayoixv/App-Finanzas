@@ -41,6 +41,8 @@ export class CuentaModalComponent implements OnInit {
   protected readonly creditLimit = signal('');
   protected readonly cutDay = signal('');
   protected readonly dueDay = signal('');
+  /** Últimos 4 dígitos de su tarjeta, para asignar sola las compras importadas del banco. */
+  protected readonly cardLast4 = signal('');
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
@@ -70,6 +72,7 @@ export class CuentaModalComponent implements OnInit {
     if (a.creditLimit) this.creditLimit.set(amountToInput(a.creditLimit));
     if (a.cutDay) this.cutDay.set(String(a.cutDay));
     if (a.dueDay) this.dueDay.set(String(a.dueDay));
+    this.cardLast4.set(a.cardLast4 ?? '');
   }
 
   protected cancel() {
@@ -87,6 +90,7 @@ export class CuentaModalComponent implements OnInit {
       creditLimit: parseAmount(this.creditLimit()),
       cutDay: this.cutDay() ? Number(this.cutDay()) : null,
       dueDay: this.dueDay() ? Number(this.dueDay()) : null,
+      cardLast4: this.cardLast4(),
     };
     this.saving.set(true);
     this.error.set(null);

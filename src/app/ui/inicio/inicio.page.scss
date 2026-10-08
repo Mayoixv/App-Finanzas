@@ -303,3 +303,7 @@ li + li .row {
 .row-amount {
   grid-area: amount;
 }
+
+app-pending-banner.pending {
+  margin: 0 20px 12px;
+}
