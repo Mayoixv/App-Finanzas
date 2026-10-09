@@ -63,8 +63,8 @@ export class LockState {
     this.authenticating = true;
     try {
       await BiometricAuth.authenticate({
-        reason: 'Desbloquear Finanzas',
-        androidTitle: 'Desbloquear Finanzas',
+        reason: 'Desbloquear Kuarto',
+        androidTitle: 'Desbloquear Kuarto',
         androidSubtitle: 'Usa tu huella o tu rostro',
         cancelTitle: 'Usar PIN',
         allowDeviceCredential: false,
@@ -87,7 +87,7 @@ export class LockState {
         await BiometricAuth.authenticate({
           reason: 'Confirmar tu huella',
           androidTitle: 'Usar huella o rostro',
-          androidSubtitle: 'Confírmalo para activarlo en Finanzas',
+          androidSubtitle: 'Confírmalo para activarlo en Kuarto',
           cancelTitle: 'Cancelar',
           androidConfirmationRequired: false,
         });

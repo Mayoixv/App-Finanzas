@@ -31,18 +31,6 @@ tipografía son estimados a ojo desde una captura, así que ajústalos si el res
 | `--negative` | `#FF5470` | Gastos pasados de presupuesto, balance negativo |
 | `--warning` | `#FFB84D` | Gasto fijo pendiente cerca del vencimiento |
 
-Estados de un pago o cobro (chip `.status-chip` en `global.scss`; siempre con ícono y texto, nunca solo color):
-
-| Token | Valor | Estado | Ícono |
-|---|---|---|---|
-| `--received` | `--positive` (`#2BD07F`) | Recibido: dinero que entró | flecha de entrada |
-| `--paid` | `#B49DFF` | Pagado: salió y ya se cumplió | check |
-| `--pending` | `--warning` (`#FFB84D`) | Pendiente: aún no ocurre (o un cobro atrasado) | reloj |
-| `--overdue` | `--negative` (`#FF5470`) | Vencido: un pago que debía hacerse y no se marcó | alerta |
-
-`--paid` es más claro que `--violet-400` para llegar a 4.5:1 sobre su chip oscuro. En fondo claro se usan las
-variantes `--*-on-light` (`#0A6F40`, `#6639EC`, `#8A5300`, `#B01E39`) con el chip al 8 % en vez de 16 %.
-
 Degradado de marca: `linear-gradient(160deg, #8F6BFF 0%, #6A3DF0 45%, #2A1478 100%)`.
 Brillo: `radial-gradient(circle at 50% 0%, rgba(143,107,255,.55), transparent 65%)` detrás del elemento principal.
 Verde y rojo solo significan dinero que entra o sale. No los uses como decoración.
@@ -71,17 +59,17 @@ Largo de línea menor a 80 caracteres. Las mayúsculas se reservan para titulare
 - **Botón secundario**: píldora con borde de 1.5 px en violeta, fondo transparente.
 - **Tarjeta**: radio 24 px, fondo `--ink-800` en oscuro o `--lavender-100` en claro, borde de 1 px con
   `rgba(143,107,255,.25)`. Las tarjetas destacadas (balance, meta) usan el degradado de marca.
+  Inclinación 3D con reflejo de luz (sección 10.6): solo en la tarjeta de balance de Inicio y en las tarjetas
+  de cuenta o tarjeta de crédito de la sección Dinero, cuando exista. Las demás tarjetas son planas.
 - **Campos de formulario**: radio 16 px, fondo ligeramente más claro que la tarjeta, borde violeta al enfocar.
 - **Selector de mes**: píldora con flechas, siempre visible arriba. Cambiar de mes anima el número, no la pantalla.
 - **Dona de gastos**: grosor medio, un color distinto por categoría dentro de la familia violeta más 2 acentos,
   total en el centro con la fuente condensada.
 - **Barra de progreso de ahorro**: pista `rgba(255,255,255,.12)`, relleno con degradado violeta, el porcentaje al final.
 - **Fila de transacción**: ícono en círculo, nombre, nota en `--muted`, monto alineado a la derecha.
-  Gasto fijo con chip de estado: "Recibido" (verde), "Pagado" (violeta), "Pendiente" (ámbar) o "Vencido" (rojo).
-- **Barra inferior**: 5 pestañas (Inicio, Movimientos, Fijos, Dinero, Planes), píldora flotante oscura con la pestaña
-  activa resaltada en violeta. Cada pestaña lleva su ícono arriba y un nombre corto debajo (12 px, solo en esta barra)
-  para que las cinco quepan a 360 px; el nombre completo va en `aria-label`. Dinero: Cuentas | Tarjetas.
-  Planes: Metas | Deudas.
+  Gasto fijo con chip "Pagado" (verde) o "Pendiente" (ámbar).
+- **Barra inferior**: 4 pestañas (Inicio, Mes, Ahorros, Resumen), píldora flotante oscura con la pestaña
+  activa resaltada en violeta.
 
 ## 5. Layout
 
@@ -134,7 +122,7 @@ No hacer:
 
 ## 10. Transiciones (Transitions.dev)
 
-Solo hay nueve transiciones aprobadas (10.1 a 10.9). Todas responden a una acción del usuario (tocar una pestaña, guardar algo, abrir un menú, cambiar de mes),
+Solo hay seis transiciones aprobadas. Todas responden a una acción del usuario (tocar una pestaña, guardar algo, abrir un menú, cambiar de mes),
 así que no cuentan como animación decorativa. Cualquier otra transición nueva se consulta antes de agregarla.
 Todas respetan `prefers-reduced-motion` (ya incluido en el CSS).
 
@@ -571,46 +559,145 @@ Notas:
   ("Negativo, gastas más de lo que ganas") en `--negative`; no colorear el número, porque el rojo pierde contraste sobre el degradado violeta.
 - El texto real del balance va siempre en el `<span class="sr-only">`, porque el lector de pantalla no debe leer las columnas.
 
-### 10.6 Hojas y pantallas
+### 10.6 Inclinación 3D de tarjetas (tilt)
 
-Dónde: todos los formularios (`ion-modal`) y el cambio entre pantallas fuera de las pestañas (Ajustes, Deudas, Bienvenida).
-Está en `src/app/ui/motion.ts` y se registra en `main.ts` con `provideIonicAngular({ modalEnter, modalLeave, navAnimation })`.
+Dónde: solo en la tarjeta de balance de Inicio y en las tarjetas de cuenta o tarjeta de crédito de la sección Dinero.
+Las demás tarjetas (listas, formularios, ajustes) quedan planas: el efecto es para las tarjetas protagonistas,
+no para todas, así se respeta la regla de la sección 7.
+Cómo se siente: la tarjeta se inclina hacia el dedo o el cursor (máximo 8°), un reflejo de luz la sigue y, al soltar,
+vuelve a quedar plana en 1 segundo.
 
-- Hoja al abrir: sube desde abajo (`translateY(100%)` a `0`) en 440 ms con `cubic-bezier(0.22, 1, 0.36, 1)`, y el fondo
-  se oscurece a la vez. Al cerrar: baja en 260 ms con `cubic-bezier(0.4, 0, 1, 1)`. La hoja mantiene `opacity: 1`
-  (en modo Android Ionic la deja casi transparente si la animación no la fija).
-- Pantalla al avanzar: la nueva entra desde la derecha (`translateX(100%)`) y la anterior se corre a `-25%` con opacidad 0.5,
-  en 380 ms. Al volver, al revés. Las pestañas no usan esta transición (su outlet tiene `[animated]="false"`; ver 10.1).
-- Pasos de la bienvenida: cada paso entra con `translateX(40px)` y opacidad 0, en 420 ms.
+Cambios respecto al original de Transitions.dev:
+- `border-radius: 24px` (el original usa 12 px), para igualar las tarjetas de la app.
+- `touch-action: pan-y` en lugar de `none`. Con `none`, tocar la tarjeta bloquearía el desplazamiento vertical de toda la
+  pantalla. Con `pan-y` la pantalla sigue desplazándose y, si el navegador empieza a hacer scroll, la inclinación se
+  reinicia sola (evento `pointercancel`). En el teléfono la inclinación aparece al mantener el dedo y arrastrar de lado.
+- El brillo violeta detrás de la tarjeta (sección 2) va en el contenedor exterior, no dentro de la tarjeta, porque
+  `overflow: hidden` lo recortaría.
+- El reflejo (`.t-tilt-glare`) usa `mix-blend-mode: screen`, que solo se nota sobre fondos oscuros o sobre el degradado
+  de marca. No incluirlo en tarjetas claras (`--lavender-100`).
 
-### 10.7 Filas que entran y salen
+```css
+:root {
+  --tilt-perspective: 1000px;
+  --tilt-return: 1000ms;
+  --tilt-return-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tilt-follow: 400ms;
+  --tilt-follow-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tilt-glare-opacity: 0.32;
+  --tilt-glare-fade: 300ms;
+  --tilt-glare-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
 
-Dónde: Movimientos, Fijos, Ahorro (metas y aportes), Deudas (deudas y pagos), presupuestos y últimos movimientos de Inicio.
-Cuándo corre: solo en el momento siguiente a guardar, borrar o deshacer (`MonthState.animateLists`, 1.5 s tras
-`notifyChange()`). Al cambiar de mes o de filtro, la lista lleva `.t-still` y las filas se reemplazan sin animación.
+/* Contenedor exterior: nunca se transforma; es el área que detecta el puntero. */
+.t-tilt { touch-action: pan-y; }
 
-```html
-<ul [class.t-still]="!monthState.animateLists()" class="rows">
-  @for (row of rows(); track row.id) {
-    <li animate.enter="t-row-enter" animate.leave="t-row-leave">…</li>
-  }
-</ul>
+/* La tarjeta se inclina con rotateX/rotateY que llegan desde JS; al soltar vuelve a plana.
+   .is-tilting cambia a un seguimiento corto mientras el puntero se mueve. */
+.t-tilt-card {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  transform:
+    perspective(var(--tilt-perspective))
+    rotateX(var(--tilt-rx, 0deg))
+    rotateY(var(--tilt-ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform var(--tilt-return) var(--tilt-return-ease);
+  will-change: transform;
+}
+.t-tilt-card.is-tilting {
+  transition: transform var(--tilt-follow) var(--tilt-follow-ease);
+}
+
+/* Reflejo que sigue al puntero: círculos suaves superpuestos que suman luz (mezcla screen). */
+.t-tilt-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle 95px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+      rgba(255,255,255,0.48), rgba(255,255,255,0.06) 52%, rgba(255,255,255,0) 84%),
+    radial-gradient(circle 200px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+      rgba(255,255,255,0.22), rgba(255,255,255,0.04) 58%, rgba(255,255,255,0) 78%),
+    radial-gradient(circle 360px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+      rgba(255,255,255,0.10), rgba(255,255,255,0) 88%);
+  transition: opacity var(--tilt-glare-fade) var(--tilt-glare-ease);
+}
+.t-tilt.is-hover .t-tilt-glare { opacity: var(--tilt-glare-opacity); }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-tilt-card { transform: none !important; transition: none !important; }
+}
 ```
 
-- Entrada: la fila se abre de altura 0 a `auto` con opacidad y `translateY(-6px) scale(0.98)`, en 360 ms.
-- Salida: se cierra a altura 0 y se va hacia la derecha (`translateX(24px)`), en 280 ms.
-- Animar hasta `height: auto` usa `interpolate-size: allow-keywords` en `:root`; donde no exista, la fila solo se desvanece.
+```html
+<div class="t-tilt balance-wrap" appTilt>   <!-- el brillo violeta va aquí, fuera de la tarjeta -->
+  <div class="t-tilt-card balance-card">
+    <!-- contenido de la tarjeta (en Inicio, el contador giratorio de 10.5) -->
+    <div class="t-tilt-glare"></div>
+  </div>
+</div>
+```
 
-### 10.8 Barras y dona que crecen
+El original solo describe el JavaScript, así que esta es la directiva de Angular que lo escribe. Se aplica con `appTilt`
+al contenedor exterior y registra los eventos de puntero (funcionan igual con mouse, dedo y lápiz):
 
-- `.bar-fill` (presupuestos, metas, fijos, deudas): al aparecer se llena desde la izquierda (`scaleX(0)` a `1`) en 700 ms.
-  Si cambia el valor, el ancho ya tiene su propia transición.
-- Dona de gastos: entra girando desde `rotate(-120deg) scale(0.85)` en 800 ms; al cambiar los datos, cada arco ajusta
-  `stroke-dasharray` y `stroke-dashoffset` en 600 ms (por eso van como `[style.…]`, no como atributos).
+```ts
+// tilt.directive.ts
+import { Directive, ElementRef, HostListener, inject } from "@angular/core";
 
-### 10.9 Respuesta al tocar
+const MAX_DEG = 8; // inclinación máxima en grados
 
-- Filas, tarjetas tocables, opciones y botones de ícono (`.row`, `.budget`, `.payment`, `.choice`, `.kind button`,
-  `.edit`, `.close`) se hunden a `scale(0.97)` mientras se presionan, en 140 ms. Los botones `.btn-*` ya lo hacen a 0.98.
-- PIN: cada bolita rebota a `scale(1.35)` al llenarse (220 ms); con PIN incorrecto, la fila de bolitas tiembla de lado
-  a lado (±10 px, 420 ms).
+@Directive({ selector: "[appTilt]", standalone: true })
+export class TiltDirective {
+  private host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  private card(): HTMLElement | null {
+    return this.host.querySelector(".t-tilt-card");
+  }
+
+  @HostListener("pointerenter")
+  onEnter() {
+    if (this.reduce) return;
+    this.host.classList.add("is-hover");
+  }
+
+  @HostListener("pointermove", ["$event"])
+  onMove(e: PointerEvent) {
+    if (this.reduce) return;
+    const r = this.host.getBoundingClientRect();
+    const x = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);   // 0 a 1
+    const y = Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1);   // 0 a 1
+    this.host.classList.add("is-hover");
+    this.card()?.classList.add("is-tilting");
+    this.host.style.setProperty("--tilt-ry", `${(x - 0.5) * 2 * MAX_DEG}deg`);
+    this.host.style.setProperty("--tilt-rx", `${-(y - 0.5) * 2 * MAX_DEG}deg`);
+    this.host.style.setProperty("--tilt-gx", `${x * 100}%`);
+    this.host.style.setProperty("--tilt-gy", `${y * 100}%`);
+  }
+
+  @HostListener("pointerleave")
+  @HostListener("pointercancel")
+  @HostListener("pointerup")
+  reset() {
+    this.host.classList.remove("is-hover");
+    this.card()?.classList.remove("is-tilting");
+    ["--tilt-rx", "--tilt-ry", "--tilt-gx", "--tilt-gy"].forEach((p) =>
+      this.host.style.removeProperty(p),
+    );
+  }
+}
+```
+
+Notas:
+- Quitar las propiedades al salir hace que la tarjeta vuelva a plana con la transición lenta (`--tilt-return`).
+- Probar la tarjeta de balance con el contador giratorio (10.5) dentro, en un teléfono Android real. Una tarjeta con
+  transformación 3D puede cambiar cómo se ven el desenfoque SVG y la máscara del contador.
+- `will-change: transform` consume memoria: usar `.t-tilt-card` en 1 o 2 tarjetas por pantalla.
+- La inclinación es decorativa: nada depende de ella. Las tarjetas que se pueden tocar mantienen foco visible y se
+  activan con teclado.
+- En PC (versión futura) con mouse funciona por hover sin cambiar nada.

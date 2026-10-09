@@ -33,10 +33,10 @@ export class DatosComponent implements OnInit {
   private readonly autoToggle = viewChild<IonToggle>('autoToggle');
   protected readonly autoBackupDetail = computed(() => {
     if (!this.autoBackup.available) return 'Disponible en la app del teléfono';
-    if (!this.autoBackup.enabled()) return 'Cada 7 días, cifrado, en Documentos/Finanzas del teléfono';
+    if (!this.autoBackup.enabled()) return 'Cada 7 días, cifrado, en Documentos/Kuarto del teléfono';
     if (this.autoBackup.lastError()) return 'No se pudo guardar el último; se reintenta al abrir la app';
     const last = this.autoBackup.lastRun();
-    return last ? `Último: ${formatDay(last)} · Documentos/Finanzas` : 'Pendiente; se hace al abrir la app';
+    return last ? `Último: ${formatDay(last)} · Documentos/Kuarto` : 'Pendiente; se hace al abrir la app';
   });
   protected readonly lockOptions = [
     { value: 0, label: 'Al momento' },
@@ -82,7 +82,7 @@ export class DatosComponent implements OnInit {
     }
     const done = await this.busy('Cifrando respaldo…', async () => {
       const file = await this.container.createBackup.execute(values['p1']);
-      await saveFile(`finanzas-respaldo-${fileDate()}.finanzas`, file, 'application/json');
+      await saveFile(`kuarto-respaldo-${fileDate()}.finanzas`, file, 'application/json');
       this.status.set('Respaldo creado. Guárdalo fuera del teléfono (Drive, correo).');
       return true;
     });
@@ -166,7 +166,7 @@ export class DatosComponent implements OnInit {
   protected async exportCsv() {
     await this.busy('Preparando archivo…', async () => {
       const { csv, rows } = await this.container.exportCsv.execute();
-      await saveFile(`finanzas-movimientos-${fileDate()}.csv`, csv, 'text/csv');
+      await saveFile(`kuarto-movimientos-${fileDate()}.csv`, csv, 'text/csv');
       this.status.set(`Exportados ${rows} movimientos.`);
     });
   }
@@ -291,7 +291,7 @@ export class DatosComponent implements OnInit {
     try {
       if (!on) {
         await this.autoBackup.disable();
-        this.status.set('Respaldo automático desactivado. Los archivos ya guardados se quedan en Documentos/Finanzas.');
+        this.status.set('Respaldo automático desactivado. Los archivos ya guardados se quedan en Documentos/Kuarto.');
         return;
       }
       const values = await this.ask(
@@ -307,7 +307,7 @@ export class DatosComponent implements OnInit {
       if (values['p1'] !== values['p2']) return this.fail('Las contraseñas no coinciden.');
       const saved = await this.busy('Creando el primer respaldo…', () => this.autoBackup.enable(values['p1']));
       if (saved === false) await this.fail('Se activó, pero no se pudo guardar el primer respaldo. Se reintenta al abrir la app.');
-      else if (saved) this.status.set('Respaldo automático activado. El primero ya está en Documentos/Finanzas.');
+      else if (saved) this.status.set('Respaldo automático activado. El primero ya está en Documentos/Kuarto.');
     } finally {
       const toggle = this.autoToggle();
       if (toggle) toggle.checked = this.autoBackup.enabled();

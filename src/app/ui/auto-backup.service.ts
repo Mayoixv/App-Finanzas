@@ -4,7 +4,7 @@ import { APP_CONTAINER } from '../app.container';
 import { saveAutoBackup } from './backup-files';
 import { todayIso } from './format';
 
-/** Respaldo automático semanal: al abrir la app, si toca, lo crea y lo guarda en Documentos/Finanzas. */
+/** Respaldo automático semanal: al abrir la app, si toca, lo crea y lo guarda en Documentos/Kuarto. */
 @Injectable({ providedIn: 'root' })
 export class AutoBackupService {
   private readonly container = inject(APP_CONTAINER);

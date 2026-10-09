@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.mayoixv.finanzas',
-  appName: 'Finanzas',
+  appName: 'Kuarto',
   webDir: 'www',
   plugins: {
     CapacitorSQLite: {

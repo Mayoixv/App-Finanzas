@@ -31,7 +31,7 @@ export class AvisosComponent {
       if (!on) await this.notifications.disable();
       else if (!(await this.notifications.enable())) {
         this.error.set(
-          'Android no dio permiso para notificar. Actívalo en Ajustes del teléfono › Aplicaciones › Finanzas › Notificaciones.',
+          'Android no dio permiso para notificar. Actívalo en Ajustes del teléfono › Aplicaciones › Kuarto › Notificaciones.',
         );
       }
     } catch (e) {

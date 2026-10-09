@@ -3,8 +3,8 @@ import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { BackupData } from '../application/ports/repositories';
 import { fileDate } from './file-io';
 
-/** Carpeta visible en "Mis archivos" del teléfono: Documentos/Finanzas. */
-export const AUTO_BACKUP_FOLDER = 'Finanzas';
+/** Carpeta visible en "Mis archivos" del teléfono: Documentos/Kuarto. */
+export const AUTO_BACKUP_FOLDER = 'Kuarto';
 const AUTO_BACKUP_KEEP = 4;
 const SAFETY_FOLDER = 'respaldos';
 const SAFETY_KEEP = 3;
@@ -36,9 +36,9 @@ export async function saveSafetyCopy(data: BackupData): Promise<void> {
   await prune(Directory.Data, SAFETY_FOLDER, 'antes-de-actualizar-', SAFETY_KEEP);
 }
 
-/** Guarda el respaldo automático (ya cifrado) en Documentos/Finanzas y deja los 4 más recientes. */
+/** Guarda el respaldo automático (ya cifrado) en Documentos/Kuarto y deja los 4 más recientes. */
 export async function saveAutoBackup(content: string): Promise<string> {
-  const name = `finanzas-auto-${fileDate()}.finanzas`;
+  const name = `kuarto-auto-${fileDate()}.finanzas`;
   await Filesystem.writeFile({
     path: `${AUTO_BACKUP_FOLDER}/${name}`,
     data: content,
@@ -46,6 +46,6 @@ export async function saveAutoBackup(content: string): Promise<string> {
     encoding: Encoding.UTF8,
     recursive: true,
   });
-  await prune(Directory.Documents, AUTO_BACKUP_FOLDER, 'finanzas-auto-', AUTO_BACKUP_KEEP);
+  await prune(Directory.Documents, AUTO_BACKUP_FOLDER, 'kuarto-auto-', AUTO_BACKUP_KEEP);
   return name;
 }

@@ -44,7 +44,7 @@ export async function exportMonthPdf(container: AppContainer, month: MonthKey): 
     doc.line(MARGIN, y, width - MARGIN, y);
   };
 
-  text('Finanzas', MARGIN, { size: 11, color: 110 });
+  text('Kuarto', MARGIN, { size: 11, color: 110 });
   y += 26;
   text(monthLabel(month), MARGIN, { size: 22, bold: true });
   y += 30;
@@ -108,10 +108,10 @@ export async function exportMonthPdf(container: AppContainer, month: MonthKey): 
 
   ensure(30);
   y += 14;
-  text(`Generado el ${formatDay(fileDate())} con Finanzas.`, MARGIN, { size: 8, color: 140 });
+  text(`Generado el ${formatDay(fileDate())} con Kuarto.`, MARGIN, { size: 8, color: 140 });
 
   const base64 = doc.output('datauristring').split(',')[1];
-  await saveBinaryFile(`finanzas-${month}.pdf`, base64, 'application/pdf');
+  await saveBinaryFile(`kuarto-${month}.pdf`, base64, 'application/pdf');
 }
 
 /** Recorta un texto para que quepa en `max` puntos, con "…" si hace falta. */
