@@ -9,7 +9,12 @@ import { AddTransaction } from './add-transaction';
 export interface RawNotification {
   text: string;
   receivedAt: string;
+  /** App que publicó la notificación; la pone Android, no se puede falsificar. */
+  package?: string;
 }
+
+/** Solo la app de Qik puede anular compras: un correo lo puede escribir cualquiera (ver IngestBankNotifications). */
+export const QIK_PACKAGE = 'com.qik.android.app';
 
 export interface IngestResult {
   added: number;
@@ -42,6 +47,8 @@ export class IngestBankNotifications {
         continue;
       }
       if (alert.kind === 'reverso') {
+        // Un reverso borra una compra sin preguntar; si viniera por Gmail, cualquiera podría mandar ese correo.
+        if (item.package !== QIK_PACKAGE) continue;
         const match = (await this.imports.listPending()).find(
           (p) => p.kind === 'compra' && p.bank === alert.bank && p.last4 === alert.last4 && p.amount === alert.amount,
         );

@@ -1,7 +1,7 @@
 import { InMemoryAccounts, InMemoryBankImports, InMemoryCategories, InMemorySettings, InMemoryTransactions, SequentialIds } from '../testing/in-memory';
 import { SaveAccount } from './accounts';
 import { AddTransaction } from './add-transaction';
-import { ConfirmImport, DiscardImport, IngestBankNotifications, ListPendingImports, merchantPrefix, UNRECOGNIZED_KEY } from './bank-imports';
+import { ConfirmImport, DiscardImport, IngestBankNotifications, ListPendingImports, merchantPrefix, QIK_PACKAGE, UNRECOGNIZED_KEY } from './bank-imports';
 
 const compra = (monto: string, comercio: string) =>
   `Usaste tu tarjeta de crédito Qik ¡Hola ANA! Tarjeta 53*************8462 Se hizo una transacción de RD$ ${monto} en ${comercio} con tu tarjeta crédito Qik que termina en 53*************8462 Localidad | ${comercio} | Fecha y hora | 10-05-2026 05:13 PM (AST)`;
@@ -52,13 +52,23 @@ describe('importar compras de las notificaciones', () => {
       { text: compra('3.19', 'WL *VALVE CORPORATION').replace('RD$ 3.19', 'RD$ 3.19'), receivedAt: '2026-10-02T20:00:00Z' },
       { text: compra('200.06', 'WL *STEAM PURCHASE'), receivedAt: '2026-10-02T21:11:46Z' },
     ]);
-    const r = await s.ingest.execute([{ text: 'Ha sido reversada la transacción de RD$ 3.19 en WL *VALVE CORPORATION con tu Tarjeta de Crédito Qik que termina en *8462.', receivedAt: '2026-10-02T22:55:49Z' }]);
+    const r = await s.ingest.execute([{ text: 'Ha sido reversada la transacción de RD$ 3.19 en WL *VALVE CORPORATION con tu Tarjeta de Crédito Qik que termina en *8462.', receivedAt: '2026-10-02T22:55:49Z', package: QIK_PACKAGE }]);
     expect(r.reversed).toBe(1);
     const [left] = await s.list.execute();
     expect(left.item.merchant).toBe('WL *STEAM PURCHASE');
     await s.discard.execute(left.item.id);
     expect(await s.list.execute()).toEqual([]);
     expect(await s.transactions.listAll()).toEqual([]);
+  });
+
+  it('ignora un reverso que llega por correo: cualquiera puede escribirlo', async () => {
+    const s = setup();
+    await s.ingest.execute([{ text: compra('3.19', 'WL *VALVE CORPORATION'), receivedAt: '2026-10-02T20:00:00Z' }]);
+    const r = await s.ingest.execute([
+      { text: 'Ha sido reversada la transacción de RD$ 3.19 en WL *VALVE CORPORATION con tu Tarjeta de Crédito Qik que termina en *8462.', receivedAt: '2026-10-02T22:55:49Z', package: 'com.google.android.gm' },
+    ]);
+    expect(r.reversed).toBe(0);
+    expect((await s.list.execute()).length).toBe(1);
   });
 
   it('guarda aparte (pocos) los avisos de banco que no pudo leer, para ajustar el lector', async () => {
