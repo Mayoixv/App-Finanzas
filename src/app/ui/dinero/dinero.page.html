@@ -2,7 +2,7 @@
   <header class="screen-head">
     <div class="title-row">
       <h1 class="screen-title">Dinero</h1>
-      <app-help-button [topic]="state.section()"></app-help-button>
+      <app-help-button topic="cuentas"></app-help-button>
     </div>
     <app-month-switcher></app-month-switcher>
   </header>
@@ -15,16 +15,5 @@
     </section>
   }
 
-  <app-pill-toggle class="sections" label="Sección" [options]="options" [value]="state.section()" (valueChange)="setSection($event)"></app-pill-toggle>
-
-  <div class="section">
-    @switch (state.section()) {
-      @case ('cuentas') {
-        <app-cuentas-view mode="cuentas"></app-cuentas-view>
-      }
-      @case ('tarjetas') {
-        <app-cuentas-view mode="tarjetas"></app-cuentas-view>
-      }
-    }
-  </div>
+  <app-cuentas-view [focus]="ver()"></app-cuentas-view>
 </ion-content>

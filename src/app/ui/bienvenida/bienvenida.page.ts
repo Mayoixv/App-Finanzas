@@ -4,14 +4,18 @@ import { IonContent, IonInput } from '@ionic/angular';
 import { APP_CONTAINER } from '../../app.container';
 import { ValidationError } from '../../application/errors';
 import { Currency } from '../../domain/currency';
+import { Account, AccountType, CASH_ACCOUNT_ID } from '../../domain/account';
+import { ACCOUNT_TYPE_LABEL } from '../cuentas/account-choices';
 import { CurrencyState } from '../currency-state';
+import { DineroFormService } from '../dinero/dinero-form.service';
+import { parseBalance } from '../format';
 import { TourService } from '../tour/tour.service';
 
-type Step = 'portada' | 'nombre' | 'moneda' | 'recorrido';
+type Step = 'portada' | 'nombre' | 'moneda' | 'dinero' | 'recorrido';
 /** Orden de los pasos. La portada y el recorrido (opcional) no cuentan en "Paso X de N". */
-const STEPS: Step[] = ['portada', 'nombre', 'moneda', 'recorrido'];
+const STEPS: Step[] = ['portada', 'nombre', 'moneda', 'dinero', 'recorrido'];
 /** Sueldo y fijos no se piden aquí: se agregan en la pestaña Fijos, para que haya una sola forma de hacerlo. */
-const COUNTED: Step[] = ['nombre', 'moneda', 'recorrido'];
+const COUNTED: Step[] = ['nombre', 'moneda', 'dinero', 'recorrido'];
 
 @Component({
   selector: 'app-bienvenida',
@@ -24,6 +28,7 @@ export class BienvenidaPage {
   private readonly router = inject(Router);
   protected readonly currencyState = inject(CurrencyState);
   private readonly tour = inject(TourService);
+  private readonly dineroForm = inject(DineroFormService);
 
   protected readonly step = signal<Step>('portada');
   protected readonly stepNumber = computed(() => COUNTED.indexOf(this.step()) + 1);
@@ -31,6 +36,10 @@ export class BienvenidaPage {
   protected readonly name = signal('');
   protected readonly error = signal<string | null>(null);
   protected readonly busy = signal(false);
+  /** Paso "¿Dónde tienes tu dinero?": efectivo de hoy y las cuentas o tarjetas que se agregaron. */
+  protected readonly cash = signal('');
+  protected readonly added = signal<Account[]>([]);
+  protected readonly typeLabel = ACCOUNT_TYPE_LABEL;
 
   protected readonly currencies: { code: Currency; label: string }[] = [
     { code: 'DOP', label: 'Peso dominicano (RD$)' },
@@ -54,6 +63,25 @@ export class BienvenidaPage {
   protected async pickCurrency(code: Currency) {
     await this.currencyState.change(code);
     this.next();
+  }
+
+  /** Abre el mismo formulario de Dinero; al cerrarlo se lista lo agregado. */
+  protected async addAccount(type: AccountType) {
+    await this.dineroForm.openAccount(undefined, type);
+    this.added.set((await this.container.accounts.list()).filter((a) => a.id !== CASH_ACCOUNT_ID));
+  }
+
+  /** El efectivo es opcional: vacío, se queda en cero. */
+  protected async saveCash() {
+    const cents = parseBalance(this.cash());
+    if (cents === null) {
+      this.error.set('Escribe el efectivo solo con números');
+      return;
+    }
+    await this.work(async () => {
+      if (cents !== 0) await this.container.adjustAccountBalance.execute(CASH_ACCOUNT_ID, cents);
+      this.next();
+    });
   }
 
   /** Con `withTour`, al entrar a la app empieza el recorrido sobre las pantallas reales. */

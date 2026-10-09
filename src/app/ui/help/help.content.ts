@@ -35,11 +35,11 @@ export const HELP: Record<HelpTopic, HelpEntry> = {
     ],
   },
   cuentas: {
-    title: 'Cuentas',
+    title: 'Dinero',
     points: [
-      'Registra dónde está tu dinero: cuentas de banco y efectivo.',
-      'Elige en cada movimiento de qué cuenta sale o a cuál entra.',
-      'Usa Transferir para mover dinero entre tus cuentas sin contarlo como gasto.',
+      'Anota dónde está tu dinero: cuentas, efectivo y tarjetas de crédito.',
+      'Disponible suma cuentas y efectivo; las tarjetas no, porque es lo que debes.',
+      'Usa Transferir para mover dinero o pagar una tarjeta sin contarlo como gasto.',
     ],
   },
   tarjetas: {

@@ -9,10 +9,12 @@ import {
 } from '@angular/core';
 import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronForward, swapHorizontal } from 'ionicons/icons';
+import { add, chevronForward, swapHorizontal } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { AccountView, CardStatus } from '../../application/use-cases/accounts';
 import {
+  Account,
+  AccountType,
   CARD_UTILIZATION_WARNING,
   isCard,
   Transfer,
@@ -53,7 +55,22 @@ interface Row {
   };
 }
 
-/** Secciones Cuentas y Tarjetas de la pestaña Dinero (misma carga, distinto contenido). */
+type GroupKey = 'cuentas' | 'efectivo' | 'tarjetas';
+
+interface Group {
+  key: GroupKey;
+  title: string;
+  /** Saldo del grupo; en tarjetas, lo que se debe. */
+  total: string;
+  rows: Row[];
+  addLabel: string;
+  addType: AccountType;
+  empty: string;
+}
+
+const groupOf = (a: Account): GroupKey => (isCard(a) ? 'tarjetas' : a.type === 'efectivo' ? 'efectivo' : 'cuentas');
+
+/** Contenido de la pestaña Dinero: Cuentas, Efectivo y Tarjetas, cada grupo con su total y su botón de agregar. */
 @Component({
   selector: 'app-cuentas-view',
   templateUrl: 'cuentas-view.component.html',
@@ -66,7 +83,8 @@ export class CuentasViewComponent {
   private readonly alerts = inject(AlertController);
   protected readonly monthState = inject(MonthState);
 
-  readonly mode = input<'cuentas' | 'tarjetas'>('cuentas');
+  /** Grupo al que llevar la vista al abrir (`?ver=tarjetas` desde alertas y notificaciones). */
+  readonly focus = input<string>();
 
   private readonly views = signal<AccountView[] | null>(null);
   protected readonly transfers = signal<Transfer[]>([]);
@@ -80,19 +98,20 @@ export class CuentasViewComponent {
   protected readonly monthName = monthLabel(currentMonth());
 
   protected readonly loaded = computed(() => this.views() !== null);
-  private readonly ofMode = computed(() =>
-    (this.views() ?? []).filter(
-      (v) => isCard(v.account) === (this.mode() === 'tarjetas'),
-    ),
-  );
-  protected readonly rows = computed(() => {
+  protected readonly groups = computed<Group[]>(() => {
     const statuses = new Map(this.cardStatuses().map((c) => [c.account.id, c]));
-    return this.ofMode()
-      .filter((v) => !v.account.archived)
-      .map((v) => withStatus(toRow(v), statuses.get(v.account.id)));
+    const active = (this.views() ?? []).filter((v) => !v.account.archived);
+    const of = (key: GroupKey) => active.filter((v) => groupOf(v.account) === key);
+    const sum = (key: GroupKey) => of(key).reduce((t, v) => t + v.balance, 0);
+    const rows = (key: GroupKey) => of(key).map((v) => withStatus(toRow(v), statuses.get(v.account.id)));
+    return [
+      { key: 'cuentas', title: 'Cuentas', total: formatMoney(sum('cuentas')), rows: rows('cuentas'), addLabel: 'Agregar cuenta', addType: 'banco', empty: 'Agrega tu primera cuenta de banco.' },
+      { key: 'efectivo', title: 'Efectivo', total: formatMoney(sum('efectivo')), rows: rows('efectivo'), addLabel: 'Agregar efectivo', addType: 'efectivo', empty: 'Sin efectivo anotado.' },
+      { key: 'tarjetas', title: 'Tarjetas de crédito', total: 'Debes ' + formatMoney(Math.max(0, -sum('tarjetas'))), rows: rows('tarjetas'), addLabel: 'Agregar tarjeta', addType: 'tarjeta', empty: 'Agrega una con su límite y sus días de corte y pago.' },
+    ];
   });
   protected readonly archived = computed(() =>
-    this.ofMode()
+    (this.views() ?? [])
       .filter((v) => v.account.archived)
       .map(toRow),
   );
@@ -105,7 +124,7 @@ export class CuentasViewComponent {
   );
 
   constructor() {
-    addIcons({ chevronForward, swapHorizontal });
+    addIcons({ add, chevronForward, swapHorizontal });
     effect(() => {
       this.monthState.version();
       this.load();
@@ -119,6 +138,10 @@ export class CuentasViewComponent {
 
   protected openAccount(view: AccountView) {
     return this.forms.openAccount(view);
+  }
+
+  protected addAccount(type: AccountType) {
+    return this.forms.openAccount(undefined, type);
   }
 
   protected openTransfer() {
@@ -187,6 +210,8 @@ export class CuentasViewComponent {
       this.transfers.set(transfers);
       this.views.set(overview.accounts);
       this.failed.set(false);
+      const focus = this.focus();
+      if (focus) setTimeout(() => document.getElementById('grupo-' + focus)?.scrollIntoView({ block: 'start' }));
     } catch (error) {
       console.error(error);
       this.failed.set(true);

@@ -7,44 +7,29 @@ import { NetWorth } from '../../application/use-cases/accounts';
 import { CuentasViewComponent } from '../cuentas/cuentas-view.component';
 import { formatMoney } from '../format';
 import { MonthState } from '../month-state';
-import { PillOption, PillToggleComponent } from '../pill-toggle.component';
-import { DINERO_SECTIONS, DineroSection, DineroState } from './dinero-state';
 
-/** Pestaña Dinero: patrimonio arriba y, debajo, cuentas (con el efectivo) o tarjetas. Metas y deudas están en Planes. */
+/** Pestaña Dinero: patrimonio arriba y, debajo, Cuentas, Efectivo y Tarjetas. Metas y deudas están en Planes. */
 @Component({
   selector: 'app-dinero',
   templateUrl: 'dinero.page.html',
   styleUrls: ['dinero.page.scss'],
-  imports: [HelpButtonComponent, MonthSwitcherComponent, IonContent, PillToggleComponent, CuentasViewComponent],
+  imports: [HelpButtonComponent, MonthSwitcherComponent, IonContent, CuentasViewComponent],
 })
 export class DineroPage {
   private readonly container = inject(APP_CONTAINER);
   private readonly monthState = inject(MonthState);
-  protected readonly state = inject(DineroState);
 
-  /** `?ver=tarjetas` en la dirección abre esa sección (desde alertas y notificaciones). */
+  /** `?ver=tarjetas` en la dirección lleva a ese grupo (desde alertas y notificaciones). */
   readonly ver = input<string>();
 
   protected readonly netWorth = signal<NetWorth | null>(null);
   protected readonly money = formatMoney;
-  protected readonly options: PillOption[] = [
-    { value: 'cuentas', label: 'Cuentas' },
-    { value: 'tarjetas', label: 'Tarjetas' },
-  ];
 
   constructor() {
-    effect(() => {
-      const ver = this.ver();
-      if (ver && (DINERO_SECTIONS as string[]).includes(ver)) this.state.section.set(ver as DineroSection);
-    });
     effect(() => {
       this.monthState.version();
       this.load();
     });
-  }
-
-  protected setSection(value: string) {
-    this.state.section.set(value as DineroSection);
   }
 
   private async load() {

@@ -19,14 +19,9 @@ import { SavingsFormService } from '../ahorro/savings-form.service';
 import { RecurringFormService } from '../fijos/recurring-form.service';
 import { TransactionFormService } from '../movimientos/transaction-form.service';
 import { DineroFormService } from '../dinero/dinero-form.service';
-import { DineroSection, DineroState } from '../dinero/dinero-state';
 import { DeudaModalComponent } from '../deudas/deuda.modal';
 import { PlanesSection, PlanesState } from '../planes/planes.page';
 
-const DINERO_ADD_LABEL: Record<DineroSection, string> = {
-  cuentas: 'Agregar cuenta',
-  tarjetas: 'Agregar tarjeta de crédito',
-};
 
 const PLANES_ADD_LABEL: Record<PlanesSection, string> = {
   metas: 'Agregar meta de ahorro',
@@ -47,7 +42,7 @@ const TABS: Tab[] = [
   { path: 'inicio', label: 'Inicio', name: 'Inicio', icon: 'home-outline', addLabel: 'Agregar movimiento' },
   { path: 'movimientos', label: 'Movim.', name: 'Movimientos', icon: 'list-outline', addLabel: 'Agregar movimiento' },
   { path: 'fijos', label: 'Fijos', name: 'Fijos', icon: 'repeat-outline', addLabel: 'Agregar fijo (gasto o ingreso)' },
-  { path: 'dinero', label: 'Dinero', name: 'Dinero', icon: 'wallet-outline', addLabel: '' },
+  { path: 'dinero', label: 'Dinero', name: 'Dinero', icon: 'wallet-outline', addLabel: 'Agregar cuenta, efectivo o tarjeta' },
   { path: 'planes', label: 'Planes', name: 'Planes: metas y deudas', icon: 'flag-outline', addLabel: '' },
 ];
 
@@ -63,7 +58,6 @@ export class TabsPage {
   private readonly recurringForm = inject(RecurringFormService);
   private readonly savingsForm = inject(SavingsFormService);
   private readonly dineroForm = inject(DineroFormService);
-  private readonly dinero = inject(DineroState);
   private readonly planes = inject(PlanesState);
 
   protected readonly tabs = TABS;
@@ -96,7 +90,6 @@ export class TabsPage {
 
   protected addLabel(): string {
     const tab = TABS[this.active()];
-    if (tab.path === 'dinero') return DINERO_ADD_LABEL[this.dinero.section()];
     if (tab.path === 'planes') return PLANES_ADD_LABEL[this.planes.section()];
     return tab.addLabel;
   }
@@ -104,16 +97,9 @@ export class TabsPage {
   protected add() {
     const path = TABS[this.active()].path;
     if (path === 'fijos') this.recurringForm.open();
-    else if (path === 'dinero') this.addInDinero();
+    else if (path === 'dinero') this.dineroForm.openAccount();
     else if (path === 'planes') this.addInPlanes();
     else this.transactionForm.open();
-  }
-
-  /** En Dinero, el + agrega lo de la sección visible. */
-  private addInDinero() {
-    return this.dinero.section() === 'tarjetas'
-      ? this.dineroForm.openAccount(undefined, 'tarjeta')
-      : this.dineroForm.openAccount();
   }
 
   /** En Planes, una meta o una deuda según la sección visible. */

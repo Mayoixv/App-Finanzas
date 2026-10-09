@@ -59,6 +59,39 @@
         </div>
       }
 
+      @case ('dinero') {
+        <div class="step">
+          <h1 class="title">¿Dónde tienes tu dinero?</h1>
+          <p class="text">Así Disponible muestra lo que de verdad tienes. Puedes omitirlo y agregarlo luego en Dinero.</p>
+          <div class="field">
+            <ion-input
+              label="Efectivo que tienes hoy"
+              label-placement="floating"
+              type="number"
+              inputmode="decimal"
+              placeholder="0.00"
+              [value]="cash()"
+              (ionInput)="cash.set(($event.detail.value ?? '').toString())"
+            ></ion-input>
+          </div>
+          @if (added().length) {
+            <ul class="added" aria-label="Agregadas">
+              @for (a of added(); track a.id) {
+                <li>{{ a.name }} · {{ typeLabel[a.type] }}</li>
+              }
+            </ul>
+          }
+          <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="addAccount('banco')">Agregar cuenta de banco</button>
+          <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="addAccount('tarjeta')">Agregar tarjeta de crédito</button>
+          @if (error(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+          }
+          <button type="button" class="btn-primary main" [disabled]="busy()" (click)="saveCash()">
+            {{ cash().trim() || added().length ? 'Seguir' : 'Omitir' }}
+          </button>
+        </div>
+      }
+
       @case ('recorrido') {
         <div class="step">
           <h1 class="title">{{ name().trim() ? '¿Te mostramos cómo funciona, ' + name().trim() + '?' : '¿Te mostramos cómo funciona?' }}</h1>

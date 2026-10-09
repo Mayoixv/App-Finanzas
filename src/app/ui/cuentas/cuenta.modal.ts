@@ -31,9 +31,7 @@ export class CuentaModalComponent implements OnInit {
   /** Tipo propuesto al crear (desde la sección Tarjetas, una tarjeta). */
   @Input() presetType?: AccountType;
 
-  protected readonly types = (Object.keys(ACCOUNT_TYPE_LABEL) as AccountType[])
-    .filter((t) => t !== 'efectivo')
-    .map((t) => ({ value: t, label: ACCOUNT_TYPE_LABEL[t] }));
+  protected readonly types = (Object.keys(ACCOUNT_TYPE_LABEL) as AccountType[]).map((t) => ({ value: t, label: ACCOUNT_TYPE_LABEL[t] }));
   protected readonly type = signal<AccountType>('banco');
   protected readonly name = signal('');
   /** Saldo de hoy; en una tarjeta, lo que se debe (en positivo). */

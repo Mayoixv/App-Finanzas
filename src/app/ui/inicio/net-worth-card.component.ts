@@ -5,7 +5,6 @@ import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
 import { NetWorth } from '../../application/use-cases/accounts';
-import { DineroState } from '../dinero/dinero-state';
 import { formatMoney } from '../format';
 import { MonthState } from '../month-state';
 
@@ -74,7 +73,6 @@ export class NetWorthCardComponent {
   private readonly container = inject(APP_CONTAINER);
   private readonly router = inject(Router);
   private readonly monthState = inject(MonthState);
-  private readonly dinero = inject(DineroState);
 
   protected readonly net = signal<NetWorth | null>(null);
   protected readonly money = formatMoney;
@@ -91,7 +89,6 @@ export class NetWorthCardComponent {
   }
 
   protected open() {
-    this.dinero.section.set('cuentas');
     this.router.navigateByUrl('/tabs/dinero');
   }
 }

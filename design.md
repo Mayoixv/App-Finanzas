@@ -701,3 +701,28 @@ Notas:
 - La inclinación es decorativa: nada depende de ella. Las tarjetas que se pueden tocar mantienen foco visible y se
   activan con teclado.
 - En PC (versión futura) con mouse funciona por hover sin cambiar nada.
+## 11. Pantalla Dinero: grupos, tarjeta de crédito y barra de uso
+
+### 11.1 Grupos (Cuentas, Efectivo, Tarjetas de crédito)
+- Una sola lista, sin cambio de vista: Cuentas (banco, ahorros, inversión), Efectivo y Tarjetas de crédito, en ese orden.
+- Cabecera de cada grupo: título de sección a la izquierda y el total a la derecha (15 px, 600, `--muted-on-light`,
+  cifras tabulares). En tarjetas el total dice "Debes RD$X". Sin filas no se muestra total.
+- Filas de cuentas y efectivo: el bloque redondeado de siempre (`--surface-soft-card`), nombre, tipo y saldo.
+- Debajo de cada grupo, un enlace "+ Agregar …" en `--violet-600`, 15 px, 600, alto mínimo 48 px. Abre el mismo
+  formulario de cuenta con el tipo ya elegido.
+- Grupo vacío: una frase corta con la acción ("Agrega tu primera cuenta de banco.") y el enlace de agregar.
+- `?ver=tarjetas` en la dirección desplaza la pantalla hasta ese grupo (alertas y notificaciones).
+
+### 11.2 Tarjeta de crédito
+- Cada tarjeta se dibuja como tarjeta física, separada de las demás (20 px entre ellas), con la inclinación de 10.6.
+- Fondo `linear-gradient(160deg, #6639ec, #4b25c4 55%, #2a1478)`: empieza en `--violet-600` para que el texto blanco
+  llegue a 4.5:1 en todo el degradado. Radio 24 px, alto mínimo 190 px, sombra violeta en el contenedor exterior
+  (la tarjeta recorta con `overflow: hidden`).
+- Contenido: nombre y "••1234" arriba; "Debes" y el monto (fuente display, 36 px); barra de uso; "Corte día X · Pago
+  día Y". El estado del corte y el botón "Pagar" van debajo de la tarjeta, no dentro.
+
+### 11.3 Barra de uso del límite
+- 6 px de alto, radio píldora, fondo `rgba(255,255,255,0.22)`, relleno blanco con el porcentaje usado (máximo 100%).
+- Desde el 30% de uso (`CARD_UTILIZATION_WARNING`) el relleno y el texto "Usado X% de RD$Y" pasan a `--warning`.
+- El ancho se anima 0.6 s con `cubic-bezier(0.22, 1, 0.36, 1)`; la barra es decorativa (`aria-hidden`), el texto
+  dice el dato.

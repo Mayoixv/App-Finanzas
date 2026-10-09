@@ -4,126 +4,136 @@
 @if (failed()) {
   <p class="note">No se pudieron leer las cuentas. Cambia de sección y vuelve.</p>
 } @else if (loaded()) {
-  @if (mode() === 'cuentas') {
-    @if (canTransfer()) {
-      <div class="actions">
-        <button type="button" class="btn-secondary action" (click)="openTransfer()">
-          <ion-icon name="swap-horizontal" aria-hidden="true"></ion-icon>
-          Transferir o pagar tarjeta
-        </button>
-      </div>
-    }
+  @if (canTransfer()) {
+    <div class="actions">
+      <button type="button" class="btn-secondary action" (click)="openTransfer()">
+        <ion-icon name="swap-horizontal" aria-hidden="true"></ion-icon>
+        Transferir o pagar tarjeta
+      </button>
+    </div>
   }
 
-  @if (rows().length && mode() === 'tarjetas') {
-    <ul [class.t-still]="!monthState.animateLists()" class="credit-cards">
-      @for (r of rows(); track r.view.account.id) {
-        <li animate.enter="t-row-enter" animate.leave="t-row-leave">
-          <!-- design.md 10.6: el contenedor detecta el dedo; la tarjeta se inclina y el reflejo la sigue. -->
-          <div class="t-tilt card-wrap" appTilt>
-            <button
-              type="button"
-              class="t-tilt-card credit-card"
-              [attr.aria-label]="'Editar ' + r.name + ', debes ' + r.balance"
-              (click)="openAccount(r.view)"
-            >
-              <span class="cc-top">
-                <span class="cc-name">{{ r.name }}</span>
-                @if (r.card?.last4) {
-                  <span class="cc-last4">••{{ r.card!.last4 }}</span>
-                }
-              </span>
-              <span class="cc-label">Debes</span>
-              <span class="cc-amount">{{ r.balance }}</span>
-              @if (r.card?.usedPercent !== null && r.card?.usedPercent !== undefined) {
-                <span class="cc-bar" aria-hidden="true"><span class="cc-fill" [class.high]="r.highUse" [style.width.%]="r.card!.usedPercent"></span></span>
-                <span class="cc-meta" [class.high]="r.highUse">Usado {{ r.card!.usedText }}</span>
+  @for (g of groups(); track g.key) {
+    <section class="group" [id]="'grupo-' + g.key" [attr.aria-labelledby]="'titulo-' + g.key">
+      <div class="group-head">
+        <h2 class="section-title" [id]="'titulo-' + g.key">{{ g.title }}</h2>
+        @if (g.rows.length) {
+          <span class="group-total">{{ g.total }}</span>
+        }
+      </div>
+      @if (!g.rows.length) {
+        <p class="note">{{ g.empty }}</p>
+      } @else if (g.key === 'tarjetas') {
+        <ul [class.t-still]="!monthState.animateLists()" class="credit-cards">
+          @for (r of g.rows; track r.view.account.id) {
+            <li animate.enter="t-row-enter" animate.leave="t-row-leave">
+              <!-- design.md 10.6: el contenedor detecta el dedo; la tarjeta se inclina y el reflejo la sigue. -->
+              <div class="t-tilt card-wrap" appTilt>
+                <button
+                  type="button"
+                  class="t-tilt-card credit-card"
+                  [attr.aria-label]="'Editar ' + r.name + ', debes ' + r.balance"
+                  (click)="openAccount(r.view)"
+                >
+                  <span class="cc-top">
+                    <span class="cc-name">{{ r.name }}</span>
+                    @if (r.card?.last4) {
+                      <span class="cc-last4">••{{ r.card!.last4 }}</span>
+                    }
+                  </span>
+                  <span class="cc-label">Debes</span>
+                  <span class="cc-amount">{{ r.balance }}</span>
+                  @if (r.card?.usedPercent !== null && r.card?.usedPercent !== undefined) {
+                    <span class="cc-bar" aria-hidden="true"><span class="cc-fill" [class.high]="r.highUse" [style.width.%]="r.card!.usedPercent"></span></span>
+                    <span class="cc-meta" [class.high]="r.highUse">Usado {{ r.card!.usedText }}</span>
+                  }
+                  <span class="cc-meta">{{ r.card?.days }}</span>
+                  <span class="t-tilt-glare" aria-hidden="true"></span>
+                </button>
+              </div>
+              @if (r.statusText) {
+                <div class="card-status">
+                  <span class="status-text">
+                    <span [class.urgent]="r.urgent">{{ r.statusText }}</span>
+                    @if (r.status && r.status.pending > 0) {
+                      <button type="button" class="min-link" (click)="askMinimum(r)">
+                        {{ r.status.minimum ? 'Mínimo: ' + money(min(r.status.minimum, r.status.pending)) + ' · cambiar' : 'Anotar pago mínimo' }}
+                      </button>
+                    }
+                  </span>
+                  @if (r.status && r.status.currentDebt > 0) {
+                    <button type="button" class="btn-secondary pay" [attr.aria-label]="'Pagar ' + r.name" (click)="payCard(r)">Pagar</button>
+                  }
+                </div>
               }
-              <span class="cc-meta">{{ r.card?.days }}</span>
-              <span class="t-tilt-glare" aria-hidden="true"></span>
-            </button>
-          </div>
-          @if (r.statusText) {
-            <div class="card-status">
-              <span class="status-text">
-                <span [class.urgent]="r.urgent">{{ r.statusText }}</span>
-                @if (r.status && r.status.pending > 0) {
-                  <button type="button" class="min-link" (click)="askMinimum(r)">
-                    {{ r.status.minimum ? 'Mínimo: ' + money(min(r.status.minimum, r.status.pending)) + ' · cambiar' : 'Anotar pago mínimo' }}
-                  </button>
-                }
-              </span>
-              @if (r.status && r.status.currentDebt > 0) {
-                <button type="button" class="btn-secondary pay" [attr.aria-label]="'Pagar ' + r.name" (click)="payCard(r)">Pagar</button>
-              }
-            </div>
+            </li>
           }
-        </li>
+        </ul>
+      } @else {
+        <ul [class.t-still]="!monthState.animateLists()" class="rows">
+          @for (r of g.rows; track r.view.account.id) {
+            <li animate.enter="t-row-enter" animate.leave="t-row-leave">
+              <button
+                type="button"
+                class="row"
+                [attr.aria-label]="'Editar ' + r.name + (r.status ? ', debes ' : ', saldo ') + r.balance"
+                (click)="openAccount(r.view)"
+              >
+                <span class="row-text">
+                  <span class="row-title">{{ r.name }}</span>
+                  <span class="row-sub" [class.warn]="r.highUse">{{ r.detail }}</span>
+                </span>
+                <span class="row-amount" [class.negative]="r.negative">{{ r.balance }}</span>
+                <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+              </button>
+              @if (r.statusText) {
+                <div class="card-status">
+                  <span class="status-text">
+                    <span [class.urgent]="r.urgent">{{ r.statusText }}</span>
+                    @if (r.status && r.status.pending > 0) {
+                      <button type="button" class="min-link" (click)="askMinimum(r)">
+                        {{ r.status.minimum ? 'Mínimo: ' + money(min(r.status.minimum, r.status.pending)) + ' · cambiar' : 'Anotar pago mínimo' }}
+                      </button>
+                    }
+                  </span>
+                  @if (r.status && r.status.currentDebt > 0) {
+                    <button type="button" class="btn-secondary pay" [attr.aria-label]="'Pagar ' + r.name" (click)="payCard(r)">Pagar</button>
+                  }
+                </div>
+              }
+            </li>
+          }
+        </ul>
       }
-    </ul>
-  } @else if (rows().length) {
+      <button type="button" class="add-link" (click)="addAccount(g.addType)">
+        <ion-icon name="add" aria-hidden="true"></ion-icon>
+        {{ g.addLabel }}
+      </button>
+    </section>
+  }
+
+  <h2 class="section-title list-title">Transferencias de {{ monthName }}</h2>
+  @if (transfers().length) {
     <ul [class.t-still]="!monthState.animateLists()" class="rows">
-      @for (r of rows(); track r.view.account.id) {
+      @for (t of transfers(); track t.id) {
         <li animate.enter="t-row-enter" animate.leave="t-row-leave">
           <button
             type="button"
             class="row"
-            [attr.aria-label]="'Editar ' + r.name + (r.status ? ', debes ' : ', saldo ') + r.balance"
-            (click)="openAccount(r.view)"
+            [attr.aria-label]="'Editar transferencia de ' + money(t.amount) + ', ' + transferText(t)"
+            (click)="forms.editTransfer(t)"
           >
             <span class="row-text">
-              <span class="row-title">{{ r.name }}</span>
-              <span class="row-sub" [class.warn]="r.highUse">{{ r.detail }}</span>
+              <span class="row-title">{{ transferText(t) }}</span>
+              <span class="row-sub">{{ day(t.date) }}{{ t.note ? ' · ' + t.note : '' }}</span>
             </span>
-            <span class="row-amount" [class.negative]="r.negative">{{ r.balance }}</span>
-            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            <span class="row-amount">{{ money(t.amount) }}</span>
           </button>
-          @if (r.statusText) {
-            <div class="card-status">
-              <span class="status-text">
-                <span [class.urgent]="r.urgent">{{ r.statusText }}</span>
-                @if (r.status && r.status.pending > 0) {
-                  <button type="button" class="min-link" (click)="askMinimum(r)">
-                    {{ r.status.minimum ? 'Mínimo: ' + money(min(r.status.minimum, r.status.pending)) + ' · cambiar' : 'Anotar pago mínimo' }}
-                  </button>
-                }
-              </span>
-              @if (r.status && r.status.currentDebt > 0) {
-                <button type="button" class="btn-secondary pay" [attr.aria-label]="'Pagar ' + r.name" (click)="payCard(r)">Pagar</button>
-              }
-            </div>
-          }
         </li>
       }
     </ul>
-  } @else if (mode() === 'tarjetas') {
-    <p class="note">Aún no tienes tarjetas de crédito. Toca + para agregar una con su límite y sus días de corte y pago.</p>
-  }
-
-  @if (mode() === 'cuentas') {
-    <h2 class="section-title list-title">Transferencias de {{ monthName }}</h2>
-    @if (transfers().length) {
-      <ul [class.t-still]="!monthState.animateLists()" class="rows">
-        @for (t of transfers(); track t.id) {
-          <li animate.enter="t-row-enter" animate.leave="t-row-leave">
-            <button
-              type="button"
-              class="row"
-              [attr.aria-label]="'Editar transferencia de ' + money(t.amount) + ', ' + transferText(t)"
-              (click)="forms.editTransfer(t)"
-            >
-              <span class="row-text">
-                <span class="row-title">{{ transferText(t) }}</span>
-                <span class="row-sub">{{ day(t.date) }}{{ t.note ? ' · ' + t.note : '' }}</span>
-              </span>
-              <span class="row-amount">{{ money(t.amount) }}</span>
-            </button>
-          </li>
-        }
-      </ul>
-    } @else {
-      <p class="note">Sin transferencias este mes.</p>
-    }
+  } @else {
+    <p class="note">Sin transferencias este mes.</p>
   }
 
   @if (archived().length) {
