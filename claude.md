@@ -1,4 +1,4 @@
-# Finanzas Personales
+# Kuarto (finanzas personales)
 
 App móvil (APK) de finanzas personales, 100% local, registro completo por mes. Luego se extiende a PC.
 
