@@ -33,6 +33,17 @@
       {{ isCollect ? 'Anotarlo también como ingreso en Movimientos' : 'Anotarlo también como gasto en Movimientos' }}
     </label>
 
+    @if (asMovement() && accounts().length > 1) {
+      <div class="field">
+        <app-select-field
+          [label]="isCollect ? 'Entra a' : 'Sale de'"
+          [options]="accountOptions()"
+          [value]="accountId()"
+          (valueChange)="accountId.set($event!)"
+        ></app-select-field>
+      </div>
+    }
+
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }

@@ -5,7 +5,7 @@ import { monthOf, MonthKey } from '../../domain/month';
 import { RecurringExpense, RecurringExpenseInstance } from '../../domain/recurring-expense';
 import { Account, CASH_ACCOUNT_ID, Transfer } from '../../domain/account';
 import { Debt, DebtPayment } from '../../domain/debts';
-import { SavingsContribution, SavingsGoal } from '../../domain/savings';
+import { SavingsContribution, SavingsGoal, signedAmount } from '../../domain/savings';
 import { Attachment, Transaction } from '../../domain/transaction';
 import {
   IBudgetRepository,
@@ -143,6 +143,7 @@ export class InMemoryAccounts implements IAccountRepository {
   constructor(
     private readonly transactions: InMemoryTransactions,
     private readonly categories: InMemoryCategories,
+    private readonly savings?: InMemorySavings,
   ) {}
   async list() { return [...this.items.values()]; }
   async get(id: string) { return this.items.get(id); }
@@ -151,7 +152,8 @@ export class InMemoryAccounts implements IAccountRepository {
   async isInUse(id: string) {
     return (
       [...this.transactions.items.values()].some((t) => (t.accountId ?? CASH_ACCOUNT_ID) === id) ||
-      [...this.transfers.values()].some((t) => t.fromAccountId === id || t.toAccountId === id)
+      [...this.transfers.values()].some((t) => t.fromAccountId === id || t.toAccountId === id) ||
+      [...(this.savings?.contributions.values() ?? [])].some((c) => c.accountId === id)
     );
   }
   async balances(upTo = '9999-12-31') {
@@ -166,6 +168,10 @@ export class InMemoryAccounts implements IAccountRepository {
       if (t.date > upTo) continue;
       out.set(t.fromAccountId, (out.get(t.fromAccountId) ?? 0) - t.amount);
       out.set(t.toAccountId, (out.get(t.toAccountId) ?? 0) + t.amount);
+    }
+    for (const c of this.savings?.contributions.values() ?? []) {
+      if (c.date > upTo || !c.accountId) continue;
+      out.set(c.accountId, (out.get(c.accountId) ?? 0) - signedAmount(c));
     }
     return out;
   }

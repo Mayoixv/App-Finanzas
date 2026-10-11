@@ -4,7 +4,8 @@ import { daysBetween, IsoDate, isValidIsoDate } from '../../domain/month';
 import { DebtDirection } from '../../domain/debts';
 import { NotFoundError, ValidationError } from '../errors';
 import { GetDebtsOverview } from './debts';
-import { IAccountRepository, IdGenerator, ISettingsRepository } from '../ports/repositories';
+import { IAccountRepository, IdGenerator, ISavingsRepository, ISettingsRepository } from '../ports/repositories';
+import { signedAmount } from '../../domain/savings';
 
 const TYPES: AccountType[] = ['efectivo', 'banco', 'ahorro', 'tarjeta', 'inversion'];
 
@@ -266,7 +267,9 @@ export interface NetWorth {
   available: number;
   /** Lo que te deben (deudas "me deben" pendientes). */
   owedToMe: number;
-  /** available + owedToMe. */
+  /** Lo que salió de tus cuentas hacia metas: sigue siendo tuyo. Los aportes sin cuenta (anteriores) no cuentan. */
+  inGoals: number;
+  /** available + owedToMe + inGoals. */
   have: number;
   /** Lo que debes: tarjetas más deudas. */
   owe: number;
@@ -279,14 +282,20 @@ export class GetNetWorth {
   constructor(
     private readonly accounts: GetAccountsOverview,
     private readonly debts: GetDebtsOverview,
+    private readonly savings?: ISavingsRepository,
   ) {}
 
   async execute(): Promise<NetWorth> {
-    const [accounts, debts] = await Promise.all([this.accounts.execute(), this.debts.execute()]);
+    const [accounts, debts, contributions] = await Promise.all([
+      this.accounts.execute(),
+      this.debts.execute(),
+      this.savings?.listContributions() ?? [],
+    ]);
+    const inGoals = contributions.filter((c) => c.accountId).reduce((s, c) => s + signedAmount(c), 0);
     const sum = (dir: DebtDirection) => debts.filter((d) => d.debt.direction === dir).reduce((s, d) => s + Math.max(0, d.balance), 0);
     const owedToMe = sum('me_deben');
-    const have = accounts.assets + owedToMe;
+    const have = accounts.assets + owedToMe + inGoals;
     const owe = accounts.cardDebt + sum('debo');
-    return { available: accounts.assets, owedToMe, have, owe, total: have - owe };
+    return { available: accounts.assets, owedToMe, inGoals, have, owe, total: have - owe };
   }
 }

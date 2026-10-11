@@ -296,6 +296,12 @@ export const MIGRATIONS: Migration[] = [
       `CREATE INDEX idx_bank_imports_status ON bank_imports(status)`,
     ],
   },
+  {
+    version: 13,
+    name: 'aportes a metas desde una cuenta',
+    // Los aportes que ya existen quedan sin cuenta: así ningún saldo cambia al actualizar.
+    statements: [`ALTER TABLE savings_contributions ADD COLUMN account_id TEXT`],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

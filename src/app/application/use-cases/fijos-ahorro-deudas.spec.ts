@@ -419,7 +419,7 @@ describe('patrimonio', () => {
     await debts.execute({ name: 'Juan', direction: 'me_deben', principal: 5_000, annualRate: 0, termMonths: null, startDate: '2026-10-01' });
     const net = await new GetNetWorth(new GetAccountsOverview(accounts), new GetDebtsOverview(s.debts)).execute();
     // Disponible es solo lo de las cuentas: lo que te deben va aparte.
-    expect(net).toEqual({ available: 100_000, owedToMe: 5_000, have: 105_000, owe: 70_000, total: 35_000 });
+    expect(net).toEqual({ available: 100_000, owedToMe: 5_000, inGoals: 0, have: 105_000, owe: 70_000, total: 35_000 });
   });
 });
 
@@ -574,5 +574,42 @@ describe('presupuesto con varias categorías', () => {
     await new SetBudget(s.budgets, s.categories, s.ids).execute({ categoryIds: ['com', 'sup'], name: 'Comida y súper', month: '2026-10', limit: 100 });
     expect(await new CopyBudgets(s.budgets, s.ids).execute('2026-10', '2026-11')).toBe(1);
     expect((await s.budgets.listByMonth('2026-11'))[0]).toMatchObject({ categoryId: 'com', extraCategoryIds: ['sup'], name: 'Comida y súper' });
+  });
+});
+
+describe('metas y deudas desde una cuenta', () => {
+  it('un aporte sale de la cuenta elegida y un retiro vuelve a ella; los aportes viejos sin cuenta no tocan saldos', async () => {
+    const s = setup();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories, s.savings);
+    const banco = await new SaveAccount(accounts, s.ids).execute({ name: 'Banco', type: 'banco', initialBalance: 100_000 });
+    const goal = await new AddSavingsGoal(s.savings, s.ids).execute({ name: 'Viaje', targetAmount: 500_000 });
+    const add = new AddSavingsContribution(s.savings, s.ids, accounts);
+    await add.execute({ goalId: goal.id, date: '2026-10-05', amount: 30_000, accountId: banco.id });
+    await add.execute({ goalId: goal.id, date: '2026-10-06', amount: 10_000, accountId: banco.id, withdrawal: true });
+    await add.execute({ goalId: goal.id, date: '2026-10-07', amount: 5_000 });
+    expect((await accounts.balances()).get(banco.id)).toBe(80_000);
+    expect(await accounts.isInUse(banco.id)).toBe(true);
+    await expect(add.execute({ goalId: goal.id, date: '2026-10-07', amount: 1, accountId: 'no-existe' })).rejects.toThrow();
+  });
+
+  it('el pago de una deuda anotado como gasto sale de la cuenta elegida', async () => {
+    const s = setup();
+    const debt = await new SaveDebt(s.debts, s.ids).execute({
+      name: 'Préstamo', direction: 'debo', principal: 100_000, annualRate: 0, termMonths: 10, startDate: '2026-10-01',
+    });
+    const p = await new RegisterDebtPayment(s.debts, s.transactions, s.categories, s.ids).execute(debt.id, '2026-10-15', 10_000, true, 'acc-banco');
+    expect(await s.transactions.get(p.transactionId!)).toMatchObject({ accountId: 'acc-banco', amount: 10_000 });
+  });
+});
+
+describe('patrimonio con metas', () => {
+  it('lo aportado desde una cuenta sale de Disponible pero sigue en el patrimonio', async () => {
+    const s = setup();
+    const accounts = new InMemoryAccounts(s.transactions, s.categories, s.savings);
+    const banco = await new SaveAccount(accounts, s.ids).execute({ name: 'Banco', type: 'banco', initialBalance: 100_000 });
+    const goal = await new AddSavingsGoal(s.savings, s.ids).execute({ name: 'Viaje', targetAmount: 500_000 });
+    await new AddSavingsContribution(s.savings, s.ids, accounts).execute({ goalId: goal.id, date: '2026-10-05', amount: 30_000, accountId: banco.id });
+    const net = await new GetNetWorth(new GetAccountsOverview(accounts), new GetDebtsOverview(s.debts), s.savings).execute();
+    expect(net).toMatchObject({ available: 70_000, inGoals: 30_000, total: 100_000 });
   });
 });

@@ -15,6 +15,8 @@ export interface SavingsContribution {
   /** Siempre positivo; si es un retiro, resta de la meta y del ahorrado del mes. */
   amount: number;
   withdrawal?: boolean;
+  /** Cuenta de donde sale el aporte (o a donde vuelve el retiro). Los aportes de antes de esto no tienen. */
+  accountId?: string | null;
 }
 
 /** Aporte en positivo, retiro en negativo. */

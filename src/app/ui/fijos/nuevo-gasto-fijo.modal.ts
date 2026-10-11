@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { DeudaModalComponent } from '../deudas/deuda.modal';
 import { SelectSheetComponent } from '../select/select-sheet.component';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { CategoryFieldComponent } from '../select/category-field.component';
@@ -250,6 +251,40 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     this.saved.set(true);
     await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
     await this.modalCtrl.dismiss(null, 'saved');
+  }
+
+  /**
+   * Convierte un pago de deuda anotado como fijo en una deuda con saldo. Si la deuda tiene plazo, sus cuotas ya
+   * salen en Fijos: se ofrece quitar este fijo para no contar el pago dos veces.
+   */
+  protected async createDebt() {
+    const e = this.expense;
+    if (!e) return;
+    const form = await this.modalCtrl.create({ component: DeudaModalComponent, componentProps: { presetName: e.name } });
+    await form.present();
+    if ((await form.onDidDismiss()).role !== 'saved') return;
+    const label = this.monthState.label();
+    const month = label.charAt(0).toLocaleLowerCase('es') + label.slice(1);
+    const alert = await this.alerts.create({
+      cssClass: 'app-alert choices',
+      header: 'Deuda creada',
+      message: `Si le pusiste plazo, sus cuotas ya aparecen en Fijos. ¿Quitas "${e.name}" desde ${month} para no contar el pago dos veces?`,
+      buttons: [
+        { text: `Quitar desde ${month}`, role: 'forward' },
+        { text: 'Dejarlo', role: 'cancel' },
+      ],
+    });
+    await alert.present();
+    if ((await alert.onDidDismiss()).role !== 'forward') return;
+    this.saving.set(true);
+    try {
+      await this.container.removeRecurringExpense.execute(e.id, this.monthState.month(), 'forward');
+      await this.modalCtrl.dismiss(null, 'deleted');
+    } catch (err) {
+      console.error(err);
+      this.error.set('No se pudo quitar el fijo. Inténtalo de nuevo.');
+      this.saving.set(false);
+    }
   }
 
   protected async confirmDelete() {

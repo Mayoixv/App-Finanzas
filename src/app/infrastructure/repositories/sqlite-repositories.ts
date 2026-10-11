@@ -357,6 +357,7 @@ interface ContributionRow {
   date: string;
   amount: number;
   withdrawal: number;
+  account_id: string | null;
 }
 
 const toGoal = (r: GoalRow): SavingsGoal => ({
@@ -372,6 +373,7 @@ const toContribution = (r: ContributionRow): SavingsContribution => ({
   date: r.date,
   amount: r.amount,
   withdrawal: r.withdrawal === 1,
+  accountId: r.account_id,
 });
 
 export class SqliteSavingsRepository implements ISavingsRepository {
@@ -417,10 +419,10 @@ export class SqliteSavingsRepository implements ISavingsRepository {
 
   async saveContribution(c: SavingsContribution): Promise<void> {
     await this.db.run(
-      `INSERT INTO savings_contributions (id, goal_id, date, amount, withdrawal) VALUES (?, ?, ?, ?, ?)
+      `INSERT INTO savings_contributions (id, goal_id, date, amount, withdrawal, account_id) VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET goal_id = excluded.goal_id, date = excluded.date,
-         amount = excluded.amount, withdrawal = excluded.withdrawal`,
-      [c.id, c.goalId, c.date, c.amount, c.withdrawal ? 1 : 0],
+         amount = excluded.amount, withdrawal = excluded.withdrawal, account_id = excluded.account_id`,
+      [c.id, c.goalId, c.date, c.amount, c.withdrawal ? 1 : 0, c.accountId ?? null],
     );
   }
 
@@ -664,8 +666,9 @@ export class SqliteAccountRepository implements IAccountRepository {
     const rows = await this.db.all<{ used: number }>(
       `SELECT EXISTS (SELECT 1 FROM transactions WHERE account_id = ?)
            OR EXISTS (SELECT 1 FROM transfers WHERE from_account = ? OR to_account = ?)
-           OR EXISTS (SELECT 1 FROM recurring_expenses WHERE account_id = ?) AS used`,
-      [id, id, id, id],
+           OR EXISTS (SELECT 1 FROM recurring_expenses WHERE account_id = ?)
+           OR EXISTS (SELECT 1 FROM savings_contributions WHERE account_id = ?) AS used`,
+      [id, id, id, id, id],
     );
     return rows[0]?.used === 1;
   }
@@ -678,9 +681,11 @@ export class SqliteAccountRepository implements IAccountRepository {
                      FROM transactions t JOIN categories c ON c.id = t.category_id
                      WHERE t.account_id = a.id AND t.date <= ?), 0)
          + COALESCE((SELECT SUM(amount) FROM transfers WHERE to_account = a.id AND date <= ?), 0)
-         - COALESCE((SELECT SUM(amount) FROM transfers WHERE from_account = a.id AND date <= ?), 0) AS balance
+         - COALESCE((SELECT SUM(amount) FROM transfers WHERE from_account = a.id AND date <= ?), 0)
+         - COALESCE((SELECT SUM(CASE WHEN withdrawal = 1 THEN -amount ELSE amount END)
+                     FROM savings_contributions WHERE account_id = a.id AND date <= ?), 0) AS balance
        FROM accounts a`,
-      [until, until, until],
+      [until, until, until, until],
     );
     return new Map(rows.map((r) => [r.id, r.balance]));
   }

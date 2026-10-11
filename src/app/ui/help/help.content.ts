@@ -54,7 +54,7 @@ export const HELP: Record<HelpTopic, HelpEntry> = {
     title: 'Metas',
     points: [
       'Crea una meta con un monto objetivo y, si quieres, una fecha.',
-      'Aporta cuando puedas y mira cuánto llevas.',
+      'Aporta desde una cuenta cuando puedas y mira cuánto llevas.',
       'Retira si lo necesitas: lo que aportas no cuenta como gasto.',
     ],
   },

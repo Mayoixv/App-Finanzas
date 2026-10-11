@@ -26,6 +26,8 @@ export class DeudaModalComponent implements OnInit {
 
   /** Si llega, el formulario edita esta deuda en vez de crear una. */
   @Input() debt?: Debt;
+  /** Nombre con que empieza una deuda nueva (desde un pago fijo). */
+  @Input() presetName?: string;
 
   protected readonly direction = signal<DebtDirection>('debo');
   protected readonly name = signal('');
@@ -61,7 +63,10 @@ export class DeudaModalComponent implements OnInit {
 
   ngOnInit() {
     const d = this.debt;
-    if (!d) return;
+    if (!d) {
+      if (this.presetName) this.name.set(this.presetName);
+      return;
+    }
     this.isEdit.set(true);
     this.direction.set(d.direction);
     this.name.set(d.name);

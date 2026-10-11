@@ -11,7 +11,7 @@
       </section>
 
       <ul [class.t-still]="!monthState.animateLists()" class="debts">
-        @for (d of list; track d.debt.id) {
+        @for (d of shown(); track d.debt.id) {
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="debt">
             <div class="debt-head">
               <span class="debt-name">{{ d.debt.name }}</span>
@@ -95,6 +95,12 @@
           </li>
         }
       </ul>
+
+      @if (settledCount() > 0) {
+        <button type="button" class="link-button settled-toggle" [attr.aria-expanded]="showSettled()" (click)="showSettled.set(!showSettled())">
+          {{ showSettled() ? 'Ocultar saldadas' : 'Ver saldadas (' + settledCount() + ')' }}
+        </button>
+      }
 
       @if (strategies(); as s) {
         <section class="strategy" aria-labelledby="estrategia-title">

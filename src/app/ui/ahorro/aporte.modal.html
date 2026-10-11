@@ -24,11 +24,22 @@
       <app-date-field label="Fecha" [(value)]="date"></app-date-field>
     </div>
 
+    @if (accounts().length > 1) {
+      <div class="field">
+        <app-select-field
+          [label]="withdrawal ? 'Vuelve a' : 'Sale de'"
+          [options]="accountOptions()"
+          [value]="accountId()"
+          (valueChange)="accountId.set($event!)"
+        ></app-select-field>
+      </div>
+    }
+
     <p class="hint">
       @if (withdrawal) {
-        El retiro resta de la meta y del ahorrado del mes de su fecha, y vuelve al balance de ese mes.
+        El retiro resta de la meta y del ahorrado del mes, y el dinero vuelve a la cuenta. No cuenta como ingreso.
       } @else {
-        El aporte cuenta como ahorrado en el mes de su fecha y se resta del balance de ese mes.
+        El aporte sale de la cuenta y cuenta como ahorrado en el mes de su fecha. No cuenta como gasto.
       }
     </p>
 

@@ -122,6 +122,9 @@
       } @else {
         <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="pause()">Pausar…</button>
       }
+      @if (categoryId() === 'cat-pago-deudas') {
+        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="createDebt()">Crear deuda a partir de este pago</button>
+      }
       <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">
         Eliminar fijo
       </button>

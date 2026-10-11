@@ -3,7 +3,7 @@
 
   <app-loading [show]="!view() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="notice">No se pudieron leer tus ahorros. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+    <p class="notice">No se pudieron leer tus metas. Cambia de mes y vuelve, o reinicia la aplicación.</p>
   } @else if (view(); as v) {
     <section class="hero" aria-labelledby="ahorro-label">
       <p id="ahorro-label" class="hero-label">Ahorrado en {{ monthState.label() }}</p>

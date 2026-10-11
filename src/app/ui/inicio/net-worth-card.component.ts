@@ -17,7 +17,7 @@ import { MonthState } from '../month-state';
         <span class="text">
           <span class="label">Patrimonio</span>
           <span class="amount">{{ money(n.total) }}</span>
-          <span class="sub">Disponible {{ money(n.available) }}@if (n.owedToMe > 0) { · Te deben {{ money(n.owedToMe) }}} · Debes {{ money(n.owe) }}</span>
+          <span class="sub">Disponible {{ money(n.available) }}@if (n.inGoals > 0) { · En metas {{ money(n.inGoals) }}}@if (n.owedToMe > 0) { · Te deben {{ money(n.owedToMe) }}} · Debes {{ money(n.owe) }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>

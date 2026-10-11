@@ -333,3 +333,8 @@ li + li .payment {
   color: var(--positive-on-light);
   font-weight: 600;
 }
+
+.settled-toggle {
+  display: block;
+  margin: -16px 20px 24px;
+}

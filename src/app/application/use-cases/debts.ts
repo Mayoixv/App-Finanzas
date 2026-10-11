@@ -95,9 +95,9 @@ export class RegisterDebtPayment {
 
   /**
    * Registra un pago: primero cubre el interés del mes sobre el saldo y el resto baja el saldo.
-   * Con `asMovement`, crea además el gasto (o ingreso, si me deben) en Movimientos y lo enlaza.
+   * Con `asMovement`, crea además el gasto (o ingreso, si me deben) en Movimientos, en la cuenta `accountId`, y lo enlaza.
    */
-  async execute(debtId: string, date: string, amount: number, asMovement: boolean): Promise<DebtPayment> {
+  async execute(debtId: string, date: string, amount: number, asMovement: boolean, accountId?: string): Promise<DebtPayment> {
     const debt = await this.debts.get(debtId);
     if (!debt) throw new NotFoundError('Deuda');
     if (!isValidCents(amount)) throw new ValidationError('El monto debe ser mayor que cero');
@@ -127,6 +127,7 @@ export class RegisterDebtPayment {
         note: debt.name,
         tags: [],
         splits: [],
+        ...(accountId ? { accountId } : {}),
       });
     }
     const payment: DebtPayment = { id: this.ids.next(), debtId, date, amount, ...split, transactionId };

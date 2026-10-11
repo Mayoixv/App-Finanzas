@@ -11,7 +11,7 @@
     <section class="hero" aria-labelledby="patrimonio-label">
       <p id="patrimonio-label" class="hero-label">Patrimonio</p>
       <p class="hero-amount">{{ money(n.total) }}</p>
-      <p class="hero-note">Disponible {{ money(n.available) }}@if (n.owedToMe > 0) { · Te deben {{ money(n.owedToMe) }}} · Debes {{ money(n.owe) }}</p>
+      <p class="hero-note">Disponible {{ money(n.available) }}@if (n.inGoals > 0) { · En metas {{ money(n.inGoals) }}}@if (n.owedToMe > 0) { · Te deben {{ money(n.owedToMe) }}} · Debes {{ money(n.owe) }}</p>
     </section>
   }
 

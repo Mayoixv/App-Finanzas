@@ -45,7 +45,7 @@ interface Strategies {
   styleUrls: ['deudas-view.component.scss'],
   imports: [LoadingComponent, IonIcon],
 })
-/** Sección Deudas de la pestaña Dinero. */
+/** Sección Deudas de la pestaña Planes. */
 export class DeudasViewComponent {
   private readonly container = inject(APP_CONTAINER);
   private readonly forms = inject(DineroFormService);
@@ -58,6 +58,14 @@ export class DeudasViewComponent {
   /** Deuda con el calendario de cuotas abierto. */
   protected readonly openSchedule = signal<string | null>(null);
   protected readonly extra = signal('');
+  /** Las saldadas quedan aparte, como historial; se muestran al pedirlo. */
+  protected readonly showSettled = signal(false);
+  protected readonly settledCount = computed(() => (this.debts() ?? []).filter((d) => d.balance <= 0).length);
+  protected readonly shown = computed(() => {
+    const list = this.debts() ?? [];
+    const open = list.filter((d) => d.balance > 0);
+    return this.showSettled() ? [...open, ...list.filter((d) => d.balance <= 0)] : open;
+  });
 
   protected readonly money = formatMoney;
   protected readonly day = formatDay;
