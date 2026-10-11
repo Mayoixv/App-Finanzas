@@ -18,11 +18,7 @@ async function initWeb(sqlite: SQLiteConnection): Promise<void> {
 }
 
 export class CapacitorSqliteDatabase implements SqlDatabase {
-  /**
-   * Cola de operaciones: el plugin abre una transacción por cada escritura y dos al mismo tiempo fallan
-   * ("cannot start a transaction within a transaction"), por ejemplo cuando dos tarjetas de Inicio crean a la vez
-   * los fijos del mes. Se ejecutan de una en una.
-   */
+  
   private queue: Promise<unknown> = Promise.resolve();
 
   private constructor(private readonly conn: SQLiteDBConnection) {}
