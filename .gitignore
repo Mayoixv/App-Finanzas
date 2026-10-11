@@ -71,3 +71,16 @@ Thumbs.db
 
 # Grafo de conocimiento generado por graphify
 /graphify-out
+
+# Instrucciones y notas para Claude (se quedan solo en esta PC)
+/CLAUDE.md
+/claude.md
+/ajuste*.md
+/design.md
+/DESIGN.md
+/Finanzas_SPEC.md
+/skills-lock.json
+/.agents/
+/.claude/
+/docs/
+/transitions/
