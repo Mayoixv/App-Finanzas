@@ -77,6 +77,7 @@
 
   <app-avisos></app-avisos>
 
+  @if (!bank.missing()) {
   <section class="block" aria-labelledby="banco-title">
     <h2 id="banco-title" class="section-title">Compras del banco</h2>
     @if (bank.available) {
@@ -112,6 +113,7 @@
       <p class="note">Disponible en la app del teléfono.</p>
     }
   </section>
+  }
 
   <app-datos></app-datos>
 

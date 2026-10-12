@@ -1,6 +1,8 @@
 package com.mayoixv.finanzas;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.provider.Settings;
 
 import androidx.core.app.NotificationManagerCompat;
@@ -87,7 +89,18 @@ public class BankNotificationsPlugin extends Plugin {
         boolean on = NotificationManagerCompat.getEnabledListenerPackages(getContext()).contains(getContext().getPackageName());
         JSObject ret = new JSObject();
         ret.put("enabled", on);
+        ret.put("supported", hasListener());
         call.resolve(ret);
+    }
+
+    /** La versión para testers quita el servicio del manifiesto; ahí la app esconde "Compras del banco". */
+    private boolean hasListener() {
+        try {
+            getContext().getPackageManager().getServiceInfo(new ComponentName(getContext(), BankNotificationListener.class), 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     @PluginMethod

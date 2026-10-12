@@ -9,7 +9,7 @@ import { MonthState } from '../month-state';
 
 /** Plugin nativo propio (android/.../BankNotificationsPlugin.java). */
 interface BankNotificationsPlugin {
-  isEnabled(): Promise<{ enabled: boolean }>;
+  isEnabled(): Promise<{ enabled: boolean; supported?: boolean }>;
   openSettings(): Promise<void>;
   drain(): Promise<{ items: RawNotification[] }>;
   takeRoute(): Promise<{ route: string | null }>;
@@ -35,6 +35,8 @@ export class BankNotificationsService {
   readonly available = Capacitor.getPlatform() === 'android';
   /** Si el usuario dio el permiso de leer notificaciones. */
   readonly enabled = signal(false);
+  /** Versión para testers: Android no tiene el servicio, así que no se ofrece "Compras del banco". */
+  readonly missing = signal(false);
   /** Cuántas compras esperan confirmación. */
   readonly pending = signal(0);
   /** Notificación propia "Compra por confirmar" al llegar cada aviso. */
@@ -69,7 +71,9 @@ export class BankNotificationsService {
     this.syncing = true;
     try {
       if (this.available) {
-        this.enabled.set((await BankNotifications.isEnabled()).enabled);
+        const state = await BankNotifications.isEnabled();
+        this.enabled.set(state.enabled);
+        this.missing.set(state.supported === false);
         const { items } = await BankNotifications.drain();
         if (items.length) {
           const { added, reversed } = await this.container.ingestBankNotifications.execute(items);

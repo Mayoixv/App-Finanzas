@@ -34,6 +34,13 @@ android {
             }
         }
     }
+    // "completa" lee los avisos del banco; "sinBanco" (para testers) no declara ese servicio, así Play Protect no la bloquea al
+    // instalarla fuera de la Play Store. Mismo appId y firma: una se instala encima de la otra sin perder datos.
+    flavorDimensions = ["version"]
+    productFlavors {
+        completa { dimension "version" }
+        sinBanco { dimension "version" }
+    }
     buildTypes {
         release {
             if (keystorePropertiesFile.exists()) signingConfig signingConfigs.release

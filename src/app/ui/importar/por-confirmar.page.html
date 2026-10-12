@@ -29,7 +29,7 @@
       <section class="empty">
         <span class="empty-icon" aria-hidden="true"><ion-icon name="receipt-outline"></ion-icon></span>
         <p class="empty-title">Nada por confirmar</p>
-        @if (bank.available && !bank.enabled()) {
+        @if (bank.available && !bank.missing() && !bank.enabled()) {
           <p class="empty-text">Activa en Ajustes la lectura de avisos del banco y aquí aparecerán tus compras.</p>
           <a routerLink="/ajustes" class="btn-secondary empty-action">Ir a Ajustes</a>
         } @else {
