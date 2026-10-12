@@ -15,6 +15,7 @@ import { MonthState } from '../month-state';
 import { DatosComponent } from './datos.component';
 import { AvisosComponent } from './avisos.component';
 import { APP_VERSION } from '../../version';
+import { UpdateService } from '../update/update.service';
 
 @Component({
   selector: 'app-ajustes',
@@ -29,6 +30,7 @@ export class AjustesPage {
   private readonly alerts = inject(AlertController);
   protected readonly tour = inject(TourService);
   protected readonly bank = inject(BankNotificationsService);
+  protected readonly update = inject(UpdateService);
   protected readonly help = inject(HelpService);
   protected readonly helpTopics = HELP_TOPICS;
   protected helpTitle(t: HelpTopic) {

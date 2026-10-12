@@ -6,6 +6,7 @@ import { NotificationsService } from './ui/notifications.service';
 import { AutoBackupService } from './ui/auto-backup.service';
 import { TourComponent } from './ui/tour/tour.component';
 import { BankNotificationsService } from './ui/importar/bank-notifications.service';
+import { UpdateService } from './ui/update/update.service';
 
 @Component({
   selector: 'app-root',
@@ -20,4 +21,6 @@ export class AppComponent {
   private readonly autoBackup = inject(AutoBackupService);
   /** Pasa a "Por confirmar" las compras de los avisos del banco al abrir y al volver a la app. */
   private readonly bankNotifications = inject(BankNotificationsService);
+  /** Busca una versión nueva al abrir la app, una vez al día. */
+  private readonly update = inject(UpdateService);
 }

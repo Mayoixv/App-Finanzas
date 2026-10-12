@@ -140,11 +140,24 @@
     </ul>
     @if (showPrivacy()) {
       <div class="privacy">
-        <p>Kuarto guarda todo solo en este teléfono. No hay cuentas, servidores ni publicidad, y la app no envía tus datos a nadie.</p>
+        <p>Kuarto guarda todo solo en este teléfono. No hay cuentas, servidores ni publicidad, y la app no envía tus datos a nadie. Solo se conecta a internet para ver si hay una versión nueva.</p>
         <p>Tus datos salen del teléfono únicamente cuando tú creas un respaldo o exportas un archivo y eliges dónde mandarlo. Los respaldos van cifrados con tu contraseña.</p>
-        <p>Los permisos que pide son para mostrarte avisos, desbloquear con huella y guardar respaldos o archivos en el teléfono.</p>
+        <p>Los permisos que pide son para mostrarte avisos, desbloquear con huella, guardar respaldos o archivos en el teléfono e instalar las versiones nuevas.</p>
         <p>Si borras la app sin un respaldo, tus datos se pierden: nadie más tiene una copia.</p>
       </div>
+    }
+    @if (update.supported()) {
+      <ul class="rows">
+        <li>
+          <button type="button" class="row" [disabled]="update.busy()" (click)="update.check()">
+            <span class="row-title">Buscar actualización</span>
+            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+      </ul>
+      @if (update.status(); as status) {
+        <p class="note" aria-live="polite">{{ status }}</p>
+      }
     }
     <p class="note">Kuarto {{ version }}</p>
   </section>

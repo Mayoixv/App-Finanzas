@@ -48,4 +48,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Instalar la versión nueva que la app descarga de los Releases de GitHub (Ajustes › Buscar actualización). -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 </manifest>
