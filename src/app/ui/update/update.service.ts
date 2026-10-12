@@ -22,6 +22,11 @@ export interface AppRelease {
   url: string;
 }
 
+/** "1.0.5" de "Kuarto-1.0.5.apk" o de "v1.0.5"; null si no trae un número de versión. */
+export function releaseVersion(text: string): string | null {
+  return /\d+(?:\.\d+)+/.exec(text)?.[0] ?? null;
+}
+
 /** true si `a` (por ejemplo "1.0.10") es más nueva que `b` ("1.0.9"). */
 export function isNewer(a: string, b: string): boolean {
   const pa = a.split('.').map(Number);
@@ -84,7 +89,9 @@ export class UpdateService {
     if (!res.ok) throw new Error(`GitHub respondió ${res.status}`);
     const data = (await res.json()) as { tag_name: string; assets: { name: string; browser_download_url: string }[] };
     const apk = data.assets.find((a) => a.name.endsWith('.apk'));
-    return apk ? { version: data.tag_name.replace(/^v/, ''), url: apk.browser_download_url } : null;
+    // El número sale del nombre del APK (Kuarto-1.0.5.apk) o, si no lo trae, de la etiqueta (v1.0.5).
+    const version = releaseVersion(apk?.name ?? '') ?? releaseVersion(data.tag_name);
+    return apk && version ? { version, url: apk.browser_download_url } : null;
   }
 
   private async offer(release: AppRelease) {
