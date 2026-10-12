@@ -1,50 +1,50 @@
 import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
+
+/** Carpeta visible en "Mis archivos" del teléfono donde se guardan respaldos y exportaciones. */
+export const FILES_FOLDER = 'Kuarto';
 
 /**
- * Entrega un archivo al usuario. En Android lo guarda en la caché de la app y abre la hoja de compartir
- * (Drive, WhatsApp, correo); en el navegador lo descarga.
+ * Guarda un archivo en Documentos/Kuarto del teléfono y devuelve dónde quedó, para decírselo al usuario.
+ * En el navegador lo descarga y devuelve ''.
  */
-export async function saveFile(name: string, content: string, mime: string): Promise<void> {
+export async function saveFile(name: string, content: string, mime: string): Promise<string> {
   if (Capacitor.isNativePlatform()) {
-    const { uri } = await Filesystem.writeFile({
-      path: name,
+    await Filesystem.writeFile({
+      path: `${FILES_FOLDER}/${name}`,
       data: content,
-      directory: Directory.Cache,
+      directory: Directory.Documents,
       encoding: Encoding.UTF8,
+      recursive: true,
     });
-    try {
-      await Share.share({ title: name, files: [uri] });
-    } catch {
-      // Cerrar la hoja de compartir sin elegir nada no es un error.
-    }
-    return;
+    return `Documentos/${FILES_FOLDER}/${name}`;
   }
-  const url = URL.createObjectURL(new Blob([content], { type: mime }));
-  Object.assign(document.createElement('a'), { href: url, download: name }).click();
-  setTimeout(() => URL.revokeObjectURL(url));
+  download(new Blob([content], { type: mime }), name);
+  return '';
 }
 
 /** Como saveFile, para archivos binarios (un PDF) que llegan en base64. */
-export async function saveBinaryFile(name: string, base64: string, mime: string): Promise<void> {
+export async function saveBinaryFile(name: string, base64: string, mime: string): Promise<string> {
   if (Capacitor.isNativePlatform()) {
-    const { uri } = await Filesystem.writeFile({ path: name, data: base64, directory: Directory.Cache });
-    try {
-      await Share.share({ title: name, files: [uri] });
-    } catch {
-      // Cerrar la hoja de compartir sin elegir nada no es un error.
-    }
-    return;
+    await Filesystem.writeFile({ path: `${FILES_FOLDER}/${name}`, data: base64, directory: Directory.Documents, recursive: true });
+    return `Documentos/${FILES_FOLDER}/${name}`;
   }
-  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const url = URL.createObjectURL(new Blob([bytes], { type: mime }));
+  download(new Blob([Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))], { type: mime }), name);
+  return '';
+}
+
+function download(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
   Object.assign(document.createElement('a'), { href: url, download: name }).click();
   setTimeout(() => URL.revokeObjectURL(url));
 }
 
-/** Abre el selector de archivos del sistema y devuelve el texto del archivo elegido, o null si se cancela. */
-export function pickTextFile(accept: string): Promise<string | null> {
+/**
+ * Abre el selector de archivos del sistema y devuelve el texto del archivo elegido, o null si se cancela.
+ * Sin `accept`, se puede elegir cualquier archivo: Android no conoce la extensión .finanzas y, si se filtra por
+ * ella, deja todos los archivos en gris. Quien llama comprueba el contenido.
+ */
+export function pickTextFile(accept = ''): Promise<string | null> {
   return new Promise((resolve) => {
     const input = Object.assign(document.createElement('input'), { type: 'file', accept });
     input.addEventListener('change', () => {

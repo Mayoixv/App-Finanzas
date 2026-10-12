@@ -1,6 +1,5 @@
 import {
   IAccountRepository,
-  IBankImportRepository,
   IBudgetRepository,
   ICategoryRepository,
   IDebtRepository,
@@ -10,7 +9,6 @@ import {
   ITransactionRepository,
 } from '../../application/ports/repositories';
 import { Budget } from '../../domain/budget';
-import { BankImport } from '../../domain/bank-alert';
 import { Account, AccountType, CASH_ACCOUNT_ID, Transfer } from '../../domain/account';
 import { Category, CategoryType } from '../../domain/category';
 import { Debt, DebtDirection, DebtPayment } from '../../domain/debts';
@@ -716,81 +714,5 @@ export class SqliteAccountRepository implements IAccountRepository {
 
   async deleteTransfer(id: string): Promise<void> {
     await this.db.run('DELETE FROM transfers WHERE id = ?', [id]);
-  }
-}
-
-interface BankImportRow {
-  id: string;
-  key: string;
-  bank: BankImport['bank'];
-  kind: BankImport['kind'];
-  amount: number;
-  currency: BankImport['currency'];
-  merchant: string;
-  date: string;
-  last4: string;
-  status: BankImport['status'];
-  received_at: string;
-  transaction_id: string | null;
-  category_id: string | null;
-}
-
-const toBankImport = (r: BankImportRow): BankImport => ({
-  id: r.id,
-  key: r.key,
-  bank: r.bank,
-  kind: r.kind,
-  amount: r.amount,
-  currency: r.currency,
-  merchant: r.merchant,
-  date: r.date,
-  last4: r.last4,
-  status: r.status,
-  receivedAt: r.received_at,
-  transactionId: r.transaction_id,
-  categoryId: r.category_id,
-});
-
-export class SqliteBankImportRepository implements IBankImportRepository {
-  constructor(private readonly db: SqlDatabase) {}
-
-  async listPending(): Promise<BankImport[]> {
-    const rows = await this.db.all<BankImportRow>(
-      "SELECT * FROM bank_imports WHERE status = 'pendiente' ORDER BY date DESC, received_at DESC",
-    );
-    return rows.map(toBankImport);
-  }
-
-  async get(id: string): Promise<BankImport | undefined> {
-    const rows = await this.db.all<BankImportRow>('SELECT * FROM bank_imports WHERE id = ?', [id]);
-    return rows[0] && toBankImport(rows[0]);
-  }
-
-  async insertIfNew(i: BankImport): Promise<boolean> {
-    const before = await this.db.all<{ n: number }>('SELECT COUNT(*) AS n FROM bank_imports WHERE key = ?', [i.key]);
-    if (before[0].n > 0) return false;
-    await this.save(i);
-    return true;
-  }
-
-  async save(i: BankImport): Promise<void> {
-    await this.db.run(
-      `INSERT INTO bank_imports (id, key, bank, kind, amount, currency, merchant, date, last4, status, received_at, transaction_id, category_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET status = excluded.status, transaction_id = excluded.transaction_id,
-         category_id = excluded.category_id`,
-      [i.id, i.key, i.bank, i.kind, i.amount, i.currency, i.merchant, i.date, i.last4, i.status, i.receivedAt,
-        i.transactionId ?? null, i.categoryId ?? null],
-    );
-  }
-
-  async lastCategoryFor(merchantPrefix: string): Promise<string | null> {
-    const rows = await this.db.all<{ category_id: string }>(
-      `SELECT category_id FROM bank_imports
-       WHERE status = 'confirmado' AND category_id IS NOT NULL AND UPPER(merchant) LIKE ?
-       ORDER BY received_at DESC LIMIT 1`,
-      [merchantPrefix.toUpperCase() + '%'],
-    );
-    return rows[0]?.category_id ?? null;
   }
 }

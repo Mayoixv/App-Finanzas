@@ -12,7 +12,7 @@ const RATING: Record<string, string> = { excelente: 'Excelente', regular: 'Regul
  * PDF del mes: resumen, gasto por categoría y todos los movimientos.
  * jsPDF se carga solo al exportar, para no hacer más lenta la apertura de la app.
  */
-export async function exportMonthPdf(container: AppContainer, month: MonthKey): Promise<void> {
+export async function exportMonthPdf(container: AppContainer, month: MonthKey): Promise<string> {
   const [{ jsPDF }, overview, transactions, categories, accounts] = await Promise.all([
     import('jspdf'),
     container.getMonthOverview.execute(month),
@@ -111,7 +111,7 @@ export async function exportMonthPdf(container: AppContainer, month: MonthKey): 
   text(`Generado el ${formatDay(fileDate())} con Kuarto.`, MARGIN, { size: 8, color: 140 });
 
   const base64 = doc.output('datauristring').split(',')[1];
-  await saveBinaryFile(`kuarto-${month}.pdf`, base64, 'application/pdf');
+  return saveBinaryFile(`kuarto-${month}.pdf`, base64, 'application/pdf');
 }
 
 /** Recorta un texto para que quepa en `max` puntos, con "…" si hace falta. */

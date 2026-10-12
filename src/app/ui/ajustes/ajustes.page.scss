@@ -193,30 +193,11 @@ li + li .row {
   transform: rotate(180deg);
 }
 
-.bank-state {
-  font-size: 15px;
-  color: var(--muted-on-light);
-
-  &.on {
-    color: var(--violet-600);
-    font-weight: 600;
-  }
-}
-
-.toggle-row {
-  display: flex;
-  align-items: center;
-  min-height: 56px;
-  border-top: 1px solid rgba(20, 18, 31, 0.08);
-
-  ion-toggle {
-    flex: 1;
-    --track-background-checked: var(--violet-600);
-    padding: 8px 0;
-    font-size: 16px;
-  }
-}
-
 .toggle-row + li .row {
   border-top: 1px solid rgba(20, 18, 31, 0.08);
+}
+
+/* Bloque aparte de Privacidad, con el mismo espacio que su texto desplegado. */
+.update-rows {
+  margin-top: 12px;
 }

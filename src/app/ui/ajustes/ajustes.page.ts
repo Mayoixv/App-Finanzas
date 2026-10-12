@@ -1,10 +1,9 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TourService } from '../tour/tour.service';
-import { BankNotificationsService } from '../importar/bank-notifications.service';
 import { HelpService } from '../help/help-button.component';
 import { HELP, HELP_TOPICS, HelpTopic } from '../help/help.content';
-import { AlertController, IonContent, IonIcon, IonToggle } from '@ionic/angular';
+import { AlertController, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmark, chevronBack, chevronDown, chevronForward, helpCircleOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
@@ -21,7 +20,7 @@ import { UpdateService } from '../update/update.service';
   selector: 'app-ajustes',
   templateUrl: 'ajustes.page.html',
   styleUrls: ['ajustes.page.scss'],
-  imports: [RouterLink, IonContent, IonIcon, IonToggle, DropdownComponent, DatosComponent, AvisosComponent],
+  imports: [RouterLink, IonContent, IonIcon, DropdownComponent, DatosComponent, AvisosComponent],
 })
 export class AjustesPage {
   private readonly container = inject(APP_CONTAINER);
@@ -29,7 +28,6 @@ export class AjustesPage {
   protected readonly currencyState = inject(CurrencyState);
   private readonly alerts = inject(AlertController);
   protected readonly tour = inject(TourService);
-  protected readonly bank = inject(BankNotificationsService);
   protected readonly update = inject(UpdateService);
   protected readonly help = inject(HelpService);
   protected readonly helpTopics = HELP_TOPICS;

@@ -1,8 +1,6 @@
 package com.mayoixv.finanzas;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -35,15 +33,6 @@ public class AppUpdaterPlugin extends Plugin {
         boolean debuggable = (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         JSObject ret = new JSObject();
         ret.put("canUpdate", !debuggable);
-        // La versión completa trae el lector de avisos del banco; la de testers no (ver productFlavors).
-        boolean completa;
-        try {
-            getContext().getPackageManager().getServiceInfo(new ComponentName(getContext(), BankNotificationListener.class), 0);
-            completa = true;
-        } catch (PackageManager.NameNotFoundException e) {
-            completa = false;
-        }
-        ret.put("completa", completa);
         call.resolve(ret);
     }
 

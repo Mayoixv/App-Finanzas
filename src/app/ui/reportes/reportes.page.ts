@@ -128,12 +128,15 @@ export class ReportesPage {
 
   protected readonly exporting = signal(false);
   protected readonly exportError = signal('');
+  protected readonly exportDone = signal('');
 
   protected async exportPdf() {
     this.exporting.set(true);
     this.exportError.set('');
+    this.exportDone.set('');
     try {
-      await exportMonthPdf(this.container, this.monthState.month());
+      const where = await exportMonthPdf(this.container, this.monthState.month());
+      if (where) this.exportDone.set(`PDF guardado en ${where}.`);
     } catch (error) {
       console.error(error);
       this.exportError.set('No se pudo crear el PDF. Inténtalo de nuevo.');

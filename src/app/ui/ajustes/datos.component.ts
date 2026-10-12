@@ -82,8 +82,8 @@ export class DatosComponent implements OnInit {
     }
     const done = await this.busy('Cifrando respaldo…', async () => {
       const file = await this.container.createBackup.execute(values['p1']);
-      await saveFile(`kuarto-respaldo-${fileDate()}.finanzas`, file, 'application/json');
-      this.status.set('Respaldo creado. Guárdalo fuera del teléfono (Drive, correo).');
+      const where = await saveFile(`kuarto-respaldo-${fileDate()}.finanzas`, file, 'application/json');
+      this.status.set(where ? `Respaldo guardado en ${where}. Copia también ese archivo fuera del teléfono (Drive, correo).` : 'Respaldo descargado.');
       return true;
     });
     return done === true;
@@ -128,7 +128,7 @@ export class DatosComponent implements OnInit {
   }
 
   protected async restoreBackup() {
-    const text = await pickTextFile('.finanzas,application/json');
+    const text = await pickTextFile();
     if (!text) return;
     const values = await this.ask('Restaurar respaldo', 'Escribe la contraseña con la que creaste el respaldo.', [
       { name: 'p', type: 'password', placeholder: 'Contraseña', attributes: { autocomplete: 'current-password' } },
@@ -166,8 +166,8 @@ export class DatosComponent implements OnInit {
   protected async exportCsv() {
     await this.busy('Preparando archivo…', async () => {
       const { csv, rows } = await this.container.exportCsv.execute();
-      await saveFile(`kuarto-movimientos-${fileDate()}.csv`, csv, 'text/csv');
-      this.status.set(`Exportados ${rows} movimientos.`);
+      const where = await saveFile(`kuarto-movimientos-${fileDate()}.csv`, csv, 'text/csv');
+      this.status.set(`Exportados ${rows} movimientos${where ? ` a ${where}` : ''}.`);
     });
   }
 

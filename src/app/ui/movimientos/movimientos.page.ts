@@ -6,7 +6,6 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { PendingBannerComponent } from '../importar/pending-banner.component';
 import { HelpButtonComponent } from '../help/help-button.component';
 import { lookOf } from '../category-look';
 import {
@@ -74,7 +73,7 @@ const fold = (text: string) =>
   selector: 'app-movimientos',
   templateUrl: 'movimientos.page.html',
   styleUrls: ['movimientos.page.scss'],
-  imports: [PendingBannerComponent, HelpButtonComponent, 
+  imports: [HelpButtonComponent, 
     LoadingComponent,
     IonContent,
     IonIcon,

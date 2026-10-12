@@ -16,7 +16,7 @@ export interface AccountFields {
   creditLimit?: number | null;
   cutDay?: number | null;
   dueDay?: number | null;
-  /** Últimos 4 dígitos de su tarjeta (crédito o débito); vacío si no se usa para importar compras. */
+  /** Últimos 4 dígitos de la tarjeta, para reconocerla (se muestran en la tarjeta de crédito). */
   cardLast4?: string | null;
 }
 

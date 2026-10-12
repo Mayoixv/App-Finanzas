@@ -5,7 +5,6 @@ import { PayRecurringExpense } from '../application/use-cases/pay-recurring-expe
 import { RemoveRecurringExpense } from '../application/use-cases/remove-recurring-expense';
 import { Migration, MIGRATIONS, runMigrations } from './sqlite/migrations';
 import {
-  SqliteBankImportRepository,
   SqliteBudgetRepository,
   SqliteAccountRepository,
   SqliteCategoryRepository,
@@ -381,24 +380,5 @@ describe('presupuestos con varias categorías (migración 11)', () => {
     // Si se borra una categoría extra, el presupuesto sigue con las demás.
     await db.run("DELETE FROM categories WHERE id = 'cat-supermercado'");
     expect((await repo.listByMonth('2026-10'))[0].extraCategoryIds).toEqual([]);
-  });
-});
-
-describe('compras importadas (migración 12)', () => {
-  it('conserva las cuentas, no duplica avisos y recuerda la categoría de cada comercio', async () => {
-    const db = new NodeSqliteDatabase();
-    await runMigrations(db, MIGRATIONS.filter((m) => m.version <= 11));
-    await db.run("INSERT INTO accounts (id, name, type, initial_balance) VALUES ('qik', 'Qik', 'tarjeta', 0)");
-    await runMigrations(db);
-    expect(await new SqliteAccountRepository(db).get('qik')).toMatchObject({ name: 'Qik', cardLast4: null });
-
-    const repo = new SqliteBankImportRepository(db);
-    const base = { bank: 'qik' as const, kind: 'compra' as const, amount: 12900, currency: 'DOP' as const, merchant: 'LA SIRENA INDEPEND MC', date: '2026-10-05', last4: '8462', status: 'pendiente' as const, receivedAt: '2026-10-05T21:13:28Z' };
-    expect(await repo.insertIfNew({ ...base, id: 'a', key: 'k1' })).toBe(true);
-    expect(await repo.insertIfNew({ ...base, id: 'b', key: 'k1' })).toBe(false);
-    expect((await repo.listPending()).map((i) => i.id)).toEqual(['a']);
-    await repo.save({ ...base, id: 'a', key: 'k1', status: 'confirmado', categoryId: 'cat-supermercado' });
-    expect(await repo.listPending()).toEqual([]);
-    expect(await repo.lastCategoryFor('la sirena')).toBe('cat-supermercado');
   });
 });

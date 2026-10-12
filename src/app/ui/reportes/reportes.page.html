@@ -15,6 +15,9 @@
     @if (exportError(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }
+    @if (exportDone(); as message) {
+      <p class="note" aria-live="polite">{{ message }}</p>
+    }
   </header>
 
   <app-pill-toggle class="range" label="Periodo" [options]="rangeOptions" [(value)]="range"></app-pill-toggle>

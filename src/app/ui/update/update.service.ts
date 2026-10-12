@@ -7,16 +7,13 @@ import { todayIso } from '../format';
 
 /** Plugin nativo propio (android/.../AppUpdaterPlugin.java). */
 interface AppUpdaterPlugin {
-  info(): Promise<{ canUpdate: boolean; completa?: boolean }>;
+  info(): Promise<{ canUpdate: boolean }>;
   downloadAndInstall(options: { url: string }): Promise<{ needsPermission: boolean }>;
 }
 
 const AppUpdater = registerPlugin<AppUpdaterPlugin>('AppUpdater');
 
-/**
- * Releases del repositorio: cada versión lleva dos APK, Kuarto-1.0.3.apk (testers, sin avisos del banco) y
- * Kuarto-completa-1.0.3.apk. Cada teléfono baja el de su misma versión.
- */
+/** Releases del repositorio: cada versión lleva su APK adjunto (Kuarto-1.0.4.apk). */
 const LATEST_URL = 'https://api.github.com/repos/Mayoixv/App-Finanzas/releases/latest';
 const CHECKED_KEY = 'update_checked_on';
 
@@ -49,14 +46,12 @@ export class UpdateService {
   readonly busy = signal(false);
   /** Solo en el APK firmado del teléfono; la versión de depuración y el navegador no se actualizan así. */
   readonly supported = signal(false);
-  private completa = false;
 
   constructor() {
     if (Capacitor.getPlatform() !== 'android') return;
     AppUpdater.info()
-      .then(async ({ canUpdate, completa }) => {
+      .then(async ({ canUpdate }) => {
         this.supported.set(canUpdate);
-        this.completa = !!completa;
         if (canUpdate && (await this.container.settings.get(CHECKED_KEY)) !== todayIso()) await this.check(false);
       })
       .catch(console.error);
@@ -88,7 +83,7 @@ export class UpdateService {
     const res = await fetch(LATEST_URL, { headers: { Accept: 'application/vnd.github+json' } });
     if (!res.ok) throw new Error(`GitHub respondió ${res.status}`);
     const data = (await res.json()) as { tag_name: string; assets: { name: string; browser_download_url: string }[] };
-    const apk = data.assets.find((a) => a.name.endsWith('.apk') && a.name.includes('completa') === this.completa);
+    const apk = data.assets.find((a) => a.name.endsWith('.apk'));
     return apk ? { version: data.tag_name.replace(/^v/, ''), url: apk.browser_download_url } : null;
   }
 

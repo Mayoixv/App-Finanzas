@@ -39,7 +39,7 @@ export class CuentaModalComponent implements OnInit {
   protected readonly creditLimit = signal('');
   protected readonly cutDay = signal('');
   protected readonly dueDay = signal('');
-  /** Últimos 4 dígitos de su tarjeta, para asignar sola las compras importadas del banco. */
+  /** Últimos 4 dígitos de la tarjeta, para reconocerla. */
   protected readonly cardLast4 = signal('');
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);

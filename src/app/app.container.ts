@@ -52,7 +52,6 @@ import { SetBudget } from './application/use-cases/set-budget';
 import { UpdateSavingsGoal } from './application/use-cases/update-savings-goal';
 import { AddSavingsContribution } from './application/use-cases/add-savings-contribution';
 import { AddTransaction } from './application/use-cases/add-transaction';
-import { ConfirmImport, DiscardImport, IngestBankNotifications, ListPendingImports } from './application/use-cases/bank-imports';
 import { GetBudgetStatuses } from './application/use-cases/get-budget-statuses';
 import { GetMonthOverview } from './application/use-cases/get-month-overview';
 import { GetMonthRecurringExpenses } from './application/use-cases/get-month-recurring-expenses';
@@ -69,12 +68,10 @@ import {
   ISavingsRepository,
   ISettingsRepository,
   ITransactionRepository,
-  IBankImportRepository,
 } from './application/ports/repositories';
 import {
   SqliteBudgetRepository,
   SqliteAccountRepository,
-  SqliteBankImportRepository,
   SqliteCategoryRepository,
   SqliteDebtRepository,
   SqliteRecurringExpenseRepository,
@@ -96,7 +93,6 @@ export interface Repositories {
   backup: IBackupStore;
   debts: IDebtRepository;
   accounts: IAccountRepository;
-  bankImports: IBankImportRepository;
 }
 
 /** Raíz de composición: une repositorios y casos de uso. La UI solo ve esto. */
@@ -165,10 +161,6 @@ export interface AppContainer {
   getReport: GetReport;
   getSubscriptionCost: GetSubscriptionCost;
   getDebtInstallments: GetDebtInstallments;
-  ingestBankNotifications: IngestBankNotifications;
-  listPendingImports: ListPendingImports;
-  confirmImport: ConfirmImport;
-  discardImport: DiscardImport;
 }
 
 export const APP_CONTAINER = new InjectionToken<AppContainer>('AppContainer');
@@ -195,10 +187,6 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     removeRecurringExpense: new RemoveRecurringExpense(repos.recurring),
     getMonthOverview: new GetMonthOverview(repos.transactions, repos.categories, repos.savings),
     getDebtInstallments: new GetDebtInstallments(getDebtsOverview),
-    ingestBankNotifications: new IngestBankNotifications(repos.bankImports, repos.settings, ids),
-    listPendingImports: new ListPendingImports(repos.bankImports, repos.accounts),
-    confirmImport: new ConfirmImport(repos.bankImports, new AddTransaction(repos.transactions, repos.categories, ids, repos.accounts)),
-    discardImport: new DiscardImport(repos.bankImports),
     getSubscriptionCost: new GetSubscriptionCost(repos.recurring, repos.categories),
     getReport: new GetReport(repos.transactions, repos.categories, repos.savings, repos.accounts, getMonthRecurringExpenses),
     getMonthHistory: new GetMonthHistory(repos.transactions, repos.categories, repos.savings),
@@ -278,6 +266,5 @@ export async function createSqliteContainer(
     backup,
     debts: new SqliteDebtRepository(db),
     accounts: new SqliteAccountRepository(db),
-    bankImports: new SqliteBankImportRepository(db),
   });
 }

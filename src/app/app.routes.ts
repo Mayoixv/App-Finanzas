@@ -32,10 +32,6 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'por-confirmar',
-    loadComponent: () => import('./ui/importar/por-confirmar.page').then((m) => m.PorConfirmarPage),
-  },
-  {
     path: 'ajustes/categorias',
     loadComponent: () => import('./ui/ajustes/categorias.page').then((m) => m.CategoriasPage),
   },

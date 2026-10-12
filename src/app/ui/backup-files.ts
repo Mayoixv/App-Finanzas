@@ -1,10 +1,10 @@
 import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { BackupData } from '../application/ports/repositories';
-import { fileDate } from './file-io';
+import { FILES_FOLDER, fileDate } from './file-io';
 
 /** Carpeta visible en "Mis archivos" del teléfono: Documentos/Kuarto. */
-export const AUTO_BACKUP_FOLDER = 'Kuarto';
+export const AUTO_BACKUP_FOLDER = FILES_FOLDER;
 const AUTO_BACKUP_KEEP = 4;
 const SAFETY_FOLDER = 'respaldos';
 const SAFETY_KEEP = 3;

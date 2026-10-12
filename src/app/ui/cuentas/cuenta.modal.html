@@ -81,10 +81,10 @@
       </div>
     }
 
-    @if (!isCash()) {
+    @if (isCard()) {
       <div class="field">
         <ion-input
-          [label]="isCard() ? 'Últimos 4 dígitos de la tarjeta (opcional)' : 'Últimos 4 dígitos de su tarjeta de débito (opcional)'"
+          label="Últimos 4 dígitos (opcional)"
           label-placement="floating"
           type="text"
           inputmode="numeric"
@@ -94,7 +94,7 @@
           (ionInput)="cardLast4.set(($event.detail.value ?? '').toString())"
         ></ion-input>
       </div>
-      <p class="hint">Con ellos, las compras que la app lee de los avisos del banco se asignan solas a esta cuenta.</p>
+      <p class="hint">Se muestran en la tarjeta para reconocerla.</p>
     }
 
     @if (error(); as message) {

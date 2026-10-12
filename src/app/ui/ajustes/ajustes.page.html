@@ -77,44 +77,6 @@
 
   <app-avisos></app-avisos>
 
-  @if (!bank.missing()) {
-  <section class="block" aria-labelledby="banco-title">
-    <h2 id="banco-title" class="section-title">Compras del banco</h2>
-    @if (bank.available) {
-      <ul class="rows">
-        <li>
-          <button type="button" class="row" (click)="bank.openSettings()">
-            <span class="row-title">Leer avisos de compra</span>
-            <span class="bank-state" [class.on]="bank.enabled()">{{ bank.enabled() ? 'Activado' : 'Desactivado' }}</span>
-            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-          </button>
-        </li>
-        <li class="toggle-row">
-          <ion-toggle justify="space-between" [checked]="bank.notifyPurchases()" (ionChange)="bank.setNotifyPurchases($event.detail.checked)">
-            Avisarme de cada compra
-          </ion-toggle>
-        </li>
-        <li>
-          <a routerLink="/por-confirmar" class="row">
-            <span class="row-title">Por confirmar</span>
-            @if (bank.pending()) {
-              <span class="bank-state on">{{ bank.pending() }}</span>
-            }
-            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-          </a>
-        </li>
-      </ul>
-      <p class="note">
-        Lee los avisos de compra de Qik, Banreservas y Popular que llegan a Gmail o a la app de Qik, y los deja en
-        "Por confirmar". Todo queda en tu teléfono. Si Android dice "Ajuste restringido": Ajustes del teléfono › Apps ›
-        Kuarto › ⋮ › Permitir ajustes restringidos.
-      </p>
-    } @else {
-      <p class="note">Disponible en la app del teléfono.</p>
-    }
-  </section>
-  }
-
   <app-datos></app-datos>
 
   <section class="block" aria-labelledby="categorias-title">
@@ -147,7 +109,7 @@
       </div>
     }
     @if (update.supported()) {
-      <ul class="rows">
+      <ul class="rows update-rows">
         <li>
           <button type="button" class="row" [disabled]="update.busy()" (click)="update.check()">
             <span class="row-title">Buscar actualización</span>
