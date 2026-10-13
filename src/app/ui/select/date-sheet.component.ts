@@ -77,7 +77,7 @@ export function todayIso(): string {
       height: 4px;
       margin: 4px auto 4px;
       border-radius: 2px;
-      background: rgba(20, 18, 31, 0.18);
+      background: var(--line-axis);
     }
     .head {
       display: flex;
@@ -141,7 +141,7 @@ export function todayIso(): string {
       transform: scale(0.92);
     }
     .day.today .num {
-      box-shadow: inset 0 0 0 1.5px var(--violet-600);
+      box-shadow: inset 0 0 0 1.5px var(--accent);
     }
     .day[aria-selected='true'] .num {
       background: var(--violet-600);
@@ -151,7 +151,7 @@ export function todayIso(): string {
     .nav:focus-visible,
     .day:focus-visible,
     .clear:focus-visible {
-      outline: 3px solid var(--violet-600);
+      outline: 3px solid var(--accent);
       outline-offset: 1px;
     }
     .actions {
@@ -161,8 +161,8 @@ export function todayIso(): string {
     }
     .actions .btn-secondary {
       flex: 1;
-      border-color: var(--violet-600);
-      color: var(--violet-600);
+      border-color: var(--accent);
+      color: var(--accent);
     }
     .clear {
       flex: 1;

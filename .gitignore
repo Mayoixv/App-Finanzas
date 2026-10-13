@@ -84,3 +84,6 @@ Thumbs.db
 /.claude/
 /docs/
 /transitions/
+
+# Configuración de Firebase del proyecto (identifica el proyecto; no se sube al repo público)
+/android/app/google-services.json

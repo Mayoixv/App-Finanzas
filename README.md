@@ -2,7 +2,7 @@
 
 App de finanzas personales para Android. Anotas lo que entra y lo que sale cada mes, tus pagos fijos, tus cuentas y tarjetas, tus metas y tus deudas, y ves cómo vas.
 
-Todo se guarda solo en tu teléfono: no hay cuentas, servidores ni publicidad.
+Todo se guarda en tu teléfono, sin publicidad. Si quieres, el respaldo semanal se sube cifrado a tu cuenta de Google.
 
 ## Qué hace
 
@@ -33,7 +33,8 @@ Para revisar solo lee la lista de versiones de GitHub: no envía ningún dato tu
 
 - Viven en una base SQLite dentro del teléfono.
 - **Ajustes › Tus datos › Crear respaldo** guarda un archivo cifrado con tu contraseña en `Documentos/Kuarto`. Cópialo fuera del teléfono (Drive, correo).
-- Para pasar tus datos a otro teléfono: instala Kuarto y usa **Restaurar respaldo** con ese archivo.
+- **Respaldo en la nube** (opcional): entras con Google y el respaldo semanal se sube cifrado con tu contraseña a Firebase. Nadie puede leerlo sin esa contraseña.
+- Para pasar tus datos a otro teléfono: instala Kuarto y usa **Restaurar respaldo** con el archivo, o **Restaurar desde la nube**.
 - Si borras la app sin un respaldo, tus datos se pierden: nadie más tiene una copia.
 
 ## Desarrollo
@@ -49,6 +50,8 @@ src/app/
 ```
 
 Las dependencias apuntan hacia adentro: `ui → application → domain`. Cada cambio de esquema es una migración nueva en `infrastructure/sqlite/migrations.ts`.
+
+El respaldo en la nube usa Firebase (Authentication con Google y Firestore). Para compilarlo necesitas el `google-services.json` de tu proyecto en `android/app/` (no está en el repositorio).
 
 Necesitas Node 22.5 o más nuevo (las pruebas usan `node:sqlite`) y, para Android, JDK 21 y el SDK de Android.
 

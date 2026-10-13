@@ -1,4 +1,6 @@
 ext {
+    // Inicio de sesión con Google del plugin @capacitor-firebase/authentication (respaldo en la nube).
+    rgcfaIncludeGoogle = true
     minSdkVersion = 24
     compileSdkVersion = 36
     targetSdkVersion = 36

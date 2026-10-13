@@ -2,12 +2,14 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { APP_CONTAINER } from '../app.container';
 import { saveAutoBackup } from './backup-files';
+import { CloudBackupService } from './cloud/cloud-backup.service';
 import { todayIso } from './format';
 
 /** Respaldo automático semanal: al abrir la app, si toca, lo crea y lo guarda en Documentos/Kuarto. */
 @Injectable({ providedIn: 'root' })
 export class AutoBackupService {
   private readonly container = inject(APP_CONTAINER);
+  private readonly cloud = inject(CloudBackupService);
 
   readonly available = Capacitor.isNativePlatform();
   readonly enabled = signal(false);
@@ -34,8 +36,12 @@ export class AutoBackupService {
   /** Hace el respaldo ya (al activarlo o si toca). Devuelve false si no se pudo guardar. */
   async runNow(): Promise<boolean> {
     try {
-      await saveAutoBackup(await this.container.autoBackup.create());
+      const file = await this.container.autoBackup.create();
+      await saveAutoBackup(file);
       await this.container.autoBackup.markDone(todayIso());
+      // Con cuenta conectada, el mismo archivo cifrado va también a la nube. Si falla (sin internet), el respaldo
+      // del teléfono ya quedó y la nube se pone al día la próxima semana o con "Subir ahora".
+      if (this.cloud.email()) await this.cloud.upload(file).catch((e) => console.error(e));
       this.lastError.set(false);
       return true;
     } catch (error) {

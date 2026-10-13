@@ -61,7 +61,7 @@ export interface SelectOption<T> {
       cursor: default;
     }
     .trigger:focus-visible {
-      outline: 3px solid var(--violet-600);
+      outline: 3px solid var(--accent);
       outline-offset: 2px;
       border-radius: 12px;
     }

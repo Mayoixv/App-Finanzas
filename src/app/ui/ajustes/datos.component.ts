@@ -4,6 +4,7 @@ import { AlertController, IonIcon, IonToggle, LoadingController } from '@ionic/a
 import { applyPrivacy, isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
 import { NotificationsService } from '../notifications.service';
 import { AutoBackupService } from '../auto-backup.service';
+import { CloudBackupService } from '../cloud/cloud-backup.service';
 import { formatDay } from '../format';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
@@ -30,6 +31,7 @@ export class DatosComponent implements OnInit {
   protected readonly lock = inject(LockState);
   private readonly notifications = inject(NotificationsService);
   protected readonly autoBackup = inject(AutoBackupService);
+  protected readonly cloud = inject(CloudBackupService);
   private readonly autoToggle = viewChild<IonToggle>('autoToggle');
   protected readonly autoBackupDetail = computed(() => {
     if (!this.autoBackup.available) return 'Disponible en la app del teléfono';
@@ -129,7 +131,11 @@ export class DatosComponent implements OnInit {
 
   protected async restoreBackup() {
     const text = await pickTextFile();
-    if (!text) return;
+    if (text) await this.restoreFromText(text);
+  }
+
+  /** Abre un respaldo cifrado (de un archivo o de la nube), muestra qué trae y, si se confirma, reemplaza los datos. */
+  private async restoreFromText(text: string) {
     const values = await this.ask('Restaurar respaldo', 'Escribe la contraseña con la que creaste el respaldo.', [
       { name: 'p', type: 'password', placeholder: 'Contraseña', attributes: { autocomplete: 'current-password' } },
     ], 'Abrir');
@@ -284,6 +290,55 @@ export class DatosComponent implements OnInit {
       const toggle = this.bioToggle();
       if (toggle) toggle.checked = this.lock.biometricOn();
     }
+  }
+
+  /** Entra con Google. La nube guarda el respaldo semanal, así que primero tiene que estar activado. */
+  protected async cloudSignIn() {
+    if (!this.autoBackup.enabled()) {
+      await this.toggleAutoBackup(true);
+      if (!this.autoBackup.enabled()) return;
+    }
+    const done = await this.busy('Entrando con Google…', async () => {
+      await this.cloud.signIn();
+      return true;
+    });
+    if (done) await this.cloudUpload();
+  }
+
+  protected async cloudUpload() {
+    const done = await this.busy('Subiendo respaldo cifrado…', async () => {
+      await this.cloud.upload(await this.container.autoBackup.create());
+      return true;
+    });
+    if (done) this.status.set('Respaldo subido a la nube, cifrado con la contraseña del respaldo automático.');
+  }
+
+  protected async cloudRestore() {
+    const list = await this.busy('Buscando respaldos…', () => this.cloud.list());
+    if (!list) return;
+    if (!list.length) return this.fail('No hay respaldos en la nube con esta cuenta.');
+    const alert = await this.alerts.create({
+      cssClass: 'app-alert choices',
+      header: 'Restaurar desde la nube',
+      message: 'Elige el respaldo. Luego te pide la contraseña del respaldo automático con que se creó.',
+      buttons: [
+        ...list.map((b, i) => ({ text: `${formatDay(b.createdAt.slice(0, 10))}${i === 0 ? ' (el más reciente)' : ''}`, role: b.id })),
+        { text: 'Cancelar', role: 'cancel' },
+      ],
+    });
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+    if (!role || role === 'cancel' || role === 'backdrop') return;
+    const text = await this.busy('Descargando…', () => this.cloud.download(role));
+    if (text) await this.restoreFromText(text);
+  }
+
+  protected async cloudSignOut() {
+    await this.busy('Saliendo…', async () => {
+      await this.cloud.signOut();
+      return true;
+    });
+    this.status.set('Saliste de la cuenta. Los respaldos ya subidos siguen en la nube.');
   }
 
   protected async toggleAutoBackup(on: boolean) {

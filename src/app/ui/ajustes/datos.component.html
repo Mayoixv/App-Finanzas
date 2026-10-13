@@ -22,6 +22,44 @@
         <span class="row-sub">{{ autoBackupDetail() }}</span>
       </ion-toggle>
     </li>
+    @if (cloud.available) {
+      @if (cloud.email(); as email) {
+        <li>
+          <button type="button" class="row" (click)="cloudUpload()">
+            <span class="row-text">
+              <span class="row-title">Subir a la nube ahora</span>
+              <span class="row-sub">Cuenta: {{ email }}. El respaldo semanal también se sube solo.</span>
+            </span>
+            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="row" (click)="cloudRestore()">
+            <span class="row-text">
+              <span class="row-title">Restaurar desde la nube</span>
+              <span class="row-sub">Para un teléfono nuevo o si se perdieron los datos</span>
+            </span>
+            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="row" (click)="cloudSignOut()">
+            <span class="row-title">Salir de la cuenta de Google</span>
+            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+      } @else {
+        <li>
+          <button type="button" class="row" (click)="cloudSignIn()">
+            <span class="row-text">
+              <span class="row-title">Respaldo en la nube</span>
+              <span class="row-sub">Entra con Google: tu respaldo semanal se guarda cifrado en tu cuenta</span>
+            </span>
+            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+          </button>
+        </li>
+      }
+    }
     <li>
       <button type="button" class="row" (click)="restoreBackup()">
         <span class="row-text">

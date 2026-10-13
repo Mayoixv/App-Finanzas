@@ -54,7 +54,7 @@ import { SelectOption } from './select-field.component';
       height: 4px;
       margin: 4px auto 12px;
       border-radius: 2px;
-      background: rgba(20, 18, 31, 0.18);
+      background: var(--line-axis);
     }
     .picker-title {
       margin: 0 12px 8px;
@@ -100,7 +100,7 @@ import { SelectOption } from './select-field.component';
       font-weight: 600;
     }
     .option:focus-visible {
-      outline: 3px solid var(--violet-600);
+      outline: 3px solid var(--accent);
       outline-offset: -3px;
     }
     .option-label {
@@ -118,19 +118,19 @@ import { SelectOption } from './select-field.component';
     }
     .dot.plus {
       background: var(--surface-soft-card);
-      color: var(--violet-600);
+      color: var(--accent);
     }
     .check {
-      color: var(--violet-600);
+      color: var(--accent);
       font-size: 22px;
       animation: t-check-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
     .action {
       flex: none;
       margin-top: 4px;
-      border-top: 1px solid rgba(20, 18, 31, 0.08);
+      border-top: 1px solid var(--line);
       border-radius: 0 0 var(--radius-field) var(--radius-field);
-      color: var(--violet-600);
+      color: var(--accent);
       font-weight: 600;
     }
     /* Las filas entran en cascada mientras sube la hoja (solo las primeras, para no hacer esperar). */

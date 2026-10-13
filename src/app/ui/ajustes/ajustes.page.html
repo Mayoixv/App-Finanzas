@@ -100,6 +100,12 @@
     <h2 id="acerca-title" class="section-title">Acerca de</h2>
     <ul class="rows">
       <li>
+        <button type="button" class="row" (click)="news.openLatest()">
+          <span class="row-title">Novedades de esta versión</span>
+          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+        </button>
+      </li>
+      <li>
         <button type="button" class="row" [attr.aria-expanded]="showPrivacy()" (click)="showPrivacy.set(!showPrivacy())">
           <span class="row-title">Privacidad</span>
           <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="showPrivacy()"></ion-icon>
@@ -108,8 +114,8 @@
     </ul>
     @if (showPrivacy()) {
       <div class="privacy">
-        <p>Kuarto guarda todo solo en este teléfono. No hay cuentas, servidores ni publicidad, y la app no envía tus datos a nadie. Solo se conecta a internet para ver si hay una versión nueva.</p>
-        <p>Tus datos salen del teléfono únicamente cuando tú creas un respaldo o exportas un archivo y eliges dónde mandarlo. Los respaldos van cifrados con tu contraseña.</p>
+        <p>Kuarto guarda todo solo en este teléfono. No hay cuentas, servidores ni publicidad, y la app no envía tus datos a nadie. Se conecta a internet solo para ver si hay una versión nueva y, si entras con Google, para subir tu respaldo cifrado.</p>
+        <p>Tus datos salen del teléfono únicamente cuando tú creas un respaldo, exportas un archivo o activas el respaldo en la nube. Los respaldos van cifrados con tu contraseña: en la nube nadie puede leerlos, ni Google.</p>
         <p>Los permisos que pide son para mostrarte avisos, desbloquear con huella, guardar respaldos o archivos en el teléfono e instalar las versiones nuevas.</p>
         <p>Si borras la app sin un respaldo, tus datos se pierden: nadie más tiene una copia.</p>
       </div>

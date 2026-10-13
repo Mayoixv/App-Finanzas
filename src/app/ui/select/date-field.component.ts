@@ -37,7 +37,7 @@ const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 
       cursor: pointer;
     }
     .trigger:focus-visible {
-      outline: 3px solid var(--violet-600);
+      outline: 3px solid var(--accent);
       outline-offset: 2px;
       border-radius: 12px;
     }

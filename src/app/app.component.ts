@@ -6,6 +6,7 @@ import { NotificationsService } from './ui/notifications.service';
 import { AutoBackupService } from './ui/auto-backup.service';
 import { TourComponent } from './ui/tour/tour.component';
 import { UpdateService } from './ui/update/update.service';
+import { NewsService } from './ui/news/news.service';
 
 @Component({
   selector: 'app-root',
@@ -20,4 +21,10 @@ export class AppComponent {
   private readonly autoBackup = inject(AutoBackupService);
   /** Busca una versión nueva al abrir la app, una vez al día. */
   private readonly update = inject(UpdateService);
+
+  constructor() {
+    // Un momento después de abrir, para no tapar la primera pantalla mientras carga.
+    const news = inject(NewsService);
+    setTimeout(() => news.showIfUpdated().catch(console.error), 1500);
+  }
 }

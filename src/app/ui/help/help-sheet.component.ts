@@ -1,17 +1,17 @@
 import { Component, inject, Input } from '@angular/core';
 import { IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { helpCircle } from 'ionicons/icons';
+import { helpCircle, sparkles } from 'ionicons/icons';
 import { HELP, HelpTopic } from './help.content';
 
-/** Hoja inferior corta con la ayuda de una pantalla. Se cierra al tocar fuera o con "Entendido"; no cambia nada. */
+/** Hoja inferior corta con la ayuda de una pantalla (o las novedades de una versión). Se cierra al tocar fuera o con "Entendido"; no cambia nada. */
 @Component({
   selector: 'app-help-sheet',
   template: `
     <div class="help">
       <div class="grab" aria-hidden="true"></div>
       <h2 class="title" id="help-title">
-        <ion-icon name="help-circle" aria-hidden="true"></ion-icon>
+        <ion-icon [name]="news ? 'sparkles' : 'help-circle'" aria-hidden="true"></ion-icon>
         {{ entry.title }}
       </h2>
       <ul class="points" aria-labelledby="help-title">
@@ -36,7 +36,7 @@ import { HELP, HelpTopic } from './help.content';
       height: 4px;
       margin: 4px auto 4px;
       border-radius: 2px;
-      background: rgba(20, 18, 31, 0.18);
+      background: var(--line-axis);
     }
     .title {
       display: flex;
@@ -47,7 +47,7 @@ import { HELP, HelpTopic } from './help.content';
       font-weight: 600;
     }
     .title ion-icon {
-      color: var(--violet-600);
+      color: var(--accent);
       font-size: 24px;
     }
     .points {
@@ -96,13 +96,15 @@ import { HELP, HelpTopic } from './help.content';
 export class HelpSheetComponent {
   private readonly modalCtrl = inject(ModalController);
   @Input() topic: HelpTopic = 'inicio';
+  /** En vez de la ayuda de una pantalla, las novedades de una versión (NewsService). */
+  @Input() news?: { title: string; points: string[] };
 
   protected get entry() {
-    return HELP[this.topic];
+    return this.news ?? HELP[this.topic];
   }
 
   constructor() {
-    addIcons({ helpCircle });
+    addIcons({ helpCircle, sparkles });
   }
 
   protected close() {

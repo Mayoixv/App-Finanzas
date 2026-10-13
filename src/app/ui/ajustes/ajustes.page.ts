@@ -15,6 +15,7 @@ import { DatosComponent } from './datos.component';
 import { AvisosComponent } from './avisos.component';
 import { APP_VERSION } from '../../version';
 import { UpdateService } from '../update/update.service';
+import { NewsService } from '../news/news.service';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { Appearance, appearance as savedAppearance, setAppearance } from '../theme';
 
@@ -31,6 +32,7 @@ export class AjustesPage {
   private readonly alerts = inject(AlertController);
   protected readonly tour = inject(TourService);
   protected readonly update = inject(UpdateService);
+  protected readonly news = inject(NewsService);
   protected readonly appearance = signal<Appearance>(savedAppearance());
   protected readonly appearanceOptions: PillOption[] = [
     { value: 'sistema', label: 'Sistema' },

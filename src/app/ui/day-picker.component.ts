@@ -67,7 +67,7 @@ export const dayLabel = (day: number | null) => (day === null ? 'Elige un día' 
       cursor: pointer;
     }
     .trigger:focus-visible {
-      outline: 3px solid var(--violet-600);
+      outline: 3px solid var(--accent);
       outline-offset: 2px;
       border-radius: 12px;
     }
@@ -124,7 +124,7 @@ export const dayLabel = (day: number | null) => (day === null ? 'Elige un día' 
       font-weight: 600;
     }
     .day:focus-visible {
-      outline: 3px solid var(--violet-600);
+      outline: 3px solid var(--accent);
       outline-offset: 1px;
     }
     .day.last {

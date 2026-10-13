@@ -11,6 +11,11 @@ const config: CapacitorConfig = {
       // llave ya no coincide y el plugin no carga ("CapacitorSQLitePlugin: null").
       androidIsEncryption: false,
     },
+    FirebaseAuthentication: {
+      // El inicio de sesión lo hace el SDK nativo de Android (con google-services.json); Firestore usa esa sesión.
+      skipNativeAuth: false,
+      providers: ['google.com'],
+    },
     LocalNotifications: {
       // Ícono de una sola tinta para la barra de estado (android/app/src/main/res/drawable/ic_stat_finanzas.xml).
       smallIcon: 'ic_stat_finanzas',
