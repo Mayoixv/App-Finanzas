@@ -23,6 +23,7 @@ import { ExportTransactionsCsv } from './application/use-cases/export-csv';
 import { PinLock } from './application/use-cases/pin-lock';
 import { BulkUpdateTransactions } from './application/use-cases/bulk-update-transactions';
 import {
+  AddDebtAsFixed,
   DeleteDebt,
   DeleteDebtPayment,
   GetDebtsOverview,
@@ -153,6 +154,7 @@ export interface AppContainer {
   getDebtsOverview: GetDebtsOverview;
   registerDebtPayment: RegisterDebtPayment;
   deleteDebtPayment: DeleteDebtPayment;
+  addDebtAsFixed: AddDebtAsFixed;
   onboarding: Onboarding;
   profile: UserProfile;
   getAlerts: GetAlerts;
@@ -171,7 +173,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
   const getMonthRecurringExpenses = new GetMonthRecurringExpenses(repos.recurring);
   const createBackup = new CreateBackup(repos.backup);
   const getCardStatuses = new GetCardStatuses(repos.accounts, repos.settings);
-  const getDebtsOverview = new GetDebtsOverview(repos.debts);
+  const getDebtsOverview = new GetDebtsOverview(repos.debts, repos.recurring);
   const getAccountsOverview = new GetAccountsOverview(repos.accounts);
   const getBudgetStatuses = new GetBudgetStatuses(repos.budgets, repos.transactions);
   const getUpcomingRecurring = new GetUpcomingRecurring(getMonthRecurringExpenses);
@@ -180,7 +182,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     transactions: repos.transactions,
     addTransaction: new AddTransaction(repos.transactions, repos.categories, ids, repos.accounts),
     updateTransaction: new UpdateTransaction(repos.transactions, repos.categories, repos.accounts),
-    deleteTransaction: new DeleteTransaction(repos.transactions, repos.recurring),
+    deleteTransaction: new DeleteTransaction(repos.transactions, repos.recurring, repos.debts),
     addRecurringExpense: new AddRecurringExpense(repos.recurring, repos.categories, ids),
     addRecurringExpenses: new AddRecurringExpenses(repos.recurring, repos.categories, ids),
     updateRecurringExpense: new UpdateRecurringExpense(repos.recurring, repos.categories),
@@ -191,7 +193,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     getReport: new GetReport(repos.transactions, repos.categories, repos.savings, repos.accounts, getMonthRecurringExpenses),
     getMonthHistory: new GetMonthHistory(repos.transactions, repos.categories, repos.savings),
     getMonthRecurringExpenses,
-    payRecurringExpense: new PayRecurringExpense(repos.recurring, repos.transactions, ids),
+    payRecurringExpense: new PayRecurringExpense(repos.recurring, repos.transactions, ids, repos.debts),
     getSavingsOverview: new GetSavingsOverview(repos.savings),
     addSavingsGoal: new AddSavingsGoal(repos.savings, ids),
     updateSavingsGoal: new UpdateSavingsGoal(repos.savings),
@@ -206,7 +208,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     addCategory: new AddCategory(repos.categories, ids),
     updateCategory: new UpdateCategory(repos.categories),
     deleteCategory: new DeleteCategory(repos.categories),
-    restoreTransaction: new RestoreTransaction(repos.transactions, repos.recurring),
+    restoreTransaction: new RestoreTransaction(repos.transactions, repos.recurring, repos.debts),
     restoreSavingsContribution: new RestoreSavingsContribution(repos.savings),
     createBackup,
     openBackup: new OpenBackup(),
@@ -237,7 +239,8 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     deleteDebt: new DeleteDebt(repos.debts),
     getDebtsOverview,
     registerDebtPayment: new RegisterDebtPayment(repos.debts, repos.transactions, repos.categories, ids),
-    deleteDebtPayment: new DeleteDebtPayment(repos.debts, repos.transactions),
+    deleteDebtPayment: new DeleteDebtPayment(repos.debts, repos.transactions, repos.recurring),
+    addDebtAsFixed: new AddDebtAsFixed(getDebtsOverview, repos.recurring, repos.categories, ids),
     profile: new UserProfile(repos.settings),
     onboarding: new Onboarding(repos.settings, repos.transactions, repos.recurring),
   };

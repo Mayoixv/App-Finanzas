@@ -75,6 +75,12 @@
     <p class="note">Solo cambia el símbolo con que se muestran los montos. Los montos guardados no se convierten.</p>
   </section>
 
+  <section class="block" aria-labelledby="apariencia-title">
+    <h2 id="apariencia-title" class="section-title">Apariencia</h2>
+    <app-pill-toggle label="Apariencia" [options]="appearanceOptions" [value]="appearance()" (valueChange)="changeAppearance($event)"></app-pill-toggle>
+    <p class="note">Sistema sigue el modo claro u oscuro de tu teléfono.</p>
+  </section>
+
   <app-avisos></app-avisos>
 
   <app-datos></app-datos>

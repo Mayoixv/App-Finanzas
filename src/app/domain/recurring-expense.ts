@@ -20,6 +20,8 @@ export interface RecurringExpense {
   accountId?: string | null;
   /** Último mes en pausa ('YYYY-MM'); hasta ese mes inclusive no genera instancias. */
   pausedUntil?: MonthKey | null;
+  /** Deuda cuya cuota es este fijo: al pagarlo, también baja el saldo de la deuda. */
+  debtId?: string | null;
 }
 
 /** 'omitido': el usuario quitó el fijo solo ese mes; la fila evita que se vuelva a crear. */

@@ -29,6 +29,12 @@
   --paid-on-light: var(--violet-600);
   --pending-on-light: #8a5300;
   --overdue-on-light: var(--negative-on-light);
+  // Violeta como texto, borde o foco sobre las superficies de pantalla (los botones llenos siguen con --violet-600).
+  --accent: var(--violet-600);
+  // Líneas finas sobre las superficies de pantalla.
+  --line: rgba(20, 18, 31, 0.08);
+  --line-strong: rgba(20, 18, 31, 0.1);
+  --line-axis: rgba(20, 18, 31, 0.25);
 
   --brand-gradient: linear-gradient(160deg, #8f6bff 0%, #6a3df0 45%, #2a1478 100%);
   --brand-glow: radial-gradient(circle at 50% 0%, rgba(143, 107, 255, 0.55), transparent 65%);
@@ -49,6 +55,35 @@
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #5d36d3;
   --ion-color-primary-tint: #7950f2;
+}
+
+:root {
+  color-scheme: light;
+}
+
+/*
+ * Modo oscuro (Ajustes › Apariencia): las mismas pantallas sobre el morado oscuro de la marca.
+ * Se cambian solo los tokens de superficie, texto y línea; todos los textos llegan a 4.5:1 o más.
+ */
+:root.theme-dark {
+  --surface-soft: #120e24;
+  --surface-soft-card: #1d1838;
+  --surface-soft-chip: #2a2350;
+  --paper: #1d1838;
+  --lavender-100: #2a2350;
+  --text-on-light: #f4f2ff;
+  --muted-on-light: #aaa4c8;
+  --accent: #b49dff;
+  --positive-on-light: #2bd07f;
+  --negative-on-light: #ff7a8f;
+  --received-on-light: #2bd07f;
+  --paid-on-light: #b49dff;
+  --pending-on-light: #ffb84d;
+  --overdue-on-light: #ff7a8f;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.12);
+  --line-axis: rgba(255, 255, 255, 0.3);
+  color-scheme: dark;
 }
 
 body {

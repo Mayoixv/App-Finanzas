@@ -12,7 +12,7 @@
 }
 
 .grid {
-  stroke: rgba(20, 18, 31, 0.1);
+  stroke: var(--line-strong);
   stroke-width: 1;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .cursor {
-  stroke: rgba(20, 18, 31, 0.25);
+  stroke: var(--line-axis);
   stroke-width: 1;
 }
 

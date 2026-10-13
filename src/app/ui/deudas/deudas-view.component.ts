@@ -3,6 +3,7 @@ import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
+import { ValidationError } from '../../application/errors';
 import { DebtView } from '../../application/use-cases/debts';
 import {
   amortization,
@@ -173,6 +174,18 @@ export class DeudasViewComponent {
 
   protected openDebt(view?: DebtView) {
     return this.forms.open(DeudaModalComponent, { debt: view?.debt });
+  }
+
+  /** La cuota pasa a Fijos como gasto fijo; pagarla allí baja el saldo de la deuda. */
+  protected async addToFixed(view: DebtView) {
+    try {
+      await this.container.addDebtAsFixed.execute(view.debt.id, this.monthState.month());
+      this.liveMessage.set(`La cuota de ${view.debt.name} está ahora en Fijos`);
+      this.monthState.notifyChange();
+    } catch (error) {
+      console.error(error);
+      this.liveMessage.set(error instanceof ValidationError ? error.message : 'No se pudo pasar la cuota a Fijos.');
+    }
   }
 
   protected openPayment(view: DebtView) {

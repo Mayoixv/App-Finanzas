@@ -302,6 +302,12 @@ export const MIGRATIONS: Migration[] = [
     // Los aportes que ya existen quedan sin cuenta: así ningún saldo cambia al actualizar.
     statements: [`ALTER TABLE savings_contributions ADD COLUMN account_id TEXT`],
   },
+  {
+    version: 14,
+    name: 'cuota de una deuda como gasto fijo',
+    // Si se borra la deuda, el fijo queda como un gasto fijo normal.
+    statements: [`ALTER TABLE recurring_expenses ADD COLUMN debt_id TEXT REFERENCES debts(id) ON DELETE SET NULL`],
+  },
 ];
 
 /** Aplica las migraciones pendientes en orden y devuelve las versiones aplicadas. */

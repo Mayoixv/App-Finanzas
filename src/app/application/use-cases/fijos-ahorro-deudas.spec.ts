@@ -14,7 +14,9 @@ import { AddRecurringExpense, AddRecurringExpenses, paymentName } from './add-re
 import { AddSavingsContribution } from './add-savings-contribution';
 import { AddSavingsGoal } from './add-savings-goal';
 import { AddTransaction } from './add-transaction';
-import { DeleteDebtPayment, GetDebtsOverview, RegisterDebtPayment, SaveDebt } from './debts';
+import { AddDebtAsFixed, DeleteDebtPayment, GetDebtsOverview, RegisterDebtPayment, SaveDebt } from './debts';
+import { PayRecurringExpense } from './pay-recurring-expense';
+import { DeleteTransaction, RestoreTransaction } from './delete-transaction';
 import { GetBudgetStatuses } from './get-budget-statuses';
 import { GetMonthRecurringExpenses } from './get-month-recurring-expenses';
 import { GetSavingsOverview } from './get-savings-overview';
@@ -611,5 +613,31 @@ describe('patrimonio con metas', () => {
     await new AddSavingsContribution(s.savings, s.ids, accounts).execute({ goalId: goal.id, date: '2026-10-05', amount: 30_000, accountId: banco.id });
     const net = await new GetNetWorth(new GetAccountsOverview(accounts), new GetDebtsOverview(s.debts), s.savings).execute();
     expect(net).toMatchObject({ available: 70_000, inGoals: 30_000, total: 100_000 });
+  });
+});
+
+describe('cuota de deuda como gasto fijo', () => {
+  it('pagar el fijo baja la deuda; borrar ese pago la devuelve y deja el fijo pendiente', async () => {
+    const s = setup();
+    const debt = await new SaveDebt(s.debts, s.ids).execute({
+      name: 'Préstamo', direction: 'debo', principal: 100_000, annualRate: 0, termMonths: 10, startDate: '2026-09-15',
+    });
+    const overview = new GetDebtsOverview(s.debts, s.recurring);
+    const fixed = await new AddDebtAsFixed(overview, s.recurring, s.categories, s.ids).execute(debt.id, '2026-10');
+    expect(fixed).toMatchObject({ amount: 10_000, dueDay: 15, startMonth: '2026-10', categoryId: 'cat-pago-deudas', debtId: debt.id });
+    // Ya no sale repetida en "Cuotas de deudas".
+    expect(await new GetDebtInstallments(overview).execute('2026-10')).toEqual([]);
+    await expect(new AddDebtAsFixed(overview, s.recurring, s.categories, s.ids).execute(debt.id, '2026-10')).rejects.toThrow('ya está en Fijos');
+
+    await new GetMonthRecurringExpenses(s.recurring).execute('2026-10');
+    const paid = await new PayRecurringExpense(s.recurring, s.transactions, s.ids, s.debts).execute({ recurringExpenseId: fixed.id, month: '2026-10', paidDate: '2026-10-15' });
+    expect((await overview.execute())[0].balance).toBe(90_000);
+
+    const deleted = await new DeleteTransaction(s.transactions, s.recurring, s.debts).execute(paid.transactionId!);
+    expect((await overview.execute())[0].balance).toBe(100_000);
+    expect((await s.recurring.listInstances('2026-10'))[0].status).toBe('pendiente');
+
+    await new RestoreTransaction(s.transactions, s.recurring, s.debts).execute(deleted);
+    expect((await overview.execute())[0].balance).toBe(90_000);
   });
 });

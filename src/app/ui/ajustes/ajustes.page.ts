@@ -15,12 +15,14 @@ import { DatosComponent } from './datos.component';
 import { AvisosComponent } from './avisos.component';
 import { APP_VERSION } from '../../version';
 import { UpdateService } from '../update/update.service';
+import { PillOption, PillToggleComponent } from '../pill-toggle.component';
+import { Appearance, appearance as savedAppearance, setAppearance } from '../theme';
 
 @Component({
   selector: 'app-ajustes',
   templateUrl: 'ajustes.page.html',
   styleUrls: ['ajustes.page.scss'],
-  imports: [RouterLink, IonContent, IonIcon, DropdownComponent, DatosComponent, AvisosComponent],
+  imports: [RouterLink, IonContent, IonIcon, PillToggleComponent, DropdownComponent, DatosComponent, AvisosComponent],
 })
 export class AjustesPage {
   private readonly container = inject(APP_CONTAINER);
@@ -29,6 +31,18 @@ export class AjustesPage {
   private readonly alerts = inject(AlertController);
   protected readonly tour = inject(TourService);
   protected readonly update = inject(UpdateService);
+  protected readonly appearance = signal<Appearance>(savedAppearance());
+  protected readonly appearanceOptions: PillOption[] = [
+    { value: 'sistema', label: 'Sistema' },
+    { value: 'claro', label: 'Claro' },
+    { value: 'oscuro', label: 'Oscuro' },
+  ];
+
+  /** Se aplica al instante en toda la app y se guarda para la próxima vez. */
+  protected changeAppearance(value: string) {
+    this.appearance.set(value as Appearance);
+    setAppearance(this.container.settings, value as Appearance).catch(console.error);
+  }
   protected readonly help = inject(HelpService);
   protected readonly helpTopics = HELP_TOPICS;
   protected helpTitle(t: HelpTopic) {

@@ -2,7 +2,9 @@ import { Debt, DebtDirection, DebtPayment, installment, outstanding, splitPaymen
 import { isValidCents } from '../../domain/money';
 import { isValidIsoDate } from '../../domain/month';
 import { NotFoundError, ValidationError } from '../errors';
-import { ICategoryRepository, IDebtRepository, IdGenerator, ITransactionRepository } from '../ports/repositories';
+import { RecurringExpense } from '../../domain/recurring-expense';
+import { ICategoryRepository, IDebtRepository, IdGenerator, IRecurringExpenseRepository, ITransactionRepository } from '../ports/repositories';
+import { monthOf } from '../../domain/month';
 
 /** Categorías con que se registra un pago como movimiento del mes. */
 const PAYMENT_CATEGORY: Record<DebtDirection, string> = {
@@ -64,13 +66,22 @@ export interface DebtView {
   paidInterest: number;
   /** Cuota fija si tiene plazo; 0 si no. */
   installment: number;
+  /** Fijo activo que paga la cuota, si la deuda se pasó a Fijos. */
+  fixedId?: string;
 }
 
 export class GetDebtsOverview {
-  constructor(private readonly debts: IDebtRepository) {}
+  constructor(
+    private readonly debts: IDebtRepository,
+    private readonly recurring?: IRecurringExpenseRepository,
+  ) {}
 
   async execute(): Promise<DebtView[]> {
-    const [debts, payments] = await Promise.all([this.debts.list(), this.debts.listPayments()]);
+    const [debts, payments, fixed] = await Promise.all([
+      this.debts.list(),
+      this.debts.listPayments(),
+      this.recurring?.list() ?? [],
+    ]);
     return debts.map((debt) => {
       const mine = payments.filter((p) => p.debtId === debt.id);
       return {
@@ -80,9 +91,70 @@ export class GetDebtsOverview {
         paidPrincipal: mine.reduce((s, p) => s + p.principal, 0),
         paidInterest: mine.reduce((s, p) => s + p.interest, 0),
         installment: installment(debt.principal, debt.annualRate, debt.termMonths),
+        fixedId: fixed.find((f) => f.debtId === debt.id && f.active)?.id,
       };
     });
   }
+}
+
+/**
+ * Pasa la cuota de una deuda a Fijos: crea un gasto fijo mensual con la cuota, en "Pago de deudas", desde el mes
+ * que viene en `fromMonth`. Desde ahí la cuota se paga en Fijos como cualquier gasto fijo y baja el saldo de la deuda.
+ */
+export class AddDebtAsFixed {
+  constructor(
+    private readonly debts: GetDebtsOverview,
+    private readonly recurring: IRecurringExpenseRepository,
+    private readonly categories: ICategoryRepository,
+    private readonly ids: IdGenerator,
+  ) {}
+
+  async execute(debtId: string, fromMonth: string): Promise<RecurringExpense> {
+    const view = (await this.debts.execute()).find((d) => d.debt.id === debtId);
+    if (!view) throw new NotFoundError('Deuda');
+    if (view.debt.direction !== 'debo' || view.installment <= 0) {
+      throw new ValidationError('Solo una deuda tuya con plazo tiene una cuota fija para pasar a Fijos');
+    }
+    if (view.fixedId) throw new ValidationError('Esta deuda ya está en Fijos');
+    if (view.balance <= 0) throw new ValidationError('Esta deuda ya está saldada');
+    if (!(await this.categories.get(PAYMENT_CATEGORY.debo))) {
+      throw new ValidationError('Falta la categoría "Pago de deudas"; créala en Ajustes');
+    }
+    const fixed: RecurringExpense = {
+      id: this.ids.next(),
+      name: view.debt.name,
+      amount: view.installment,
+      categoryId: PAYMENT_CATEGORY.debo,
+      dueDay: Number(view.debt.startDate.slice(8)),
+      active: true,
+      startMonth: fromMonth > monthOf(view.debt.startDate) ? fromMonth : monthOf(view.debt.startDate),
+      frequency: 1,
+      accountId: null,
+      pausedUntil: null,
+      debtId,
+    };
+    await this.recurring.save(fixed);
+    return fixed;
+  }
+}
+
+/** Pago a la deuda por el monto `amount`, enlazado al movimiento `transactionId` (el del fijo pagado). */
+export async function recordDebtPayment(
+  debts: IDebtRepository,
+  ids: IdGenerator,
+  debtId: string,
+  date: string,
+  amount: number,
+  transactionId: string,
+): Promise<DebtPayment | null> {
+  const debt = await debts.get(debtId);
+  if (!debt) return null;
+  const balance = outstanding(debt, await debts.listPayments(debtId));
+  if (balance <= 0) return null;
+  const split = splitPayment(balance, debt.annualRate, amount);
+  const payment: DebtPayment = { id: ids.next(), debtId, date, amount, ...split, transactionId };
+  await debts.savePayment(payment);
+  return payment;
 }
 
 export class RegisterDebtPayment {
@@ -140,11 +212,18 @@ export class DeleteDebtPayment {
   constructor(
     private readonly debts: IDebtRepository,
     private readonly transactions: ITransactionRepository,
+    private readonly recurring?: IRecurringExpenseRepository,
   ) {}
 
-  /** Borra el pago y, si había creado un movimiento, también ese movimiento. */
+  /** Borra el pago y, si había creado un movimiento, también ese movimiento (y el fijo que pagaba vuelve a pendiente). */
   async execute(payment: DebtPayment): Promise<void> {
     await this.debts.deletePayment(payment.id);
-    if (payment.transactionId) await this.transactions.delete(payment.transactionId);
+    if (!payment.transactionId) return;
+    const instance = await this.recurring?.findInstanceByTransaction(payment.transactionId);
+    await this.transactions.delete(payment.transactionId);
+    if (instance) {
+      const { transactionId: _, ...rest } = instance;
+      await this.recurring!.saveInstance({ ...rest, status: 'pendiente' });
+    }
   }
 }

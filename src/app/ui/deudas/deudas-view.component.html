@@ -41,6 +41,13 @@
             @if (d.paidInterest > 0) {
               <p class="debt-detail">Intereses pagados: {{ money(d.paidInterest) }}</p>
             }
+            @if (d.debt.direction === 'debo' && d.installment > 0 && d.balance > 0) {
+              @if (d.fixedId) {
+                <p class="debt-detail">La cuota está en Fijos: al pagarla allí, baja este saldo.</p>
+              } @else {
+                <button type="button" class="link-button" (click)="addToFixed(d)">Pasar la cuota a Fijos</button>
+              }
+            }
 
             <div class="debt-foot">
               @if (d.installment > 0) {

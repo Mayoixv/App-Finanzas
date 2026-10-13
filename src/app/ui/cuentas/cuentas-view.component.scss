@@ -22,8 +22,8 @@
 }
 
 .btn-secondary.action {
-  border-color: var(--violet-600);
-  color: var(--violet-600);
+  border-color: var(--accent);
+  color: var(--accent);
 
   ion-icon {
     font-size: 20px;
@@ -43,7 +43,7 @@
 }
 
 li + li .row {
-  border-top: 1px solid rgba(20, 18, 31, 0.08);
+  border-top: 1px solid var(--line);
 }
 
 
@@ -67,7 +67,7 @@ li + li .row {
   }
 
   &:focus-visible {
-    outline: 3px solid var(--violet-600);
+    outline: 3px solid var(--accent);
     outline-offset: 2px;
     border-radius: 12px;
   }
@@ -111,14 +111,14 @@ li + li .row {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--violet-600);
+  color: var(--accent);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
 .row-sub.warn {
-  color: #8a5300;
+  color: var(--pending-on-light);
   font-weight: 600;
 }
 
@@ -148,8 +148,8 @@ li + li .row {
   min-height: 48px;
   padding: 0 18px;
   font-size: 15px;
-  border-color: var(--violet-600);
-  color: var(--violet-600);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .min-link {
@@ -157,7 +157,7 @@ li + li .row {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--violet-600);
+  color: var(--accent);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -196,7 +196,7 @@ li + li .row {
   cursor: pointer;
 
   &:focus-visible {
-    outline: 3px solid var(--violet-600);
+    outline: 3px solid var(--accent);
     outline-offset: 3px;
   }
 }
@@ -312,7 +312,7 @@ li + li .row {
   padding: 0 4px;
   border: 0;
   background: transparent;
-  color: var(--violet-600);
+  color: var(--accent);
   font: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -323,7 +323,7 @@ li + li .row {
   }
 
   &:focus-visible {
-    outline: 3px solid var(--violet-600);
+    outline: 3px solid var(--accent);
     outline-offset: 2px;
     border-radius: 12px;
   }

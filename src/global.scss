@@ -159,7 +159,7 @@ ion-alert.app-alert button.alert-button {
   text-transform: none;
   font-size: 16px;
   font-weight: 600;
-  color: var(--violet-600);
+  color: var(--accent);
 }
 
 ion-alert.app-alert button.alert-button-role-destructive {
@@ -429,9 +429,9 @@ ion-alert.app-alert.choices button.alert-button {
   width: 100%;
   min-height: 48px;
   margin: 0;
-  border: 1.5px solid var(--violet-600);
+  border: 1.5px solid var(--accent);
   border-radius: var(--radius-pill);
-  color: var(--violet-600);
+  color: var(--accent);
   font-weight: 600;
   text-transform: none;
 
@@ -517,7 +517,7 @@ ion-alert.app-alert.choices button.alert-button {
 
 .field ion-input.has-focus .label-text-wrapper,
 .field ion-textarea.has-focus .label-text-wrapper {
-  color: var(--violet-600);
+  color: var(--accent);
 }
 
 /* Inclinación 3D de tarjetas con reflejo de luz (design.md 10.6). Se usa con la directiva appTilt. */

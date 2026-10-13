@@ -10,10 +10,12 @@ import { setInitialLock } from './app/ui/lock/lock-state';
 import { pageTransition, sheetEnter, sheetLeave } from './app/ui/motion';
 import { applyPrivacy, isPrivacyOn } from './app/ui/privacy';
 import { saveSafetyCopy } from './app/ui/backup-files';
+import { loadAppearance } from './app/ui/theme';
 
 async function start() {
   const container = await createSqliteContainer(saveSafetyCopy);
   setDisplayCurrency(await container.currencySettings.get());
+  await loadAppearance(container.settings);
   setInitialLock(await container.pinLock.isEnabled(), await container.pinLock.length());
   // Antes de mostrar nada, para que el balance no aparezca en la vista de recientes.
   if (await isPrivacyOn(container.settings)) await applyPrivacy(true).catch(console.error);

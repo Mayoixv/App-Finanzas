@@ -21,7 +21,8 @@ export class GetDebtInstallments {
     const out: DebtInstallment[] = [];
     for (const view of await this.debts.execute()) {
       const { debt } = view;
-      if (debt.direction !== 'debo' || !debt.termMonths || view.installment <= 0) continue;
+      // Si la cuota ya es un gasto fijo, aparece en Fijos como ese fijo y no se repite aquí.
+      if (debt.direction !== 'debo' || !debt.termMonths || view.installment <= 0 || view.fixedId) continue;
       const number = monthsBetween(monthOf(debt.startDate), month);
       if (number < 1 || number > debt.termMonths) continue;
       const paid = view.payments.some((p) => monthOf(p.date) === month);

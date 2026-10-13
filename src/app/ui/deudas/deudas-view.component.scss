@@ -117,7 +117,7 @@
 .bar {
   height: 10px;
   border-radius: var(--radius-pill);
-  background: rgba(20, 18, 31, 0.1);
+  background: var(--line-strong);
   overflow: hidden;
 }
 
@@ -151,7 +151,7 @@
   padding: 0 4px;
   border: 0;
   background: transparent;
-  color: var(--violet-600);
+  color: var(--accent);
   font: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -162,8 +162,8 @@
   min-height: 48px;
   padding: 0 20px;
   font-size: 15px;
-  border-color: var(--violet-600);
-  color: var(--violet-600);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .schedule {
@@ -178,7 +178,7 @@
     padding: 6px 2px;
     text-align: right;
     white-space: nowrap;
-    border-bottom: 1px solid rgba(20, 18, 31, 0.08);
+    border-bottom: 1px solid var(--line);
   }
 
   th:first-child,
@@ -200,7 +200,7 @@
 }
 
 li + li .payment {
-  border-top: 1px solid rgba(20, 18, 31, 0.08);
+  border-top: 1px solid var(--line);
 }
 
 .payment {
@@ -253,7 +253,7 @@ li + li .payment {
   border: 1.5px solid transparent;
 
   &:focus-within {
-    border-color: var(--violet-600);
+    border-color: var(--accent);
   }
 
   label {

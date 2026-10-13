@@ -223,6 +223,7 @@ interface RecurringRow {
   frequency: number;
   paused_until: string | null;
   account_id: string | null;
+  debt_id: string | null;
 }
 
 interface InstanceRow {
@@ -245,6 +246,7 @@ const toRecurring = (r: RecurringRow): RecurringExpense => ({
   frequency: (r.frequency ?? 1) as Frequency,
   pausedUntil: r.paused_until,
   accountId: r.account_id,
+  debtId: r.debt_id ?? null,
 });
 
 const toInstance = (r: InstanceRow): RecurringExpenseInstance => ({
@@ -272,13 +274,13 @@ export class SqliteRecurringExpenseRepository implements IRecurringExpenseReposi
   async save(e: RecurringExpense): Promise<void> {
     await this.db.run(
       `INSERT INTO recurring_expenses
-         (id, name, amount, category_id, due_day, active, start_month, frequency, paused_until, account_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         (id, name, amount, category_id, due_day, active, start_month, frequency, paused_until, account_id, debt_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET name = excluded.name, amount = excluded.amount,
          category_id = excluded.category_id, due_day = excluded.due_day, active = excluded.active,
          start_month = excluded.start_month, frequency = excluded.frequency,
-         paused_until = excluded.paused_until, account_id = excluded.account_id`,
-      [e.id, e.name, e.amount, e.categoryId, e.dueDay, e.active ? 1 : 0, e.startMonth, e.frequency ?? 1, e.pausedUntil ?? null, e.accountId ?? null],
+         paused_until = excluded.paused_until, account_id = excluded.account_id, debt_id = excluded.debt_id`,
+      [e.id, e.name, e.amount, e.categoryId, e.dueDay, e.active ? 1 : 0, e.startMonth, e.frequency ?? 1, e.pausedUntil ?? null, e.accountId ?? null, e.debtId ?? null],
     );
   }
 
