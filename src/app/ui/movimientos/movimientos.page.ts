@@ -12,6 +12,7 @@ import {
   AlertController,
   IonContent,
   IonIcon,
+  ModalController,
   ToastController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -40,6 +41,8 @@ import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { UndoService } from '../undo.service';
 import { TransactionFormService } from './transaction-form.service';
 import { LoadingComponent } from '../loading.component';
+import { t, tn, locale } from '../i18n';
+import { CopiarModalComponent } from './copiar.modal';
 
 /** Alto aproximado del menú de 3 opciones y espacio que ocupan la barra inferior y el botón +. */
 const MENU_HEIGHT = 170;
@@ -67,7 +70,7 @@ const fold = (text: string) =>
   text
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')
-    .toLocaleLowerCase('es');
+    .toLocaleLowerCase();
 
 @Component({
   selector: 'app-movimientos',
@@ -83,6 +86,7 @@ const fold = (text: string) =>
   ],
 })
 export class MovimientosPage {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   protected readonly monthState = inject(MonthState);
   private readonly form = inject(TransactionFormService);
@@ -90,6 +94,8 @@ export class MovimientosPage {
   private readonly toasts = inject(ToastController);
   private readonly undo = inject(UndoService);
   private readonly dineroForm = inject(DineroFormService);
+  private readonly modals = inject(ModalController);
+  protected readonly headMenuOpen = signal(false);
 
   /** `?categoria=<id>` en la dirección (desde Reportes) deja puesto ese filtro. */
   readonly categoria = input<string>();
@@ -113,11 +119,9 @@ export class MovimientosPage {
   protected readonly accountFilter = signal<string | null>(null);
   protected readonly accountMenuOpen = signal(false);
   private readonly transfers = signal<Transfer[]>([]);
-  protected readonly kindOptions: PillOption[] = [
-    { value: 'todos', label: 'Todos' },
-    { value: 'gasto', label: 'Gastos' },
-    { value: 'ingreso', label: 'Ingresos' },
-  ];
+  protected readonly kindOptions = computed<PillOption[]>(() =>
+    ['todos', 'gasto', 'ingreso'].map((value) => ({ value, label: t(`movs.kinds.${value}`) })),
+  );
 
   // Selección para edición masiva.
   protected readonly selecting = signal(false);
@@ -128,19 +132,19 @@ export class MovimientosPage {
     const used = new Set((this.rows() ?? []).flatMap((r) => r.categoryIds));
     return this.categories()
       .filter((c) => used.has(c.id))
-      .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+      .sort((a, b) => a.name.localeCompare(b.name, locale()));
   });
 
   protected readonly categoryFilterLabel = computed(
     () =>
       this.categories().find((c) => c.id === this.categoryFilter())?.name ??
-      'Todas las categorías',
+      t('movs.allCategories'),
   );
 
   protected readonly accountFilterLabel = computed(
     () =>
       this.accounts().find((a) => a.id === this.accountFilter())?.name ??
-      'Todas las cuentas',
+      t('movs.allAccounts'),
   );
 
   protected readonly filtering = computed(
@@ -159,17 +163,17 @@ export class MovimientosPage {
     const words = fold(this.search()).split(/\s+/).filter(Boolean);
     return this.transfers()
       .filter(
-        (t) =>
-          !account || t.fromAccountId === account || t.toAccountId === account,
+        (tr) =>
+          !account || tr.fromAccountId === account || tr.toAccountId === account,
       )
-      .map((t) => {
-        const title = `${names.get(t.fromAccountId) ?? 'Cuenta'} → ${names.get(t.toAccountId) ?? 'Cuenta'}`;
+      .map((tr) => {
+        const title = `${names.get(tr.fromAccountId) ?? t('cuentas.account')} → ${names.get(tr.toAccountId) ?? t('cuentas.account')}`;
         return {
-          transfer: t,
+          transfer: tr,
           title,
-          sub: `${t.note ? t.note + ' · ' : ''}${formatDay(t.date)}`,
-          amount: formatMoney(t.amount),
-          haystack: fold(`${title} ${t.note}`),
+          sub: `${tr.note ? tr.note + ' · ' : ''}${formatDay(tr.date)}`,
+          amount: formatMoney(tr.amount),
+          haystack: fold(`${title} ${tr.note}`),
         };
       })
       .filter((r) => words.every((w) => r.haystack.includes(w)));
@@ -259,23 +263,34 @@ export class MovimientosPage {
     this.menuFor.set(null);
     if (
       !(await this.confirm(
-        'Eliminar movimiento',
-        `Se borrará ${row.title} (${row.amount}). Si era el pago de un gasto fijo, ese gasto volverá a quedar pendiente.`,
+        t('movs.deleteTitle'),
+        t('movs.deleteMsg', { name: row.title, amount: row.amount }),
       ))
     )
       return;
     try {
       const deleted = await this.container.deleteTransaction.execute(row.id);
       this.monthState.notifyChange();
-      this.undo.offer(`${row.title} eliminado`, () =>
+      this.undo.offer(t('movs.deleted', { name: row.title }), () =>
         this.container.restoreTransaction.execute(deleted),
       );
     } catch (error) {
       console.error(error);
-      this.liveMessage.set(
-        'No se pudo eliminar el movimiento. Inténtalo de nuevo.',
-      );
+      this.liveMessage.set(t('movs.deleteFailed'));
     }
+  }
+
+  /** Copia movimientos de otro mes al que se ve; con "Deshacer" se borran las copias. */
+  protected async copyFromMonth() {
+    this.headMenuOpen.set(false);
+    const modal = await this.modals.create({ component: CopiarModalComponent, componentProps: { to: this.monthState.month() } });
+    await modal.present();
+    const { data, role } = await modal.onWillDismiss<Transaction[]>();
+    if (role !== 'saved' || !data?.length) return;
+    this.monthState.notifyChange();
+    this.undo.offer(tn('copy.done', data.length), async () => {
+      for (const copy of data) await this.container.deleteTransaction.execute(copy.id);
+    });
   }
 
   protected setCategoryFilter(id: string | null) {
@@ -288,8 +303,8 @@ export class MovimientosPage {
     this.accountMenuOpen.set(false);
   }
 
-  protected editTransfer(t: Transfer) {
-    return this.dineroForm.editTransfer(t);
+  protected editTransfer(transfer: Transfer) {
+    return this.dineroForm.editTransfer(transfer);
   }
 
   protected clearFilters() {
@@ -330,9 +345,7 @@ export class MovimientosPage {
     // Solo se ofrecen categorías del mismo tipo que lo seleccionado; con gastos e ingresos mezclados no hay ninguna.
     const kinds = new Set(rows.map((r) => r.isIncome));
     if (kinds.size !== 1) {
-      return this.info(
-        'Elige solo gastos o solo ingresos para cambiarles la categoría.',
-      );
+      return this.info(t('movs.mixed'));
     }
     const income = rows[0].isIncome;
     const options = this.categories().filter((c) =>
@@ -340,15 +353,15 @@ export class MovimientosPage {
     );
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Cambiar categoría',
+      header: t('movs.changeCategory'),
       inputs: options.map((c) => ({
         type: 'radio' as const,
         label: c.name,
         value: c.id,
       })),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Cambiar', role: 'confirm' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('movs.change'), role: 'confirm' },
       ],
     });
     await alert.present();
@@ -360,7 +373,7 @@ export class MovimientosPage {
   protected async bulkDate() {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Cambiar fecha',
+      header: t('movs.changeDate'),
       inputs: [
         {
           name: 'date',
@@ -370,8 +383,8 @@ export class MovimientosPage {
         },
       ],
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Cambiar', role: 'confirm' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('movs.change'), role: 'confirm' },
       ],
     });
     await alert.present();
@@ -384,8 +397,8 @@ export class MovimientosPage {
     const ids = [...this.selected()];
     if (
       !(await this.confirm(
-        'Eliminar movimientos',
-        `Se borrarán ${ids.length} movimientos. Los pagos de gastos fijos volverán a quedar pendientes.`,
+        t('movs.bulkDeleteTitle'),
+        t('movs.bulkDeleteMsg', { count: ids.length }),
       ))
     )
       return;
@@ -395,13 +408,11 @@ export class MovimientosPage {
         deleted.push(await this.container.deleteTransaction.execute(id));
     } catch (error) {
       console.error(error);
-      this.liveMessage.set(
-        'No se pudieron eliminar todos. Inténtalo de nuevo.',
-      );
+      this.liveMessage.set(t('movs.bulkDeleteFailed'));
     }
     this.stopSelecting();
     this.monthState.notifyChange();
-    this.undo.offer(`${deleted.length} movimientos eliminados`, async () => {
+    this.undo.offer(t('movs.bulkDeleted', { count: deleted.length }), async () => {
       for (const d of deleted)
         await this.container.restoreTransaction.execute(d);
     });
@@ -416,13 +427,11 @@ export class MovimientosPage {
         );
       this.stopSelecting();
       this.monthState.notifyChange();
-      const extra = skipped
-        ? ` ${skipped} no se cambiaron (divididos o de otro tipo).`
-        : '';
-      await this.info(`${updated} movimientos cambiados.${extra}`);
+      const extra = skipped ? t('movs.skipped', { count: skipped }) : '';
+      await this.info(t('movs.changed', { count: updated }) + extra);
     } catch (error) {
       console.error(error);
-      await this.info('No se pudieron cambiar. Inténtalo de nuevo.');
+      await this.info(t('movs.changeFailed'));
     }
   }
 
@@ -432,8 +441,8 @@ export class MovimientosPage {
       header,
       message,
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -469,7 +478,7 @@ export class MovimientosPage {
       this.rows.set(
         [...transactions]
           .sort((a, b) => b.date.localeCompare(a.date))
-          .map((t) => toRow(t, byId)),
+          .map((tx) => toRow(tx, byId)),
       );
       this.failed.set(false);
     } catch (error) {
@@ -479,27 +488,27 @@ export class MovimientosPage {
   }
 }
 
-function toRow(t: Transaction, byId: Map<string, Category>): Row {
-  const category = byId.get(t.categoryId);
+function toRow(tx: Transaction, byId: Map<string, Category>): Row {
+  const category = byId.get(tx.categoryId);
   const isIncome = category?.type === 'ingreso';
-  const categoryName = category?.name ?? 'Sin categoría';
-  const categoryIds = t.splits?.length
-    ? t.splits.map((s) => s.categoryId)
-    : [t.categoryId];
+  const categoryName = category?.name ?? t('common.noCategory');
+  const categoryIds = tx.splits?.length
+    ? tx.splits.map((s) => s.categoryId)
+    : [tx.categoryId];
   const names = categoryIds.map((id) => byId.get(id)?.name ?? '');
-  const tags = t.tags ?? [];
-  const split = (t.splits?.length ?? 0) > 1;
+  const tags = tx.tags ?? [];
+  const split = (tx.splits?.length ?? 0) > 1;
   return {
-    id: t.id,
-    transaction: t,
+    id: tx.id,
+    transaction: tx,
     ...lookOf(category ?? { type: isIncome ? 'ingreso' : 'variable' }),
-    title: t.note || categoryName,
-    subtitle: `${split ? `${categoryName} y ${t.splits!.length - 1} más` : categoryName} · ${formatDay(t.date)}`,
-    amount: `${isIncome ? '+' : '−'}${formatMoney(t.amount)}`,
+    title: tx.note || categoryName,
+    subtitle: `${split ? t('movs.splitName', { name: categoryName, count: tx.splits!.length - 1 }) : categoryName} · ${formatDay(tx.date)}`,
+    amount: `${isIncome ? '+' : '−'}${formatMoney(tx.amount)}`,
     isIncome,
     tags,
-    hasPhotos: (t.attachmentCount ?? 0) > 0,
+    hasPhotos: (tx.attachmentCount ?? 0) > 0,
     categoryIds,
-    haystack: fold([t.note, ...names, ...tags].join(' ')),
+    haystack: fold([tx.note, ...names, ...tags].join(' ')),
   };
 }

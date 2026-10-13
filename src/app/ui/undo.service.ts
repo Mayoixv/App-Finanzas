@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { MonthState } from './month-state';
+import { t } from './i18n';
 
 /** Aviso de 5 segundos con "Deshacer" tras borrar algo. */
 @Injectable({ providedIn: 'root' })
@@ -14,7 +15,7 @@ export class UndoService {
       duration: 5000,
       position: 'top',
       cssClass: 'app-toast',
-      buttons: [{ text: 'Deshacer', role: 'undo' }],
+      buttons: [{ text: t('fields.undo'), role: 'undo' }],
     });
     await toast.present();
     const { role } = await toast.onDidDismiss();

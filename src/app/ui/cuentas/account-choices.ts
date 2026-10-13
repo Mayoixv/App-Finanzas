@@ -1,21 +1,17 @@
 import { AppContainer } from '../../app.container';
 import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
+import { t } from '../i18n';
 
 const LAST_ACCOUNT_KEY = 'last_account';
 
-export const ACCOUNT_TYPE_LABEL: Record<Account['type'], string> = {
-  efectivo: 'Efectivo',
-  banco: 'Banco',
-  ahorro: 'Ahorros',
-  tarjeta: 'Tarjeta de crédito',
-  inversion: 'Inversión',
-};
+export const ACCOUNT_TYPES: Account['type'][] = ['efectivo', 'banco', 'ahorro', 'tarjeta', 'inversion'];
+export const accountTypeLabel = (type: Account['type']) => t(`accountType.${type}`);
 
 /** Etiqueta para elegir la cuenta: "Visa · Tarjeta de crédito". Efectivo va solo. */
 /** Opciones para app-select-field. */
 export const accountOptions = (accounts: Account[]) => accounts.map((a) => ({ value: a.id, label: accountLabel(a) }));
 
-export const accountLabel = (a: Account) => (a.id === CASH_ACCOUNT_ID ? a.name : `${a.name} · ${ACCOUNT_TYPE_LABEL[a.type]}`);
+export const accountLabel = (a: Account) => (a.id === CASH_ACCOUNT_ID ? a.name : `${a.name} · ${accountTypeLabel(a.type)}`);
 
 /**
  * Cuentas que se pueden elegir en un formulario (las activas, más la actual aunque esté archivada)

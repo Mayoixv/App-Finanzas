@@ -1,7 +1,7 @@
 <ion-content class="surface-light" [fullscreen]="true">
   <header class="screen-head">
     <div class="title-row">
-      <h1 class="screen-title">Dinero</h1>
+      <h1 class="screen-title">{{ t('tabs.dinero.name') }}</h1>
       <app-help-button topic="cuentas"></app-help-button>
     </div>
     <app-month-switcher></app-month-switcher>
@@ -9,9 +9,9 @@
 
   @if (netWorth(); as n) {
     <section class="hero" aria-labelledby="patrimonio-label">
-      <p id="patrimonio-label" class="hero-label">Patrimonio</p>
+      <p id="patrimonio-label" class="hero-label">{{ t('networth.title') }}</p>
       <p class="hero-amount">{{ money(n.total) }}</p>
-      <p class="hero-note">Disponible {{ money(n.available) }}@if (n.inGoals > 0) { · En metas {{ money(n.inGoals) }}}@if (n.owedToMe > 0) { · Te deben {{ money(n.owedToMe) }}} · Debes {{ money(n.owe) }}</p>
+      <p class="hero-note">{{ t('networth.available', { amount: money(n.available) }) }}@if (n.inGoals > 0) { · {{ t('networth.inGoals', { amount: money(n.inGoals) }) }}}@if (n.owedToMe > 0) { · {{ t('networth.owedToMe', { amount: money(n.owedToMe) }) }}} · {{ t('networth.owe', { amount: money(n.owe) }) }}</p>
     </section>
   }
 

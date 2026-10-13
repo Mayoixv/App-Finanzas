@@ -11,7 +11,6 @@ import {
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { Budget, budgetCategoryIds, budgetName } from '../../domain/budget';
 import { Category, isExpenseType } from '../../domain/category';
 import { CurrencyState } from '../currency-state';
@@ -19,6 +18,7 @@ import { amountToInput, parseAmount } from '../format';
 import { MonthState } from '../month-state';
 import { lookOf } from '../category-look';
 import { SuccessCheckComponent } from '../success-check.component';
+import { t, errorText, listText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -30,6 +30,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [CategoryFieldComponent, IonToggle, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class PresupuestoModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
@@ -62,7 +63,7 @@ export class PresupuestoModalComponent implements OnInit {
   protected readonly look = lookOf;
   protected readonly autoName = computed(() => {
     const names = this.chosen().map((c) => c.name);
-    return names.length < 2 ? '' : `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`;
+    return names.length < 2 ? '' : listText(names);
   });
 
   protected readonly canSave = computed(
@@ -109,7 +110,7 @@ export class PresupuestoModalComponent implements OnInit {
   /** Nombre para mostrar en mensajes. */
   private displayName(): string {
     const b = this.budget;
-    return b ? budgetName(b, new Map(this.chosen().map((c) => [c.id, c.name]))) : '';
+    return b ? budgetName(b, new Map(this.chosen().map((c) => [c.id, c.name])), listText) : '';
   }
 
   protected cancel() {
@@ -134,9 +135,7 @@ export class PresupuestoModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
       this.error.set(
-        e instanceof ValidationError || e instanceof NotFoundError
-          ? e.message
-          : 'No se pudo guardar. Inténtalo de nuevo.',
+        errorText(e, 'common.saveFailed'),
       );
       this.saving.set(false);
     }
@@ -147,11 +146,11 @@ export class PresupuestoModalComponent implements OnInit {
     if (!budget) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar presupuesto',
-      message: `Se quitará el límite de ${this.displayName()} en ${this.monthState.label()}. Tus gastos no cambian.`,
+      header: t('budget.delete'),
+      message: t('budget.deleteMsg', { name: this.displayName(), month: this.monthState.label() }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -164,7 +163,7 @@ export class PresupuestoModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (err) {
       console.error(err);
-      this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(t('common.deleteFailed'));
       this.saving.set(false);
     }
   }

@@ -53,10 +53,10 @@ export async function decryptText(fileText: string, password: string): Promise<s
   try {
     file = JSON.parse(fileText);
   } catch {
-    throw new ValidationError('El archivo no es un respaldo de esta app');
+    throw new ValidationError('notBackup');
   }
   if (file?.format !== 'finanzas-backup' || file.version !== 1) {
-    throw new ValidationError('El archivo no es un respaldo de esta app');
+    throw new ValidationError('notBackup');
   }
   const bits = await pbkdf2(password, fromB64(file.salt), file.iterations);
   const key = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
@@ -65,6 +65,6 @@ export async function decryptText(fileText: string, password: string): Promise<s
     return new TextDecoder().decode(plain);
   } catch {
     // AES-GCM no distingue contraseña errónea de archivo alterado; ambos se rechazan sin tocar nada.
-    throw new ValidationError('Contraseña incorrecta o archivo dañado');
+    throw new ValidationError('wrongPassword');
   }
 }

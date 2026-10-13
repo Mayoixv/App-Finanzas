@@ -24,7 +24,7 @@ export class DeleteTransaction {
   /** Borra el movimiento. Si era el pago de un gasto fijo, ese gasto vuelve a quedar pendiente. */
   async execute(id: string): Promise<DeletedTransaction> {
     const transaction = await this.transactions.get(id);
-    if (!transaction) throw new NotFoundError('Movimiento');
+    if (!transaction) throw new NotFoundError('transaction');
     // Se busca antes de borrar: al borrar, la base deja transaction_id en NULL y ya no se podría encontrar.
     const instance = await this.recurring.findInstanceByTransaction(id);
     // Las fotos se borran en cascada con el movimiento; se guardan aquí para poder deshacer.

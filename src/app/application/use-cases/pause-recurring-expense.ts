@@ -7,9 +7,9 @@ export class PauseRecurringExpense {
 
   /** Pausa `months` meses desde `fromMonth` (inclusive) y quita lo pendiente de esos meses. Lo pagado se queda. */
   async execute(id: string, fromMonth: MonthKey, months: number): Promise<MonthKey> {
-    if (!Number.isInteger(months) || months < 1 || months > 24) throw new ValidationError('Pausa de 1 a 24 meses');
+    if (!Number.isInteger(months) || months < 1 || months > 24) throw new ValidationError('pause');
     const expense = await this.recurring.get(id);
-    if (!expense) throw new NotFoundError('Fijo');
+    if (!expense) throw new NotFoundError('fixed');
     const pausedUntil = addMonths(fromMonth, months - 1);
     await this.recurring.save({ ...expense, pausedUntil });
     for (const i of await this.recurring.listInstancesOf(id)) {
@@ -26,7 +26,7 @@ export class ResumeRecurringExpense {
 
   async execute(id: string): Promise<void> {
     const expense = await this.recurring.get(id);
-    if (!expense) throw new NotFoundError('Fijo');
+    if (!expense) throw new NotFoundError('fixed');
     await this.recurring.save({ ...expense, pausedUntil: null });
   }
 }

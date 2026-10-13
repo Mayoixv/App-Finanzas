@@ -4,6 +4,7 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import { APP_CONTAINER } from '../../app.container';
 import { APP_VERSION } from '../../version';
 import { todayIso } from '../format';
+import { t } from '../i18n';
 
 /** Plugin nativo propio (android/.../AppUpdaterPlugin.java). */
 interface AppUpdaterPlugin {
@@ -66,19 +67,19 @@ export class UpdateService {
   async check(manual = true) {
     if (this.busy()) return;
     this.busy.set(true);
-    if (manual) this.status.set('Buscando…');
+    if (manual) this.status.set(t('update.searching'));
     try {
       const release = await this.latest();
       await this.container.settings.set(CHECKED_KEY, todayIso());
       if (!release || !isNewer(release.version, APP_VERSION)) {
-        if (manual) this.status.set(`Tienes la versión más reciente (${APP_VERSION}).`);
+        if (manual) this.status.set(t('update.latest', { version: APP_VERSION }));
         return;
       }
-      this.status.set(`Versión ${release.version} disponible.`);
+      this.status.set(t('update.available', { version: release.version }));
       await this.offer(release);
     } catch (e) {
       console.error(e);
-      if (manual) this.status.set('No se pudo revisar. Comprueba tu conexión a internet.');
+      if (manual) this.status.set(t('update.failed'));
     } finally {
       this.busy.set(false);
     }
@@ -97,21 +98,21 @@ export class UpdateService {
   private async offer(release: AppRelease) {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Hay una versión nueva',
-      message: `Kuarto ${release.version} está lista. Tus datos se quedan como están.`,
+      header: t('update.newTitle'),
+      message: t('update.newMsg', { version: release.version }),
       buttons: [
-        { text: 'Luego', role: 'cancel' },
-        { text: 'Actualizar', role: 'confirm' },
+        { text: t('update.later'), role: 'cancel' },
+        { text: t('update.update'), role: 'confirm' },
       ],
     });
     await alert.present();
     if ((await alert.onDidDismiss()).role !== 'confirm') return;
-    this.status.set('Descargando…');
+    this.status.set(t('update.downloading'));
     const { needsPermission } = await AppUpdater.downloadAndInstall({ url: release.url });
     this.status.set(
       needsPermission
-        ? 'Activa "Permitir de esta fuente" para Kuarto, vuelve y toca Buscar actualización otra vez.'
-        : `Versión ${release.version} descargada: toca Instalar.`,
+        ? t('update.permission')
+        : t('update.downloaded', { version: release.version }),
     );
   }
 }

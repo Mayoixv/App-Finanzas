@@ -20,10 +20,14 @@ export function budgetCategoryIds(budget: Budget): string[] {
 }
 
 /** "Comida", "Comida y Supermercado", "Comida, Supermercado y Gasolina", o el nombre que le puso el usuario. */
-export function budgetName(budget: Budget, categoryNames: Map<string, string>): string {
+/** `list` une los nombres ("Comida y Luz"); la interfaz pasa la del idioma elegido. */
+export function budgetName(
+  budget: Budget,
+  categoryNames: Map<string, string>,
+  list: (items: string[]) => string = (items) => new Intl.ListFormat('es', { type: 'conjunction' }).format(items),
+): string {
   if (budget.name?.trim()) return budget.name.trim();
-  const names = budgetCategoryIds(budget).map((id) => categoryNames.get(id) ?? 'Categoría');
-  return names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`;
+  return list(budgetCategoryIds(budget).map((id) => categoryNames.get(id) ?? '?'));
 }
 
 export interface BudgetStatus {

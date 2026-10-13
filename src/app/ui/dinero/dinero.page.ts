@@ -7,6 +7,7 @@ import { NetWorth } from '../../application/use-cases/accounts';
 import { CuentasViewComponent } from '../cuentas/cuentas-view.component';
 import { formatMoney } from '../format';
 import { MonthState } from '../month-state';
+import { t } from '../i18n';
 
 /** Pestaña Dinero: patrimonio arriba y, debajo, Cuentas, Efectivo y Tarjetas. Metas y deudas están en Planes. */
 @Component({
@@ -16,6 +17,7 @@ import { MonthState } from '../month-state';
   imports: [HelpButtonComponent, MonthSwitcherComponent, IonContent, CuentasViewComponent],
 })
 export class DineroPage {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly monthState = inject(MonthState);
 

@@ -3,7 +3,12 @@
 :root {
   --violet-600: #6639ec; // apenas más oscuro que el de design.md (#6a3df0) para que el texto llegue a 4.5:1 sobre --surface-soft
   --violet-400: #8f6bff;
+  --violet-200: #c9b8ff; // texto violeta claro sobre fondos oscuros
+  --violet-700: #4b25c4;
   --violet-900: #2a1478;
+  // Los mismos tonos como "r, g, b" para rgba(); el brillo usa el violeta de design.md (#6a3df0).
+  --violet-600-rgb: 106, 61, 240;
+  --violet-400-rgb: 143, 107, 255;
   --ink-950: #0a0a12;
   --ink-800: #171722;
   --paper: #ffffff;
@@ -26,7 +31,7 @@
   --pending: var(--warning); // Pendiente: aún no ocurre
   --overdue: var(--negative); // Vencido: debía pagarse y no se marcó
   --received-on-light: var(--positive-on-light);
-  --paid-on-light: var(--violet-600);
+  --paid-on-light: #6639ec; // fijo: los colores de estado no cambian con la paleta
   --pending-on-light: #8a5300;
   --overdue-on-light: var(--negative-on-light);
   // Violeta como texto, borde o foco sobre las superficies de pantalla (los botones llenos siguen con --violet-600).
@@ -36,9 +41,9 @@
   --line-strong: rgba(20, 18, 31, 0.1);
   --line-axis: rgba(20, 18, 31, 0.25);
 
-  --brand-gradient: linear-gradient(160deg, #8f6bff 0%, #6a3df0 45%, #2a1478 100%);
-  --brand-glow: radial-gradient(circle at 50% 0%, rgba(143, 107, 255, 0.55), transparent 65%);
-  --border-glow: rgba(143, 107, 255, 0.25);
+  --brand-gradient: linear-gradient(160deg, var(--violet-400) 0%, rgb(var(--violet-600-rgb)) 45%, var(--violet-900) 100%);
+  --brand-glow: radial-gradient(circle at 50% 0%, rgba(var(--violet-400-rgb), 0.55), transparent 65%);
+  --border-glow: rgba(var(--violet-400-rgb), 0.25);
 
   --radius-pill: 999px;
   --radius-card: 24px;
@@ -49,12 +54,12 @@
 
   --ion-font-family: var(--font-body);
 
-  --ion-color-primary: #6639ec;
-  --ion-color-primary-rgb: 106, 61, 240;
+  --ion-color-primary: var(--violet-600);
+  --ion-color-primary-rgb: var(--violet-600-rgb);
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #5d36d3;
-  --ion-color-primary-tint: #7950f2;
+  --ion-color-primary-shade: var(--violet-700);
+  --ion-color-primary-tint: var(--violet-400);
 }
 
 :root {
@@ -95,4 +100,13 @@ body {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/*
+ * Japonés: Anton e Inter no traen kanji ni kana. Solo con la app en japonés se agrega la fuente japonesa del
+ * sistema (Noto Sans CJK en Android) como respaldo; en los demás idiomas no se carga nada más.
+ */
+:root:lang(ja) {
+  --font-display: 'Anton', 'Noto Sans JP', 'Noto Sans CJK JP', 'Hiragino Sans', sans-serif;
+  --font-body: 'Inter', 'Noto Sans JP', 'Noto Sans CJK JP', 'Hiragino Sans', system-ui, sans-serif;
 }

@@ -8,18 +8,14 @@ import { Category, CategoryType } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { MonthState } from '../month-state';
 import { CategoriaModalComponent } from './categoria.modal';
+import { t, locale } from '../i18n';
 
 interface Group {
   type: CategoryType;
-  title: string;
   items: Category[];
 }
 
-const GROUPS: { type: CategoryType; title: string }[] = [
-  { type: 'ingreso', title: 'Ingresos' },
-  { type: 'fijo', title: 'Gastos fijos' },
-  { type: 'variable', title: 'Gastos variables' },
-];
+const GROUPS: CategoryType[] = ['ingreso', 'fijo', 'variable'];
 
 /** Ajustes › Categorías: crear, editar, ocultar y borrar categorías. */
 @Component({
@@ -29,6 +25,7 @@ const GROUPS: { type: CategoryType; title: string }[] = [
   imports: [RouterLink, IonContent, IonIcon],
 })
 export class CategoriasPage {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modals = inject(ModalController);
   private readonly monthState = inject(MonthState);
@@ -40,9 +37,9 @@ export class CategoriasPage {
 
   protected readonly groups = computed<Group[]>(() => {
     const all = this.categories() ?? [];
-    return GROUPS.map((g) => ({
-      ...g,
-      items: all.filter((c) => c.type === g.type).sort((a, b) => a.name.localeCompare(b.name, 'es')),
+    return GROUPS.map((type) => ({
+      type,
+      items: all.filter((c) => c.type === type).sort((a, b) => a.name.localeCompare(b.name, locale())),
     }));
   });
 

@@ -2,12 +2,12 @@
 
   <app-loading [show]="!debts() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="notice">No se pudieron leer las deudas. Vuelve a abrir esta pantalla.</p>
+    <p class="notice">{{ t('deudas.failed') }}</p>
   } @else if (debts(); as list) {
     @if (list.length > 0) {
-      <section class="totals" aria-label="Totales">
-        <p><span class="totals-label">Debes</span> <span class="totals-amount">{{ money(totals().owe) }}</span></p>
-        <p><span class="totals-label">Te deben</span> <span class="totals-amount">{{ money(totals().owed) }}</span></p>
+      <section class="totals" [attr.aria-label]="t('deudas.totals')">
+        <p><span class="totals-label">{{ t('deudas.owe') }}</span> <span class="totals-amount">{{ money(totals().owe) }}</span></p>
+        <p><span class="totals-label">{{ t('deudas.owed') }}</span> <span class="totals-amount">{{ money(totals().owed) }}</span></p>
       </section>
 
       <ul [class.t-still]="!monthState.animateLists()" class="debts">
@@ -15,22 +15,22 @@
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="debt">
             <div class="debt-head">
               <span class="debt-name">{{ d.debt.name }}</span>
-              <span class="chip" [class.owed]="d.debt.direction === 'me_deben'">{{ d.debt.direction === 'debo' ? 'Debo' : 'Me deben' }}</span>
-              <button type="button" class="edit" [attr.aria-label]="'Editar ' + d.debt.name" (click)="openDebt(d)">
+              <span class="chip" [class.owed]="d.debt.direction === 'me_deben'">{{ d.debt.direction === 'debo' ? t('deudas.iOwe') : t('deudas.theyOwe') }}</span>
+              <button type="button" class="edit" [attr.aria-label]="t('common.edit', { name: d.debt.name })" (click)="openDebt(d)">
                 <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
               </button>
             </div>
             <p class="debt-amounts">
               @if (d.balance > 0) {
-                <span class="debt-balance">{{ money(d.balance) }}</span> por {{ d.debt.direction === 'debo' ? 'pagar' : 'cobrar' }} de {{ money(d.debt.principal) }}
+                {{ amountsAround(d)[0] }}<span class="debt-balance">{{ money(d.balance) }}</span>{{ amountsAround(d)[1] }}
               } @else {
-                <span class="debt-balance">Saldada</span>
+                <span class="debt-balance">{{ t('deudas.settled') }}</span>
               }
             </p>
             <div
               class="bar"
               role="progressbar"
-              [attr.aria-label]="'Pagado de ' + d.debt.name"
+              [attr.aria-label]="t('deudas.paidOf', { name: d.debt.name })"
               aria-valuemin="0"
               aria-valuemax="100"
               [attr.aria-valuenow]="percentPaid(d)"
@@ -39,36 +39,36 @@
             </div>
             <p class="debt-detail">{{ detail(d) }}</p>
             @if (d.paidInterest > 0) {
-              <p class="debt-detail">Intereses pagados: {{ money(d.paidInterest) }}</p>
+              <p class="debt-detail">{{ t('deudas.interestPaid', { amount: money(d.paidInterest) }) }}</p>
             }
             @if (d.debt.direction === 'debo' && d.installment > 0 && d.balance > 0) {
               @if (d.fixedId) {
-                <p class="debt-detail">La cuota está en Fijos: al pagarla allí, baja este saldo.</p>
+                <p class="debt-detail">{{ t('deudas.inFixed') }}</p>
               } @else {
-                <button type="button" class="link-button" (click)="addToFixed(d)">Pasar la cuota a Fijos</button>
+                <button type="button" class="link-button" (click)="addToFixed(d)">{{ t('deudas.toFixed') }}</button>
               }
             }
 
             <div class="debt-foot">
               @if (d.installment > 0) {
                 <button type="button" class="link-button" [attr.aria-expanded]="openSchedule() === d.debt.id" (click)="toggleSchedule(d.debt.id)">
-                  {{ openSchedule() === d.debt.id ? 'Ocultar calendario' : 'Ver calendario' }}
+                  {{ openSchedule() === d.debt.id ? t('deudas.hideSchedule') : t('deudas.showSchedule') }}
                 </button>
               } @else {
                 <span></span>
               }
               @if (d.balance > 0) {
-                <button type="button" class="btn-secondary pay" [attr.aria-label]="'Registrar pago de ' + d.debt.name" (click)="openPayment(d)">
-                  {{ d.debt.direction === 'debo' ? 'Registrar pago' : 'Registrar cobro' }}
+                <button type="button" class="btn-secondary pay" [attr.aria-label]="t('fijos.registerPaymentOf', { name: d.debt.name })" (click)="openPayment(d)">
+                  {{ d.debt.direction === 'debo' ? t('deudas.registerPayment') : t('deudas.registerCharge') }}
                 </button>
               }
             </div>
 
             @if (openSchedule() === d.debt.id) {
               <table class="schedule">
-                <caption class="sr-only">Calendario de cuotas de {{ d.debt.name }}</caption>
+                <caption class="sr-only">{{ t('deudas.scheduleOf', { name: d.debt.name }) }}</caption>
                 <thead>
-                  <tr><th scope="col">Mes</th><th scope="col">Interés</th><th scope="col">Capital</th><th scope="col">Saldo</th></tr>
+                  <tr><th scope="col">{{ t('deudas.month') }}</th><th scope="col">{{ t('deudas.interest') }}</th><th scope="col">{{ t('deudas.principal') }}</th><th scope="col">{{ t('deudas.balance') }}</th></tr>
                 </thead>
                 <tbody>
                   @for (r of schedule(d); track r.n) {
@@ -84,14 +84,14 @@
             }
 
             @if (d.payments.length > 0) {
-              <h3 class="payments-title">Pagos</h3>
+              <h3 class="payments-title">{{ t('deudas.payments') }}</h3>
               <ul [class.t-still]="!monthState.animateLists()" class="payments">
                 @for (p of d.payments; track p.id) {
                   <li animate.enter="t-row-enter" animate.leave="t-row-leave">
-                    <button type="button" class="payment" [attr.aria-label]="'Eliminar pago de ' + money(p.amount) + ' del ' + day(p.date)" (click)="confirmDeletePayment(d, p)">
+                    <button type="button" class="payment" [attr.aria-label]="t('deudas.deletePaymentLabel', { amount: money(p.amount), date: day(p.date) })" (click)="confirmDeletePayment(d, p)">
                       <span class="payment-text">
                         <span>{{ day(p.date) }}</span>
-                        <span class="payment-sub">Capital {{ money(p.principal) }} · interés {{ money(p.interest) }}</span>
+                        <span class="payment-sub">{{ t('deudas.paymentSub', { principal: money(p.principal), interest: money(p.interest) }) }}</span>
                       </span>
                       <span class="payment-amount">{{ money(p.amount) }}</span>
                     </button>
@@ -105,31 +105,31 @@
 
       @if (settledCount() > 0) {
         <button type="button" class="link-button settled-toggle" [attr.aria-expanded]="showSettled()" (click)="showSettled.set(!showSettled())">
-          {{ showSettled() ? 'Ocultar saldadas' : 'Ver saldadas (' + settledCount() + ')' }}
+          {{ showSettled() ? t('deudas.hideSettled') : t('deudas.showSettled', { count: settledCount() }) }}
         </button>
       }
 
       @if (strategies(); as s) {
         <section class="strategy" aria-labelledby="estrategia-title">
-          <h2 id="estrategia-title" class="section-title">¿Cuál pagar primero?</h2>
-          <p class="note">Pagando la cuota de cada deuda y poniendo un extra cada mes a una sola.</p>
+          <h2 id="estrategia-title" class="section-title">{{ t('deudas.whichFirst') }}</h2>
+          <p class="note">{{ t('deudas.strategyNote') }}</p>
           <div class="field">
-            <label for="extra">Extra al mes</label>
+            <label for="extra">{{ t('deudas.extra') }}</label>
             <input id="extra" type="number" inputmode="decimal" min="0" placeholder="0.00" [value]="extra()" (input)="extra.set($any($event.target).value)" />
           </div>
           <div class="compare">
             <div class="option">
-              <h3>Bola de nieve</h3>
-              <p class="option-sub">Primero la de menor saldo</p>
+              <h3>{{ t('deudas.snowball') }}</h3>
+              <p class="option-sub">{{ t('deudas.snowballSub') }}</p>
               <p>{{ endLabel(s.snowball) }}</p>
-              <p>Intereses: {{ money(s.snowball.totalInterest) }}</p>
+              <p>{{ t('deudas.interestTotal', { amount: money(s.snowball.totalInterest) }) }}</p>
               <p class="option-sub">{{ orderNames(s.snowball) }}</p>
             </div>
             <div class="option">
-              <h3>Avalancha</h3>
-              <p class="option-sub">Primero la de mayor tasa</p>
+              <h3>{{ t('deudas.avalanche') }}</h3>
+              <p class="option-sub">{{ t('deudas.avalancheSub') }}</p>
               <p>{{ endLabel(s.avalanche) }}</p>
-              <p>Intereses: {{ money(s.avalanche.totalInterest) }}</p>
+              <p>{{ t('deudas.interestTotal', { amount: money(s.avalanche.totalInterest) }) }}</p>
               <p class="option-sub">{{ orderNames(s.avalanche) }}</p>
             </div>
           </div>
@@ -137,14 +137,14 @@
             <p class="note saved">{{ text }}</p>
           }
           @if (s.skipped > 0) {
-            <p class="note">{{ s.skipped === 1 ? 'Una deuda sin plazo no entra' : s.skipped + ' deudas sin plazo no entran' }} en la comparación porque no tiene cuota fija.</p>
+            <p class="note">{{ tn('deudas.skipped', s.skipped) }}</p>
           }
         </section>
       }
     } @else {
       <section class="empty">
-        <p class="empty-title">No tienes deudas registradas.</p>
-        <p class="empty-text">Toca + para anotar un préstamo o lo que alguien te debe y llevar la cuenta de cuánto falta.</p>
+        <p class="empty-title">{{ t('deudas.emptyTitle') }}</p>
+        <p class="empty-text">{{ t('deudas.emptyText') }}</p>
       </section>
     }
   }

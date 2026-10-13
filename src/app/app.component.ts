@@ -7,6 +7,10 @@ import { AutoBackupService } from './ui/auto-backup.service';
 import { TourComponent } from './ui/tour/tour.component';
 import { UpdateService } from './ui/update/update.service';
 import { NewsService } from './ui/news/news.service';
+import { AlertController } from '@ionic/angular';
+import { APP_CONTAINER } from './app.container';
+import { askName } from './ui/profile-name';
+import { MonthState } from './ui/month-state';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +29,18 @@ export class AppComponent {
   constructor() {
     // Un momento después de abrir, para no tapar la primera pantalla mientras carga.
     const news = inject(NewsService);
-    setTimeout(() => news.showIfUpdated().catch(console.error), 1500);
+    setTimeout(() => news.showIfUpdated().then(() => this.askNameOnce()).catch(console.error), 1500);
+  }
+
+  private readonly container = inject(APP_CONTAINER);
+  private readonly alerts = inject(AlertController);
+  private readonly monthState = inject(MonthState);
+
+  /** Quien ya usaba la app no ve las preguntas iniciales: solo se le pide el nombre, una vez y con "Omitir". */
+  private async askNameOnce() {
+    const profile = this.container.profile;
+    if ((await this.container.onboarding.needed()) || (await profile.name()) || (await profile.nameAsked())) return;
+    await profile.markNameAsked();
+    if (await askName(this.alerts, this.container, true)) this.monthState.notifyChange();
   }
 }

@@ -1,27 +1,27 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ transfer ? 'Editar transferencia' : isCardPayment() ? 'Pagar tarjeta' : 'Transferir' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ transfer ? t('transfer.edit') : isCardPayment() ? t('transfer.payCard') : t('transfer.title') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
     <div class="field">
-      <app-select-field label="Sale de" placeholder="Elige una cuenta" [options]="accountOptions()" [(value)]="from"></app-select-field>
+      <app-select-field [label]="t('transfer.from')" [placeholder]="t('common.chooseAccount')" [options]="accountOptions()" [(value)]="from"></app-select-field>
     </div>
 
-    <button type="button" class="swap" aria-label="Intercambiar: que salga de la otra cuenta" [disabled]="!from() || !to()" (click)="swap()">
+    <button type="button" class="swap" [attr.aria-label]="t('transfer.swap')" [disabled]="!from() || !to()" (click)="swap()">
       <ion-icon name="swap-vertical" aria-hidden="true"></ion-icon>
     </button>
 
     <div class="field">
-      <app-select-field label="Entra a" placeholder="Elige una cuenta" [options]="toOptions()" [(value)]="to"></app-select-field>
+      <app-select-field [label]="t('transfer.to')" [placeholder]="t('common.chooseAccount')" [options]="toOptions()" [(value)]="to"></app-select-field>
     </div>
 
     <div class="field">
       <ion-input
-        label="Monto ({{ currency() }})"
+        [label]="t('common.amount', { currency: currency() })"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -37,7 +37,7 @@
         @for (r of rows; track r.name) {
           <div class="preview-row">
             <dt>{{ r.name }}</dt>
-            <dd><span>{{ money(r.before) }}</span><span class="arrow" aria-label="pasa a">→</span><strong [class.negative]="r.after < 0">{{ money(r.after) }}</strong></dd>
+            <dd><span>{{ money(r.before) }}</span><span class="arrow" [attr.aria-label]="t('common.becomes')">→</span><strong [class.negative]="r.after < 0">{{ money(r.after) }}</strong></dd>
           </div>
         }
       </dl>
@@ -47,38 +47,38 @@
     }
 
     <div class="field">
-      <app-date-field label="Fecha" [(value)]="date"></app-date-field>
+      <app-date-field [label]="t('common.date')" [(value)]="date"></app-date-field>
     </div>
 
     <div class="field">
       <ion-input
-        label="Nota (opcional)"
+        [label]="t('common.noteOptional')"
         label-placement="floating"
-        placeholder="Depósito, retiro del cajero"
+        [placeholder]="t('transfer.notePlaceholder')"
         [value]="note()"
         (ionInput)="note.set(($event.detail.value ?? '').toString())"
       ></ion-input>
     </div>
 
-    <p class="hint">Una transferencia mueve dinero entre tus cuentas: no cuenta como ingreso ni como gasto del mes.</p>
+    <p class="hint">{{ t('transfer.hint') }}</p>
 
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ transfer ? 'Guardar cambios' : isCardPayment() ? 'Guardar pago' : 'Guardar transferencia' }}
+      {{ transfer ? t('common.saveChanges') : isCardPayment() ? t('transfer.savePayment') : t('transfer.save') }}
     </button>
 
     @if (transfer) {
-      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar transferencia</button>
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">{{ t('transfer.delete') }}</button>
     }
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">{{ isCardPayment() ? 'Pago guardado' : 'Transferencia guardada' }}</p>
+      <p class="done-text">{{ isCardPayment() ? t('transfer.paymentSaved') : t('transfer.saved') }}</p>
     }
   </div>
 </ion-content>

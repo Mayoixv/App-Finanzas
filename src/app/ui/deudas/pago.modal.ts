@@ -7,12 +7,12 @@ import { IonContent, IonIcon, IonInput, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { DebtView } from '../../application/use-cases/debts';
 import { splitPayment } from '../../domain/debts';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, formatMoney, parseAmount, todayIso } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
+import { t, errorText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -24,6 +24,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [DateFieldComponent, SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class PagoModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
 
@@ -47,7 +48,7 @@ export class PagoModalComponent implements OnInit {
     const amount = parseAmount(this.amount());
     if (!amount) return '';
     const { interest, principal } = splitPayment(this.view.balance, this.view.debt.annualRate, amount);
-    return `Interés ${formatMoney(interest)} · capital ${formatMoney(principal)} · queda ${formatMoney(this.view.balance - principal)}`;
+    return t('pago.preview', { interest: formatMoney(interest), principal: formatMoney(principal), left: formatMoney(this.view.balance - principal) });
   });
 
   constructor() {
@@ -87,9 +88,7 @@ export class PagoModalComponent implements OnInit {
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
-      this.error.set(
-        e instanceof ValidationError || e instanceof NotFoundError ? e.message : 'No se pudo guardar. Inténtalo de nuevo.',
-      );
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }

@@ -3,6 +3,7 @@ import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { backspaceOutline, fingerPrint } from 'ionicons/icons';
 import { LockState } from './lock-state';
+import { t } from '../i18n';
 
 const MAX_DIGITS = 6;
 
@@ -14,6 +15,7 @@ const MAX_DIGITS = 6;
   imports: [IonIcon],
 })
 export class LockScreenComponent {
+  protected readonly t = t;
   protected readonly lock = inject(LockState);
 
   protected readonly pin = signal('');
@@ -64,7 +66,7 @@ export class LockScreenComponent {
     this.shake.set(true);
     setTimeout(() => this.shake.set(false), 450);
     if (check.waitSeconds > 0) this.startWait(check.waitSeconds);
-    else this.message.set('PIN incorrecto');
+    else this.message.set(t('lock.wrong'));
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -80,11 +82,11 @@ export class LockScreenComponent {
   private startWait(seconds: number) {
     clearInterval(this.timer);
     this.waitSeconds.set(seconds);
-    this.message.set(`Demasiados intentos. Espera ${seconds} s.`);
+    this.message.set(t('lock.wait', { seconds }));
     this.timer = setInterval(() => {
       const left = this.waitSeconds() - 1;
       this.waitSeconds.set(Math.max(left, 0));
-      this.message.set(left > 0 ? `Demasiados intentos. Espera ${left} s.` : '');
+      this.message.set(left > 0 ? t('lock.wait', { seconds: left }) : '');
       if (left <= 0) clearInterval(this.timer);
     }, 1000);
   }

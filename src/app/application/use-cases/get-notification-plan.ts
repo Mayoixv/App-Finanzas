@@ -94,7 +94,7 @@ export class GetNotificationPlan {
           key: `tarjeta:${c.account.id}:${c.dueDate}:${when}`,
           kind: 'tarjeta',
           minimum: c.minimum,
-          name: `el pago de ${c.account.name}`,
+          name: c.account.name,
           amount: c.pending,
           dueDate: c.dueDate,
           when,

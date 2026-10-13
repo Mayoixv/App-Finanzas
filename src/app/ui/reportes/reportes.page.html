@@ -1,16 +1,16 @@
 <ion-content class="surface-light" [fullscreen]="true">
   <header class="screen-head">
-    <button type="button" class="back" aria-label="Volver" (click)="back()">
+    <button type="button" class="back" [attr.aria-label]="t('common.goBack')" (click)="back()">
       <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
-      Volver
+      {{ t('common.goBack') }}
     </button>
     <div class="title-row">
-      <h1 class="screen-title">Reportes</h1>
+      <h1 class="screen-title">{{ t('reports.title') }}</h1>
       <app-help-button topic="reportes"></app-help-button>
     </div>
-    <p class="subtitle">Hasta {{ monthState.label() }}</p>
+    <p class="subtitle">{{ t('reports.until', { month: monthState.label() }) }}</p>
     <button type="button" class="btn-secondary export" [disabled]="exporting()" (click)="exportPdf()">
-      {{ exporting() ? 'Creando PDF…' : 'Exportar ' + monthState.label() + ' a PDF' }}
+      {{ exporting() ? t('reports.creating') : t('reports.export', { month: monthState.label() }) }}
     </button>
     @if (exportError(); as message) {
       <p class="error" role="alert">{{ message }}</p>
@@ -20,43 +20,43 @@
     }
   </header>
 
-  <app-pill-toggle class="range" label="Periodo" [options]="rangeOptions" [(value)]="range"></app-pill-toggle>
+  <app-pill-toggle class="range" [label]="t('reports.period')" [options]="rangeOptions()" [(value)]="range"></app-pill-toggle>
 
   <app-loading [show]="!report() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="note">No se pudieron preparar los reportes. Vuelve a abrir esta pantalla.</p>
+    <p class="note">{{ t('reports.failed') }}</p>
   } @else if (report(); as r) {
     @if (r.projection; as p) {
       <section class="card stat" aria-labelledby="proyeccion-title">
-        <h2 id="proyeccion-title" class="stat-label">Si se cobran y pagan los fijos pendientes, terminas el mes con</h2>
+        <h2 id="proyeccion-title" class="stat-label">{{ t('reports.projection') }}</h2>
         <p class="stat-value" [class.negative]="p.projected < 0">{{ money(p.projected) }}</p>
         <p class="stat-note">
-          Hoy {{ money(p.current) }}
+          {{ t('reports.today', { amount: money(p.current) }) }}
           @if (p.pendingIncome) {
-            · por cobrar {{ money(p.pendingIncome) }}
+            {{ t('reports.toCollect', { amount: money(p.pendingIncome) }) }}
           }
           @if (p.pendingExpenses) {
-            · por pagar {{ money(p.pendingExpenses) }}
+            {{ t('reports.toPay', { amount: money(p.pendingExpenses) }) }}
           }
         </p>
       </section>
     }
 
     @if (isEmpty()) {
-      <p class="note">Sin movimientos en estos meses. Cuando registres ingresos y gastos, aquí verás cómo cambian.</p>
+      <p class="note">{{ t('reports.empty') }}</p>
     } @else {
       <section class="card" aria-labelledby="mes-title">
-        <h2 id="mes-title" class="card-title">Ingresos y gastos por mes</h2>
+        <h2 id="mes-title" class="card-title">{{ t('reports.byMonth') }}</h2>
         <app-column-chart [labels]="labels()" [fullLabels]="fullLabels()" [series]="monthSeries()"></app-column-chart>
         <button type="button" class="link-button" [attr.aria-expanded]="showTable()" (click)="showTable.set(!showTable())">
-          {{ showTable() ? 'Ocultar tabla' : 'Ver tabla' }}
+          {{ showTable() ? t('reports.hideTable') : t('reports.showTable') }}
         </button>
         @if (showTable()) {
           <div class="table-wrap">
             <table>
-              <caption class="sr-only">Ingresos, gastos, ahorrado y balance por mes</caption>
+              <caption class="sr-only">{{ t('reports.tableCaption') }}</caption>
               <thead>
-                <tr><th scope="col">Mes</th><th scope="col">Ingresos</th><th scope="col">Gastos</th><th scope="col">Ahorrado</th><th scope="col">Balance</th></tr>
+                <tr><th scope="col">{{ t('deudas.month') }}</th><th scope="col">{{ t('inicio.income') }}</th><th scope="col">{{ t('inicio.expenses') }}</th><th scope="col">{{ t('inicio.saved') }}</th><th scope="col">{{ t('reports.balance') }}</th></tr>
               </thead>
               <tbody>
                 @for (s of r.summaries; track s.month; let i = $index) {
@@ -76,8 +76,8 @@
 
       @if (categoryRows().length) {
         <section class="card" aria-labelledby="cat-title">
-          <h2 id="cat-title" class="card-title">Gasto por categoría</h2>
-          <p class="card-sub">Toca una para ver cómo cambió mes a mes.</p>
+          <h2 id="cat-title" class="card-title">{{ t('reports.byCategory') }}</h2>
+          <p class="card-sub">{{ t('reports.tapCategory') }}</p>
           <ul class="cats">
             @for (c of categoryRows(); track c.categoryId) {
               <li>
@@ -85,7 +85,7 @@
                   type="button"
                   class="cat"
                   [attr.aria-expanded]="categoryId() === c.categoryId"
-                  [attr.aria-label]="c.name + ', ' + money(c.total) + ', ' + percent(c.share) + ' del gasto'"
+                  [attr.aria-label]="t('reports.catLabel', { name: c.name, amount: money(c.total), percent: percent(c.share) })"
                   (click)="toggleCategory(c.categoryId)"
                 >
                   <span class="cat-head">
@@ -101,11 +101,11 @@
                     [labels]="labels()"
                     [fullLabels]="fullLabels()"
                     [values]="c.byMonth"
-                    [name]="'Gasto en ' + c.name"
+                    [name]="t('reports.spentIn', { name: c.name })"
                     [color]="c.color"
                   ></app-line-chart>
                   <a class="link-button see-moves" [routerLink]="'/tabs/movimientos'" [queryParams]="{ categoria: c.categoryId }">
-                    Ver sus movimientos de {{ monthState.label() }}
+                    {{ t('reports.seeMoves', { month: monthState.label() }) }}
                   </a>
                 }
               </li>
@@ -116,13 +116,13 @@
     }
 
     <section class="card" aria-labelledby="saldo-title">
-      <h2 id="saldo-title" class="card-title">Saldo en cuentas al cierre</h2>
-      <p class="card-sub">Todas tus cuentas sumadas, con las tarjetas restando.</p>
+      <h2 id="saldo-title" class="card-title">{{ t('reports.accounts') }}</h2>
+      <p class="card-sub">{{ t('reports.accountsSub') }}</p>
       <app-line-chart
         [labels]="labels()"
         [fullLabels]="fullLabels()"
         [values]="r.accountsAtClose"
-        name="Saldo en cuentas"
+        [name]="t('reports.accountsName')"
         color="var(--series-gastos)"
       ></app-line-chart>
     </section>

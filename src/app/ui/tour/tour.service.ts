@@ -1,74 +1,58 @@
-import { computed, Injectable, signal } from '@angular/core';
-import { HELP } from '../help/help.content';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { APP_CONTAINER } from '../../app.container';
+import { OnboardingGoal } from '../../application/use-cases/user-profile';
+
+export type TourStepId = 'inicio' | 'movimientos' | 'fijos' | 'dinero' | 'metas' | 'deudas' | 'resumen' | 'respaldo';
 
 export interface TourStep {
-  /** Pantalla donde está el elemento. */
+  id: TourStepId;
+  /** Pantalla donde está el elemento (con su `?ver=` si hace falta). */
   route: string;
-  /** Selectores del elemento real que se resalta; se usa el primero visible. */
+  /** Selectores del elemento real que se resalta, en orden de preferencia; se usa el primero visible. */
   target: string;
-  title: string;
-  /** Una o dos frases cortas, con el verbo al inicio. */
-  text: string;
-  /** Paso de acción: la persona toca el elemento real y el recorrido sigue solo al cerrar el formulario. */
-  action?: boolean;
 }
 
-/** Recorrido por las pantallas reales, con los textos de la ayuda (help.content.ts). Lo que se crea en él es dato real del usuario. */
-export const TOUR_STEPS: TourStep[] = [
-  {
-    route: '/tabs/inicio',
-    target: 'app-inicio .hero, app-inicio .empty',
-    title: 'Tu mes en un vistazo',
-    text: HELP.inicio.points[0],
-  },
-  {
-    route: '/tabs/inicio',
-    target: 'app-inicio app-month-switcher',
-    title: 'Cambia de mes',
-    text: HELP.inicio.points[1],
-  },
-  {
-    route: '/tabs/inicio',
-    target: 'app-tabs .add-button',
-    title: 'Anota un gasto',
-    text: HELP.inicio.points[2],
-  },
-  {
-    route: '/tabs/fijos',
-    target: 'app-fijos .empty-action, app-tabs .add-button',
-    title: 'Agrega tu primer pago fijo',
-    text: HELP.fijos.points[0],
-    action: true,
-  },
-  {
-    route: '/tabs/dinero',
-    target: 'app-dinero .hero',
-    title: 'Tu dinero',
-    text: HELP.cuentas.points[0],
-  },
-  {
-    route: '/tabs/planes',
-    target: 'app-planes .sections',
-    title: 'Metas y deudas',
-    text: HELP.metas.points[0],
-  },
-  {
-    route: '/reportes',
-    target: 'app-reportes .screen-head',
-    title: 'Reportes',
-    text: HELP.reportes.points[0],
-  },
-];
+/**
+ * Recorrido por las pantallas reales. Título, explicación y ejemplo de cada paso están en es.json (tour.steps.*);
+ * el ejemplo se dibuja en la tarjeta con datos de muestra que no se guardan.
+ */
+const STEPS: Record<TourStepId, TourStep> = {
+  inicio: { id: 'inicio', route: '/tabs/inicio', target: 'app-inicio .hero, app-inicio .empty' },
+  movimientos: { id: 'movimientos', route: '/tabs/movimientos', target: 'app-tabs .add-button' },
+  fijos: { id: 'fijos', route: '/tabs/fijos', target: 'app-fijos .summary, app-fijos .empty' },
+  dinero: { id: 'dinero', route: '/tabs/dinero', target: 'app-dinero .hero, app-cuentas-view' },
+  metas: { id: 'metas', route: '/tabs/planes?ver=metas', target: 'app-metas-view .hero, app-planes .sections' },
+  deudas: { id: 'deudas', route: '/tabs/planes?ver=deudas', target: 'app-deudas-view .totals, app-deudas-view .empty, app-planes .sections' },
+  resumen: { id: 'resumen', route: '/reportes', target: 'app-reportes .stat, app-reportes .card, app-reportes .screen-head' },
+  respaldo: { id: 'respaldo', route: '/ajustes/datos', target: 'app-datos .rows' },
+};
+
+const DEFAULT_ORDER: TourStepId[] = ['inicio', 'movimientos', 'fijos', 'dinero', 'metas', 'deudas', 'resumen', 'respaldo'];
+/** La sección del objetivo elegido va justo después de Inicio. */
+const FIRST_FOR_GOAL: Record<OnboardingGoal, TourStepId> = {
+  controlar: 'movimientos',
+  organizar: 'fijos',
+  ahorrar: 'metas',
+  deudas: 'deudas',
+};
+
+export function tourOrder(goal: OnboardingGoal | null): TourStep[] {
+  const first = goal ? FIRST_FOR_GOAL[goal] : null;
+  const order = first ? ['inicio', first, ...DEFAULT_ORDER.filter((id) => id !== 'inicio' && id !== first)] : DEFAULT_ORDER;
+  return (order as TourStepId[]).map((id) => STEPS[id]);
+}
 
 @Injectable({ providedIn: 'root' })
 export class TourService {
-  readonly steps = TOUR_STEPS;
+  private readonly container = inject(APP_CONTAINER);
+  readonly steps = signal<TourStep[]>(tourOrder(null));
   readonly active = signal(false);
   readonly index = signal(0);
-  readonly step = computed(() => this.steps[this.index()]);
-  readonly isLast = computed(() => this.index() === this.steps.length - 1);
+  readonly step = computed(() => this.steps()[this.index()]);
+  readonly isLast = computed(() => this.index() === this.steps().length - 1);
 
-  start() {
+  async start() {
+    this.steps.set(tourOrder(await this.container.profile.goal().catch(() => null)));
     this.index.set(0);
     this.active.set(true);
   }

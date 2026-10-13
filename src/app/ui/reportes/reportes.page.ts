@@ -25,6 +25,7 @@ import { MonthState } from '../month-state';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
 import { exportMonthPdf } from './month-pdf';
 import { LoadingComponent } from '../loading.component';
+import { t } from '../i18n';
 
 /** Reportes del periodo que termina en el mes visto: por mes, por categoría y saldo de cuentas. */
 @Component({
@@ -42,16 +43,15 @@ import { LoadingComponent } from '../loading.component';
   ],
 })
 export class ReportesPage {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly location = inject(Location);
   protected readonly monthState = inject(MonthState);
 
   protected readonly range = signal('6');
-  protected readonly rangeOptions: PillOption[] = [
-    { value: '3', label: '3 meses' },
-    { value: '6', label: '6 meses' },
-    { value: '12', label: '12 meses' },
-  ];
+  protected readonly rangeOptions = computed<PillOption[]>(() =>
+    ['3', '6', '12'].map((value) => ({ value, label: t('reports.months', { count: value }) })),
+  );
   protected readonly report = signal<Report | null>(null);
   protected readonly failed = signal(false);
   protected readonly showTable = signal(false);
@@ -81,12 +81,12 @@ export class ReportesPage {
     const s = this.report()?.summaries ?? [];
     return [
       {
-        name: 'Ingresos',
+        name: t('inicio.income'),
         color: 'var(--series-ingresos)',
         values: s.map((m) => m.income),
       },
       {
-        name: 'Gastos',
+        name: t('inicio.expenses'),
         color: 'var(--series-gastos)',
         values: s.map((m) => m.expenses),
       },
@@ -136,10 +136,10 @@ export class ReportesPage {
     this.exportDone.set('');
     try {
       const where = await exportMonthPdf(this.container, this.monthState.month());
-      if (where) this.exportDone.set(`PDF guardado en ${where}.`);
+      if (where) this.exportDone.set(t('reports.pdfSaved', { where }));
     } catch (error) {
       console.error(error);
-      this.exportError.set('No se pudo crear el PDF. Inténtalo de nuevo.');
+      this.exportError.set(t('reports.pdfFailed'));
     } finally {
       this.exporting.set(false);
     }

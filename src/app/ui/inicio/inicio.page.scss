@@ -23,7 +23,7 @@
   border: 1px solid rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 24px 64px -16px rgba(106, 61, 240, 0.6);
+  box-shadow: 0 24px 64px -16px rgba(var(--violet-600-rgb), 0.6);
   color: #fff;
 }
 
@@ -116,7 +116,7 @@
   min-height: 48px;
   display: inline-flex;
   align-items: center;
-  color: #c9b8ff;
+  color: var(--violet-200);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
@@ -165,8 +165,8 @@ li + li .row {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(143, 107, 255, 0.2);
-  color: #c9b8ff;
+  background: rgba(var(--violet-400-rgb), 0.2);
+  color: var(--violet-200);
   font-weight: 600;
 
   &.income {
@@ -217,7 +217,7 @@ li + li .row {
     content: '';
     position: absolute;
     inset: -60px -20px;
-    background: radial-gradient(ellipse at 50% 38%, rgba(143, 107, 255, 0.5), transparent 68%);
+    background: radial-gradient(ellipse at 50% 38%, rgba(var(--violet-400-rgb), 0.5), transparent 68%);
     pointer-events: none;
   }
 
@@ -306,4 +306,26 @@ li + li .row {
 
 app-pending-banner.pending {
   margin: 0 20px 12px;
+}
+
+/* Objetivo de las preguntas iniciales: lo primero que se ve bajo el saludo. */
+.goal-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  margin-top: -4px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--violet-400-rgb), 0.18);
+  color: var(--violet-200);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-400);
+    outline-offset: 2px;
+  }
 }

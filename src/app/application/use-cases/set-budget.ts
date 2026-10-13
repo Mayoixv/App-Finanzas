@@ -30,24 +30,24 @@ export class SetBudget {
   ) {}
 
   async execute(input: SetBudgetInput): Promise<Budget> {
-    if (!isValidCents(input.limit)) throw new ValidationError('El límite debe ser mayor que cero');
+    if (!isValidCents(input.limit)) throw new ValidationError('budgetLimit');
     const categoryIds = [...new Set(input.categoryIds ?? (input.categoryId ? [input.categoryId] : []))];
-    if (categoryIds.length === 0) throw new ValidationError('Elige al menos una categoría');
+    if (categoryIds.length === 0) throw new ValidationError('budgetCategories');
     for (const id of categoryIds) {
       const category = await this.categories.get(id);
-      if (!category) throw new NotFoundError('Categoría');
-      if (!isExpenseType(category.type)) throw new ValidationError('Solo se presupuestan categorías de gasto');
+      if (!category) throw new NotFoundError('category');
+      if (!isExpenseType(category.type)) throw new ValidationError('budgetExpenseOnly');
     }
 
     const month = await this.budgets.listByMonth(input.month);
     const existing = input.id ? month.find((b) => b.id === input.id) : month.find((b) => b.categoryId === categoryIds[0]);
-    if (input.id && !existing) throw new NotFoundError('Presupuesto');
+    if (input.id && !existing) throw new NotFoundError('budget');
     const others = month.filter((b) => b.id !== existing?.id);
     const used = new Map(others.flatMap((b) => budgetCategoryIds(b).map((id) => [id, b] as const)));
     for (const id of categoryIds) {
       if (used.has(id)) {
         const name = (await this.categories.get(id))?.name ?? 'Una categoría';
-        throw new ValidationError(`${name} ya está en otro presupuesto de este mes`);
+        throw new ValidationError('budgetTaken', { name });
       }
     }
 

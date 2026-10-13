@@ -2,8 +2,9 @@ import { Component, inject, Injectable, input } from '@angular/core';
 import { IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { helpCircleOutline } from 'ionicons/icons';
-import { HELP, HelpTopic } from './help.content';
+import { helpEntry, HelpTopic } from './help.content';
 import { HelpSheetComponent } from './help-sheet.component';
+import { t } from '../i18n';
 
 /** Abre la ayuda de una pantalla. Lo usan el botón "?" y Ajustes › Ayuda. */
 @Injectable({ providedIn: 'root' })
@@ -29,7 +30,7 @@ export class HelpService {
 @Component({
   selector: 'app-help-button',
   template: `
-    <button type="button" class="help" [attr.aria-label]="'Ayuda sobre ' + title()" (click)="help.open(topic())">
+    <button type="button" class="help" [attr.aria-label]="t('ajustes.helpAbout', { topic: title() })" (click)="help.open(topic())">
       <ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon>
     </button>
   `,
@@ -58,10 +59,11 @@ export class HelpService {
   imports: [IonIcon],
 })
 export class HelpButtonComponent {
+  protected readonly t = t;
   protected readonly help = inject(HelpService);
   readonly topic = input.required<HelpTopic>();
   protected title() {
-    return HELP[this.topic()].title;
+    return helpEntry(this.topic()).title;
   }
 
   constructor() {

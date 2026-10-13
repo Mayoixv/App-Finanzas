@@ -1,3 +1,5 @@
+import { locale } from '../i18n';
+
 /** Tope "redondo" del eje para que las marcas caigan en números limpios (0, 25k, 50k…). */
 export function niceMax(max: number, ticks = 4): number {
   if (max <= 0) return ticks;
@@ -19,10 +21,9 @@ export function compactMoney(cents: number): string {
 
 const trim = (n: number) => (n >= 10 ? String(Math.round(n)) : String(Math.round(n * 10) / 10));
 
-const SHORT_MONTH = new Intl.DateTimeFormat('es-DO', { month: 'short' });
 
 /** "2026-10" → "oct". */
 export function shortMonth(month: string): string {
   const [y, m] = month.split('-').map(Number);
-  return SHORT_MONTH.format(new Date(y, m - 1, 1)).replace('.', '');
+  return new Intl.DateTimeFormat(locale(), { month: 'short' }).format(new Date(y, m - 1, 1)).replace('.', '');
 }

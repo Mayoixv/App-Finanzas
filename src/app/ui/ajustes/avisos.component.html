@@ -1,5 +1,5 @@
 <section class="block" aria-labelledby="avisos-title">
-  <h2 id="avisos-title" class="section-title">Avisos</h2>
+  <h2 id="avisos-title" class="section-title">{{ t('avisos.title') }}</h2>
   <div class="rows">
     <div class="row">
       <ion-toggle
@@ -9,7 +9,7 @@
         [checked]="notifications.enabled()"
         (ionChange)="toggle($event.detail.checked)"
       >
-        Notificaciones
+        {{ t('avisos.notifications') }}
       </ion-toggle>
     </div>
 
@@ -17,53 +17,53 @@
       @let p = notifications.prefs();
       <div class="row">
         <ion-toggle justify="space-between" [checked]="p.fijos" (ionChange)="set('fijos', $event.detail.checked)">
-          <span class="label">Gastos fijos por vencer</span>
-          <span class="sub">El día antes y el día que vencen</span>
+          <span class="label">{{ t('avisos.fixed') }}</span>
+          <span class="sub">{{ t('avisos.fixedSub') }}</span>
         </ion-toggle>
       </div>
       @if (p.fijos) {
         <div class="row">
-          <app-select-field label="Hora" [inline]="true" [options]="hourOptions" [value]="p.hour" (valueChange)="set('hour', $event!)"></app-select-field>
+          <app-select-field [label]="t('avisos.hour')" [inline]="true" [options]="hourOptions" [value]="p.hour" (valueChange)="set('hour', $event!)"></app-select-field>
         </div>
       }
       <div class="row">
         <ion-toggle justify="space-between" [checked]="p.budgets" (ionChange)="set('budgets', $event.detail.checked)">
-          <span class="label">Presupuestos</span>
-          <span class="sub">Al llegar al 85% y al pasarse, una vez al mes</span>
+          <span class="label">{{ t('avisos.budgets') }}</span>
+          <span class="sub">{{ t('avisos.budgetsSub') }}</span>
         </ion-toggle>
       </div>
       <div class="row">
         <ion-toggle justify="space-between" [checked]="p.daily" (ionChange)="set('daily', $event.detail.checked)">
-          <span class="label">Recordatorio diario</span>
-          <span class="sub">"¿Registraste tus gastos de hoy?" Si ya anotaste algo hoy, no suena</span>
+          <span class="label">{{ t('avisos.daily') }}</span>
+          <span class="sub">{{ t('avisos.dailySub') }}</span>
         </ion-toggle>
       </div>
       @if (p.daily) {
         <div class="row">
-          <app-select-field label="Hora" [inline]="true" [options]="hourOptions" [value]="p.dailyHour" (valueChange)="set('dailyHour', $event!)"></app-select-field>
+          <app-select-field [label]="t('avisos.hour')" [inline]="true" [options]="hourOptions" [value]="p.dailyHour" (valueChange)="set('dailyHour', $event!)"></app-select-field>
         </div>
       }
       <div class="row">
         <ion-toggle justify="space-between" [checked]="p.quiet" (ionChange)="set('quiet', $event.detail.checked)">
-          <span class="label">Horas de silencio</span>
-          <span class="sub">Lo que caiga en ese rango suena al terminar</span>
+          <span class="label">{{ t('avisos.quiet') }}</span>
+          <span class="sub">{{ t('avisos.quietSub') }}</span>
         </ion-toggle>
       </div>
       @if (p.quiet) {
         <div class="row">
-          <app-select-field label="Desde" [inline]="true" [options]="allHourOptions" [value]="p.quietStart" (valueChange)="set('quietStart', $event!)"></app-select-field>
+          <app-select-field [label]="t('avisos.from')" [inline]="true" [options]="allHourOptions" [value]="p.quietStart" (valueChange)="set('quietStart', $event!)"></app-select-field>
         </div>
         <div class="row">
-          <app-select-field label="Hasta" [inline]="true" [options]="allHourOptions" [value]="p.quietEnd" (valueChange)="set('quietEnd', $event!)"></app-select-field>
+          <app-select-field [label]="t('avisos.to')" [inline]="true" [options]="allHourOptions" [value]="p.quietEnd" (valueChange)="set('quietEnd', $event!)"></app-select-field>
         </div>
       }
     }
   </div>
 
   @if (!notifications.available) {
-    <p class="note">Disponible en la app del teléfono.</p>
+    <p class="note">{{ t('common.phoneOnly') }}.</p>
   } @else if (!notifications.enabled()) {
-    <p class="note">Te avisa de gastos fijos por vencer y presupuestos al límite, aunque no abras la app.</p>
+    <p class="note">{{ t('avisos.offNote') }}</p>
   }
   @if (error(); as message) {
     <p class="error" role="alert">{{ message }}</p>

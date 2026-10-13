@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { APP_CONTAINER } from '../../app.container';
 import { PinCheck } from '../../application/use-cases/pin-lock';
+import { t } from '../i18n';
 
 const BIOMETRIC_KEY = 'biometric_unlock';
 
@@ -63,10 +64,10 @@ export class LockState {
     this.authenticating = true;
     try {
       await BiometricAuth.authenticate({
-        reason: 'Desbloquear Kuarto',
-        androidTitle: 'Desbloquear Kuarto',
-        androidSubtitle: 'Usa tu huella o tu rostro',
-        cancelTitle: 'Usar PIN',
+        reason: t('lock.unlock'),
+        androidTitle: t('lock.unlock'),
+        androidSubtitle: t('lock.useBiometric'),
+        cancelTitle: t('lock.usePin'),
         allowDeviceCredential: false,
         androidConfirmationRequired: false,
       });
@@ -85,10 +86,10 @@ export class LockState {
       this.authenticating = true;
       try {
         await BiometricAuth.authenticate({
-          reason: 'Confirmar tu huella',
-          androidTitle: 'Usar huella o rostro',
-          androidSubtitle: 'Confírmalo para activarlo en Kuarto',
-          cancelTitle: 'Cancelar',
+          reason: t('lock.confirm'),
+          androidTitle: t('lock.biometric'),
+          androidSubtitle: t('lock.confirmSub'),
+          cancelTitle: t('common.cancel'),
           androidConfirmationRequired: false,
         });
       } catch {

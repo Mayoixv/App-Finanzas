@@ -2,6 +2,7 @@ import { isValidCents } from '../../domain/money';
 import { MonthKey } from '../../domain/month';
 import { FREQUENCIES, Frequency, RecurringExpense } from '../../domain/recurring-expense';
 import { NotFoundError, ValidationError } from '../errors';
+import { spanish, TextParams } from '../text';
 import {
   ICategoryRepository,
   IdGenerator,
@@ -23,15 +24,15 @@ export async function validateRecurringInput(
   categories: ICategoryRepository,
 ): Promise<string> {
   const name = input.name.trim();
-  if (!name) throw new ValidationError('Escribe un nombre para el gasto fijo');
-  if (!isValidCents(input.amount)) throw new ValidationError('El monto debe ser mayor que cero');
+  if (!name) throw new ValidationError('fixedName');
+  if (!isValidCents(input.amount)) throw new ValidationError('amountPositive');
   if (!Number.isInteger(input.dueDay) || input.dueDay < 1 || input.dueDay > 31) {
-    throw new ValidationError('El día de vencimiento debe estar entre 1 y 31');
+    throw new ValidationError('dueDay');
   }
   const category = await categories.get(input.categoryId);
-  if (!category) throw new NotFoundError('Categoría');
+  if (!category) throw new NotFoundError('category');
   if (input.frequency !== undefined && !FREQUENCIES.includes(input.frequency)) {
-    throw new ValidationError('Frecuencia inválida');
+    throw new ValidationError('frequency');
   }
   return name;
 }
@@ -67,9 +68,12 @@ export class AddRecurringExpense {
   }
 }
 
-/** Nombre de cada cobro cuando un ingreso se cobra varias veces al mes: "Sueldo · día 15", "Sueldo · fin de mes". */
-export function paymentName(base: string, dueDay: number): string {
-  return `${base.trim()} · ${dueDay === 31 ? 'fin de mes' : `día ${dueDay}`}`;
+/**
+ * Nombre de cada cobro cuando un ingreso se cobra varias veces al mes: "Sueldo · día 15", "Sueldo · fin de mes".
+ * `text` da los textos en el idioma de la interfaz; por defecto, español.
+ */
+export function paymentName(base: string, dueDay: number, text: (key: string, params?: TextParams) => string = spanish): string {
+  return `${base.trim()} · ${dueDay === 31 ? text('fijo.endOfMonth') : text('fijo.dayN', { n: dueDay })}`;
 }
 
 /**
@@ -84,9 +88,9 @@ export class AddRecurringExpenses {
   ) {}
 
   async execute(inputs: AddRecurringExpenseInput[]): Promise<RecurringExpense[]> {
-    if (inputs.length === 0) throw new ValidationError('Agrega al menos un cobro');
+    if (inputs.length === 0) throw new ValidationError('oneIncome');
     const days = inputs.map((i) => i.dueDay);
-    if (new Set(days).size !== days.length) throw new ValidationError('Hay dos cobros el mismo día');
+    if (new Set(days).size !== days.length) throw new ValidationError('sameDayIncome');
     for (const input of inputs) await validateRecurringInput(input, this.categories);
     const add = new AddRecurringExpense(this.recurring, this.categories, this.ids);
     const saved: RecurringExpense[] = [];

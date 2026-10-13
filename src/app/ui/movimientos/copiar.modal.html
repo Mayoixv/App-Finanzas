@@ -1,0 +1,80 @@
+<ion-content class="surface-light">
+  <div class="sheet">
+    <header class="sheet-head">
+      <h1 class="screen-title">{{ t('copy.title') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
+        <ion-icon name="close" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    <div class="field">
+      <app-select-field [label]="t('copy.from')" [options]="monthOptions()" [value]="from()" (valueChange)="load($event!)"></app-select-field>
+    </div>
+    <p class="hint">{{ t('copy.hint', { month: toLabel() }) }}</p>
+
+    @if (rows(); as list) {
+      @if (copyable().length === 0) {
+        <p class="hint">{{ t('copy.empty') }}</p>
+      } @else {
+        <ul class="rows" role="group" [attr.aria-label]="t('copy.listLabel')">
+          @for (r of copyable(); track r.candidate.transaction.id) {
+            <li class="row" [class.off]="!r.picked">
+              <button
+                type="button"
+                class="check"
+                role="checkbox"
+                [attr.aria-checked]="r.picked"
+                [attr.aria-label]="r.title + ', ' + r.sub"
+                (click)="toggle(r)"
+              >
+                @if (r.picked) {
+                  <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                }
+              </button>
+              <span class="row-text" (click)="toggle(r)" aria-hidden="true">
+                <span class="row-title">{{ r.title }}</span>
+                <span class="row-sub">
+                  {{ r.sub }}@if (r.candidate.income) { · {{ t('common.income') }}}
+                </span>
+              </span>
+              <label class="amount" [class.income]="r.candidate.income">
+                <span class="sr-only">{{ t('copy.amountOf', { name: r.title }) }}</span>
+                <input
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  [disabled]="!r.picked"
+                  [value]="r.amount"
+                  (input)="setAmount(r, $any($event.target).value)"
+                />
+              </label>
+            </li>
+          }
+        </ul>
+      }
+      @if (fixedCount() > 0) {
+        <p class="hint">{{ tn('copy.fixedNote', fixedCount()) }}</p>
+      }
+    }
+
+    @if (needsAccount()) {
+      <div class="field">
+        <app-select-field
+          [label]="t('copy.account')"
+          [options]="accountOptions()"
+          [value]="accountId()"
+          (valueChange)="accountId.set($event!)"
+        ></app-select-field>
+      </div>
+      <p class="hint">{{ t('copy.accountHint') }}</p>
+    }
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    <button type="button" class="btn-primary save" [disabled]="!picked().length || !valid() || saving()" (click)="save()">
+      {{ saveLabel() }}
+    </button>
+  </div>
+</ion-content>

@@ -1,15 +1,15 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar movimiento' : isCopy() ? 'Duplicar movimiento' : 'Nuevo movimiento' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ isEdit() ? t('tx.edit') : isCopy() ? t('tx.duplicate') : t('tx.new') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
-    <div class="kind" role="radiogroup" aria-label="Tipo de movimiento">
-      <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">Gasto</button>
-      <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">Ingreso</button>
+    <div class="kind" role="radiogroup" [attr.aria-label]="t('tx.kind')">
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">{{ t('common.expense') }}</button>
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">{{ t('common.income') }}</button>
     </div>
 
     @if (!splitOn()) {
@@ -25,7 +25,7 @@
 
     <div class="field">
       <ion-input
-        label="Monto ({{ currency() }})"
+        [label]="t('common.amount', { currency: currency() })"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -39,7 +39,7 @@
     @if (accounts().length > 1) {
       <div class="field">
         <app-select-field
-          [label]="kind() === 'ingreso' ? 'Entra a' : 'Sale de'"
+          [label]="kind() === 'ingreso' ? t('transfer.to') : t('transfer.from')"
           [options]="accountOptions()"
           [value]="accountId()"
           (valueChange)="accountId.set($event!)"
@@ -48,17 +48,17 @@
     }
 
     <button type="button" class="link-button" [attr.aria-pressed]="splitOn()" (click)="toggleSplit()">
-      {{ splitOn() ? 'No dividir' : 'Dividir en varias categorías' }}
+      {{ splitOn() ? t('tx.noSplit') : t('tx.split') }}
     </button>
 
     @if (splitOn()) {
       <fieldset class="parts">
-        <legend class="sr-only">Partes del movimiento</legend>
+        <legend class="sr-only">{{ t('tx.parts') }}</legend>
         @for (part of parts(); track $index; let i = $index) {
           <div class="part">
             <div class="field part-category">
               <app-category-field
-                [label]="'Parte ' + (i + 1)"
+                [label]="t('tx.part', { n: i + 1 })"
                 [categories]="options()"
                 [newType]="kind() === 'ingreso' ? 'ingreso' : 'variable'"
                 [value]="part.categoryId"
@@ -68,7 +68,7 @@
             </div>
             <div class="field part-amount">
               <ion-input
-                label="Monto"
+                [label]="t('tx.amount')"
                 label-placement="floating"
                 type="number"
                 inputmode="decimal"
@@ -79,7 +79,7 @@
               ></ion-input>
             </div>
             @if (parts().length > 2) {
-              <button type="button" class="icon-button" [attr.aria-label]="'Quitar parte ' + (i + 1)" (click)="removePart(i)">
+              <button type="button" class="icon-button" [attr.aria-label]="t('tx.removePart', { n: i + 1 })" (click)="removePart(i)">
                 <ion-icon name="close" aria-hidden="true"></ion-icon>
               </button>
             }
@@ -87,15 +87,15 @@
         }
         <div class="parts-foot">
           <button type="button" class="link-button" (click)="addPart()">
-            <ion-icon name="add-outline" aria-hidden="true"></ion-icon> Agregar parte
+            <ion-icon name="add-outline" aria-hidden="true"></ion-icon> {{ t('tx.addPart') }}
           </button>
           <p class="remaining" [class.off]="remaining() !== 0" aria-live="polite">
             @if (remaining() > 0) {
-              Falta asignar {{ money(remaining()) }}
+              {{ t('tx.remaining', { amount: money(remaining()) }) }}
             } @else if (remaining() < 0) {
-              Te pasaste por {{ money(abs(remaining())) }}
+              {{ t('tx.over', { amount: money(abs(remaining())) }) }}
             } @else {
-              Las partes suman el total
+              {{ t('tx.balanced') }}
             }
           </p>
         </div>
@@ -103,12 +103,12 @@
     }
 
     <div class="field">
-      <app-date-field label="Fecha" [(value)]="date"></app-date-field>
+      <app-date-field [label]="t('common.date')" [(value)]="date"></app-date-field>
     </div>
 
     <div class="field">
       <ion-input
-        label="Nota (opcional)"
+        [label]="t('common.noteOptional')"
         label-placement="floating"
         [value]="note()"
         (ionInput)="note.set(($event.detail.value ?? '').toString())"
@@ -117,9 +117,9 @@
 
     <div class="field">
       <ion-input
-        label="Etiquetas (opcional, separadas por coma)"
+        [label]="t('tx.tags')"
         label-placement="floating"
-        placeholder="viaje, trabajo"
+        [placeholder]="t('tx.tagsPlaceholder')"
         [value]="tags()"
         (ionInput)="tags.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -128,10 +128,10 @@
     <div class="photos">
       @for (p of photos(); track p.id; let i = $index) {
         <div class="photo">
-          <button type="button" class="photo-open" [attr.aria-label]="'Ver foto ' + (i + 1)" (click)="viewing.set(p.data)">
+          <button type="button" class="photo-open" [attr.aria-label]="t('tx.viewPhoto', { n: i + 1 })" (click)="viewing.set(p.data)">
             <img [src]="p.data" alt="" />
           </button>
-          <button type="button" class="photo-remove" [attr.aria-label]="'Quitar foto ' + (i + 1)" (click)="removePhoto(p)">
+          <button type="button" class="photo-remove" [attr.aria-label]="t('tx.removePhoto', { n: i + 1 })" (click)="removePhoto(p)">
             <ion-icon name="close" aria-hidden="true"></ion-icon>
           </button>
         </div>
@@ -139,7 +139,7 @@
       @if (photos().length < maxPhotos) {
         <button type="button" class="photo-add" (click)="addPhoto()">
           <ion-icon name="camera-outline" aria-hidden="true"></ion-icon>
-          Foto del recibo
+          {{ t('tx.photo') }}
         </button>
       }
     </div>
@@ -154,15 +154,15 @@
 
     @if (isEdit()) {
       <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">
-        Eliminar movimiento
+        {{ t('tx.delete') }}
       </button>
     }
   </div>
 
   @if (viewing(); as src) {
-    <div class="viewer" role="dialog" aria-modal="true" aria-label="Foto del recibo">
-      <img [src]="src" alt="Foto del recibo" />
-      <button type="button" class="btn-primary viewer-close" (click)="viewing.set(null)">Cerrar</button>
+    <div class="viewer" role="dialog" aria-modal="true" [attr.aria-label]="t('tx.photo')">
+      <img [src]="src" [alt]="t('tx.photo')" />
+      <button type="button" class="btn-primary viewer-close" (click)="viewing.set(null)">{{ t('common.close') }}</button>
     </div>
   }
 

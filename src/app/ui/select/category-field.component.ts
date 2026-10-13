@@ -4,6 +4,7 @@ import { Category, CategoryType } from '../../domain/category';
 import { CategoriaModalComponent } from '../ajustes/categoria.modal';
 import { lookOf } from '../category-look';
 import { SelectFieldComponent, SelectOption } from './select-field.component';
+import { t } from '../i18n';
 
 /**
  * Elegir categoría, con ícono y color, y crear una nueva desde la misma hoja.
@@ -15,8 +16,8 @@ import { SelectFieldComponent, SelectOption } from './select-field.component';
     <app-select-field
       [label]="label()"
       [placeholder]="placeholder()"
-      title="Elige una categoría"
-      action="Nueva categoría"
+      [title]="t('fields.chooseCategory')"
+      [action]="t('fields.newCategory')"
       [options]="options()"
       [disabled]="disabled()"
       [(value)]="value"
@@ -26,13 +27,14 @@ import { SelectFieldComponent, SelectOption } from './select-field.component';
   imports: [SelectFieldComponent],
 })
 export class CategoryFieldComponent {
+  protected readonly t = t;
   private readonly modals = inject(ModalController);
 
   readonly categories = input.required<Category[]>();
   /** Tipo de las categorías que se crean desde aquí. */
   readonly newType = input.required<CategoryType>();
-  readonly label = input('Categoría');
-  readonly placeholder = input('Elige una categoría');
+  readonly label = input(t('fields.category'));
+  readonly placeholder = input(t('fields.chooseCategory'));
   readonly disabled = input(false);
   readonly value = model<string | null>(null);
   /** Se creó una categoría: el padre la agrega a su lista (ya queda elegida). */

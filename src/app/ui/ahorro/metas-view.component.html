@@ -3,48 +3,48 @@
 
   <app-loading [show]="!view() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="notice">No se pudieron leer tus metas. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+    <p class="notice">{{ t('metas.failed') }}</p>
   } @else if (view(); as v) {
     <section class="hero" aria-labelledby="ahorro-label">
-      <p id="ahorro-label" class="hero-label">Ahorrado en {{ monthState.label() }}</p>
+      <p id="ahorro-label" class="hero-label">{{ t('metas.savedIn', { month: monthState.label() }) }}</p>
       <p class="hero-amount">{{ money(v.summary.saved) }}</p>
       <p class="hero-note">
         @if (v.summary.income > 0) {
-          {{ percent(v.summary.savingsPercent) }} del ingreso · {{ ratingText[v.summary.rating] }}
+          {{ t('metas.ofIncome', { percent: percent(v.summary.savingsPercent), rating: t('inicio.rating.' + v.summary.rating) }) }}
         } @else {
-          Sin ingresos este mes, no hay porcentaje de ahorro.
+          {{ t('inicio.noIncome') }}
         }
       </p>
     </section>
 
     @if (v.goals.length === 0) {
       <section class="empty">
-        <p class="empty-title">Aún no tienes metas de ahorro.</p>
-        <p class="empty-text">Toca el botón + para crear la primera, por ejemplo un fondo de emergencia.</p>
+        <p class="empty-title">{{ t('metas.emptyTitle') }}</p>
+        <p class="empty-text">{{ t('metas.emptyText') }}</p>
       </section>
     } @else {
-      <app-pill-toggle class="views" label="Ver ahorro" [options]="viewOptions" [(value)]="view1or2"></app-pill-toggle>
+      <app-pill-toggle class="views" [label]="t('metas.viewLabel')" [options]="viewOptions()" [(value)]="view1or2"></app-pill-toggle>
 
       <app-page-slide [page]="page()">
         <div page1>
-          <h2 class="sr-only">Metas, ahorro acumulado</h2>
+          <h2 class="sr-only">{{ t('metas.goalsTitle') }}</h2>
           <ul [class.t-still]="!monthState.animateLists()" class="goals">
             @for (g of v.goals; track g.goal.id) {
               <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="goal">
                 <div class="goal-head">
                   <span class="goal-name">{{ g.goal.name }}</span>
-                  <button type="button" class="edit" [attr.aria-label]="'Editar ' + g.goal.name" (click)="form.openGoal(g.goal)">
+                  <button type="button" class="edit" [attr.aria-label]="t('common.edit', { name: g.goal.name })" (click)="form.openGoal(g.goal)">
                     <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
                   </button>
                 </div>
                 <p class="goal-amounts">
                   <span class="goal-saved">{{ money(g.saved) }}</span>
-                  de {{ money(g.goal.targetAmount) }}
+                  {{ t('metas.of', { amount: money(g.goal.targetAmount) }) }}
                 </p>
                 <div
                   class="bar"
                   role="progressbar"
-                  [attr.aria-label]="'Progreso de ' + g.goal.name"
+                  [attr.aria-label]="t('metas.progressOf', { name: g.goal.name })"
                   aria-valuemin="0"
                   aria-valuemax="100"
                   [attr.aria-valuenow]="barWidth(g.percent)"
@@ -55,24 +55,24 @@
                   @if (g.reached) {
                     <span class="chip reached">
                       <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-                      Meta cumplida
+                      {{ t('metas.reached') }}
                     </span>
                   } @else {
                     <span class="goal-meta">
                       {{ percent(g.percent) }}
                       @if (g.savedThisMonth !== 0) {
-                        · {{ g.savedThisMonth > 0 ? '+' : '−' }}{{ money(abs(g.savedThisMonth)) }} este mes
+                        {{ t('metas.monthChange', { sign: g.savedThisMonth > 0 ? '+' : '−', amount: money(abs(g.savedThisMonth)) }) }}
                       }
                     </span>
                   }
                   <span class="goal-actions">
                     @if (g.saved > 0) {
-                      <button type="button" class="link-button" [attr.aria-label]="'Retirar de ' + g.goal.name" (click)="form.openContribution(g.goal, true)">
-                        Retirar
+                      <button type="button" class="link-button" [attr.aria-label]="t('metas.withdrawFrom', { name: g.goal.name })" (click)="form.openContribution(g.goal, true)">
+                        {{ t('metas.withdraw') }}
                       </button>
                     }
-                    <button type="button" class="btn-secondary contribute" [attr.aria-label]="'Aportar a ' + g.goal.name" (click)="form.openContribution(g.goal)">
-                      Aportar
+                    <button type="button" class="btn-secondary contribute" [attr.aria-label]="t('metas.contributeTo', { name: g.goal.name })" (click)="form.openContribution(g.goal)">
+                      {{ t('metas.contribute') }}
                     </button>
                   </span>
                 </div>
@@ -86,7 +86,7 @@
         </div>
 
         <div page2>
-          <h2 class="sr-only">Aportes de {{ monthState.label() }}</h2>
+          <h2 class="sr-only">{{ t('metas.contributionsOf', { month: monthState.label() }) }}</h2>
           @if (v.contributions.length > 0) {
             <ul [class.t-still]="!monthState.animateLists()" class="rows">
               @for (c of v.contributions; track c.contribution.id) {
@@ -94,12 +94,12 @@
                   <button
                     type="button"
                     class="row"
-                    [attr.aria-label]="'Eliminar ' + (c.contribution.withdrawal ? 'retiro de ' : 'aporte de ') + money(c.contribution.amount) + ' de ' + c.goalName"
+                    [attr.aria-label]="t(c.contribution.withdrawal ? 'metas.deleteWithdrawal' : 'metas.deleteContribution', { amount: money(c.contribution.amount), name: goalName(c) })"
                     (click)="confirmDeleteContribution(c)"
                   >
                     <span class="row-text">
-                      <span class="row-title">{{ c.goalName }}</span>
-                      <span class="row-sub">{{ day(c.contribution.date) }}{{ c.contribution.withdrawal ? ' · Retiro' : '' }}</span>
+                      <span class="row-title">{{ goalName(c) }}</span>
+                      <span class="row-sub">{{ day(c.contribution.date) }}{{ c.contribution.withdrawal ? t('metas.withdrawalTag') : '' }}</span>
                     </span>
                     <span class="row-amount" [class.negative]="c.contribution.withdrawal">{{ c.contribution.withdrawal ? '−' : '' }}{{ money(c.contribution.amount) }}</span>
                   </button>
@@ -107,7 +107,7 @@
               }
             </ul>
           } @else {
-            <p class="page-empty">Sin aportes en {{ monthState.label() }}. Toca Aportar en una meta para registrar uno.</p>
+            <p class="page-empty">{{ t('metas.noContributions', { month: monthState.label() }) }}</p>
           }
         </div>
       </app-page-slide>

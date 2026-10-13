@@ -1,0 +1,1671 @@
+{
+  "_meta": {
+    "draft": "Borrador traducido sin revisión de una persona nativa. Draft translation, not reviewed by a native speaker."
+  },
+  "errors": {
+    "notBackup": "This file isn't a backup from this app",
+    "wrongPassword": "Wrong password or damaged file",
+    "accountName": "Enter a name for the account",
+    "accountType": "Invalid account type",
+    "initialBalance": "Invalid starting balance",
+    "cashType": "Cash can't change type",
+    "cardLast4": "Enter the card's last 4 digits",
+    "cardLast4Taken": "Another account already uses those 4 digits",
+    "cardLimit": "Enter the card's limit",
+    "cutDay": "The statement day must be between 1 and 31",
+    "payDay": "The payment day must be between 1 and 31",
+    "cashArchive": "Cash can't be archived",
+    "cashDelete": "Cash can't be deleted",
+    "accountHasMovements": "This account has transactions. Archive it to hide it without losing its history.",
+    "balance": "Invalid balance",
+    "amountPositive": "The amount must be greater than zero",
+    "date": "Invalid date",
+    "sameAccounts": "Choose two different accounts",
+    "minPayment": "The minimum payment must be greater than zero",
+    "fixedName": "Enter a name for the recurring item",
+    "dueDay": "The due day must be between 1 and 31",
+    "frequency": "Invalid frequency",
+    "oneIncome": "Add at least one payment",
+    "sameDayIncome": "Two payments fall on the same day",
+    "withdrawTooMuch": "You can't withdraw more than you've saved in this goal",
+    "goalName": "Enter a name for the goal",
+    "goalAmount": "The goal must be greater than zero",
+    "goalDate": "Invalid target date",
+    "splitTwo": "Splitting needs at least two categories",
+    "splitDistinct": "Each part needs a different category",
+    "splitPositive": "Each part must be greater than zero",
+    "splitSum": "The parts must add up to the total",
+    "splitType": "All parts must be the same type (expense or income)",
+    "accountArchived": "That account is archived; choose another",
+    "backupIncomplete": "The backup is incomplete",
+    "autoBackupOff": "Automatic backup isn't on",
+    "currency": "Currency not supported",
+    "debtName": "Enter a name for the debt",
+    "debtType": "Invalid debt type",
+    "rate": "The rate must be between 0% and 200%",
+    "term": "The term must be 1 to 600 months",
+    "debtNoInstallment": "Only a debt you owe with a set term has a fixed installment to move to Recurring",
+    "debtAlreadyFixed": "This debt is already in Recurring",
+    "debtPaid": "This debt is already paid off",
+    "debtCategoryMissing": "The \"Debt payments\" category is missing; create it in Settings",
+    "paymentTooBig": "The payment is more than what's left to pay",
+    "debtPaymentCategory": "The \"Debt payments\" category is missing; create it in Settings or record the payment without a transaction",
+    "debtIncomeCategory": "The \"Other income\" category is missing; create it in Settings or record the collection without a transaction",
+    "categoryName": "Enter a name for the category",
+    "categoryTaken": "You already have a category with that name",
+    "categoryType": "Invalid category type",
+    "categoryBuiltIn": "The app's categories can't be deleted. You can hide it.",
+    "categoryMoveTo": "Choose which category to move its transactions to",
+    "categorySameType": "Choose a category of the same type",
+    "pause": "Pause for 1 to 24 months",
+    "alreadyPaid": "This bill is already paid",
+    "lockAfter": "Invalid lock time",
+    "pin": "The PIN must have 4 to 6 digits",
+    "budgetLimit": "The limit must be greater than zero",
+    "budgetCategories": "Choose at least one category",
+    "budgetExpenseOnly": "Only expense categories can have a budget",
+    "backupNewer": "This backup is from a newer version of the app. Update it to restore.",
+    "passwordLength": "The password must have at least {min} characters",
+    "wipeConfirm": "Type {word} to confirm.",
+    "budgetTaken": "{name} is already in another budget this month",
+    "nameLength": "The name can have up to {max} characters",
+    "notFound": {
+      "account": "Account not found",
+      "transfer": "Transfer not found",
+      "category": "Category not found",
+      "goal": "Savings goal not found",
+      "debt": "Debt not found",
+      "transaction": "Transaction not found",
+      "fixed": "Recurring item not found",
+      "fixedMonth": "This month's recurring item not found",
+      "budget": "Budget not found"
+    },
+    "backupKeep": "Choose how many backups to keep",
+    "copySameMonth": "Choose a month other than the destination",
+    "copyFixed": "Recurring payments aren't copied: Recurring already creates them every month"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "understood": "Got it",
+    "tryAgain": "Something went wrong. Please try again.",
+    "saveFailed": "Couldn't save. Please try again.",
+    "changeFailed": "Couldn't change it. Please try again.",
+    "failedTitle": "Couldn't do it",
+    "phoneOnly": "Available in the phone app",
+    "back": "Back to {to}",
+    "home": "Home",
+    "delete": "Delete",
+    "saveChanges": "Save changes",
+    "name": "Name",
+    "deleteFailed": "Couldn't delete. Please try again.",
+    "close": "Close",
+    "type": "Type",
+    "changesSaved": "Changes saved",
+    "example": "E.g. {value}",
+    "pay": "Pay",
+    "edit": "Edit {name}",
+    "chooseAccount": "Choose an account",
+    "amount": "Amount ({currency})",
+    "date": "Date",
+    "noteOptional": "Note (optional)",
+    "becomes": "becomes",
+    "noCategory": "No category",
+    "sections": "Sections",
+    "editAmount": "Edit {name}, {amount}",
+    "expense": "Expense",
+    "income": "Income",
+    "goBack": "Back"
+  },
+  "datos": {
+    "createBackup": "Create backup",
+    "createBackupSub": "Password-encrypted file to keep off your phone",
+    "autoBackup": "Automatic backup",
+    "autoOff": "Encrypted, daily or weekly, in your phone's Documents/Kuarto",
+    "autoError": "Couldn't save the last one; it retries when you open the app",
+    "autoLast": "Last: {date} · Documents/Kuarto",
+    "autoPending": "Pending; it runs when you open the app",
+    "cloudUpload": "Upload to the cloud now",
+    "cloudUploadSub": "Account: {email}. The automatic backup is also uploaded on its own.",
+    "cloudRestore": "Restore from the cloud",
+    "cloudRestoreSub": "For a new phone or if your data was lost",
+    "cloudSignOut": "Sign out of Google",
+    "cloudSignIn": "Cloud backup",
+    "cloudSignInSub": "Sign in with Google: your automatic backup is saved encrypted in your account",
+    "restore": "Restore backup",
+    "restoreSub": "Replaces the app's data with the file's",
+    "exportCsv": "Export transactions to Excel",
+    "exportCsvSub": "CSV file with all your transactions",
+    "wipe": "Delete all data",
+    "wipeSub": "Leaves the app as freshly installed; offers a backup first",
+    "createBackupMsg": "Choose a password to encrypt the backup. If you forget it, the backup can't be opened.",
+    "passwordMin": "Password (at least 6)",
+    "passwordRepeat": "Repeat the password",
+    "create": "Create",
+    "passwordsDiffer": "The passwords don't match.",
+    "encrypting": "Encrypting backup…",
+    "savedAt": "Backup saved to {where}. Also copy that file off your phone (Drive, email).",
+    "downloaded": "Backup downloaded.",
+    "wipeMsg": "Your transactions, recurring items, goals, budgets, debts and settings are deleted, including the PIN. This can't be undone. It's best to create a backup first.",
+    "wipeNoBackup": "Continue without backup",
+    "wipeConfirmTitle": "Confirm deletion",
+    "wipeConfirmMsg": "Type {word} to delete everything.",
+    "wipeAll": "Delete everything",
+    "wiping": "Deleting…",
+    "restorePasswordMsg": "Enter the password you used to create the backup.",
+    "password": "Password",
+    "open": "Open",
+    "opening": "Opening backup…",
+    "rangeOne": " (from {month})",
+    "rangeMany": " (from {from} to {to})",
+    "replaceTitle": "Replace your data",
+    "replaceMsg": "The backup has {count} transactions{range}. Restoring it deletes ALL the app's current data and replaces it with the backup's.",
+    "restoreBtn": "Restore",
+    "restoring": "Restoring…",
+    "preparing": "Preparing file…",
+    "exported": "Exported {count} transactions.",
+    "exportedAt": "Exported {count} transactions to {where}.",
+    "cloudSigningIn": "Signing in with Google…",
+    "cloudUploading": "Uploading encrypted backup…",
+    "cloudUploaded": "Backup uploaded to the cloud, encrypted with the automatic backup's password.",
+    "cloudSearching": "Looking for backups…",
+    "cloudEmpty": "There are no cloud backups for this account.",
+    "cloudChooseMsg": "Choose the backup. Then it asks for the automatic backup password it was created with.",
+    "cloudLatest": "{date} (latest)",
+    "downloading": "Downloading…",
+    "signingOut": "Signing out…",
+    "signedOut": "You signed out. Backups already uploaded stay in the cloud.",
+    "autoDisabled": "Automatic backup turned off. Files already saved stay in Documents/Kuarto.",
+    "autoTitle": "Automatic backup",
+    "autoMsg": "Choose the password that will encrypt the automatic backups. You'll need it to restore them; if you forget it, they can't be opened.",
+    "activate": "Turn on",
+    "autoFirst": "Creating the first backup…",
+    "autoFirstFailed": "It's on, but the first backup couldn't be saved. It retries when you open the app.",
+    "autoEnabled": "Automatic backup on. The first one is already in Documents/Kuarto.",
+    "frequency": "Frequency",
+    "daily": "Every day",
+    "weekly": "Every week",
+    "keep": "Keep",
+    "keepN": "The last {count}",
+    "lastManual": "Last: {date}. Encrypted file to keep off your phone",
+    "beforeRestoreTitle": "Before restoring",
+    "beforeRestoreMsg": "It's a good idea to back up what you have now, in case you want to come back to it.",
+    "savingCurrent": "Backing up your current data…",
+    "replaceMsgAuto": "The backup has {count} transactions{range}. Restoring it deletes ALL the app's current data and replaces it with the backup's. An automatic backup of what you have now is saved first.",
+    "currentFailed": "Couldn't back up your current data. Nothing was restored.",
+    "import": "Import from Excel",
+    "importSub": "Transactions from an .xlsx or .csv file, with a template"
+  },
+  "seguridad": {
+    "changePin": "Change PIN",
+    "biometric": "Unlock with fingerprint or face",
+    "biometricSub": "The PIN still works if the fingerprint fails",
+    "lockAfter": "Ask again after leaving",
+    "removePin": "Remove PIN",
+    "enablePin": "Turn on PIN lock",
+    "enablePinSub": "Asked when you open the app and when you come back to it",
+    "privacy": "Hide in recent apps",
+    "privacySub": "Blurs the app when switching apps and blocks screenshots",
+    "lockNow": "Immediately",
+    "lock1": "After 1 minute",
+    "lock5": "After 5 minutes",
+    "lock15": "After 15 minutes",
+    "pinMsg": "4 to 6 digits. If you forget it, there's no way to recover it: you'd have to delete the app and restore a backup.",
+    "newPin": "New PIN",
+    "repeatPin": "Repeat the PIN",
+    "pinsDiffer": "The PINs don't match.",
+    "savingPin": "Saving PIN…",
+    "pinOn": "PIN lock on.",
+    "currentPinMsg": "Enter your current PIN.",
+    "currentPin": "Current PIN",
+    "remove": "Remove",
+    "checking": "Checking…",
+    "tooMany": "Too many attempts. Wait {seconds} s.",
+    "wrongPin": "Wrong PIN.",
+    "pinOff": "PIN lock off.",
+    "lockSaved": "Lock time saved.",
+    "lockFailed": "Couldn't save the lock time.",
+    "privacyOn": "The app is hidden in recent apps and blocks screenshots.",
+    "privacyOff": "The app shows in recent apps again.",
+    "bioNotConfirmed": "The fingerprint wasn't confirmed; it stays off.",
+    "bioOn": "Fingerprint unlock on.",
+    "bioOff": "Fingerprint unlock off."
+  },
+  "ajustes": {
+    "title": "Settings",
+    "search": "Search for an option",
+    "searchPlaceholder": "Backup, PIN, currency…",
+    "sectionsLabel": "Sections",
+    "noResults": "Nothing for \"{query}\".",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeNote": "System follows your phone's light or dark mode.",
+    "currency": "Currency",
+    "currencyChange": "Currency: {label}. Change",
+    "currencyNote": "It only changes the symbol shown with amounts. Saved amounts aren't converted.",
+    "currencyDOP": "Dominican peso (RD$)",
+    "currencyUSD": "US dollar (US$)",
+    "currencyChanged": "Currency changed to {code}",
+    "currencyFailed": "Couldn't change the currency. Please try again.",
+    "accounts": "Accounts and cards",
+    "accountsSub": "Add, edit or hide accounts, cash and cards",
+    "categories": "Manage categories",
+    "categoriesSub": "Create, change or hide categories",
+    "name": "Your name",
+    "noName": "No name. Used to greet you on Home",
+    "google": "Google account",
+    "googleOff": "Not connected. Used for the cloud backup",
+    "tourAgain": "Take the tour again",
+    "helpAbout": "Help about {topic}",
+    "news": "What's new in this version",
+    "privacy": "Privacy",
+    "privacyText": [
+      "Kuarto keeps everything only on this phone. There are no accounts, servers or ads, and the app doesn't send your data to anyone. It only goes online to check for a new version and, if you sign in with Google, to upload your encrypted backup.",
+      "Your data only leaves the phone when you create a backup, export a file or turn on the cloud backup. Backups are encrypted with your password: in the cloud nobody can read them, not even Google.",
+      "The permissions it asks for are to show you reminders, unlock with your fingerprint, save backups or files on the phone and install new versions.",
+      "If you delete the app without a backup, your data is lost: nobody else has a copy."
+    ],
+    "checkUpdate": "Check for updates",
+    "version": "Kuarto {version}",
+    "nameTitle": "Your name",
+    "nameMsg": "To greet you on Home. Leave it empty to remove it.",
+    "nameSaved": "Name saved",
+    "nameFailed": "Couldn't save the name.",
+    "sections": {
+      "apariencia": {
+        "title": "Appearance",
+        "sub": "Theme, color, language and currency",
+        "options": [
+          "Light mode",
+          "Dark mode",
+          "Theme",
+          "Color",
+          "Color palette",
+          "Language",
+          "Currency"
+        ]
+      },
+      "dinero": {
+        "title": "Money",
+        "sub": "Accounts, cards, categories",
+        "options": [
+          "Accounts and cards",
+          "Manage categories"
+        ]
+      },
+      "avisos": {
+        "title": "Recurring and reminders",
+        "sub": "Bills coming due, reminders",
+        "options": [
+          "Notifications",
+          "Recurring bills coming due",
+          "Budgets",
+          "Daily reminder",
+          "Quiet hours"
+        ]
+      },
+      "datos": {
+        "title": "Data and backup",
+        "sub": "Backup, cloud, export",
+        "options": [
+          "Create backup",
+          "Automatic backup",
+          "Backup frequency",
+          "Keep backups",
+          "Cloud backup",
+          "Restore backup",
+          "Export transactions to Excel",
+          "Delete all data"
+        ]
+      },
+      "cuenta": {
+        "title": "Account",
+        "sub": "Name, Google",
+        "options": [
+          "Your name",
+          "Google account"
+        ]
+      },
+      "seguridad": {
+        "title": "Security and privacy",
+        "sub": "PIN, fingerprint, hide in recent apps",
+        "options": [
+          "PIN lock",
+          "Unlock with fingerprint or face",
+          "Hide in recent apps",
+          "Screenshots"
+        ]
+      },
+      "ayuda": {
+        "title": "Help",
+        "sub": "Tour, guides",
+        "options": [
+          "Take the tour again"
+        ]
+      },
+      "acerca": {
+        "title": "About",
+        "sub": "Version {version}",
+        "options": [
+          "What's new in this version",
+          "Privacy",
+          "Check for updates"
+        ]
+      }
+    },
+    "language": "Language",
+    "languageNote": "Dates and numbers follow the language. The currency doesn't change.",
+    "languageChanged": "Language changed"
+  },
+  "avisos": {
+    "title": "Reminders",
+    "notifications": "Notifications",
+    "fixed": "Recurring bills coming due",
+    "fixedSub": "The day before and the day they're due",
+    "hour": "Time",
+    "budgets": "Budgets",
+    "budgetsSub": "When you reach 85% and when you go over, once a month",
+    "daily": "Daily reminder",
+    "dailySub": "\"Did you log today's expenses?\" If you already logged something today, it stays quiet",
+    "quiet": "Quiet hours",
+    "quietSub": "Anything in that range rings when it ends",
+    "from": "From",
+    "to": "To",
+    "offNote": "It reminds you of recurring bills coming due and budgets at their limit, even if you don't open the app.",
+    "denied": "Android didn't allow notifications. Turn them on in Phone settings › Apps › Kuarto › Notifications.",
+    "toggleFailed": "Couldn't change the notifications. Please try again.",
+    "saveFailed": "Couldn't save the change. Please try again."
+  },
+  "categorias": {
+    "title": "Categories",
+    "note": "Tap one to change its name, icon or color, or to hide it.",
+    "failed": "Couldn't read the categories. Open Settings again.",
+    "edit": "Edit category {name}",
+    "editHidden": "Edit category {name}, hidden",
+    "hidden": "Hidden",
+    "empty": "No categories of this type.",
+    "add": "Add category",
+    "groups": {
+      "ingreso": "Income",
+      "fijo": "Recurring expenses",
+      "variable": "Variable expenses"
+    }
+  },
+  "icons": {
+    "restaurant-outline": "Food",
+    "cart-outline": "Cart",
+    "car-outline": "Car",
+    "bus-outline": "Bus",
+    "airplane-outline": "Plane",
+    "home-outline": "House",
+    "bed-outline": "Bed",
+    "flash-outline": "Lightning",
+    "water-outline": "Water",
+    "wifi-outline": "Wi-Fi",
+    "phone-portrait-outline": "Phone",
+    "tv-outline": "TV",
+    "play-circle-outline": "Play",
+    "medkit-outline": "First aid kit",
+    "fitness-outline": "Gym",
+    "school-outline": "School",
+    "shirt-outline": "Clothes",
+    "gift-outline": "Gift",
+    "paw-outline": "Pet",
+    "game-controller-outline": "Games",
+    "heart-outline": "Heart",
+    "card-outline": "Card",
+    "cash-outline": "Bills",
+    "wallet-outline": "Wallet",
+    "briefcase-outline": "Briefcase",
+    "construct-outline": "Tools",
+    "shield-checkmark-outline": "Shield",
+    "pricetag-outline": "Tag"
+  },
+  "categoryType": {
+    "ingreso": "Income",
+    "fijo": "Recurring expense",
+    "variable": "Variable expense"
+  },
+  "categoria": {
+    "edit": "Edit category",
+    "new": "New category",
+    "type": "Type",
+    "typeLabel": "Category type",
+    "namePlaceholder": "Pets, gym, tips",
+    "icon": "Icon",
+    "color": "Color",
+    "colorN": "Color {n}",
+    "hide": "Hide",
+    "hideSub": "It won't show up when choosing. Its transactions don't change.",
+    "save": "Save category",
+    "moveTitle": "It has transactions or recurring items. Which category should they move to?",
+    "moveNone": "Create another category of this type first, or hide it.",
+    "moveTo": "Move to",
+    "choose": "Choose a category",
+    "moveDelete": "Move and delete",
+    "delete": "Delete category",
+    "builtIn": "It's one of the app's categories: you can change or hide it, but not delete it.",
+    "saved": "Category saved",
+    "deleteMsg": "{name} will be deleted. If it has budgets, they're deleted too."
+  },
+  "accountType": {
+    "efectivo": "Cash",
+    "banco": "Bank",
+    "ahorro": "Savings",
+    "tarjeta": "Credit card",
+    "inversion": "Investment"
+  },
+  "cuenta": {
+    "edit": "Edit account",
+    "new": "New account",
+    "cardPlaceholder": "Visa, Mastercard",
+    "accountPlaceholder": "Savings account, payroll",
+    "owedToday": "What you owe today ({currency})",
+    "balanceToday": "Today's balance ({currency})",
+    "adjustHint": "If you change the balance, it's adjusted without creating a transaction, so it doesn't count as income or expense.",
+    "creditLimit": "Credit limit ({currency})",
+    "cutDay": "Statement day",
+    "payDay": "Payment day",
+    "last4": "Last 4 digits (optional)",
+    "last4Hint": "Shown on the card so you can recognize it.",
+    "save": "Save account",
+    "unarchive": "Use again",
+    "archive": "Archive",
+    "delete": "Delete account",
+    "saved": "Account saved",
+    "deleteMsg": "{name} will be deleted. Only possible if it has no transactions, transfers or recurring items."
+  },
+  "cuentas": {
+    "failed": "Couldn't read the accounts. Switch sections and come back.",
+    "transfer": "Transfer or pay a card",
+    "editOwes": "Edit {name}, you owe {amount}",
+    "editBalance": "Edit {name}, balance {amount}",
+    "owes": "You owe",
+    "owesAmount": "You owe {amount}",
+    "used": "Used {value}",
+    "minimum": "Minimum: {amount} · change",
+    "addMinimum": "Add minimum payment",
+    "payName": "Pay {name}",
+    "transfersOf": "Transfers in {month}",
+    "editTransfer": "Edit transfer of {amount}, {text}",
+    "noTransfers": "No transfers this month.",
+    "hideArchived": "Hide archived",
+    "showArchived": "Show archived ({count})",
+    "archived": "Archived · {detail}",
+    "account": "Account",
+    "groups": {
+      "cuentas": {
+        "title": "Accounts",
+        "add": "Add account",
+        "empty": "Add your first bank account."
+      },
+      "efectivo": {
+        "title": "Cash",
+        "add": "Add cash",
+        "empty": "No cash recorded."
+      },
+      "tarjetas": {
+        "title": "Credit cards",
+        "add": "Add card",
+        "empty": "Add one with its limit and its statement and payment days."
+      }
+    },
+    "minTitle": "Minimum payment",
+    "minMsg": "What the {name} statement from {date} says. Leave it empty to remove it.",
+    "invalidAmount": "Invalid amount.",
+    "minFailed": "Couldn't save the minimum payment.",
+    "usedOf": "Used {percent} of {limit} · statement day {cut}, payment day {due}",
+    "usedShort": "{percent} of {limit}",
+    "days": "Statement day {cut} · Payment day {due}",
+    "nothingToPay": "Nothing to pay from the {cut} statement",
+    "statementPaid": "{cut} statement paid",
+    "overdue": "Was due {due}: {amount} left from the {cut} statement",
+    "payBefore": "Pay {amount} before {due} ({cut} statement)",
+    "newCharges": " · {amount} in new purchases"
+  },
+  "transfer": {
+    "edit": "Edit transfer",
+    "payCard": "Pay card",
+    "title": "Transfer",
+    "from": "From",
+    "to": "To",
+    "swap": "Swap: take it from the other account",
+    "notePlaceholder": "Deposit, ATM withdrawal",
+    "hint": "A transfer moves money between your accounts: it doesn't count as income or as an expense for the month.",
+    "savePayment": "Save payment",
+    "save": "Save transfer",
+    "delete": "Delete transfer",
+    "paymentSaved": "Payment saved",
+    "saved": "Transfer saved",
+    "warning": "{name} would end up at {amount}. Check that \"From\" and \"To\" are right.",
+    "deleteMsg": "This transfer will be deleted and both accounts' balances will go back to how they were.",
+    "deleted": "Transfer deleted"
+  },
+  "networth": {
+    "title": "Net worth",
+    "open": "Net worth {amount}. See accounts",
+    "available": "Available {amount}",
+    "inGoals": "In goals {amount}",
+    "owedToMe": "Owed to you {amount}",
+    "owe": "You owe {amount}"
+  },
+  "tabs": {
+    "inicio": {
+      "label": "Home",
+      "name": "Home",
+      "add": "Add transaction"
+    },
+    "movimientos": {
+      "label": "Activity",
+      "name": "Transactions",
+      "add": "Add transaction"
+    },
+    "fijos": {
+      "label": "Recurring",
+      "name": "Recurring",
+      "add": "Add recurring item (expense or income)"
+    },
+    "dinero": {
+      "label": "Money",
+      "name": "Money",
+      "add": "Add account, cash or card"
+    },
+    "planes": {
+      "label": "Plans",
+      "name": "Plans: goals and debts",
+      "add": ""
+    },
+    "addGoal": "Add savings goal",
+    "addDebt": "Add debt or loan"
+  },
+  "inicio": {
+    "settings": "Settings: currency and categories",
+    "hello": "Hi, {name}",
+    "failed": "Couldn't read this month's data. Switch months and come back, or restart the app.",
+    "emptyTitle": "No transactions yet in {month}.",
+    "emptyText": "Tap the + button to add the first one and you'll see your balance and where your money goes here.",
+    "balanceOf": "{month} balance",
+    "negative": "Negative, you're spending more than you earn",
+    "income": "Income",
+    "expenses": "Expenses",
+    "saved": "Saved",
+    "saving": "Saved {percent} of income · {rating}",
+    "noIncome": "No income this month, so no savings rate.",
+    "rating": {
+      "excelente": "Excellent",
+      "regular": "Fair",
+      "bajo": "Low"
+    },
+    "whereTitle": "Where does the money go?",
+    "noExpenses": "No expenses yet in {month}.",
+    "recent": "Recent transactions",
+    "seeAll": "See all"
+  },
+  "alerts": {
+    "label": "Alerts",
+    "two": "{a} and {b}",
+    "more": "{a}, {b} and {count} more",
+    "overdue": {
+      "one": "Overdue and unpaid: {names}",
+      "other": "Overdue and unpaid: {names}"
+    },
+    "soon": {
+      "one": "Due in 3 days or less: {names}",
+      "other": "Due in 3 days or less: {names}"
+    },
+    "cardsDue": {
+      "one": "Pay the {names} card: the payment is due soon",
+      "other": "Pay the {names} cards: the payment is due soon"
+    },
+    "exceeded": "You went over in {names}",
+    "near": "Close to the limit: {names}",
+    "cardsUse": "You're using 30% or more of the limit: {names}"
+  },
+  "compare": {
+    "title": "Month by month",
+    "noPrev": "No transactions in {month} to compare.",
+    "last": "Last {count} months",
+    "empty": "No transactions",
+    "reports": "See reports and charts",
+    "same": "Same as {month}",
+    "more": "{percent}more than {month} ({amount})",
+    "less": "{percent}less than {month} ({amount})",
+    "detail": "Income {income} · Expenses {expenses} · Saved {saved}"
+  },
+  "donut": {
+    "label": "Spending by category: {summary}",
+    "spent": "spent",
+    "share": "{percent} of spending",
+    "others": "Others"
+  },
+  "movs": {
+    "done": "Done",
+    "select": "Select",
+    "failed": "Couldn't read the transactions. Switch months and come back, or restart the app.",
+    "emptyTitle": "No transactions in {month}.",
+    "emptyText": "Tap the + button to add income or an expense for this month.",
+    "filters": "Search and filter",
+    "searchLabel": "Search by note, category or tag",
+    "searchPlaceholder": "Search note, category or tag",
+    "kind": "Transaction type",
+    "kinds": {
+      "todos": "All",
+      "gasto": "Expenses",
+      "ingreso": "Income"
+    },
+    "byCategory": "Filter by category",
+    "allCategories": "All categories",
+    "byAccount": "Filter by account",
+    "allAccounts": "All accounts",
+    "summary": "{shown} of {total} · Net {net}",
+    "clear": "Clear filters",
+    "noMatch": "No transaction matches the search.",
+    "selectHint": "Tap the transactions you want to change.",
+    "selectAll": "Select all {count}",
+    "selectRow": "Select {name}, {amount}",
+    "withPhoto": "with receipt photo",
+    "moreFor": "More actions for {name}",
+    "actionsFor": "Actions for {name}",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "transfers": "Transfers",
+    "editTransfer": "Edit transfer {name}, {amount}",
+    "bulkActions": "Actions for the selected",
+    "selected": "{count} selected",
+    "category": "Category",
+    "date": "Date",
+    "deleteTitle": "Delete transaction",
+    "deleteMsg": "{name} ({amount}) will be deleted. If it paid a recurring bill, that bill will be pending again.",
+    "deleted": "{name} deleted",
+    "deleteFailed": "Couldn't delete the transaction. Please try again.",
+    "mixed": "Choose only expenses or only income to change their category.",
+    "changeCategory": "Change category",
+    "change": "Change",
+    "changeDate": "Change date",
+    "bulkDeleteTitle": "Delete transactions",
+    "bulkDeleteMsg": "{count} transactions will be deleted. Recurring bill payments will be pending again.",
+    "bulkDeleteFailed": "Couldn't delete them all. Please try again.",
+    "bulkDeleted": "{count} transactions deleted",
+    "changed": "{count} transactions changed.",
+    "skipped": " {count} weren't changed (split or of another type).",
+    "changeFailed": "Couldn't change them. Please try again.",
+    "splitName": "{name} and {count} more"
+  },
+  "tx": {
+    "edit": "Edit transaction",
+    "duplicate": "Duplicate transaction",
+    "new": "New transaction",
+    "kind": "Transaction type",
+    "noSplit": "Don't split",
+    "split": "Split across categories",
+    "parts": "Transaction parts",
+    "part": "Part {n}",
+    "amount": "Amount",
+    "removePart": "Remove part {n}",
+    "addPart": "Add part",
+    "remaining": "{amount} left to assign",
+    "over": "You went over by {amount}",
+    "balanced": "The parts add up to the total",
+    "tags": "Tags (optional, comma-separated)",
+    "tagsPlaceholder": "trip, work",
+    "viewPhoto": "View photo {n}",
+    "removePhoto": "Remove photo {n}",
+    "photo": "Receipt photo",
+    "delete": "Delete transaction",
+    "saveIncome": "Save income",
+    "saveExpense": "Save expense",
+    "incomeSaved": "Income saved",
+    "expenseSaved": "Expense saved",
+    "photoFailed": "Couldn't read the photo. Try another image.",
+    "deleteMsg": "This transaction will be deleted. If it paid a recurring bill, that bill will be pending again.",
+    "deleted": "Transaction deleted",
+    "dupTitle": "Is it a duplicate?",
+    "dupMsg": "You already recorded {amount} in {name} on {date}{note}. Save it anyway?",
+    "dupNote": " (\"{note}\")",
+    "dontSave": "Don't save",
+    "saveAnyway": "Save anyway"
+  },
+  "due": {
+    "pastExpense": {
+      "one": "Was due yesterday",
+      "other": "Was due {count} days ago"
+    },
+    "pastIncome": {
+      "one": "Should have come in yesterday",
+      "other": "Should have come in {count} days ago"
+    },
+    "todayExpense": "Due today",
+    "todayIncome": "Comes in today",
+    "tomorrowExpense": "Due tomorrow",
+    "tomorrowIncome": "Comes in tomorrow",
+    "inDaysExpense": "Due in {count} days",
+    "inDaysIncome": "Comes in in {count} days",
+    "onExpense": "Due {date}",
+    "onIncome": "Comes in {date}"
+  },
+  "status": {
+    "received": "Received",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "pending": "Pending",
+    "paidF": "Paid",
+    "overdueF": "Overdue"
+  },
+  "fijos": {
+    "failed": "Couldn't read the recurring items. Switch months and come back, or restart the app.",
+    "nothingIn": "Nothing to pay in {month}",
+    "otherMonths": "Your recurring items from other months don't apply to this month.",
+    "add": "Add recurring payment",
+    "firstTitle": "Add your first recurring payment",
+    "firstText": "Rent, electricity, internet or your salary. You add it once and it shows up every month.",
+    "noneToPay": "No bills to pay",
+    "toPayIn": "To pay in {month}",
+    "allPaid": "All paid",
+    "progress": "Recurring bills paid",
+    "paidOf": "Paid {paid} of {total} · {percent}",
+    "toReceive": "Income to receive: {amount}",
+    "subscriptions": {
+      "one": "1 subscription: {monthly} a month · {yearly} a year",
+      "other": "{count} subscriptions: {monthly} a month · {yearly} a year"
+    },
+    "edit": "Edit",
+    "markReceived": "Mark {name} as received",
+    "markPaid": "Mark {name} as paid",
+    "installments": "Debt installments",
+    "installment": "Installment {n} of {of} · {status}",
+    "registerPaymentOf": "Record payment for {name}",
+    "registerPayment": "Record payment",
+    "paused": "Paused",
+    "resumeName": "Resume {name}",
+    "resume": "Resume",
+    "markedReceived": "{name} marked as received",
+    "markedPaid": "{name} marked as paid",
+    "payFailed": "Couldn't mark {name} as paid. Please try again.",
+    "resumed": "{name} resumed",
+    "resumeFailed": "Couldn't resume. Please try again.",
+    "pausedUntil": "Paused until {month}",
+    "frequency": {
+      "3": "Quarterly",
+      "6": "Every 6 months",
+      "12": "Yearly"
+    },
+    "chargeOn": "Comes in {date}",
+    "dueOn": "Due {date}",
+    "upcoming": "Next 7 days",
+    "upcomingRow": "{name}, {detail}, {amount}. See in Recurring"
+  },
+  "fijo": {
+    "edit": "Edit recurring item",
+    "new": "New recurring item",
+    "kind": "Recurring item type",
+    "incomePlaceholder": "Salary, rent you collect",
+    "expensePlaceholder": "Rent, monthly groceries, internet",
+    "howOften": "How often do you get paid?",
+    "once": "Once",
+    "biweekly": "Twice a month",
+    "other": "Other",
+    "payment": "Payment {n}",
+    "removePayment": "Remove payment {n}",
+    "payDay": "Payday",
+    "dueDay": "Due day",
+    "addPayment": "+ Add another payment",
+    "repeats": "Repeats",
+    "chargedTo": "Paid into",
+    "paidWith": "Paid with",
+    "save": "Save recurring item",
+    "appliesFrom": "Changes apply from {month}. Earlier months and what's already paid don't change.",
+    "pause": "Pause…",
+    "createDebt": "Create a debt from this payment",
+    "delete": "Delete recurring item",
+    "saved": "Recurring item saved",
+    "freq": {
+      "1": "Every month",
+      "3": "Every 3 months",
+      "6": "Every 6 months",
+      "12": "Every year"
+    },
+    "pauseFrom": "Pause from {month}",
+    "pauseNote": "What's pending in those months is removed; what's already paid stays.",
+    "months": {
+      "one": "1 month",
+      "other": "{count} months"
+    },
+    "debtCreated": "Debt created",
+    "debtCreatedMsg": "If you gave it a term, its installments already show up in Recurring. Remove \"{name}\" from {month} so the payment isn't counted twice?",
+    "removeFrom": "Remove from {month}",
+    "keep": "Keep it",
+    "removeFailed": "Couldn't remove the recurring item. Please try again.",
+    "deleteName": "Delete {name}",
+    "deleteMsg": "Payments already recorded stay in Transactions.",
+    "onlyMonth": "Only {month}",
+    "thisAndNext": "This month and the following",
+    "endOfMonth": "end of month",
+    "dayN": "day {n}"
+  },
+  "deudas": {
+    "failed": "Couldn't read the debts. Open this screen again.",
+    "totals": "Totals",
+    "owe": "You owe",
+    "owed": "Owed to you",
+    "iOwe": "I owe",
+    "theyOwe": "Owed to me",
+    "toPay": "{balance} left to pay of {principal}",
+    "toCollect": "{balance} left to collect of {principal}",
+    "settled": "Paid off",
+    "paidOf": "Paid of {name}",
+    "interestPaid": "Interest paid: {amount}",
+    "inFixed": "The installment is in Recurring: paying it there lowers this balance.",
+    "toFixed": "Move the installment to Recurring",
+    "hideSchedule": "Hide schedule",
+    "showSchedule": "See schedule",
+    "registerPayment": "Record payment",
+    "registerCharge": "Record collection",
+    "scheduleOf": "Installment schedule for {name}",
+    "month": "Month",
+    "interest": "Interest",
+    "principal": "Principal",
+    "balance": "Balance",
+    "payments": "Payments",
+    "deletePaymentLabel": "Delete payment of {amount} on {date}",
+    "paymentSub": "Principal {principal} · interest {interest}",
+    "hideSettled": "Hide paid off",
+    "showSettled": "Show paid off ({count})",
+    "whichFirst": "Which one to pay first?",
+    "strategyNote": "Paying each debt's installment and putting an extra amount every month on just one.",
+    "extra": "Extra per month",
+    "snowball": "Snowball",
+    "snowballSub": "Smallest balance first",
+    "avalanche": "Avalanche",
+    "avalancheSub": "Highest rate first",
+    "interestTotal": "Interest: {amount}",
+    "skipped": {
+      "one": "One debt without a term isn't in the comparison because it has no fixed installment.",
+      "other": "{count} debts without a term aren't in the comparison because they have no fixed installment."
+    },
+    "emptyTitle": "You have no debts recorded.",
+    "emptyText": "Tap + to add a loan or what someone owes you and keep track of how much is left.",
+    "rate": "{rate}% a year",
+    "noInterest": "No interest",
+    "installment": "installment {amount} × {count}",
+    "endsIn": "ends in {month}",
+    "since": "since {date}",
+    "neverEnds": "It never gets paid off with those amounts",
+    "endsAt": "You finish in {month}",
+    "savings": {
+      "one": "With that extra you finish 1 month sooner and save {amount} in interest.",
+      "other": "With that extra you finish {count} months sooner and save {amount} in interest."
+    },
+    "nowFixed": "The {name} installment is now in Recurring",
+    "toFixedFailed": "Couldn't move the installment to Recurring.",
+    "deletePayment": "Delete payment",
+    "deletePaymentMsg": "The payment of {amount} on {date} to {name} will be deleted.",
+    "deletePaymentMsgTx": "The payment of {amount} on {date} to {name} will be deleted, and its transaction too.",
+    "paymentDeleted": "Payment deleted",
+    "paymentDeleteFailed": "Couldn't delete the payment. Please try again."
+  },
+  "deuda": {
+    "edit": "Edit debt",
+    "new": "New debt",
+    "kind": "Debt type",
+    "mePlaceholder": "Car loan, card",
+    "themPlaceholder": "Name of who owes you",
+    "principal": "Amount borrowed ({currency})",
+    "rate": "Annual interest rate % (optional)",
+    "term": "Term in months (optional)",
+    "date": "Loan date",
+    "save": "Save debt",
+    "delete": "Delete debt",
+    "saved": "Debt saved",
+    "installment": "Monthly installment: {amount}",
+    "deleteMsg": "{name} will be deleted with its payment history. Transactions you created with those payments stay in Transactions."
+  },
+  "pago": {
+    "collectFrom": "Collection from {name}",
+    "payTo": "Payment to {name}",
+    "asIncome": "Also record it as income in Transactions",
+    "asExpense": "Also record it as an expense in Transactions",
+    "saveCollect": "Save collection",
+    "savePayment": "Save payment",
+    "collectSaved": "Collection saved",
+    "paymentSaved": "Payment saved",
+    "preview": "Interest {interest} · principal {principal} · left {left}"
+  },
+  "metas": {
+    "failed": "Couldn't read your goals. Switch months and come back, or restart the app.",
+    "savedIn": "Saved in {month}",
+    "ofIncome": "{percent} of income · {rating}",
+    "emptyTitle": "You don't have savings goals yet.",
+    "emptyText": "Tap the + button to create the first one, for example an emergency fund.",
+    "viewLabel": "View savings",
+    "total": "Total",
+    "thisMonth": "This month",
+    "goalsTitle": "Goals, total saved",
+    "of": "of {amount}",
+    "progressOf": "Progress of {name}",
+    "reached": "Goal reached",
+    "monthChange": "· {sign}{amount} this month",
+    "withdrawFrom": "Withdraw from {name}",
+    "withdraw": "Withdraw",
+    "contributeTo": "Add to {name}",
+    "contribute": "Add money",
+    "contributionsOf": "Contributions in {month}",
+    "deleteWithdrawal": "Delete withdrawal of {amount} from {name}",
+    "deleteContribution": "Delete contribution of {amount} to {name}",
+    "withdrawalTag": " · Withdrawal",
+    "noContributions": "No contributions in {month}. Tap Add money on a goal to record one.",
+    "datePassed": "The target date ({month}) has passed",
+    "needed": "For {month}: {amount} a month",
+    "atPace": "At your pace you get there in {month}",
+    "noPace": "No recent contributions to project",
+    "deleteWithdrawalTitle": "Delete withdrawal",
+    "deleteContributionTitle": "Delete contribution",
+    "deleteWithdrawalMsg": "The withdrawal of {amount} from {name} on {date} will be deleted.",
+    "deleteContributionMsg": "The contribution of {amount} to {name} on {date} will be deleted.",
+    "withdrawalDeleted": "Withdrawal deleted",
+    "contributionDeleted": "Contribution deleted",
+    "deleteFailed": "Couldn't delete the contribution. Please try again.",
+    "deletedGoal": "Deleted goal"
+  },
+  "planes": {
+    "section": "Section",
+    "metas": "Goals",
+    "deudas": "Debts",
+    "title": "Plans"
+  },
+  "meta": {
+    "edit": "Edit goal",
+    "new": "New goal",
+    "placeholder": "Emergency fund, trip, car down payment",
+    "target": "How much you want to save ({currency})",
+    "date": "By when (optional)",
+    "removeDate": "Remove date",
+    "save": "Save goal",
+    "delete": "Delete goal",
+    "saved": "Goal saved",
+    "deleteMsg": "{name} will be deleted along with all its contributions, and they'll stop counting as saved in their months."
+  },
+  "aporte": {
+    "withdrawFrom": "Withdraw from {name}",
+    "contributeTo": "Add to {name}",
+    "returnsTo": "Goes back to",
+    "withdrawHint": "The withdrawal is taken from the goal and from the month's savings, and the money goes back to the account. It doesn't count as income.",
+    "contributeHint": "The contribution comes out of the account and counts as saved in the month of its date. It doesn't count as an expense.",
+    "saveWithdrawal": "Save withdrawal",
+    "saveContribution": "Save contribution",
+    "withdrawalSaved": "Withdrawal saved",
+    "contributionSaved": "Contribution saved"
+  },
+  "budgets": {
+    "title": "{month} budgets",
+    "failed": "Couldn't read this month's budgets.",
+    "editLabel": "Edit budget for {name}. {text}",
+    "spentOf": "{spent} of {limit}",
+    "empty": "Set a limit on an expense category and you'll see how much is left here.",
+    "copy": "Copy the ones from {month}",
+    "add": "Add budget",
+    "copied": "{count} budgets copied from {month}",
+    "copyFailed": "Couldn't copy the budgets. Please try again.",
+    "over": "You went over by {amount}",
+    "left": "{amount} left",
+    "carryIn": " · includes {amount} from last month",
+    "carryOut": " · minus {amount} from last month"
+  },
+  "budget": {
+    "edit": "Edit budget",
+    "new": "New budget",
+    "categories": "Categories",
+    "remove": "Remove {name}",
+    "allTaken": "All your expense categories already have a budget in {month}.",
+    "addAnother": "Add another category",
+    "category": "Category",
+    "shared": "They share the same limit",
+    "choose": "Choose an expense category",
+    "nameOptional": "Name (optional)",
+    "limit": "Limit for {month} ({currency})",
+    "rollover": "Carry what's left (or over) to next month",
+    "rolloverHint": "It only carries over between months that have this option on in the same budget.",
+    "save": "Save budget",
+    "delete": "Delete budget",
+    "saved": "Budget saved",
+    "deleteMsg": "The limit for {name} in {month} will be removed. Your expenses don't change."
+  },
+  "reports": {
+    "title": "Reports",
+    "until": "Up to {month}",
+    "creating": "Creating PDF…",
+    "export": "Export {month} to PDF",
+    "period": "Period",
+    "months": "{count} months",
+    "failed": "Couldn't prepare the reports. Open this screen again.",
+    "projection": "If pending recurring items come in and get paid, you end the month with",
+    "today": "Today {amount}",
+    "toCollect": "· to receive {amount}",
+    "toPay": "· to pay {amount}",
+    "empty": "No transactions in these months. When you record income and expenses, you'll see how they change here.",
+    "byMonth": "Income and expenses by month",
+    "hideTable": "Hide table",
+    "showTable": "See table",
+    "tableCaption": "Income, expenses, savings and balance by month",
+    "balance": "Balance",
+    "byCategory": "Spending by category",
+    "tapCategory": "Tap one to see how it changed month by month.",
+    "catLabel": "{name}, {amount}, {percent} of spending",
+    "spentIn": "Spending on {name}",
+    "seeMoves": "See its transactions in {month}",
+    "accounts": "Account balance at month end",
+    "accountsSub": "All your accounts added up, with cards subtracted.",
+    "accountsName": "Account balance",
+    "pdfSaved": "PDF saved to {where}.",
+    "pdfFailed": "Couldn't create the PDF. Please try again."
+  },
+  "pdf": {
+    "savingRate": "Savings rate",
+    "noIncome": "No income",
+    "noExpenses": "No expenses this month.",
+    "movements": "Transactions ({count})",
+    "date": "Date",
+    "category": "Category",
+    "note": "Note",
+    "noteAccount": "Note · account",
+    "amount": "Amount",
+    "generated": "Generated on {date} with Kuarto."
+  },
+  "charts": {
+    "byMonth": "Monthly chart",
+    "lineByMonth": "{name} by month"
+  },
+  "help": {
+    "inicio": {
+      "title": "Home",
+      "points": [
+        "See your monthly balance: what came in minus what you spent and saved.",
+        "Change months with the arrows or by tapping the month name.",
+        "Tap + to log an expense or income in seconds."
+      ]
+    },
+    "movimientos": {
+      "title": "Transactions",
+      "points": [
+        "Search by note, category or tag, and filter by type or account.",
+        "Tap a transaction to edit it; with ⋯ you duplicate or delete it.",
+        "Use Select to change or delete several at once."
+      ]
+    },
+    "fijos": {
+      "title": "Recurring",
+      "points": [
+        "Add the payments and income that repeat every month just once.",
+        "Mark them as paid or received when they happen.",
+        "Pause a payment for a few months or delete it just for this month."
+      ]
+    },
+    "cuentas": {
+      "title": "Money",
+      "points": [
+        "Record where your money is: accounts, cash and credit cards.",
+        "Available adds up accounts and cash; not cards, since that's what you owe.",
+        "Use Transfer to move money or pay a card without counting it as an expense."
+      ]
+    },
+    "tarjetas": {
+      "title": "Cards",
+      "points": [
+        "Add your card with its limit and its statement and payment days.",
+        "Check what you owe from the statement and how much is left to pay.",
+        "Pay the card with Transfer: it comes out of an account and lowers what you owe."
+      ]
+    },
+    "metas": {
+      "title": "Goals",
+      "points": [
+        "Create a goal with a target amount and, if you want, a date.",
+        "Add money from an account when you can and see how far you've come.",
+        "Withdraw if you need to: what you put in doesn't count as an expense."
+      ]
+    },
+    "deudas": {
+      "title": "Debts",
+      "points": [
+        "Record what you owe or what you're owed, with its rate and installments.",
+        "Record each payment and watch the balance go down.",
+        "Pay the month's installments from Recurring, under \"Debt installments\"."
+      ]
+    },
+    "reportes": {
+      "title": "Reports",
+      "points": [
+        "Compare your income and expenses over 3, 6 or 12 months.",
+        "Tap a category to see how it changed month by month.",
+        "Export the month to PDF to keep it or share it."
+      ]
+    }
+  },
+  "fields": {
+    "category": "Category",
+    "chooseCategory": "Choose a category",
+    "newCategory": "New category",
+    "date": "Date",
+    "chooseDate": "Choose a date",
+    "chooseOption": "Choose an option",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "noDate": "No date",
+    "chooseDay": "Choose a day",
+    "lastDay": "Last day",
+    "dayN": "Day {n}",
+    "dayOfMonth": "Day of the month",
+    "loading": "Loading…",
+    "undo": "Undo",
+    "month": "Month",
+    "chooseOtherMonth": "{month}. Choose another month",
+    "chooseMonth": "Choose month",
+    "prevYear": "Previous year",
+    "nextYear": "Next year",
+    "goToday": "Go to current month"
+  },
+  "lock": {
+    "enterPin": "Enter your PIN",
+    "digits": "{count} of {max} digits",
+    "upTo6": "up to 6",
+    "erase": "Delete",
+    "enter": "Enter",
+    "biometric": "Use fingerprint or face",
+    "wrong": "Wrong PIN",
+    "wait": "Too many attempts. Wait {seconds} s.",
+    "unlock": "Unlock Kuarto",
+    "useBiometric": "Use your fingerprint or face",
+    "usePin": "Use PIN",
+    "confirm": "Confirm your fingerprint",
+    "confirmSub": "Confirm it to turn it on in Kuarto"
+  },
+  "update": {
+    "searching": "Checking…",
+    "latest": "You have the latest version ({version}).",
+    "available": "Version {version} available.",
+    "failed": "Couldn't check. Check your internet connection.",
+    "newTitle": "There's a new version",
+    "newMsg": "Kuarto {version} is ready. Your data stays as it is.",
+    "later": "Later",
+    "update": "Update",
+    "downloading": "Downloading…",
+    "permission": "Turn on \"Allow from this source\" for Kuarto, come back and tap Check for updates again.",
+    "downloaded": "Version {version} downloaded: tap Install."
+  },
+  "notify": {
+    "tomorrow": "{name} is due tomorrow",
+    "today": "{name} is due today",
+    "cardTomorrow": "The {name} payment is due tomorrow",
+    "cardToday": "The {name} payment is due today",
+    "cardBody": "You still owe {amount} from the statement{minimum}. Pay it from Money › Cards to avoid interest.",
+    "cardMinimum": " (minimum {amount})",
+    "fixedBody": "{amount} · Mark it as paid in Recurring.",
+    "exceeded": "You went over in {name}",
+    "near": "Close to the limit in {name}",
+    "exceededBody": "You've spent {spent} of {limit} this month.",
+    "nearBody": "You've spent {spent} of {limit}; {left} left.",
+    "dailyTitle": "Did you log today's expenses?",
+    "dailyBody": "Logging them the same day is what makes the month's balance add up."
+  },
+  "news": {
+    "title": "What's new in Kuarto {version}",
+    "fallback": "Fixes and improvements."
+  },
+  "cloud": {
+    "yourAccount": "your Google account"
+  },
+  "startup": {
+    "dbFailed": "Couldn't open the local database. Close and reopen the app.\n\nDetails: {detail}"
+  },
+  "changelog": {
+    "1_0_10": [
+      "New animated welcome and first questions that set up your accounts, salary, recurring items, debts and goals.",
+      "Renewed tour: an example in each section and, at the end, how to back up your data.",
+      "Colors: choose a palette (Ocean, Teal, Fuchsia, Graphite) or your own color, in light and dark.",
+      "Transactions › ⋯ › Copy from another month: bring last month's expenses into this one in one tap.",
+      "Import from Excel or CSV, with a template, error review and undo.",
+      "Daily or weekly automatic backup, and you choose how many to keep. Your current data is saved before restoring.",
+      "The app is now ready for several languages: choose yours in Settings › Appearance."
+    ],
+    "1_0_9": [
+      "Settings is now organized in sections: Appearance, Money, Recurring and reminders, Data and backup, Account, Security, Help and About.",
+      "Tap the magnifier in Settings to find an option by name."
+    ],
+    "1_0_8": [
+      "After each update you'll see what changed here. Also in Settings › What's new in this version.",
+      "Color fixes in dark mode: calendar, pickers and help sheets."
+    ],
+    "1_0_7": [
+      "Cloud backup: sign in with Google in Settings › Your data and your weekly backup is saved encrypted in your account.",
+      "If you change phones, use \"Restore from the cloud\" to get your data back."
+    ],
+    "1_0_6": [
+      "Light or dark mode: choose it in Settings › Appearance.",
+      "Debts: with \"Move the installment to Recurring\", paying the installment in Recurring lowers the debt's balance."
+    ],
+    "1_0_5": [
+      "\"Check for updates\" now appears separate from Privacy in Settings."
+    ],
+    "1_0_4": [
+      "The app updates itself: it lets you know when there's a new version.",
+      "Backups, the CSV and PDFs are saved in your phone's Documents/Kuarto.",
+      "Reading bank notifications was removed."
+    ]
+  },
+  "copy": {
+    "title": "Copy from another month",
+    "from": "Copy from",
+    "hint": "Copies go to {month}, on the same day of the month. You can change each amount before copying.",
+    "empty": "That month has no transactions to copy.",
+    "listLabel": "Transactions to copy",
+    "amountOf": "Amount of {name}",
+    "fixedNote": {
+      "one": "1 recurring payment isn't copied: Recurring already creates it every month.",
+      "other": "{count} recurring payments aren't copied: Recurring already creates them every month."
+    },
+    "account": "Account for the copies",
+    "accountHint": "Some used an archived account or one that no longer exists.",
+    "saveExpenses": {
+      "one": "Copy 1 expense · {amount}",
+      "other": "Copy {count} expenses · {amount}"
+    },
+    "saveMoves": {
+      "one": "Copy 1 transaction · {amount}",
+      "other": "Copy {count} transactions · {amount}"
+    },
+    "loadFailed": "Couldn't read that month's transactions.",
+    "done": {
+      "one": "1 transaction copied",
+      "other": "{count} transactions copied"
+    },
+    "more": "More actions"
+  },
+  "import": {
+    "title": "Import from Excel",
+    "intro": "Bring your transactions over from an Excel (.xlsx) or CSV file. Before anything is saved, you'll see which rows go in and which need fixing.",
+    "pick": "Choose file (.xlsx or .csv)",
+    "template": "Download template",
+    "howTitle": "How should my Excel look?",
+    "howText": "One row per transaction, with these headers in the first row. The column order doesn't matter.",
+    "colColumn": "Column",
+    "colRequired": "Required",
+    "colExample": "Example",
+    "colNotes": "Notes",
+    "yes": "Yes",
+    "no": "No",
+    "requiredNote": "* Required.",
+    "columns": {
+      "date": "Date",
+      "type": "Type",
+      "amount": "Amount",
+      "category": "Category",
+      "account": "Account",
+      "description": "Description",
+      "status": "Status"
+    },
+    "aliases": {
+      "date": [
+        "Date",
+        "Day",
+        "Fecha"
+      ],
+      "type": [
+        "Type",
+        "Kind",
+        "Tipo"
+      ],
+      "amount": [
+        "Amount",
+        "Value",
+        "Sum",
+        "Monto"
+      ],
+      "category": [
+        "Category",
+        "Categoría"
+      ],
+      "account": [
+        "Account",
+        "Cuenta"
+      ],
+      "description": [
+        "Description",
+        "Note",
+        "Memo",
+        "Details",
+        "Descripción"
+      ],
+      "status": [
+        "Status",
+        "State",
+        "Estado"
+      ]
+    },
+    "words": {
+      "expense": [
+        "Expense",
+        "Expenses",
+        "Debit",
+        "Outflow",
+        "Gasto"
+      ],
+      "income": [
+        "Income",
+        "Credit",
+        "Inflow",
+        "Ingreso"
+      ],
+      "pending": [
+        "Pending",
+        "Pendiente"
+      ]
+    },
+    "example": [
+      "2026-10-05",
+      "Expense",
+      "1250.50",
+      "Food",
+      "Cash",
+      "Supermarket",
+      "Paid"
+    ],
+    "examplePlain": {
+      "date": "2026-10-05",
+      "type": "Expense",
+      "amount": "1250.50",
+      "category": "Food",
+      "account": "Cash",
+      "description": "Supermarket",
+      "status": "Paid"
+    },
+    "notes": {
+      "date": "Also accepts 05/10/2026 (day first).",
+      "type": "Expense or Income.",
+      "amount": "Positive, no currency symbol.",
+      "category": "If it doesn't exist, you're offered to create it.",
+      "account": "If it doesn't exist, you're offered to create it.",
+      "description": "Optional.",
+      "status": "Paid, Received or Pending. By default, Paid or Received. Pending rows aren't imported: they go in Recurring."
+    },
+    "dataSheet": "Transactions",
+    "instructionsSheet": [
+      "Instructions",
+      "Instrucciones"
+    ],
+    "templateSaved": "Template saved to {where}.",
+    "templateDownloaded": "Template downloaded.",
+    "templateFailed": "Couldn't create the template. Please try again.",
+    "readFailed": "Couldn't read the file. Try an .xlsx or .csv with headers in the first row.",
+    "columnsIntro": "We didn't recognize all the columns in {file}. Choose which file column goes with each field.",
+    "noColumn": "Not in the file",
+    "columnN": "Column {n}",
+    "continue": "Continue",
+    "ready": "Ready to import",
+    "withErrors": "With errors",
+    "repeated": "Look duplicated",
+    "seeErrors": {
+      "one": "See the row with an error",
+      "other": "See the {count} rows with errors"
+    },
+    "problem": "Row {line}: {reason}",
+    "errors": {
+      "date": "invalid or empty date",
+      "type": "the type must be Expense or Income",
+      "amount": "amount empty, zero or not a number",
+      "category": "missing category",
+      "account": "missing account"
+    },
+    "errorsNote": "Rows with errors aren't imported. Fix them in the file and import it again, or continue without them.",
+    "pendingNote": {
+      "one": "1 row is Pending and isn't imported: bills still to pay go in Recurring.",
+      "other": "{count} rows are Pending and aren't imported: bills still to pay go in Recurring."
+    },
+    "skipRepeated": {
+      "one": "Skip the one that looks duplicated (same date, amount and description)",
+      "other": "Skip the {count} that look duplicated (same date, amount and description)"
+    },
+    "newCategories": "Categories that don't exist",
+    "newAccounts": "Accounts that don't exist",
+    "create": "Create it",
+    "createAccount": "Create it as a bank account",
+    "importN": {
+      "one": "Import 1 transaction",
+      "other": "Import {count} transactions"
+    },
+    "failed": "Couldn't import. Nothing was saved.",
+    "doneText": {
+      "one": "1 transaction was imported.",
+      "other": "{count} transactions were imported."
+    },
+    "seeMoves": "See transactions",
+    "undoTitle": "Last import",
+    "undo": "Undo import",
+    "lastImport": {
+      "one": "{date} · 1 transaction",
+      "other": "{date} · {count} transactions"
+    },
+    "undone": {
+      "one": "1 imported transaction was removed.",
+      "other": "{count} imported transactions were removed."
+    },
+    "undoFailed": "Couldn't undo. Please try again."
+  },
+  "palette": {
+    "title": "Color",
+    "names": {
+      "violeta": "Violet",
+      "oceano": "Ocean",
+      "turquesa": "Teal",
+      "fucsia": "Fuchsia",
+      "grafito": "Graphite",
+      "custom": "Custom"
+    },
+    "customHint": "Choose a shade or type its code.",
+    "hex": "Color code",
+    "hexInvalid": "Type the color as #RRGGBB, for example #2E86DE.",
+    "preview": "Preview",
+    "previewBalance": "This month's balance",
+    "previewButton": "Save",
+    "adjusted": "We darkened it a bit so the text is easy to read.",
+    "clash": "It looks like the color of {what}: it may be confusing.",
+    "clashWhat": {
+      "positive": "income",
+      "negative": "expenses and overdue items",
+      "warning": "pending items"
+    },
+    "apply": "Use this color",
+    "applied": "Color changed",
+    "statusNote": "The Received, Paid, Pending and Overdue colors don't change: they always mean the same thing."
+  },
+  "intro": {
+    "slogan": "The best way to spend your money is knowing what you spent it on",
+    "skip": "Tap to continue"
+  },
+  "onboarding": {
+    "progress": "Step {n} of {total}",
+    "continue": "Continue",
+    "skip": "Skip",
+    "remove": "Remove {name}",
+    "nameTitle": "What's your name?",
+    "nameText": "To greet you on Home. It's saved only on this phone and you can change it anytime in Settings › Account.",
+    "firstName": "First name",
+    "lastName": "Last name (optional)",
+    "nameRequired": "Enter your name to continue.",
+    "langTitle": "Language and currency",
+    "langText": "The currency only changes the symbol of amounts. You can change both later in Settings.",
+    "goalTitle": "What's your main goal?",
+    "goalText": "We'll put it first on Home and in the tour.",
+    "goalShort": "Goal",
+    "goals": {
+      "controlar": {
+        "title": "Control my spending",
+        "sub": "Know where the money goes each month"
+      },
+      "ahorrar": {
+        "title": "Save",
+        "sub": "Save up for something or build an emergency fund"
+      },
+      "deudas": {
+        "title": "Get out of debt",
+        "sub": "See how much is left and what to pay first"
+      },
+      "organizar": {
+        "title": "Get organized",
+        "sub": "Keep payments, income and dates at hand"
+      }
+    },
+    "moneyTitle": "Where's your money?",
+    "moneyText": "With what you have today, Available shows what you really have. Add your accounts and cards with today's balance.",
+    "cashToday": "Cash you have today ({currency})",
+    "cashInvalid": "Enter the cash using only numbers.",
+    "addBank": "Add bank account",
+    "addCard": "Add credit card",
+    "salaryTitle": "How much do you earn and how often?",
+    "salaryText": "If your salary is almost always the same, we put it in Recurring and each month you just mark it as received.",
+    "salaryVaries": "Does your salary change a lot from month to month?",
+    "salaryStable": "No, it's almost always the same",
+    "salaryChanges": "Yes, it changes",
+    "salaryVariesTip": "Then we won't put it in Recurring: when you get paid, tap + and record what came in as income.",
+    "salaryTip": "It goes in Recurring as income. Tap to change it.",
+    "salaryName": "Salary",
+    "payments": "{name} · {count} payments · {amount}",
+    "fixedTitle": "What do you pay every month?",
+    "fixedText": "You add them once and they show up every month in Recurring, with their due day.",
+    "fixedNames": {
+      "rent": "Rent",
+      "power": "Electricity",
+      "internet": "Internet",
+      "water": "Water",
+      "phone": "Phone"
+    },
+    "otherFixed": "Other payment",
+    "debtTitle": "Do you have loans or debts?",
+    "debtText": "Record what you owe (or what you're owed) and you'll see how much is left and when you finish.",
+    "addDebt": "Add debt or loan",
+    "debtToFixed": "Pay the installment from Recurring (so the debt goes down on its own)",
+    "goalsTitle": "Are you saving for something?",
+    "goalsText": "A goal with how much you want to save and, if you want, by when.",
+    "addGoal": "Add savings goal",
+    "limitTitle": "How much do you want to spend at most per month?",
+    "limitText": "Optional. It's a reference for your budgets.",
+    "limitLabel": "Monthly maximum ({currency})",
+    "limitInvalid": "Enter the amount using only numbers, greater than zero.",
+    "summaryTitle": "This is what we'll create",
+    "summaryText": "Check it before saving: nothing is saved until you tap Create.",
+    "summaryAccount": "Account",
+    "summarySalary": "Salary in Recurring",
+    "summaryFixed": "Recurring payment",
+    "summaryDebt": "Debt",
+    "summaryInFixed": "installment in Recurring",
+    "summaryGoal": "Goal",
+    "summaryLimit": "Monthly spending maximum",
+    "summaryEmpty": "There are no accounts, recurring items, debts or goals to create: you can add them anytime.",
+    "summaryEdit": "To change something, tap Back and go back to the question.",
+    "change": "Back",
+    "create": "Create everything",
+    "doneTitle": "All set, {name}",
+    "tourText": "Want us to show you how it works? It's a short tour with an example in each section. You can see it later in Settings › Help.",
+    "seeTour": "Take the tour",
+    "notNow": "Not now",
+    "google": "Continue with Google",
+    "googleHint": "Optional: fill in your name with your Google account. It's also used for the cloud backup; the app works the same without an account.",
+    "googleFailed": "Couldn't sign in with Google. You can type your name."
+  },
+  "profile": {
+    "askTitle": "What's your name?",
+    "askMsg": "To greet you on Home. It's saved only on this phone; you can skip it."
+  },
+  "goalLink": {
+    "controlar": "Your goal: control your spending · See reports",
+    "ahorrar": "Your goal: save · See your goals",
+    "deudas": "Your goal: get out of debt · See your debts",
+    "organizar": "Your goal: get organized · See your recurring items"
+  },
+  "tour": {
+    "progress": "{n} of {total}",
+    "skip": "Skip",
+    "next": "Next",
+    "example": "Example",
+    "activateBackup": "Turn on automatic backup",
+    "steps": {
+      "inicio": {
+        "title": "Home",
+        "text": "Here you see what you have available. Example: if you earned {income} and spent {spent}, you'll see how much is left."
+      },
+      "movimientos": {
+        "title": "Transactions",
+        "text": "Log each expense in seconds with +. Example: {gas} of gas, from Cash."
+      },
+      "fijos": {
+        "title": "Recurring",
+        "text": "What you pay or receive every month. Example: rent on the 5th. You mark it as paid when you pay it."
+      },
+      "dinero": {
+        "title": "Money",
+        "text": "Your accounts, cash and cards. The card shows what you owe."
+      },
+      "metas": {
+        "title": "Goals",
+        "text": "Save for something. Example: {goal} for a trip; you add money when you can."
+      },
+      "deudas": {
+        "title": "Debts",
+        "text": "What you owe and how much is left. When you pay the installment in Recurring, the debt goes down on its own."
+      },
+      "resumen": {
+        "title": "Summary",
+        "text": "How your month went and how much you saved, month by month."
+      },
+      "respaldo": {
+        "title": "Your data",
+        "text": "Everything lives only on this phone. A backup protects you if you lose it or change phones."
+      }
+    },
+    "demo": {
+      "left": "Left",
+      "inOut": "Earned {income} · Spent {spent}",
+      "gas": "Gas",
+      "fromCash": "Transportation · Cash",
+      "rent": "Rent",
+      "due5": "Due on the 5th",
+      "trip": "Trip",
+      "goalOf": "{goalSaved} of {goal}",
+      "carLoan": "Car loan",
+      "debtLeft": "{debtLeft} left of {debt}",
+      "saved": "Saved from income"
+    },
+    "backupPoints": [
+      "Your data lives only on this phone: nobody else has a copy.",
+      "Create a backup whenever you want, or turn on automatic backups daily or weekly.",
+      "With your Google account, the backup is also saved encrypted in the cloud."
+    ]
+  },
+  "defaults": {
+    "categories": {
+      "cat-salario": "Salary",
+      "cat-otros-ingresos": "Other income",
+      "cat-alquiler": "Rent",
+      "cat-servicios": "Utilities",
+      "cat-suscripciones": "Subscriptions",
+      "cat-comida": "Food",
+      "cat-transporte": "Transportation",
+      "cat-salud": "Health",
+      "cat-ocio": "Leisure",
+      "cat-otros-gastos": "Other expenses",
+      "cat-pago-deudas": "Debt payments",
+      "cat-luz": "Electricity",
+      "cat-agua": "Water",
+      "cat-internet": "Internet and cable",
+      "cat-telefono": "Phone",
+      "cat-seguros": "Insurance",
+      "cat-educacion": "Education",
+      "cat-supermercado": "Groceries",
+      "cat-gasolina": "Gas",
+      "cat-ropa": "Clothes",
+      "cat-hogar": "Home"
+    },
+    "cash": "Cash"
+  }
+}

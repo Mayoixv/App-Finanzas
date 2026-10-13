@@ -1,17 +1,17 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar meta' : 'Nueva meta' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ isEdit() ? t('meta.edit') : t('meta.new') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
     <div class="field">
       <ion-input
-        label="Nombre"
+        [label]="t('common.name')"
         label-placement="floating"
-        placeholder="Fondo de emergencia, viaje, inicial del carro"
+        [placeholder]="t('meta.placeholder')"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -19,7 +19,7 @@
 
     <div class="field">
       <ion-input
-        label="Cuánto quieres juntar ({{ currency() }})"
+        [label]="t('meta.target', { currency: currency() })"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -31,10 +31,10 @@
     </div>
 
     <div class="field">
-      <app-date-field label="Para cuándo (opcional)" [optional]="true" [(value)]="targetDate"></app-date-field>
+      <app-date-field [label]="t('meta.date')" [optional]="true" [(value)]="targetDate"></app-date-field>
     </div>
     @if (targetDate()) {
-      <button type="button" class="link-button" (click)="targetDate.set('')">Quitar fecha</button>
+      <button type="button" class="link-button" (click)="targetDate.set('')">{{ t('meta.removeDate') }}</button>
     }
 
     @if (error(); as message) {
@@ -42,18 +42,18 @@
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isEdit() ? 'Guardar cambios' : 'Guardar meta' }}
+      {{ isEdit() ? t('common.saveChanges') : t('meta.save') }}
     </button>
 
-    @if (isEdit()) {
-      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar meta</button>
+    @if (isEdit() && !draft) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">{{ t('meta.delete') }}</button>
     }
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Meta guardada' }}</p>
+      <p class="done-text">{{ isEdit() ? t('common.changesSaved') : t('meta.saved') }}</p>
     }
   </div>
 </ion-content>

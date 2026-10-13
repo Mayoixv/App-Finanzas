@@ -4,6 +4,7 @@ import { APP_CONTAINER } from '../../app.container';
 import { MonthRecurringExpense } from '../../application/use-cases/get-month-recurring-expenses';
 import { currentMonth, dueLabel, formatMoney, todayIso } from '../format';
 import { MonthState } from '../month-state';
+import { t } from '../i18n';
 
 interface Row {
   key: string;
@@ -23,6 +24,7 @@ interface Row {
   styleUrls: ['upcoming-card.component.scss'],
 })
 export class UpcomingCardComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly router = inject(Router);
   private readonly monthState = inject(MonthState);

@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, viewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { AlertController, IonIcon, IonToggle, LoadingController } from '@ionic/angular';
 import { applyPrivacy, isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
@@ -9,22 +10,33 @@ import { formatDay } from '../format';
 import { addIcons } from 'ionicons';
 import { chevronForward } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { ValidationError } from '../../application/errors';
-import { WIPE_CONFIRMATION } from '../../application/use-cases/backup';
+import { AppError } from '../../application/errors';
+import { AUTO_BACKUP_KEEP_OPTIONS, AutoBackupFrequency, WIPE_CONFIRMATION } from '../../application/use-cases/backup';
+import { saveSafetyCopy } from '../backup-files';
+import { todayIso } from '../format';
 import { fileDate, pickTextFile, saveFile } from '../file-io';
 import { monthLabel } from '../format';
 import { LockState } from '../lock/lock-state';
+import { t, errorText } from '../i18n';
 
 type Values = Record<string, string>;
+
+/** Fecha (ISO) del último respaldo creado a mano. */
+const LAST_MANUAL_KEY = 'backup_last_manual';
 
 /** Secciones "Tus datos" (respaldo, restauración, CSV) y "Bloqueo con PIN" de Ajustes. */
 @Component({
   selector: 'app-datos',
   templateUrl: 'datos.component.html',
   styleUrls: ['datos.component.scss'],
-  imports: [SelectFieldComponent, IonIcon, IonToggle],
+  imports: [RouterLink, SelectFieldComponent, IonIcon, IonToggle],
 })
 export class DatosComponent implements OnInit {
+  protected readonly t = t;
+  /** Qué sección muestra: Datos y respaldo, o Seguridad y privacidad. */
+  readonly part = input<'datos' | 'seguridad'>('datos');
+  /** Empieza a activar el respaldo automático al abrir (desde el final del recorrido). */
+  readonly startAuto = input(false);
   private readonly container = inject(APP_CONTAINER);
   private readonly alerts = inject(AlertController);
   private readonly loading = inject(LoadingController);
@@ -34,18 +46,25 @@ export class DatosComponent implements OnInit {
   protected readonly cloud = inject(CloudBackupService);
   private readonly autoToggle = viewChild<IonToggle>('autoToggle');
   protected readonly autoBackupDetail = computed(() => {
-    if (!this.autoBackup.available) return 'Disponible en la app del teléfono';
-    if (!this.autoBackup.enabled()) return 'Cada 7 días, cifrado, en Documentos/Kuarto del teléfono';
-    if (this.autoBackup.lastError()) return 'No se pudo guardar el último; se reintenta al abrir la app';
+    if (!this.autoBackup.available) return t('common.phoneOnly');
+    if (!this.autoBackup.enabled()) return t('datos.autoOff');
+    if (this.autoBackup.lastError()) return t('datos.autoError');
     const last = this.autoBackup.lastRun();
-    return last ? `Último: ${formatDay(last)} · Documentos/Kuarto` : 'Pendiente; se hace al abrir la app';
+    return last ? t('datos.autoLast', { date: formatDay(last) }) : t('datos.autoPending');
   });
-  protected readonly lockOptions = [
-    { value: 0, label: 'Al momento' },
-    { value: 60, label: 'Tras 1 minuto' },
-    { value: 300, label: 'Tras 5 minutos' },
-    { value: 900, label: 'Tras 15 minutos' },
-  ];
+  protected readonly frequencyOptions = computed(() => [
+    { value: 1 as AutoBackupFrequency, label: t('datos.daily') },
+    { value: 7 as AutoBackupFrequency, label: t('datos.weekly') },
+  ]);
+  protected readonly keepOptions = computed(() => AUTO_BACKUP_KEEP_OPTIONS.map((count) => ({ value: count as number, label: t('datos.keepN', { count }) })));
+  /** Fecha del último respaldo hecho a mano, ya con formato. */
+  protected readonly lastManual = signal<string | null>(null);
+  protected readonly lockOptions = computed(() => [
+    { value: 0, label: t('seguridad.lockNow') },
+    { value: 60, label: t('seguridad.lock1') },
+    { value: 300, label: t('seguridad.lock5') },
+    { value: 900, label: t('seguridad.lock15') },
+  ]);
 
   protected readonly pinEnabled = signal(false);
   protected readonly privacy = signal(false);
@@ -63,29 +82,34 @@ export class DatosComponent implements OnInit {
     this.pinEnabled.set(await this.container.pinLock.isEnabled());
     this.privacy.set(await isPrivacyOn(this.container.settings));
     if (this.autoBackup.available) await this.autoBackup.refresh();
+    const last = await this.container.settings.get(LAST_MANUAL_KEY);
+    this.lastManual.set(last ? formatDay(last) : null);
+    if (this.startAuto() && this.autoBackup.available && !this.autoBackup.enabled()) await this.toggleAutoBackup(true);
     this.biometryAvailable.set(await this.lock.biometryAvailable().catch(() => false));
   }
 
   /** Devuelve true si el respaldo se creó y se entregó para guardar. */
   protected async createBackup(): Promise<boolean> {
     const values = await this.ask(
-      'Crear respaldo',
-      'Elige una contraseña para cifrar el respaldo. Si la olvidas, el respaldo no se puede abrir.',
+      t('datos.createBackup'),
+      t('datos.createBackupMsg'),
       [
-        { name: 'p1', type: 'password', placeholder: 'Contraseña (mínimo 6)', attributes: { autocomplete: 'new-password' } },
-        { name: 'p2', type: 'password', placeholder: 'Repite la contraseña', attributes: { autocomplete: 'new-password' } },
+        { name: 'p1', type: 'password', placeholder: t('datos.passwordMin'), attributes: { autocomplete: 'new-password' } },
+        { name: 'p2', type: 'password', placeholder: t('datos.passwordRepeat'), attributes: { autocomplete: 'new-password' } },
       ],
-      'Crear',
+      t('datos.create'),
     );
     if (!values) return false;
     if (values['p1'] !== values['p2']) {
-      await this.fail('Las contraseñas no coinciden.');
+      await this.fail(t('datos.passwordsDiffer'));
       return false;
     }
-    const done = await this.busy('Cifrando respaldo…', async () => {
+    const done = await this.busy(t('datos.encrypting'), async () => {
       const file = await this.container.createBackup.execute(values['p1']);
       const where = await saveFile(`kuarto-respaldo-${fileDate()}.finanzas`, file, 'application/json');
-      this.status.set(where ? `Respaldo guardado en ${where}. Copia también ese archivo fuera del teléfono (Drive, correo).` : 'Respaldo descargado.');
+      this.status.set(where ? t('datos.savedAt', { where }) : t('datos.downloaded'));
+      await this.container.settings.set(LAST_MANUAL_KEY, todayIso());
+      this.lastManual.set(formatDay(todayIso()));
       return true;
     });
     return done === true;
@@ -94,13 +118,12 @@ export class DatosComponent implements OnInit {
   protected async wipeAll() {
     const warning = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Borrar todos los datos',
-      message:
-        'Se borran tus movimientos, fijos, metas, presupuestos, deudas y ajustes, incluido el PIN. No se puede deshacer. Conviene crear un respaldo antes.',
+      header: t('datos.wipe'),
+      message: t('datos.wipeMsg'),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Seguir sin respaldo', role: 'continue' },
-        { text: 'Crear respaldo', role: 'backup' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('datos.wipeNoBackup'), role: 'continue' },
+        { text: t('datos.createBackup'), role: 'backup' },
       ],
     });
     await warning.present();
@@ -112,13 +135,13 @@ export class DatosComponent implements OnInit {
     }
 
     const values = await this.ask(
-      'Confirmar borrado',
-      `Escribe ${WIPE_CONFIRMATION} para borrar todo.`,
+      t('datos.wipeConfirmTitle'),
+      t('datos.wipeConfirmMsg', { word: WIPE_CONFIRMATION }),
       [{ name: 'w', type: 'text', placeholder: WIPE_CONFIRMATION, attributes: { autocapitalize: 'characters', autocomplete: 'off' } }],
-      'Borrar todo',
+      t('datos.wipeAll'),
     );
     if (!values) return;
-    const done = await this.busy('Borrando…', async () => {
+    const done = await this.busy(t('datos.wiping'), async () => {
       await this.container.wipeAllData.execute(values['w']);
       // Ya sin datos: que no quede ningún aviso programado ni la pantalla protegida.
       if (this.notifications.available) await this.notifications.disable();
@@ -136,32 +159,36 @@ export class DatosComponent implements OnInit {
 
   /** Abre un respaldo cifrado (de un archivo o de la nube), muestra qué trae y, si se confirma, reemplaza los datos. */
   private async restoreFromText(text: string) {
-    const values = await this.ask('Restaurar respaldo', 'Escribe la contraseña con la que creaste el respaldo.', [
-      { name: 'p', type: 'password', placeholder: 'Contraseña', attributes: { autocomplete: 'current-password' } },
-    ], 'Abrir');
+    const values = await this.ask(t('datos.restore'), t('datos.restorePasswordMsg'), [
+      { name: 'p', type: 'password', placeholder: t('datos.password'), attributes: { autocomplete: 'current-password' } },
+    ], t('datos.open'));
     if (!values) return;
 
-    const opened = await this.busy('Abriendo respaldo…', () => this.container.openBackup.execute(text, values['p']));
+    const opened = await this.busy(t('datos.opening'), () => this.container.openBackup.execute(text, values['p']));
     if (!opened) return;
     const { transactions, firstMonth, lastMonth } = opened.summary;
     const range = !firstMonth || !lastMonth
       ? ''
       : firstMonth === lastMonth
-        ? ` (de ${monthLabel(firstMonth)})`
-        : ` (de ${monthLabel(firstMonth)} a ${monthLabel(lastMonth)})`;
+        ? t('datos.rangeOne', { month: monthLabel(firstMonth) })
+        : t('datos.rangeMany', { from: monthLabel(firstMonth), to: monthLabel(lastMonth) });
+    const auto = this.autoBackup.enabled();
     const confirm = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Reemplazar tus datos',
-      message: `El respaldo tiene ${transactions} movimientos${range}. Restaurarlo borra TODOS los datos actuales de la app y los cambia por los del respaldo.`,
+      header: t('datos.replaceTitle'),
+      message: t(auto ? 'datos.replaceMsgAuto' : 'datos.replaceMsg', { count: transactions, range }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Restaurar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('datos.restoreBtn'), role: 'destructive' },
       ],
     });
     await confirm.present();
     if ((await confirm.onDidDismiss()).role !== 'destructive') return;
+    if (!(await this.backUpCurrent(auto))) return;
 
-    const done = await this.busy('Restaurando…', async () => {
+    const done = await this.busy(t('datos.restoring'), async () => {
+      // Copia privada de lo actual, además del respaldo: si el restaurado no era el bueno, hay de dónde volver.
+      await saveSafetyCopy(await this.container.restoreBackup.current(), 'antes-de-restaurar-').catch(console.error);
       await this.container.restoreBackup.execute(opened.data);
       return true;
     });
@@ -169,50 +196,94 @@ export class DatosComponent implements OnInit {
     if (done) location.reload();
   }
 
+  /**
+   * Antes de restaurar, un respaldo de lo que hay ahora: el automático si está activado; si no, se ofrece crear uno.
+   * Devuelve false si hay que cancelar la restauración.
+   */
+  private async backUpCurrent(auto: boolean): Promise<boolean> {
+    if (auto) {
+      const saved = await this.busy(t('datos.savingCurrent'), () => this.autoBackup.runNow());
+      if (!saved) await this.fail(t('datos.currentFailed'));
+      return !!saved;
+    }
+    const alert = await this.alerts.create({
+      cssClass: 'app-alert',
+      header: t('datos.beforeRestoreTitle'),
+      message: t('datos.beforeRestoreMsg'),
+      buttons: [
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('datos.wipeNoBackup'), role: 'continue' },
+        { text: t('datos.createBackup'), role: 'backup' },
+      ],
+    });
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+    if (role === 'backup') return this.createBackup();
+    return role === 'continue';
+  }
+
+  protected async setFrequency(days: AutoBackupFrequency) {
+    try {
+      await this.autoBackup.setFrequency(days);
+    } catch (e) {
+      console.error(e);
+      this.status.set(t('common.changeFailed'));
+    }
+  }
+
+  protected async setKeep(count: number) {
+    try {
+      await this.autoBackup.setKeep(count);
+    } catch (e) {
+      console.error(e);
+      this.status.set(t('common.changeFailed'));
+    }
+  }
+
   protected async exportCsv() {
-    await this.busy('Preparando archivo…', async () => {
+    await this.busy(t('datos.preparing'), async () => {
       const { csv, rows } = await this.container.exportCsv.execute();
       const where = await saveFile(`kuarto-movimientos-${fileDate()}.csv`, csv, 'text/csv');
-      this.status.set(`Exportados ${rows} movimientos${where ? ` a ${where}` : ''}.`);
+      this.status.set(where ? t('datos.exportedAt', { count: rows, where }) : t('datos.exported', { count: rows }));
     });
   }
 
   protected async enablePin() {
     const values = await this.ask(
-      this.pinEnabled() ? 'Cambiar PIN' : 'Activar bloqueo con PIN',
-      'De 4 a 6 números. Si lo olvidas no hay forma de recuperarlo: tendrías que borrar la app y restaurar un respaldo.',
+      this.pinEnabled() ? t('seguridad.changePin') : t('seguridad.enablePin'),
+      t('seguridad.pinMsg'),
       [
-        { name: 'p1', type: 'password', placeholder: 'PIN nuevo', attributes: { inputmode: 'numeric', maxlength: 6 } },
-        { name: 'p2', type: 'password', placeholder: 'Repite el PIN', attributes: { inputmode: 'numeric', maxlength: 6 } },
+        { name: 'p1', type: 'password', placeholder: t('seguridad.newPin'), attributes: { inputmode: 'numeric', maxlength: 6 } },
+        { name: 'p2', type: 'password', placeholder: t('seguridad.repeatPin'), attributes: { inputmode: 'numeric', maxlength: 6 } },
       ],
-      'Guardar',
+      t('common.save'),
     );
     if (!values) return;
-    if (values['p1'] !== values['p2']) return this.fail('Los PIN no coinciden.');
-    const ok = await this.busy('Guardando PIN…', async () => {
+    if (values['p1'] !== values['p2']) return this.fail(t('seguridad.pinsDiffer'));
+    const ok = await this.busy(t('seguridad.savingPin'), async () => {
       await this.container.pinLock.enable(values['p1']);
       return true;
     });
     if (!ok) return;
     this.pinEnabled.set(true);
     this.lock.setEnabled(true, values['p1'].length);
-    this.status.set('Bloqueo con PIN activado.');
+    this.status.set(t('seguridad.pinOn'));
   }
 
   protected async disablePin() {
-    const values = await this.ask('Quitar PIN', 'Escribe tu PIN actual.', [
-      { name: 'p', type: 'password', placeholder: 'PIN actual', attributes: { inputmode: 'numeric', maxlength: 6 } },
-    ], 'Quitar');
+    const values = await this.ask(t('seguridad.removePin'), t('seguridad.currentPinMsg'), [
+      { name: 'p', type: 'password', placeholder: t('seguridad.currentPin'), attributes: { inputmode: 'numeric', maxlength: 6 } },
+    ], t('seguridad.remove'));
     if (!values) return;
-    const check = await this.busy('Comprobando…', () => this.container.pinLock.disable(values['p']));
+    const check = await this.busy(t('seguridad.checking'), () => this.container.pinLock.disable(values['p']));
     if (!check) return;
     if (!check.ok) {
-      return this.fail(check.waitSeconds ? `Demasiados intentos. Espera ${check.waitSeconds} s.` : 'PIN incorrecto.');
+      return this.fail(check.waitSeconds ? t('seguridad.tooMany', { seconds: check.waitSeconds }) : t('seguridad.wrongPin'));
     }
     this.pinEnabled.set(false);
     this.lock.setEnabled(false);
     if (this.lock.biometricOn()) await this.lock.setBiometric(false);
-    this.status.set('Bloqueo con PIN desactivado.');
+    this.status.set(t('seguridad.pinOff'));
   }
 
   private async ask(header: string, message: string, inputs: object[], okText: string): Promise<Values | null> {
@@ -222,7 +293,7 @@ export class DatosComponent implements OnInit {
       message,
       inputs,
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
+        { text: t('common.cancel'), role: 'cancel' },
         { text: okText, role: 'confirm' },
       ],
     });
@@ -238,9 +309,9 @@ export class DatosComponent implements OnInit {
     try {
       return await work();
     } catch (error) {
-      if (!(error instanceof ValidationError)) console.error(error);
+      if (!(error instanceof AppError)) console.error(error);
       await spinner.dismiss();
-      await this.fail(error instanceof ValidationError ? error.message : 'Algo salió mal. Inténtalo de nuevo.');
+      await this.fail(errorText(error));
       return undefined;
     } finally {
       await spinner.dismiss();
@@ -248,17 +319,17 @@ export class DatosComponent implements OnInit {
   }
 
   private async fail(message: string) {
-    const alert = await this.alerts.create({ cssClass: 'app-alert', header: 'No se pudo', message, buttons: ['Entendido'] });
+    const alert = await this.alerts.create({ cssClass: 'app-alert', header: t('common.failedTitle'), message, buttons: [t('common.understood')] });
     await alert.present();
   }
 
   protected async setLockAfter(seconds: number) {
     try {
       await this.lock.setLockAfter(seconds);
-      this.status.set('Tiempo de bloqueo guardado.');
+      this.status.set(t('seguridad.lockSaved'));
     } catch (e) {
       console.error(e);
-      this.status.set('No se pudo guardar el tiempo de bloqueo.');
+      this.status.set(t('seguridad.lockFailed'));
     }
   }
 
@@ -267,10 +338,10 @@ export class DatosComponent implements OnInit {
     try {
       await setPrivacy(this.container.settings, on);
       this.privacy.set(on);
-      this.status.set(on ? 'La app se oculta en recientes y no permite capturas.' : 'La app vuelve a verse en recientes.');
+      this.status.set(on ? t('seguridad.privacyOn') : t('seguridad.privacyOff'));
     } catch (e) {
       console.error(e);
-      this.status.set('No se pudo cambiar. Inténtalo de nuevo.');
+      this.status.set(t('common.changeFailed'));
       const toggle = this.privacyToggle();
       if (toggle) toggle.checked = this.privacy();
     }
@@ -281,11 +352,11 @@ export class DatosComponent implements OnInit {
     try {
       const ok = await this.lock.setBiometric(on);
       this.status.set(
-        !ok ? 'No se confirmó la huella; sigue desactivada.' : on ? 'Desbloqueo con huella activado.' : 'Desbloqueo con huella desactivado.',
+        !ok ? t('seguridad.bioNotConfirmed') : on ? t('seguridad.bioOn') : t('seguridad.bioOff'),
       );
     } catch (e) {
       console.error(e);
-      this.status.set('No se pudo cambiar. Inténtalo de nuevo.');
+      this.status.set(t('common.changeFailed'));
     } finally {
       const toggle = this.bioToggle();
       if (toggle) toggle.checked = this.lock.biometricOn();
@@ -298,7 +369,7 @@ export class DatosComponent implements OnInit {
       await this.toggleAutoBackup(true);
       if (!this.autoBackup.enabled()) return;
     }
-    const done = await this.busy('Entrando con Google…', async () => {
+    const done = await this.busy(t('datos.cloudSigningIn'), async () => {
       await this.cloud.signIn();
       return true;
     });
@@ -306,39 +377,42 @@ export class DatosComponent implements OnInit {
   }
 
   protected async cloudUpload() {
-    const done = await this.busy('Subiendo respaldo cifrado…', async () => {
+    const done = await this.busy(t('datos.cloudUploading'), async () => {
       await this.cloud.upload(await this.container.autoBackup.create());
       return true;
     });
-    if (done) this.status.set('Respaldo subido a la nube, cifrado con la contraseña del respaldo automático.');
+    if (done) this.status.set(t('datos.cloudUploaded'));
   }
 
   protected async cloudRestore() {
-    const list = await this.busy('Buscando respaldos…', () => this.cloud.list());
+    const list = await this.busy(t('datos.cloudSearching'), () => this.cloud.list());
     if (!list) return;
-    if (!list.length) return this.fail('No hay respaldos en la nube con esta cuenta.');
+    if (!list.length) return this.fail(t('datos.cloudEmpty'));
     const alert = await this.alerts.create({
       cssClass: 'app-alert choices',
-      header: 'Restaurar desde la nube',
-      message: 'Elige el respaldo. Luego te pide la contraseña del respaldo automático con que se creó.',
+      header: t('datos.cloudRestore'),
+      message: t('datos.cloudChooseMsg'),
       buttons: [
-        ...list.map((b, i) => ({ text: `${formatDay(b.createdAt.slice(0, 10))}${i === 0 ? ' (el más reciente)' : ''}`, role: b.id })),
-        { text: 'Cancelar', role: 'cancel' },
+        ...list.map((b, i) => {
+          const date = formatDay(b.createdAt.slice(0, 10));
+          return { text: i === 0 ? t('datos.cloudLatest', { date }) : date, role: b.id };
+        }),
+        { text: t('common.cancel'), role: 'cancel' },
       ],
     });
     await alert.present();
     const { role } = await alert.onDidDismiss();
     if (!role || role === 'cancel' || role === 'backdrop') return;
-    const text = await this.busy('Descargando…', () => this.cloud.download(role));
+    const text = await this.busy(t('datos.downloading'), () => this.cloud.download(role));
     if (text) await this.restoreFromText(text);
   }
 
   protected async cloudSignOut() {
-    await this.busy('Saliendo…', async () => {
+    await this.busy(t('datos.signingOut'), async () => {
       await this.cloud.signOut();
       return true;
     });
-    this.status.set('Saliste de la cuenta. Los respaldos ya subidos siguen en la nube.');
+    this.status.set(t('datos.signedOut'));
   }
 
   protected async toggleAutoBackup(on: boolean) {
@@ -346,23 +420,23 @@ export class DatosComponent implements OnInit {
     try {
       if (!on) {
         await this.autoBackup.disable();
-        this.status.set('Respaldo automático desactivado. Los archivos ya guardados se quedan en Documentos/Kuarto.');
+        this.status.set(t('datos.autoDisabled'));
         return;
       }
       const values = await this.ask(
-        'Respaldo automático',
-        'Elige la contraseña con la que se cifrarán los respaldos semanales. La necesitarás para restaurarlos; si la olvidas, no se pueden abrir.',
+        t('datos.autoTitle'),
+        t('datos.autoMsg'),
         [
-          { name: 'p1', type: 'password', placeholder: 'Contraseña (mínimo 6)', attributes: { autocomplete: 'new-password' } },
-          { name: 'p2', type: 'password', placeholder: 'Repite la contraseña', attributes: { autocomplete: 'new-password' } },
+          { name: 'p1', type: 'password', placeholder: t('datos.passwordMin'), attributes: { autocomplete: 'new-password' } },
+          { name: 'p2', type: 'password', placeholder: t('datos.passwordRepeat'), attributes: { autocomplete: 'new-password' } },
         ],
-        'Activar',
+        t('datos.activate'),
       );
       if (!values) return;
-      if (values['p1'] !== values['p2']) return this.fail('Las contraseñas no coinciden.');
-      const saved = await this.busy('Creando el primer respaldo…', () => this.autoBackup.enable(values['p1']));
-      if (saved === false) await this.fail('Se activó, pero no se pudo guardar el primer respaldo. Se reintenta al abrir la app.');
-      else if (saved) this.status.set('Respaldo automático activado. El primero ya está en Documentos/Kuarto.');
+      if (values['p1'] !== values['p2']) return this.fail(t('datos.passwordsDiffer'));
+      const saved = await this.busy(t('datos.autoFirst'), () => this.autoBackup.enable(values['p1']));
+      if (saved === false) await this.fail(t('datos.autoFirstFailed'));
+      else if (saved) this.status.set(t('datos.autoEnabled'));
     } finally {
       const toggle = this.autoToggle();
       if (toggle) toggle.checked = this.autoBackup.enabled();

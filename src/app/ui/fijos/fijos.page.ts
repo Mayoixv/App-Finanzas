@@ -26,14 +26,10 @@ import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 import { RecurringFormService } from './recurring-form.service';
 import { LoadingComponent } from '../loading.component';
+import { t, tn } from '../i18n';
 
-/** Solo se muestra la frecuencia cuando no es mensual. */
-const FREQUENCY_LABEL: Record<number, string> = {
-  1: '',
-  3: 'Trimestral',
-  6: 'Semestral',
-  12: 'Anual',
-};
+/** Solo se muestra la frecuencia cuando no es mensual (fijos.frequency en es.json). */
+const frequencyLabel = (months: number) => (months === 1 ? '' : t(`fijos.frequency.${months}`));
 
 /** Cuánto se ve el check de éxito sobre la tarjeta (design.md, 10.2). */
 const FLASH_MS = 1200;
@@ -76,6 +72,8 @@ interface Totals {
   ],
 })
 export class FijosPage {
+  protected readonly t = t;
+  protected readonly tn = tn;
   private readonly container = inject(APP_CONTAINER);
   protected readonly monthState = inject(MonthState);
   private readonly form = inject(RecurringFormService);
@@ -134,16 +132,12 @@ export class FijosPage {
         paidDate,
       });
       this.flashId.set(row.id);
-      this.liveMessage.set(
-        `${row.name} marcado como ${row.isIncome ? 'recibido' : 'pagado'}`,
-      );
+      this.liveMessage.set(t(row.isIncome ? 'fijos.markedReceived' : 'fijos.markedPaid', { name: row.name }));
       this.monthState.notifyChange();
       setTimeout(() => this.flashId.set(null), FLASH_MS);
     } catch (error) {
       console.error(error);
-      this.liveMessage.set(
-        `No se pudo marcar ${row.name} como pagado. Inténtalo de nuevo.`,
-      );
+      this.liveMessage.set(t('fijos.payFailed', { name: row.name }));
     } finally {
       this.payingId.set(null);
     }
@@ -152,17 +146,17 @@ export class FijosPage {
   protected async resume(expense: RecurringExpense) {
     try {
       await this.container.resumeRecurringExpense.execute(expense.id);
-      this.liveMessage.set(`${expense.name} reanudado`);
+      this.liveMessage.set(t('fijos.resumed', { name: expense.name }));
       this.monthState.notifyChange();
     } catch (error) {
       console.error(error);
-      this.liveMessage.set('No se pudo reanudar. Inténtalo de nuevo.');
+      this.liveMessage.set(t('fijos.resumeFailed'));
     }
   }
 
   protected pausedLabel(expense: RecurringExpense): string {
     return expense.pausedUntil
-      ? `En pausa hasta ${monthLabel(expense.pausedUntil)}`
+      ? t('fijos.pausedUntil', { month: monthLabel(expense.pausedUntil) })
       : '';
   }
 
@@ -242,12 +236,12 @@ function toRow(
   const paid = instance.status === 'pagado';
   const due = paid
     ? {
-        text: `${isIncome ? 'Cobro' : 'Vencimiento'} ${formatDay(instance.dueDate)}`,
+        text: t(isIncome ? 'fijos.chargeOn' : 'fijos.dueOn', { date: formatDay(instance.dueDate) }),
         urgent: false,
         overdue: false,
       }
     : dueLabel(instance.dueDate, today, isIncome);
-  const every = FREQUENCY_LABEL[expense.frequency ?? 1];
+  const every = frequencyLabel(expense.frequency ?? 1);
   return {
     id: expense.id,
     isIncome,

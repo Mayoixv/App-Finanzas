@@ -105,33 +105,237 @@
 }
 
 .cover {
-  align-items: center;
-  text-align: center;
   padding-top: 24px;
 }
 
-/* El gato entra creciendo un poco: es la única animación de la portada. */
-.cover-icon {
-  width: 160px;
-  height: 160px;
-  border-radius: 40px;
-  box-shadow: 0 24px 56px -20px rgba(106, 61, 240, 0.55);
-  animation: t-cover-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
 }
 
-.cover-title {
-  font-size: 34px;
+.back {
+  min-height: 48px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-@keyframes t-cover-in {
-  from {
-    opacity: 0;
-    transform: scale(0.85);
+.top .progress {
+  margin-left: auto;
+}
+
+.bar {
+  height: 6px;
+  margin-top: -8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-soft-card);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--violet-600), var(--violet-400));
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group-label {
+  margin: 8px 0 -4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted-on-light);
+}
+
+.choice.with-sub {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding-block: 12px;
+}
+
+.choice-sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--muted-on-light);
+}
+
+.skip {
+  align-self: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--muted-on-light);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tip {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-field);
+  background: var(--surface-soft-chip);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-on-light);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-soft-card);
+  color: var(--text-on-light);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+
+  ion-icon {
+    color: var(--accent);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .cover-icon {
-    animation: none;
+.drafts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: var(--radius-field);
+    background: var(--surface-soft-card);
   }
+
+  li.with-toggle {
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: 4px;
+  }
+
+  ion-toggle {
+    padding: 4px 16px 8px;
+    font-size: 15px;
+    color: var(--text-on-light);
+    --track-background-checked: var(--violet-600);
+  }
+}
+
+.draft-row {
+  display: flex;
+  align-items: center;
+}
+
+.draft {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 0 8px 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text-on-light);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+
+  ion-icon {
+    flex: none;
+    color: var(--muted-on-light);
+  }
+}
+
+.draft-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--muted-on-light);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.toggle-text {
+  display: block;
+  white-space: normal;
+}
+
+.summary {
+  margin: 0;
+  padding: 4px 16px;
+  border-radius: var(--radius-card);
+  background: var(--surface-soft-card);
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 0;
+
+    & + div {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  dt {
+    font-size: 13px;
+    color: var(--muted-on-light);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-on-light);
+  }
+}
+
+.error {
+  margin: 0;
+  color: var(--negative-on-light);
+  font-size: 15px;
+}
+
+.hint-small {
+  margin: -4px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted-on-light);
+  text-align: center;
 }

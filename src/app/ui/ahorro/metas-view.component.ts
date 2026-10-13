@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, createOutline } from 'ionicons/icons';
@@ -7,7 +7,7 @@ import {
   GoalProgress,
   MonthContribution,
 } from '../../application/use-cases/get-savings-overview';
-import { MonthlySummary, SavingsRating } from '../../domain/monthly-summary';
+import { MonthlySummary } from '../../domain/monthly-summary';
 import { formatDay, formatMoney, formatPercent, monthLabel } from '../format';
 import { PageSlideComponent } from '../page-slide.component';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
@@ -15,12 +15,7 @@ import { MonthState } from '../month-state';
 import { UndoService } from '../undo.service';
 import { SavingsFormService } from './savings-form.service';
 import { LoadingComponent } from '../loading.component';
-
-const RATING_TEXT: Record<SavingsRating, string> = {
-  excelente: 'Excelente',
-  regular: 'Regular',
-  bajo: 'Bajo',
-};
+import { t } from '../i18n';
 
 interface View {
   summary: MonthlySummary;
@@ -41,6 +36,7 @@ interface View {
 })
 /** Sección Metas de la pestaña Dinero: ahorrado del mes, metas y aportes. */
 export class MetasViewComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly alerts = inject(AlertController);
   private readonly undo = inject(UndoService);
@@ -52,10 +48,14 @@ export class MetasViewComponent {
   protected readonly liveMessage = signal('');
   /** Vista activa (design.md 10.3): '1' progreso acumulado de las metas, '2' aportes del mes. */
   protected readonly view1or2 = signal('1');
-  protected readonly viewOptions: PillOption[] = [
-    { value: '1', label: 'Acumulado' },
-    { value: '2', label: 'Este mes' },
-  ];
+  protected readonly viewOptions = computed<PillOption[]>(() => [
+    { value: '1', label: t('metas.total') },
+    { value: '2', label: t('metas.thisMonth') },
+  ]);
+
+  protected goalName(c: MonthContribution): string {
+    return c.goalName ?? t('metas.deletedGoal');
+  }
   /** Cada carga lleva un número; si el usuario cambió de mes mientras tanto, la respuesta vieja se descarta. */
   private loadSeq = 0;
 
@@ -71,17 +71,16 @@ export class MetasViewComponent {
     if (g.goal.targetDate) {
       parts.push(
         g.targetPassed
-          ? `La fecha objetivo (${monthLabel(g.goal.targetDate.slice(0, 7))}) ya pasó`
-          : `Para ${monthLabel(g.goal.targetDate.slice(0, 7))}: ${formatMoney(g.neededPerMonth ?? 0)} al mes`,
+          ? t('metas.datePassed', { month: monthLabel(g.goal.targetDate.slice(0, 7)) })
+          : t('metas.needed', { month: monthLabel(g.goal.targetDate.slice(0, 7)), amount: formatMoney(g.neededPerMonth ?? 0) }),
       );
     }
     if (g.projectedMonth)
-      parts.push(`A tu ritmo llegas en ${monthLabel(g.projectedMonth)}`);
+      parts.push(t('metas.atPace', { month: monthLabel(g.projectedMonth) }));
     else if (g.saved > 0 || g.goal.targetDate)
-      parts.push('Sin aportes recientes para proyectar');
+      parts.push(t('metas.noPace'));
     return parts.join(' · ');
   }
-  protected readonly ratingText = RATING_TEXT;
 
   constructor() {
     addIcons({ checkmarkCircleOutline, createOutline });
@@ -104,13 +103,15 @@ export class MetasViewComponent {
   protected async confirmDeleteContribution(item: MonthContribution) {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: item.contribution.withdrawal
-        ? 'Eliminar retiro'
-        : 'Eliminar aporte',
-      message: `Se borrará el ${item.contribution.withdrawal ? 'retiro' : 'aporte'} de ${formatMoney(item.contribution.amount)} a ${item.goalName} del ${formatDay(item.contribution.date)}.`,
+      header: t(item.contribution.withdrawal ? 'metas.deleteWithdrawalTitle' : 'metas.deleteContributionTitle'),
+      message: t(item.contribution.withdrawal ? 'metas.deleteWithdrawalMsg' : 'metas.deleteContributionMsg', {
+        amount: formatMoney(item.contribution.amount),
+        name: this.goalName(item),
+        date: formatDay(item.contribution.date),
+      }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -123,14 +124,12 @@ export class MetasViewComponent {
       this.monthState.notifyChange();
       if (removed)
         this.undo.offer(
-          removed.withdrawal ? 'Retiro eliminado' : 'Aporte eliminado',
+          t(removed.withdrawal ? 'metas.withdrawalDeleted' : 'metas.contributionDeleted'),
           () => this.container.restoreSavingsContribution.execute(removed),
         );
     } catch (error) {
       console.error(error);
-      this.liveMessage.set(
-        'No se pudo eliminar el aporte. Inténtalo de nuevo.',
-      );
+      this.liveMessage.set(t('metas.deleteFailed'));
     }
   }
 

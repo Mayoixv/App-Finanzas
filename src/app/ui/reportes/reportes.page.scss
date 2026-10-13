@@ -1,6 +1,6 @@
 :host {
   /* Colores de serie validados con la guía de visualización sobre --surface-soft-card (contraste y daltonismo). */
-  --series-gastos: #6639ec;
+  --series-gastos: var(--violet-600);
   --series-ingresos: #0f8a5f;
 }
 
@@ -194,7 +194,7 @@ li + li .cat {
   display: block;
   height: 8px;
   border-radius: var(--radius-pill);
-  background: rgba(106, 61, 240, 0.12);
+  background: rgba(var(--violet-600-rgb), 0.12);
 }
 
 .cat-fill {

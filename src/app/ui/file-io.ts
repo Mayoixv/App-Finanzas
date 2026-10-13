@@ -39,22 +39,24 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url));
 }
 
-/**
- * Abre el selector de archivos del sistema y devuelve el texto del archivo elegido, o null si se cancela.
- * Sin `accept`, se puede elegir cualquier archivo: Android no conoce la extensión .finanzas y, si se filtra por
- * ella, deja todos los archivos en gris. Quien llama comprueba el contenido.
- */
-export function pickTextFile(accept = ''): Promise<string | null> {
+/** Abre el selector de archivos del sistema y devuelve el archivo elegido, o null si se cancela. */
+export function pickFile(accept = ''): Promise<File | null> {
   return new Promise((resolve) => {
     const input = Object.assign(document.createElement('input'), { type: 'file', accept });
-    input.addEventListener('change', () => {
-      const file = input.files?.[0];
-      if (file) file.text().then(resolve, () => resolve(null));
-      else resolve(null);
-    });
+    input.addEventListener('change', () => resolve(input.files?.[0] ?? null));
     input.addEventListener('cancel', () => resolve(null));
     input.click();
   });
+}
+
+/**
+ * Como pickFile, pero devuelve el texto del archivo.
+ * Sin `accept`, se puede elegir cualquier archivo: Android no conoce la extensión .finanzas y, si se filtra por
+ * ella, deja todos los archivos en gris. Quien llama comprueba el contenido.
+ */
+export async function pickTextFile(accept = ''): Promise<string | null> {
+  const file = await pickFile(accept);
+  return file ? file.text().catch(() => null) : null;
 }
 
 /** Fecha de hoy para nombres de archivo: finanzas-respaldo-2026-10-05. */

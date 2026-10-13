@@ -5,10 +5,11 @@ import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline, settingsOutline } from 'ionicons/icons';
+import { alertCircleOutline, chevronForward, settingsOutline } from 'ionicons/icons';
+import { OnboardingGoal } from '../../application/use-cases/user-profile';
 import { APP_CONTAINER } from '../../app.container';
 import { MonthOverview } from '../../application/use-cases/get-month-overview';
-import { MonthlySummary, SavingsRating } from '../../domain/monthly-summary';
+import { MonthlySummary } from '../../domain/monthly-summary';
 import { Transaction } from '../../domain/transaction';
 import { formatDay, formatMoney, formatPercent } from '../format';
 import { MonthSwitcherComponent } from '../month-switcher.component';
@@ -22,12 +23,7 @@ import { NetWorthCardComponent } from './net-worth-card.component';
 import { BalanceReelComponent } from '../balance-reel.component';
 import { ExpenseDonutComponent } from './expense-donut.component';
 import { LoadingComponent } from '../loading.component';
-
-const RATING_TEXT: Record<SavingsRating, string> = {
-  excelente: 'Excelente',
-  regular: 'Regular',
-  bajo: 'Bajo',
-};
+import { t } from '../i18n';
 
 interface RecentRow {
   id: string;
@@ -61,23 +57,31 @@ interface RecentRow {
   ],
 })
 export class InicioPage {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   protected readonly monthState = inject(MonthState);
   private readonly transactionForm = inject(TransactionFormService);
 
   protected readonly overview = signal<MonthOverview | null>(null);
   protected readonly userName = signal('');
+  protected readonly goal = signal<OnboardingGoal | null>(null);
+  /** A dónde lleva el objetivo elegido en las preguntas iniciales. */
+  protected readonly goalRoute: Record<OnboardingGoal, { path: string; query?: Record<string, string> }> = {
+    controlar: { path: '/reportes' },
+    ahorrar: { path: '/tabs/planes', query: { ver: 'metas' } },
+    deudas: { path: '/tabs/planes', query: { ver: 'deudas' } },
+    organizar: { path: '/tabs/fijos' },
+  };
   protected readonly recent = signal<RecentRow[]>([]);
   protected readonly failed = signal(false);
   protected readonly money = formatMoney;
   protected readonly percent = formatPercent;
-  protected readonly ratingText = RATING_TEXT;
   /** Cada carga lleva un número; si el usuario cambió de mes mientras tanto, la respuesta vieja se descarta. */
   protected readonly categories = signal<Category[]>([]);
   private loadSeq = 0;
 
   constructor() {
-    addIcons({ alertCircleOutline, settingsOutline });
+    addIcons({ alertCircleOutline, chevronForward, settingsOutline });
     effect(() => {
       const month = this.monthState.month();
       this.monthState.version();
@@ -97,6 +101,7 @@ export class InicioPage {
     const seq = ++this.loadSeq;
     try {
       this.userName.set(await this.container.profile.name());
+      this.goal.set(await this.container.profile.goal());
       const [overview, categories] = await Promise.all([
         this.container.getMonthOverview.execute(month),
         this.container.categories.list(),
@@ -105,16 +110,16 @@ export class InicioPage {
       this.overview.set(overview);
       this.categories.set(categories);
       this.recent.set(
-        overview.recent.map(({ transaction: t, category }) => {
+        overview.recent.map(({ transaction: tx, category }) => {
           const isIncome = category?.type === 'ingreso';
-          const name = category?.name ?? 'Sin categoría';
+          const name = category?.name ?? t('common.noCategory');
           return {
-            id: t.id,
-            transaction: t,
+            id: tx.id,
+            transaction: tx,
             ...lookOf(category ?? { type: isIncome ? 'ingreso' : 'variable' }),
-            title: t.note || name,
-            subtitle: `${name} · ${formatDay(t.date)}`,
-            amount: `${isIncome ? '+' : '−'}${formatMoney(t.amount)}`,
+            title: tx.note || name,
+            subtitle: `${name} · ${formatDay(tx.date)}`,
+            amount: `${isIncome ? '+' : '−'}${formatMoney(tx.amount)}`,
             isIncome,
           };
         }),

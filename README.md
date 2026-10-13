@@ -12,7 +12,12 @@ Todo se guarda en tu teléfono, sin publicidad. Si quieres, el respaldo semanal 
 - **Dinero:** cuentas de banco, efectivo y tarjetas de crédito, con su saldo. Transferencias y pago de tarjeta sin contarlos como gasto. Corte, fecha de pago y uso del límite de cada tarjeta.
 - **Planes:** metas de ahorro con aportes desde una cuenta, y deudas (lo que debes o te deben) con calendario de cuotas.
 - **Reportes:** meses comparados, gasto por categoría y exportación del mes a PDF.
-- **Presupuestos** por categoría, **avisos** de pagos próximos, **PIN y huella**, y **respaldos cifrados** (manuales o automáticos cada semana).
+- **Presupuestos** por categoría, **avisos** de pagos próximos, **PIN y huella**, y **respaldos cifrados** (manuales o automáticos cada día o cada semana).
+- **Copiar de otro mes:** pasa los gastos del mes pasado al actual, con montos editables y deshacer.
+- **Importar desde Excel o CSV**, con plantilla descargable, revisión de errores y deshacer.
+- **Bienvenida** con preguntas iniciales que dejan listas cuentas, sueldo, fijos, deudas y metas, y un **recorrido** con ejemplos.
+- **Apariencia:** modo claro u oscuro, paletas de color o un color propio.
+- **Idiomas:** español, inglés, portugués, francés, italiano y japonés (las traducciones son borradores sin revisión nativa).
 - Moneda en pesos dominicanos (RD$) o dólares (US$). Solo cambia el símbolo, no convierte montos.
 
 ## Instalar
@@ -50,6 +55,10 @@ src/app/
 ```
 
 Las dependencias apuntan hacia adentro: `ui → application → domain`. Cada cambio de esquema es una migración nueva en `infrastructure/sqlite/migrations.ts`.
+
+Los textos de la interfaz están en `src/assets/i18n/<idioma>.json` (el español es la base) y se leen con `t()` de `ui/i18n.ts`. Una prueba falla si a un idioma le falta una clave o un `{dato}` del español.
+
+Para leer y crear archivos de Excel se usa SheetJS, instalado desde su fuente oficial: el paquete está en `vendor/xlsx-0.20.3.tgz` (el de npm está desactualizado).
 
 El respaldo en la nube usa Firebase (Authentication con Google y Firestore). Para compilarlo necesitas el `google-services.json` de tu proyecto en `android/app/` (no está en el repositorio).
 

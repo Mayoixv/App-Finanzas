@@ -17,7 +17,7 @@ export class CreateBackup {
 
   async execute(password: string): Promise<string> {
     if (password.length < MIN_PASSWORD) {
-      throw new ValidationError(`La contraseña debe tener al menos ${MIN_PASSWORD} caracteres`);
+      throw new ValidationError('passwordLength', { min: MIN_PASSWORD });
     }
     return encryptText(JSON.stringify(await this.store.dump()), password);
   }
@@ -28,7 +28,7 @@ export class OpenBackup {
   async execute(fileText: string, password: string): Promise<{ data: BackupData; summary: BackupSummary }> {
     const data = JSON.parse(await decryptText(fileText, password)) as BackupData;
     if (!Number.isInteger(data?.schemaVersion) || typeof data.tables !== 'object') {
-      throw new ValidationError('El respaldo está incompleto');
+      throw new ValidationError('backupIncomplete');
     }
     const months = (data.tables['transactions'] ?? [])
       .map((t) => monthOf(String(t['date'])))
@@ -51,6 +51,11 @@ export class RestoreBackup {
   execute(data: BackupData): Promise<void> {
     return this.store.restore(data);
   }
+
+  /** Los datos de ahora, para guardar una copia antes de reemplazarlos. */
+  current(): Promise<BackupData> {
+    return this.store.dump();
+  }
 }
 
 /** Palabra que hay que escribir para confirmar el borrado total. */
@@ -62,17 +67,21 @@ export class WipeAllData {
   /** Borra todos los datos y ajustes (también el PIN). Exige escribir BORRAR para que no pase por un toque. */
   async execute(confirmation: string): Promise<void> {
     if (confirmation.trim().toUpperCase() !== WIPE_CONFIRMATION) {
-      throw new ValidationError(`Escribe ${WIPE_CONFIRMATION} para confirmar.`);
+      throw new ValidationError('wipeConfirm', { word: WIPE_CONFIRMATION });
     }
     return this.store.wipe();
   }
 }
 
-/** Cada cuántos días se hace el respaldo automático. */
-export const AUTO_BACKUP_DAYS = 7;
+/** Cada cuántos días se hace el respaldo automático: diario o semanal (semanal por defecto). */
+export const AUTO_BACKUP_FREQUENCIES = [1, 7] as const;
+export type AutoBackupFrequency = (typeof AUTO_BACKUP_FREQUENCIES)[number];
+/** Cuántos respaldos automáticos se conservan en el teléfono; los más viejos se borran. */
+export const AUTO_BACKUP_KEEP_OPTIONS = [2, 4, 8, 12] as const;
+const DEFAULT_KEEP = 4;
 
 /**
- * Respaldo automático semanal, cifrado con una contraseña que se elige una vez y se guarda en la app.
+ * Respaldo automático, cifrado con una contraseña que se elige una vez y se guarda en la app.
  * El archivo lo guarda la interfaz (en Documentos del teléfono); aquí solo se decide cuándo y se genera.
  */
 export class AutoBackup {
@@ -90,7 +99,7 @@ export class AutoBackup {
   }
 
   async enable(password: string): Promise<void> {
-    if (password.length < MIN_PASSWORD) throw new ValidationError(`La contraseña debe tener al menos ${MIN_PASSWORD} caracteres`);
+    if (password.length < MIN_PASSWORD) throw new ValidationError('passwordLength', { min: MIN_PASSWORD });
     await this.settings.set('auto_backup_password', password);
     await this.settings.set('auto_backup_last', '');
   }
@@ -99,17 +108,36 @@ export class AutoBackup {
     await this.settings.set('auto_backup_password', '');
   }
 
-  /** Si toca hacer el respaldo hoy: activado y sin respaldo en los últimos 7 días. */
+  async frequency(): Promise<AutoBackupFrequency> {
+    return (await this.settings.get('auto_backup_days')) === '1' ? 1 : 7;
+  }
+
+  async setFrequency(days: AutoBackupFrequency): Promise<void> {
+    if (!AUTO_BACKUP_FREQUENCIES.includes(days)) throw new ValidationError('frequency');
+    await this.settings.set('auto_backup_days', String(days));
+  }
+
+  async keep(): Promise<number> {
+    const saved = Number(await this.settings.get('auto_backup_keep'));
+    return (AUTO_BACKUP_KEEP_OPTIONS as readonly number[]).includes(saved) ? saved : DEFAULT_KEEP;
+  }
+
+  async setKeep(count: number): Promise<void> {
+    if (!(AUTO_BACKUP_KEEP_OPTIONS as readonly number[]).includes(count)) throw new ValidationError('backupKeep');
+    await this.settings.set('auto_backup_keep', String(count));
+  }
+
+  /** Si toca hacer el respaldo hoy: activado y sin respaldo en el último día o semana, según la frecuencia. */
   async isDue(today: string): Promise<boolean> {
     if (!(await this.isEnabled())) return false;
     const last = await this.lastRun();
-    return !last || daysBetween(last, today) >= AUTO_BACKUP_DAYS;
+    return !last || daysBetween(last, today) >= (await this.frequency());
   }
 
   /** Genera el archivo cifrado. Se marca como hecho solo cuando la interfaz confirma que lo guardó. */
   async create(): Promise<string> {
     const password = await this.settings.get('auto_backup_password');
-    if (!password) throw new ValidationError('El respaldo automático no está activado');
+    if (!password) throw new ValidationError('autoBackupOff');
     return this.backup.execute(password);
   }
 

@@ -131,4 +131,18 @@ describe('respaldo', () => {
     await auto.disable();
     expect(await auto.isDue('2026-10-20')).toBe(false);
   });
+
+  it('el respaldo automático puede ser diario y conservar más o menos archivos', async () => {
+    const a = await dbWith([1250]);
+    const auto = new AutoBackup(new SqliteSettingsRepository(a.db), new CreateBackup(a.store));
+    await auto.enable('diario12');
+    expect(await auto.keep()).toBe(4);
+    await auto.setFrequency(1);
+    await auto.setKeep(8);
+    await auto.markDone('2026-10-05');
+    expect(await auto.isDue('2026-10-05')).toBe(false);
+    expect(await auto.isDue('2026-10-06')).toBe(true);
+    expect(await auto.keep()).toBe(8);
+    await expect(auto.setKeep(3)).rejects.toThrow(ValidationError);
+  });
 });

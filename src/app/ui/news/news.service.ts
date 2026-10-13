@@ -5,6 +5,7 @@ import { HelpSheetComponent } from '../help/help-sheet.component';
 import { isNewer } from '../update/update.service';
 import { APP_VERSION } from '../../version';
 import { CHANGELOG } from './changelog';
+import { t } from '../i18n';
 
 const SEEN_KEY = 'news_seen_version';
 
@@ -36,13 +37,13 @@ export class NewsService {
 
   /** Ajustes › Novedades: lo de la versión instalada. */
   openLatest() {
-    return this.open(CHANGELOG.find((e) => e.version === APP_VERSION)?.points ?? ['Arreglos y mejoras.']);
+    return this.open(CHANGELOG.find((e) => e.version === APP_VERSION)?.points ?? [t('news.fallback')]);
   }
 
   private async open(points: string[]) {
     const sheet = await this.modals.create({
       component: HelpSheetComponent,
-      componentProps: { news: { title: `Novedades de Kuarto ${APP_VERSION}`, points } },
+      componentProps: { news: { title: t('news.title', { version: APP_VERSION }), points } },
       cssClass: 'select-modal',
     });
     await sheet.present();

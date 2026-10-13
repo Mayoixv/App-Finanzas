@@ -7,7 +7,7 @@ export class UpdateSavingsGoal {
   constructor(private readonly savings: ISavingsRepository) {}
 
   async execute(id: string, input: SavingsGoalFields): Promise<SavingsGoal> {
-    if (!(await this.savings.getGoal(id))) throw new NotFoundError('Meta de ahorro');
+    if (!(await this.savings.getGoal(id))) throw new NotFoundError('goal');
     const goal: SavingsGoal = {
       id,
       name: validateGoalInput(input),

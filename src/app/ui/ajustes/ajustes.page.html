@@ -1,138 +1,315 @@
 <ion-content class="surface-light" [fullscreen]="true">
   <header class="screen-head">
-    <a routerLink="/tabs/inicio" class="back" aria-label="Volver a Inicio">
-      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
-      Inicio
-    </a>
-    <h1 class="screen-title">Ajustes</h1>
+    <div class="head-bar">
+      @if (section(); as s) {
+        <a routerLink="/ajustes" class="back" [attr.aria-label]="t('common.back', { to: t('ajustes.title') })">
+          <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+          {{ t('ajustes.title') }}
+        </a>
+      } @else {
+        <a routerLink="/tabs/inicio" class="back" [attr.aria-label]="t('common.back', { to: t('common.home') })">
+          <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+          {{ t('common.home') }}
+        </a>
+        <button type="button" class="search-btn" [attr.aria-expanded]="searching()" [attr.aria-label]="t('ajustes.search')" (click)="toggleSearch()">
+          <ion-icon [name]="searching() ? 'close' : 'search'" aria-hidden="true"></ion-icon>
+        </button>
+      }
+    </div>
+    <h1 class="screen-title">{{ section() ? sectionText(section()!.id, 'title') : t('ajustes.title') }}</h1>
+    @if (!section() && searching()) {
+      <label class="search">
+        <ion-icon name="search" aria-hidden="true"></ion-icon>
+        <span class="sr-only">{{ t('ajustes.search') }}</span>
+        <input #searchBox type="search" [placeholder]="t('ajustes.searchPlaceholder')" [value]="query()" (input)="query.set(searchBox.value)" />
+      </label>
+    }
   </header>
 
   <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
-  <section class="block" aria-labelledby="tu-title">
-    <h2 id="tu-title" class="section-title">Tú</h2>
-    <ul class="rows">
-      <li>
-        <button type="button" class="row" (click)="editName()">
-          <span class="row-title">{{ userName() ? 'Nombre: ' + userName() : 'Agregar tu nombre' }}</span>
-          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </button>
-      </li>
-    </ul>
-  </section>
+  @switch (seccion()) {
+    @case (undefined) {
+      <section class="block" [attr.aria-label]="t('ajustes.sectionsLabel')">
+        @if (query().trim()) {
+          <ul class="rows">
+            @for (r of results(); track r.label + r.section.id) {
+              <li>
+                <a class="row section-row" [routerLink]="['/ajustes', r.section.id]">
+                  <ion-icon class="section-icon" [name]="r.section.icon" aria-hidden="true"></ion-icon>
+                  <span class="row-text">
+                    <span class="row-title">{{ r.label }}</span>
+                    <span class="row-sub">{{ sectionText(r.section.id, 'title') }}</span>
+                  </span>
+                </a>
+              </li>
+            } @empty {
+              <li class="row-empty">{{ t('ajustes.noResults', { query: query() }) }}</li>
+            }
+          </ul>
+        } @else {
+          <ul class="rows">
+            @for (s of sections; track s.id) {
+              <li>
+                <a class="row section-row" [routerLink]="['/ajustes', s.id]">
+                  <ion-icon class="section-icon" [name]="s.icon" aria-hidden="true"></ion-icon>
+                  <span class="row-text">
+                    <span class="row-title">{{ sectionText(s.id, 'title') }}</span>
+                    <span class="row-sub">{{ sectionText(s.id, 'sub') }}</span>
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
 
-  <section class="block" aria-labelledby="ayuda-title">
-    <h2 id="ayuda-title" class="section-title">Ayuda</h2>
-    <ul class="rows">
-      <li>
-        <button type="button" class="row" (click)="tour.start()">
-          <span class="row-title">Ver recorrido otra vez</span>
-          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </button>
-      </li>
-      @for (t of helpTopics; track t) {
-        <li>
-          <button type="button" class="row" [attr.aria-label]="'Ayuda sobre ' + helpTitle(t)" (click)="help.open(t)">
-            <span class="row-title">{{ helpTitle(t) }}</span>
-            <ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon>
+    @case ('apariencia') {
+      <section class="block" aria-labelledby="apariencia-title">
+        <h2 id="apariencia-title" class="section-title">{{ t('ajustes.theme') }}</h2>
+        <app-pill-toggle [label]="t('ajustes.theme')" [options]="appearanceOptions()" [value]="appearance()" (valueChange)="changeAppearance($event)"></app-pill-toggle>
+        <p class="note">{{ t('ajustes.themeNote') }}</p>
+      </section>
+
+      <section class="block" aria-labelledby="color-title">
+        <h2 id="color-title" class="section-title">{{ t('palette.title') }}</h2>
+        <div class="swatches" role="radiogroup" [attr.aria-label]="t('palette.title')">
+          @for (p of presets; track p.id) {
+            <button
+              type="button"
+              role="radio"
+              class="swatch"
+              [attr.aria-checked]="choice() === p.id"
+              [style.--swatch]="p.accent"
+              (click)="choose(p.id)"
+            >
+              <span class="dot" aria-hidden="true"></span>
+              <span class="swatch-name">{{ t('palette.names.' + p.id) }}</span>
+            </button>
+          }
+          <button type="button" role="radio" class="swatch custom" [attr.aria-checked]="isCustom()" (click)="choose(customHex())">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="swatch-name">{{ t('palette.names.custom') }}</span>
           </button>
-        </li>
-      }
-    </ul>
-  </section>
+        </div>
 
-  <section class="block" aria-labelledby="moneda-title">
-    <h2 id="moneda-title" class="section-title">Moneda</h2>
-    <div class="anchor">
-      <button
-        type="button"
-        class="select"
-        aria-haspopup="menu"
-        [attr.aria-expanded]="currencyOpen()"
-        [attr.aria-label]="'Moneda: ' + currencyLabel() + '. Cambiar'"
-        (click)="currencyOpen.set(!currencyOpen())"
-      >
-        {{ currencyLabel() }}
-        <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="currencyOpen()"></ion-icon>
-      </button>
-      <app-dropdown class="currency-menu" origin="top-left" label="Moneda" [(open)]="currencyOpen">
-        @for (c of currencies; track c.code) {
+        @if (isCustom()) {
+          <p class="note">{{ t('palette.customHint') }}</p>
+          <div class="hues" role="group" [attr.aria-label]="t('palette.names.custom')">
+            @for (h of hues; track h) {
+              <button type="button" class="hue" [style.background]="h" [attr.aria-label]="h" [attr.aria-pressed]="choice() === h" (click)="choose(h)"></button>
+            }
+          </div>
+          <label class="hex">
+            <span class="hex-label">{{ t('palette.hex') }}</span>
+            <input #hexBox type="text" maxlength="7" autocapitalize="characters" spellcheck="false" [value]="hexText()" (input)="typeHex(hexBox.value)" />
+          </label>
+          @if (hexError()) {
+            <p class="note warn" role="alert">{{ t('palette.hexInvalid') }}</p>
+          }
+        }
+
+        <p class="preview-label">{{ t('palette.preview') }}</p>
+        <div class="preview" [style]="previewStyle()">
+          <div class="preview-hero">
+            <span class="preview-small">{{ t('palette.previewBalance') }}</span>
+            <span class="preview-amount">RD$12,500.00</span>
+          </div>
+          <div class="preview-row">
+            <span class="status-chip paid">{{ t('status.paid') }}</span>
+            <span class="status-chip pending">{{ t('status.pending') }}</span>
+            <span class="preview-link">{{ t('palette.names.' + (isCustom() ? 'custom' : choice())) }}</span>
+          </div>
+          <span class="preview-button">{{ t('palette.previewButton') }}</span>
+        </div>
+        @if (paletteNotes().adjusted) {
+          <p class="note">{{ t('palette.adjusted') }}</p>
+        }
+        @for (w of paletteNotes().clashes; track w) {
+          <p class="note warn">{{ w }}</p>
+        }
+        <p class="note">{{ t('palette.statusNote') }}</p>
+        <button type="button" class="btn-primary apply" [disabled]="choice() === savedPalette() || hexError()" (click)="applyPalette()">
+          {{ t('palette.apply') }}
+        </button>
+      </section>
+
+      <section class="block" aria-labelledby="idioma-title">
+        <h2 id="idioma-title" class="section-title">{{ t('ajustes.language') }}</h2>
+        <ul class="rows">
+          @for (l of languages; track l.code) {
+            <li>
+              <button type="button" class="row" role="radio" [attr.aria-checked]="language() === l.code" [attr.lang]="l.code" (click)="changeLanguage(l.code)">
+                <span class="row-title">{{ l.label }}</span>
+                @if (language() === l.code) {
+                  <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+        <p class="note">{{ t('ajustes.languageNote') }}</p>
+      </section>
+
+      <section class="block" aria-labelledby="moneda-title">
+        <h2 id="moneda-title" class="section-title">{{ t('ajustes.currency') }}</h2>
+        <div class="anchor">
           <button
             type="button"
-            role="menuitemradio"
-            class="t-menu-item"
-            [attr.aria-checked]="currencyState.currency() === c.code"
-            (click)="setCurrency(c.code)"
+            class="select"
+            aria-haspopup="menu"
+            [attr.aria-expanded]="currencyOpen()"
+            [attr.aria-label]="t('ajustes.currencyChange', { label: currencyLabel() })"
+            (click)="currencyOpen.set(!currencyOpen())"
           >
-            {{ c.label }}
-            @if (currencyState.currency() === c.code) {
-              <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+            {{ currencyLabel() }}
+            <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="currencyOpen()"></ion-icon>
+          </button>
+          <app-dropdown class="currency-menu" origin="top-left" [label]="t('ajustes.currency')" [(open)]="currencyOpen">
+            @for (c of currencies(); track c.code) {
+              <button
+                type="button"
+                role="menuitemradio"
+                class="t-menu-item"
+                [attr.aria-checked]="currencyState.currency() === c.code"
+                (click)="setCurrency(c.code)"
+              >
+                {{ c.label }}
+                @if (currencyState.currency() === c.code) {
+                  <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                }
+              </button>
             }
-          </button>
+          </app-dropdown>
+        </div>
+        <p class="note">{{ t('ajustes.currencyNote') }}</p>
+      </section>
+    }
+
+    @case ('dinero') {
+      <section class="block" [attr.aria-label]="sectionText('dinero', 'title')">
+        <ul class="rows">
+          <li>
+            <a routerLink="/tabs/dinero" class="row">
+              <span class="row-text">
+                <span class="row-title">{{ t('ajustes.accounts') }}</span>
+                <span class="row-sub">{{ t('ajustes.accountsSub') }}</span>
+              </span>
+              <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/ajustes/categorias" class="row">
+              <span class="row-text">
+                <span class="row-title">{{ t('ajustes.categories') }}</span>
+                <span class="row-sub">{{ t('ajustes.categoriesSub') }}</span>
+              </span>
+              <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            </a>
+          </li>
+        </ul>
+      </section>
+    }
+
+    @case ('avisos') {
+      <app-avisos></app-avisos>
+    }
+
+    @case ('datos') {
+      <app-datos part="datos" [startAuto]="activar() === '1'"></app-datos>
+    }
+
+    @case ('seguridad') {
+      <app-datos part="seguridad"></app-datos>
+    }
+
+    @case ('cuenta') {
+      <section class="block" [attr.aria-label]="sectionText('cuenta', 'title')">
+        <ul class="rows">
+          <li>
+            <button type="button" class="row" (click)="editName()">
+              <span class="row-text">
+                <span class="row-title">{{ t('ajustes.name') }}</span>
+                <span class="row-sub">{{ userName() || t('ajustes.noName') }}</span>
+              </span>
+              <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            </button>
+          </li>
+          @if (cloud.available) {
+            <li>
+              <a routerLink="/ajustes/datos" class="row">
+                <span class="row-text">
+                  <span class="row-title">{{ t('ajustes.google') }}</span>
+                  <span class="row-sub">{{ cloud.email() ?? t('ajustes.googleOff') }}</span>
+                </span>
+                <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @case ('ayuda') {
+      <section class="block" [attr.aria-label]="sectionText('ayuda', 'title')">
+        <ul class="rows">
+          <li>
+            <button type="button" class="row" (click)="tour.start()">
+              <span class="row-title">{{ t('ajustes.tourAgain') }}</span>
+              <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            </button>
+          </li>
+          @for (topic of helpTopics; track topic) {
+            <li>
+              <button type="button" class="row" [attr.aria-label]="t('ajustes.helpAbout', { topic: helpTitle(topic) })" (click)="help.open(topic)">
+                <span class="row-title">{{ helpTitle(topic) }}</span>
+                <ion-icon name="help-circle-outline" aria-hidden="true"></ion-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @case ('acerca') {
+      <section class="block" [attr.aria-label]="sectionText('acerca', 'title')">
+        <ul class="rows">
+          <li>
+            <button type="button" class="row" (click)="news.openLatest()">
+              <span class="row-title">{{ t('ajustes.news') }}</span>
+              <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="row" [attr.aria-expanded]="showPrivacy()" (click)="showPrivacy.set(!showPrivacy())">
+              <span class="row-title">{{ t('ajustes.privacy') }}</span>
+              <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="showPrivacy()"></ion-icon>
+            </button>
+          </li>
+        </ul>
+        @if (showPrivacy()) {
+          <div class="privacy">
+            @for (p of tList('ajustes.privacyText'); track $index) {
+              <p>{{ p }}</p>
+            }
+          </div>
         }
-      </app-dropdown>
-    </div>
-    <p class="note">Solo cambia el símbolo con que se muestran los montos. Los montos guardados no se convierten.</p>
-  </section>
-
-  <section class="block" aria-labelledby="apariencia-title">
-    <h2 id="apariencia-title" class="section-title">Apariencia</h2>
-    <app-pill-toggle label="Apariencia" [options]="appearanceOptions" [value]="appearance()" (valueChange)="changeAppearance($event)"></app-pill-toggle>
-    <p class="note">Sistema sigue el modo claro u oscuro de tu teléfono.</p>
-  </section>
-
-  <app-avisos></app-avisos>
-
-  <app-datos></app-datos>
-
-  <section class="block" aria-labelledby="categorias-title">
-    <h2 id="categorias-title" class="section-title">Categorías</h2>
-    <ul class="rows">
-      <li>
-        <a routerLink="/ajustes/categorias" class="row">
-          <span class="row-title">Administrar categorías</span>
-          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </a>
-      </li>
-    </ul>
-  </section>
-  <section class="block" aria-labelledby="acerca-title">
-    <h2 id="acerca-title" class="section-title">Acerca de</h2>
-    <ul class="rows">
-      <li>
-        <button type="button" class="row" (click)="news.openLatest()">
-          <span class="row-title">Novedades de esta versión</span>
-          <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-        </button>
-      </li>
-      <li>
-        <button type="button" class="row" [attr.aria-expanded]="showPrivacy()" (click)="showPrivacy.set(!showPrivacy())">
-          <span class="row-title">Privacidad</span>
-          <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="showPrivacy()"></ion-icon>
-        </button>
-      </li>
-    </ul>
-    @if (showPrivacy()) {
-      <div class="privacy">
-        <p>Kuarto guarda todo solo en este teléfono. No hay cuentas, servidores ni publicidad, y la app no envía tus datos a nadie. Se conecta a internet solo para ver si hay una versión nueva y, si entras con Google, para subir tu respaldo cifrado.</p>
-        <p>Tus datos salen del teléfono únicamente cuando tú creas un respaldo, exportas un archivo o activas el respaldo en la nube. Los respaldos van cifrados con tu contraseña: en la nube nadie puede leerlos, ni Google.</p>
-        <p>Los permisos que pide son para mostrarte avisos, desbloquear con huella, guardar respaldos o archivos en el teléfono e instalar las versiones nuevas.</p>
-        <p>Si borras la app sin un respaldo, tus datos se pierden: nadie más tiene una copia.</p>
-      </div>
+        @if (update.supported()) {
+          <ul class="rows update-rows">
+            <li>
+              <button type="button" class="row" [disabled]="update.busy()" (click)="update.check()">
+                <span class="row-title">{{ t('ajustes.checkUpdate') }}</span>
+                <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+              </button>
+            </li>
+          </ul>
+          @if (update.status(); as status) {
+            <p class="note" aria-live="polite">{{ status }}</p>
+          }
+        }
+        <p class="note">{{ t('ajustes.version', { version }) }}</p>
+      </section>
     }
-    @if (update.supported()) {
-      <ul class="rows update-rows">
-        <li>
-          <button type="button" class="row" [disabled]="update.busy()" (click)="update.check()">
-            <span class="row-title">Buscar actualización</span>
-            <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
-          </button>
-        </li>
-      </ul>
-      @if (update.status(); as status) {
-        <p class="note" aria-live="polite">{{ status }}</p>
-      }
-    }
-    <p class="note">Kuarto {{ version }}</p>
-  </section>
+  }
 </ion-content>

@@ -23,7 +23,7 @@ export class RemoveRecurringExpense {
    */
   async execute(id: string, fromMonth: MonthKey, scope: RemoveScope = 'forward'): Promise<RemoveResult> {
     const expense = await this.recurring.get(id);
-    if (!expense) throw new NotFoundError('Gasto fijo');
+    if (!expense) throw new NotFoundError('fixed');
 
     if (scope === 'month') {
       const current = (await this.recurring.listInstancesOf(id)).find((i) => i.month === fromMonth);

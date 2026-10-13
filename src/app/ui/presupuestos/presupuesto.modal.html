@@ -1,20 +1,20 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar presupuesto' : 'Nuevo presupuesto' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ isEdit() ? t('budget.edit') : t('budget.new') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
-    <p class="group-label" id="cats-label">Categorías</p>
+    <p class="group-label" id="cats-label">{{ t('budget.categories') }}</p>
     @if (chosen().length) {
       <ul class="chosen" aria-labelledby="cats-label">
         @for (c of chosen(); track c.id) {
           <li class="chosen-row t-row-enter">
             <span class="dot" [style.background]="look(c).color" aria-hidden="true"><ion-icon [name]="look(c).icon"></ion-icon></span>
             <span class="chosen-name">{{ c.name }}</span>
-            <button type="button" class="remove" [attr.aria-label]="'Quitar ' + c.name" (click)="remove(c.id)">
+            <button type="button" class="remove" [attr.aria-label]="t('budget.remove', { name: c.name })" (click)="remove(c.id)">
               <ion-icon name="close" aria-hidden="true"></ion-icon>
             </button>
           </li>
@@ -22,12 +22,12 @@
       </ul>
     }
     @if (categories().length === 0 && chosen().length === 0) {
-      <p class="hint">Todas tus categorías de gasto ya tienen presupuesto en {{ monthState.label() }}.</p>
+      <p class="hint">{{ t('budget.allTaken', { month: monthState.label() }) }}</p>
     }
     <div class="field">
       <app-category-field
-        [label]="chosen().length ? 'Agregar otra categoría' : 'Categoría'"
-        [placeholder]="chosen().length ? 'Comparten el mismo límite' : 'Elige una categoría de gasto'"
+        [label]="chosen().length ? t('budget.addAnother') : t('budget.category')"
+        [placeholder]="chosen().length ? t('budget.shared') : t('budget.choose')"
         [categories]="categories()"
         newType="variable"
         [value]="adding()"
@@ -39,7 +39,7 @@
     @if (chosen().length > 1) {
       <div class="field">
         <ion-input
-          label="Nombre (opcional)"
+          [label]="t('budget.nameOptional')"
           label-placement="floating"
           [placeholder]="autoName()"
           [value]="name()"
@@ -50,7 +50,7 @@
 
     <div class="field">
       <ion-input
-        label="Límite para {{ monthState.label() }} ({{ currency() }})"
+        [label]="t('budget.limit', { month: monthState.label(), currency: currency() })"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -67,27 +67,27 @@
       [checked]="rollover()"
       (ionChange)="rollover.set($event.detail.checked)"
     >
-      Pasar lo que sobre (o falte) al mes siguiente
+      {{ t('budget.rollover') }}
     </ion-toggle>
-    <p class="hint">Solo se arrastra entre meses que tengan esta opción activa en el mismo presupuesto.</p>
+    <p class="hint">{{ t('budget.rolloverHint') }}</p>
 
     @if (error(); as message) {
       <p class="error" role="alert">{{ message }}</p>
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isEdit() ? 'Guardar cambios' : 'Guardar presupuesto' }}
+      {{ isEdit() ? t('common.saveChanges') : t('budget.save') }}
     </button>
 
     @if (isEdit()) {
-      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar presupuesto</button>
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">{{ t('budget.delete') }}</button>
     }
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">Presupuesto guardado</p>
+      <p class="done-text">{{ t('budget.saved') }}</p>
     }
   </div>
 </ion-content>

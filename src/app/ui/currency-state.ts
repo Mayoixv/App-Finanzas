@@ -18,4 +18,10 @@ export class CurrencyState {
     this.currency.set(value);
     this.monthState.notifyChange();
   }
+
+  /** Solo cambia el símbolo en pantalla, sin guardarlo (preguntas iniciales: se guarda al confirmar). */
+  preview(value: Currency) {
+    setDisplayCurrency(value);
+    this.currency.set(value);
+  }
 }

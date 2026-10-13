@@ -1,5 +1,5 @@
 <div class="donut">
-  <svg viewBox="0 0 200 200" role="img" [attr.aria-label]="'Gasto por categoría: ' + summary()">
+  <svg viewBox="0 0 200 200" role="img" [attr.aria-label]="t('donut.label', { summary: summary() })">
     <circle class="track" cx="100" cy="100" r="80" />
     @for (arc of arcs(); track arc.name) {
       <circle
@@ -16,7 +16,7 @@
   </svg>
   <div class="center">
     <span class="center-amount">{{ money(total()) }}</span>
-    <span class="center-label">gastado</span>
+    <span class="center-label">{{ t('donut.spent') }}</span>
   </div>
 </div>
 
@@ -26,7 +26,7 @@
       <span class="swatch" [style.background]="arc.color" aria-hidden="true"></span>
       <span class="name">{{ arc.name }}</span>
       <span class="value">{{ money(arc.amount) }}</span>
-      <span class="share">{{ percent(arc.percent) }} del gasto</span>
+      <span class="share">{{ t('donut.share', { percent: percent(arc.percent) }) }}</span>
     </li>
   }
 </ul>

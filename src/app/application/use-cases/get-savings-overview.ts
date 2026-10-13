@@ -23,7 +23,8 @@ export interface GoalProgress {
 
 export interface MonthContribution {
   contribution: SavingsContribution;
-  goalName: string;
+  /** null si la meta ya no existe. */
+  goalName: string | null;
 }
 
 export interface SavingsOverview {
@@ -75,7 +76,7 @@ export class GetSavingsOverview {
         .sort((a, b) => b.date.localeCompare(a.date))
         .map((contribution) => ({
           contribution,
-          goalName: names.get(contribution.goalId) ?? 'Meta eliminada',
+          goalName: names.get(contribution.goalId) ?? null,
         })),
       savedThisMonth: sum(inMonth),
     };

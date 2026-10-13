@@ -3,7 +3,6 @@ import { AlertController, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { ValidationError } from '../../application/errors';
 import { DebtView } from '../../application/use-cases/debts';
 import {
   amortization,
@@ -25,11 +24,9 @@ import { DeudaModalComponent } from './deuda.modal';
 import { PagoModalComponent } from './pago.modal';
 import { DineroFormService } from '../dinero/dinero-form.service';
 import { LoadingComponent } from '../loading.component';
+import { t, tn, locale, errorText } from '../i18n';
 
-const SHORT_MONTH = new Intl.DateTimeFormat('es-DO', {
-  month: 'short',
-  year: 'numeric',
-});
+const shortMonth = (d: Date) => new Intl.DateTimeFormat(locale(), { month: 'short', year: 'numeric' }).format(d);
 
 interface Strategies {
   snowball: StrategyResult;
@@ -48,6 +45,8 @@ interface Strategies {
 })
 /** Sección Deudas de la pestaña Planes. */
 export class DeudasViewComponent {
+  protected readonly t = t;
+  protected readonly tn = tn;
   private readonly container = inject(APP_CONTAINER);
   private readonly forms = inject(DineroFormService);
   private readonly alerts = inject(AlertController);
@@ -116,17 +115,24 @@ export class DeudasViewComponent {
     );
   }
 
+  /** El texto antes y después del saldo en "RD$X por pagar de RD$Y": el saldo va aparte para resaltarlo. */
+  protected amountsAround(d: DebtView): [string, string] {
+    const key = d.debt.direction === 'debo' ? 'deudas.toPay' : 'deudas.toCollect';
+    const [before, after = ''] = t(key, { balance: '|', principal: formatMoney(d.debt.principal) }).split('|');
+    return [before, after];
+  }
+
   protected detail(d: DebtView): string {
     const parts = [
-      d.debt.annualRate > 0 ? `${d.debt.annualRate}% anual` : 'Sin interés',
+      d.debt.annualRate > 0 ? t('deudas.rate', { rate: d.debt.annualRate }) : t('deudas.noInterest'),
     ];
     if (d.installment > 0 && d.debt.termMonths) {
-      parts.push(`cuota ${formatMoney(d.installment)} × ${d.debt.termMonths}`);
+      parts.push(t('deudas.installment', { amount: formatMoney(d.installment), count: d.debt.termMonths }));
       parts.push(
-        `termina en ${monthLabel(addMonths(d.debt.startDate.slice(0, 7), d.debt.termMonths))}`,
+        t('deudas.endsIn', { month: monthLabel(addMonths(d.debt.startDate.slice(0, 7), d.debt.termMonths)) }),
       );
     }
-    parts.push(`desde ${formatDay(d.debt.startDate)}`);
+    parts.push(t('deudas.since', { date: formatDay(d.debt.startDate) }));
     return parts.join(' · ');
   }
 
@@ -139,13 +145,13 @@ export class DeudasViewComponent {
     const [y, m] = addMonths(d.debt.startDate.slice(0, 7), n)
       .split('-')
       .map(Number);
-    return SHORT_MONTH.format(new Date(y, m - 1, 1));
+    return shortMonth(new Date(y, m - 1, 1));
   }
 
   protected endLabel(r: StrategyResult): string {
     return r.months === null
-      ? 'No se termina de pagar con esos montos'
-      : `Terminas en ${monthLabel(addMonths(currentMonth(), r.months - 1))}`;
+      ? t('deudas.neverEnds')
+      : t('deudas.endsAt', { month: monthLabel(addMonths(currentMonth(), r.months - 1)) });
   }
 
   /** Con el extra, cuántos meses e intereses se ahorran frente a pagar solo las cuotas (con la mejor estrategia). */
@@ -158,7 +164,7 @@ export class DeudasViewComponent {
     const months = s.base.months - best.months;
     const interest = s.base.totalInterest - best.totalInterest;
     if (interest <= 0) return '';
-    return `Con ese extra terminas ${months} ${months === 1 ? 'mes' : 'meses'} antes y ahorras ${formatMoney(interest)} de intereses.`;
+    return tn('deudas.savings', months, { amount: formatMoney(interest) });
   }
 
   protected orderNames(r: StrategyResult): string {
@@ -180,11 +186,11 @@ export class DeudasViewComponent {
   protected async addToFixed(view: DebtView) {
     try {
       await this.container.addDebtAsFixed.execute(view.debt.id, this.monthState.month());
-      this.liveMessage.set(`La cuota de ${view.debt.name} está ahora en Fijos`);
+      this.liveMessage.set(t('deudas.nowFixed', { name: view.debt.name }));
       this.monthState.notifyChange();
     } catch (error) {
       console.error(error);
-      this.liveMessage.set(error instanceof ValidationError ? error.message : 'No se pudo pasar la cuota a Fijos.');
+      this.liveMessage.set(errorText(error, 'deudas.toFixedFailed'));
     }
   }
 
@@ -195,24 +201,26 @@ export class DeudasViewComponent {
   protected async confirmDeletePayment(view: DebtView, p: DebtPayment) {
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar pago',
-      message: `Se borrará el pago de ${formatMoney(p.amount)} del ${formatDay(p.date)} a ${view.debt.name}${
-        p.transactionId ? ', y también su movimiento' : ''
-      }.`,
+      header: t('deudas.deletePayment'),
+      message: t(p.transactionId ? 'deudas.deletePaymentMsgTx' : 'deudas.deletePaymentMsg', {
+        amount: formatMoney(p.amount),
+        date: formatDay(p.date),
+        name: view.debt.name,
+      }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
     if ((await alert.onDidDismiss()).role !== 'destructive') return;
     try {
       await this.container.deleteDebtPayment.execute(p);
-      this.liveMessage.set('Pago eliminado');
+      this.liveMessage.set(t('deudas.paymentDeleted'));
       this.monthState.notifyChange();
     } catch (error) {
       console.error(error);
-      this.liveMessage.set('No se pudo eliminar el pago. Inténtalo de nuevo.');
+      this.liveMessage.set(t('deudas.paymentDeleteFailed'));
     }
   }
 

@@ -2,6 +2,7 @@ import { Component, inject, signal, viewChild } from '@angular/core';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { IonToggle } from '@ionic/angular';
 import { NotificationPrefs, NotificationsService } from '../notifications.service';
+import { t } from '../i18n';
 
 /** Horas que se ofrecen, de 6:00 a 22:00. */
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6);
@@ -16,6 +17,7 @@ const hourLabel = (h: number) => `${h}:00`;
   imports: [SelectFieldComponent, IonToggle],
 })
 export class AvisosComponent {
+  protected readonly t = t;
   protected readonly notifications = inject(NotificationsService);
   protected readonly busy = signal(false);
   protected readonly error = signal('');
@@ -30,13 +32,11 @@ export class AvisosComponent {
     try {
       if (!on) await this.notifications.disable();
       else if (!(await this.notifications.enable())) {
-        this.error.set(
-          'Android no dio permiso para notificar. Actívalo en Ajustes del teléfono › Aplicaciones › Kuarto › Notificaciones.',
-        );
+        this.error.set(t('avisos.denied'));
       }
     } catch (e) {
       console.error(e);
-      this.error.set('No se pudieron cambiar las notificaciones. Inténtalo de nuevo.');
+      this.error.set(t('avisos.toggleFailed'));
     } finally {
       this.busy.set(false);
       // El interruptor cambia solo al tocarlo; si no se pudo, vuelve a mostrar el estado real.
@@ -51,7 +51,7 @@ export class AvisosComponent {
       await this.notifications.setPref(key, value);
     } catch (e) {
       console.error(e);
-      this.error.set('No se pudo guardar el cambio. Inténtalo de nuevo.');
+      this.error.set(t('avisos.saveFailed'));
     }
   }
 }

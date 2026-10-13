@@ -7,7 +7,7 @@
   </span>
 </div>
 
-<svg [attr.viewBox]="'0 0 ' + W + ' ' + H" class="chart" role="group" [attr.aria-label]="name() + ' por mes'">
+<svg [attr.viewBox]="'0 0 ' + W + ' ' + H" class="chart" role="group" [attr.aria-label]="t('charts.lineByMonth', { name: name() })">
   @for (t of ticks(); track $index) {
     <line class="grid" [attr.x1]="40" [attr.x2]="W" [attr.y1]="t.y" [attr.y2]="t.y" />
     <text class="tick" [attr.x]="34" [attr.y]="t.y + 4" text-anchor="end">{{ t.label }}</text>

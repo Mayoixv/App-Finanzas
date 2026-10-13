@@ -1,0 +1,204 @@
+<ion-content class="surface-light" [fullscreen]="true">
+  <header class="screen-head">
+    <a routerLink="/ajustes/datos" class="back" [attr.aria-label]="t('common.back', { to: t('ajustes.sections.datos.title') })">
+      <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
+      {{ t('ajustes.sections.datos.title') }}
+    </a>
+    <h1 class="screen-title">{{ t('import.title') }}</h1>
+  </header>
+
+  @switch (step()) {
+    @case ('start') {
+      <section class="block">
+        <p class="note first">{{ t('import.intro') }}</p>
+        <button type="button" class="btn-primary wide" [disabled]="busy()" (click)="pick()">
+          <ion-icon name="document-outline" aria-hidden="true"></ion-icon>
+          {{ t('import.pick') }}
+        </button>
+        <button type="button" class="btn-secondary wide" [disabled]="busy()" (click)="downloadTemplate()">
+          <ion-icon name="download-outline" aria-hidden="true"></ion-icon>
+          {{ t('import.template') }}
+        </button>
+        @if (status(); as s) {
+          <p class="note" aria-live="polite">{{ s }}</p>
+        }
+        @if (error(); as message) {
+          <p class="error" role="alert">{{ message }}</p>
+        }
+
+        <ul class="rows format-rows">
+          <li>
+            <button type="button" class="row" [attr.aria-expanded]="showFormat()" (click)="showFormat.set(!showFormat())">
+              <span class="row-title">{{ t('import.howTitle') }}</span>
+              <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="showFormat()"></ion-icon>
+            </button>
+          </li>
+        </ul>
+        @if (showFormat()) {
+          <div class="format">
+            <p>{{ t('import.howText') }}</p>
+            <table>
+              <caption class="sr-only">{{ t('import.howTitle') }}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{{ t('import.colColumn') }}</th>
+                  <th scope="col">{{ t('import.colExample') }}</th>
+                  <th scope="col">{{ t('import.colNotes') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of fields; track f; let i = $index) {
+                  <tr>
+                    <th scope="row">{{ fieldLabel(f) }}@if (required(f)) {<span class="req" [attr.aria-label]="t('import.colRequired')">*</span>}</th>
+                    <td>{{ t('import.examplePlain.' + f) }}</td>
+                    <td>{{ t('import.notes.' + f) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <p class="small">{{ t('import.requiredNote') }}</p>
+          </div>
+        }
+
+        @if (lastImport(); as last) {
+          <h2 class="section-title undo-title">{{ t('import.undoTitle') }}</h2>
+          <ul class="rows">
+            <li>
+              <button type="button" class="row" [disabled]="busy()" (click)="undo()">
+                <span class="row-text">
+                  <span class="row-title danger">{{ t('import.undo') }}</span>
+                  <span class="row-sub">{{ lastLabel(last) }}</span>
+                </span>
+              </button>
+            </li>
+          </ul>
+        }
+      </section>
+    }
+
+    @case ('columns') {
+      <section class="block">
+        <p class="note first">{{ t('import.columnsIntro', { file: fileName() }) }}</p>
+        <ul class="rows">
+          @for (f of fields; track f) {
+            <li class="select-row">
+              <app-select-field
+                [label]="fieldLabel(f) + (required(f) ? ' *' : '')"
+                [inline]="true"
+                [options]="columnOptions()"
+                [value]="columns()![f] ?? -1"
+                (valueChange)="setColumn(f, $event!)"
+              ></app-select-field>
+            </li>
+          }
+        </ul>
+        <p class="note">{{ t('import.requiredNote') }}</p>
+        <button type="button" class="btn-primary wide" [disabled]="!canContinue()" (click)="review()">{{ t('import.continue') }}</button>
+        <button type="button" class="btn-secondary wide" (click)="restart()">{{ t('common.cancel') }}</button>
+      </section>
+    }
+
+    @case ('review') {
+      <section class="block">
+        <p class="note first">{{ fileName() }}</p>
+        <dl class="summary">
+          <div>
+            <dt>{{ t('import.ready') }}</dt>
+            <dd>{{ toImport().length }}</dd>
+          </div>
+          <div [class.warn]="problems().length">
+            <dt>{{ t('import.withErrors') }}</dt>
+            <dd>{{ problems().length }}</dd>
+          </div>
+          @if (duplicates().size) {
+            <div>
+              <dt>{{ t('import.repeated') }}</dt>
+              <dd>{{ duplicates().size }}</dd>
+            </div>
+          }
+        </dl>
+
+        @if (problems().length) {
+          <ul class="rows">
+            <li>
+              <button type="button" class="row" [attr.aria-expanded]="showProblems()" (click)="showProblems.set(!showProblems())">
+                <span class="row-title">{{ tn('import.seeErrors', problems().length) }}</span>
+                <ion-icon name="chevron-down" aria-hidden="true" [class.flipped]="showProblems()"></ion-icon>
+              </button>
+            </li>
+          </ul>
+          @if (showProblems()) {
+            <ul class="problems">
+              @for (p of problems(); track p.line) {
+                <li>{{ problemText(p) }}</li>
+              }
+            </ul>
+          }
+          <p class="note">{{ t('import.errorsNote') }}</p>
+        }
+        @if (pending().length) {
+          <p class="note">{{ tn('import.pendingNote', pending().length) }}</p>
+        }
+
+        @if (duplicates().size) {
+          <div class="rows toggle-box">
+            <ion-toggle justify="space-between" [checked]="skipDuplicates()" (ionChange)="skipDuplicates.set($event.detail.checked)">
+              <span class="toggle-text">{{ tn('import.skipRepeated', duplicates().size) }}</span>
+            </ion-toggle>
+          </div>
+        }
+
+        @if (newCategories().length) {
+          <h2 class="section-title sub">{{ t('import.newCategories') }}</h2>
+          <ul class="rows">
+            @for (c of newCategories(); track c.name) {
+              <li class="select-row">
+                <app-select-field
+                  [label]="c.name"
+                  [inline]="true"
+                  [options]="categoryOptions(c.income)"
+                  [value]="c.choice"
+                  (valueChange)="chooseCategory(c.name, $event!)"
+                ></app-select-field>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (newAccounts().length) {
+          <h2 class="section-title sub">{{ t('import.newAccounts') }}</h2>
+          <ul class="rows">
+            @for (a of newAccounts(); track a.name) {
+              <li class="select-row">
+                <app-select-field
+                  [label]="a.name"
+                  [inline]="true"
+                  [options]="accountOptions()"
+                  [value]="a.choice"
+                  (valueChange)="chooseAccount(a.name, $event!)"
+                ></app-select-field>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (error(); as message) {
+          <p class="error" role="alert">{{ message }}</p>
+        }
+        <button type="button" class="btn-primary wide" [disabled]="!toImport().length || busy()" (click)="import()">
+          {{ tn('import.importN', toImport().length) }}
+        </button>
+        <button type="button" class="btn-secondary wide" [disabled]="busy()" (click)="restart()">{{ t('common.cancel') }}</button>
+      </section>
+    }
+
+    @case ('done') {
+      <section class="block done">
+        <app-success-check state="in"></app-success-check>
+        <p class="done-text" aria-live="polite">{{ tn('import.doneText', imported()) }}</p>
+        <a routerLink="/tabs/movimientos" class="btn-primary wide">{{ t('import.seeMoves') }}</a>
+        <button type="button" class="btn-secondary wide" [disabled]="busy()" (click)="undo()">{{ t('import.undo') }}</button>
+      </section>
+    }
+  }
+</ion-content>

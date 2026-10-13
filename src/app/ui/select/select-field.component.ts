@@ -3,6 +3,7 @@ import { IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronDown } from 'ionicons/icons';
 import { SelectSheetComponent } from './select-sheet.component';
+import { t } from '../i18n';
 
 export interface SelectOption<T> {
   value: T;
@@ -120,7 +121,7 @@ export class SelectFieldComponent<T> {
 
   readonly label = input.required<string>();
   readonly options = input.required<SelectOption<T>[]>();
-  readonly placeholder = input('Elige una opción');
+  readonly placeholder = input(t('fields.chooseOption'));
   /** Título de la hoja; si falta, la etiqueta. */
   readonly title = input<string>();
   /** Texto de una acción extra al final de la hoja (por ejemplo "Nueva categoría"). */

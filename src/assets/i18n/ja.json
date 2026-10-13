@@ -1,0 +1,1677 @@
+{
+  "_meta": {
+    "draft": "Borrador traducido sin revisión de una persona nativa. ネイティブ未確認の仮訳です。"
+  },
+  "errors": {
+    "notBackup": "このファイルはこのアプリのバックアップではありません",
+    "wrongPassword": "パスワードが違うか、ファイルが壊れています",
+    "accountName": "口座の名前を入力してください",
+    "accountType": "口座の種類が正しくありません",
+    "initialBalance": "初期残高が正しくありません",
+    "cashType": "現金の種類は変更できません",
+    "cardLast4": "カード番号の下4桁を入力してください",
+    "cardLast4Taken": "その4桁は別の口座で使われています",
+    "cardLimit": "カードの利用限度額を入力してください",
+    "cutDay": "締め日は1〜31の間で指定してください",
+    "payDay": "支払日は1〜31の間で指定してください",
+    "cashArchive": "現金はアーカイブできません",
+    "cashDelete": "現金は削除できません",
+    "accountHasMovements": "この口座には取引があります。履歴を残したまま隠すにはアーカイブしてください。",
+    "balance": "残高が正しくありません",
+    "amountPositive": "金額は0より大きくしてください",
+    "date": "日付が正しくありません",
+    "sameAccounts": "別々の口座を2つ選んでください",
+    "minPayment": "最低支払額は0より大きくしてください",
+    "fixedName": "固定費の名前を入力してください",
+    "dueDay": "期日は1〜31の間で指定してください",
+    "frequency": "頻度が正しくありません",
+    "oneIncome": "受け取りを1つ以上追加してください",
+    "sameDayIncome": "同じ日に受け取りが2つあります",
+    "withdrawTooMuch": "この目標で貯めた額より多くは引き出せません",
+    "goalName": "目標の名前を入力してください",
+    "goalAmount": "目標額は0より大きくしてください",
+    "goalDate": "目標日が正しくありません",
+    "splitTwo": "分割するにはカテゴリーが2つ以上必要です",
+    "splitDistinct": "各部分には別々のカテゴリーを指定してください",
+    "splitPositive": "各部分は0より大きくしてください",
+    "splitSum": "各部分の合計が総額と一致する必要があります",
+    "splitType": "すべての部分を同じ種類(支出または収入)にしてください",
+    "accountArchived": "その口座はアーカイブ済みです。別の口座を選んでください",
+    "backupIncomplete": "バックアップが不完全です",
+    "autoBackupOff": "自動バックアップがオンになっていません",
+    "currency": "対応していない通貨です",
+    "debtName": "借入の名前を入力してください",
+    "debtType": "借入の種類が正しくありません",
+    "rate": "金利は0%〜200%の間で指定してください",
+    "term": "期間は1〜600か月で指定してください",
+    "debtNoInstallment": "固定費に移せる定額の返済があるのは、期間を決めた自分の借入だけです",
+    "debtAlreadyFixed": "この借入はすでに固定費にあります",
+    "debtPaid": "この借入はすでに完済しています",
+    "debtCategoryMissing": "「借入返済」カテゴリーがありません。設定で作成してください",
+    "paymentTooBig": "支払額が残りの金額を超えています",
+    "debtPaymentCategory": "「借入返済」カテゴリーがありません。設定で作成するか、取引なしで支払いを記録してください",
+    "debtIncomeCategory": "「その他の収入」カテゴリーがありません。設定で作成するか、取引なしで受け取りを記録してください",
+    "categoryName": "カテゴリーの名前を入力してください",
+    "categoryTaken": "同じ名前のカテゴリーがすでにあります",
+    "categoryType": "カテゴリーの種類が正しくありません",
+    "categoryBuiltIn": "アプリのカテゴリーは削除できません。非表示にはできます。",
+    "categoryMoveTo": "取引を移すカテゴリーを選んでください",
+    "categorySameType": "同じ種類のカテゴリーを選んでください",
+    "pause": "一時停止は1〜24か月です",
+    "alreadyPaid": "この支出はすでに支払い済みです",
+    "lockAfter": "ロックまでの時間が正しくありません",
+    "pin": "PINは4〜6桁の数字にしてください",
+    "budgetLimit": "上限は0より大きくしてください",
+    "budgetCategories": "カテゴリーを1つ以上選んでください",
+    "budgetExpenseOnly": "予算を設定できるのは支出カテゴリーだけです",
+    "backupNewer": "このバックアップはより新しいバージョンのアプリで作られています。復元するにはアプリを更新してください。",
+    "passwordLength": "パスワードは{min}文字以上にしてください",
+    "wipeConfirm": "確認のため {word} と入力してください。",
+    "budgetTaken": "{name}は今月の別の予算に入っています",
+    "nameLength": "名前は{max}文字までです",
+    "notFound": {
+      "account": "口座が見つかりません",
+      "transfer": "振替が見つかりません",
+      "category": "カテゴリーが見つかりません",
+      "goal": "貯金目標が見つかりません",
+      "debt": "借入が見つかりません",
+      "transaction": "取引が見つかりません",
+      "fixed": "固定費が見つかりません",
+      "fixedMonth": "今月の固定費が見つかりません",
+      "budget": "予算が見つかりません"
+    },
+    "backupKeep": "残すバックアップの数を選んでください",
+    "copySameMonth": "コピー先とは別の月を選んでください",
+    "copyFixed": "固定費の支払いはコピーしません。固定費が毎月自動で作ります"
+  },
+  "common": {
+    "cancel": "キャンセル",
+    "save": "保存",
+    "understood": "わかりました",
+    "tryAgain": "問題が発生しました。もう一度お試しください。",
+    "saveFailed": "保存できませんでした。もう一度お試しください。",
+    "changeFailed": "変更できませんでした。もう一度お試しください。",
+    "failedTitle": "できませんでした",
+    "phoneOnly": "スマホのアプリで利用できます",
+    "back": "{to}に戻る",
+    "home": "ホーム",
+    "delete": "削除",
+    "saveChanges": "変更を保存",
+    "name": "名前",
+    "deleteFailed": "削除できませんでした。もう一度お試しください。",
+    "close": "閉じる",
+    "type": "種類",
+    "changesSaved": "変更を保存しました",
+    "example": "例:{value}",
+    "pay": "支払う",
+    "edit": "{name}を編集",
+    "chooseAccount": "口座を選択",
+    "amount": "金額({currency})",
+    "date": "日付",
+    "noteOptional": "メモ(任意)",
+    "becomes": "→",
+    "noCategory": "カテゴリーなし",
+    "sections": "セクション",
+    "editAmount": "{name}、{amount}を編集",
+    "expense": "支出",
+    "income": "収入",
+    "goBack": "戻る"
+  },
+  "datos": {
+    "createBackup": "バックアップを作成",
+    "createBackupSub": "スマホの外に保管する、パスワードで暗号化されたファイル",
+    "autoBackup": "自動バックアップ",
+    "autoOff": "暗号化して、毎日または毎週スマホの Documents/Kuarto に保存",
+    "autoError": "前回は保存できませんでした。アプリを開いたときに再試行します",
+    "autoLast": "前回:{date} · Documents/Kuarto",
+    "autoPending": "未実行。アプリを開いたときに作成します",
+    "cloudUpload": "今すぐクラウドにアップロード",
+    "cloudUploadSub": "アカウント:{email}。自動バックアップも自動でアップロードされます。",
+    "cloudRestore": "クラウドから復元",
+    "cloudRestoreSub": "新しいスマホや、データをなくしたときに",
+    "cloudSignOut": "Google アカウントからログアウト",
+    "cloudSignIn": "クラウドバックアップ",
+    "cloudSignInSub": "Google でログイン:自動バックアップが暗号化されてアカウントに保存されます",
+    "restore": "バックアップから復元",
+    "restoreSub": "アプリのデータをファイルの内容に置き換えます",
+    "exportCsv": "取引を Excel に書き出す",
+    "exportCsvSub": "すべての取引を含む CSV ファイル",
+    "wipe": "すべてのデータを削除",
+    "wipeSub": "インストール直後の状態に戻します。先にバックアップを勧めます",
+    "createBackupMsg": "バックアップを暗号化するパスワードを決めてください。忘れるとバックアップを開けません。",
+    "passwordMin": "パスワード(6文字以上)",
+    "passwordRepeat": "パスワードを再入力",
+    "create": "作成",
+    "passwordsDiffer": "パスワードが一致しません。",
+    "encrypting": "バックアップを暗号化中…",
+    "savedAt": "バックアップを {where} に保存しました。このファイルはスマホの外にもコピーしておいてください(Drive、メール)。",
+    "downloaded": "バックアップをダウンロードしました。",
+    "wipeMsg": "取引、固定費、目標、予算、借入、設定(PINを含む)が削除されます。元に戻せません。先にバックアップを作成することをおすすめします。",
+    "wipeNoBackup": "バックアップせずに続ける",
+    "wipeConfirmTitle": "削除の確認",
+    "wipeConfirmMsg": "すべて削除するには {word} と入力してください。",
+    "wipeAll": "すべて削除",
+    "wiping": "削除中…",
+    "restorePasswordMsg": "バックアップを作成したときのパスワードを入力してください。",
+    "password": "パスワード",
+    "open": "開く",
+    "opening": "バックアップを開いています…",
+    "rangeOne": "({month})",
+    "rangeMany": "({from}〜{to})",
+    "replaceTitle": "データを置き換える",
+    "replaceMsg": "このバックアップには {count} 件の取引があります{range}。復元すると、アプリの現在のデータはすべて削除され、バックアップの内容に置き換わります。",
+    "restoreBtn": "復元",
+    "restoring": "復元中…",
+    "preparing": "ファイルを準備中…",
+    "exported": "{count} 件の取引を書き出しました。",
+    "exportedAt": "{count} 件の取引を {where} に書き出しました。",
+    "cloudSigningIn": "Google でログイン中…",
+    "cloudUploading": "暗号化したバックアップをアップロード中…",
+    "cloudUploaded": "自動バックアップのパスワードで暗号化して、クラウドにアップロードしました。",
+    "cloudSearching": "バックアップを検索中…",
+    "cloudEmpty": "このアカウントのクラウドバックアップはありません。",
+    "cloudChooseMsg": "バックアップを選んでください。そのあと、作成時の自動バックアップのパスワードを入力します。",
+    "cloudLatest": "{date}(最新)",
+    "downloading": "ダウンロード中…",
+    "signingOut": "ログアウト中…",
+    "signedOut": "ログアウトしました。アップロード済みのバックアップはクラウドに残ります。",
+    "autoDisabled": "自動バックアップをオフにしました。保存済みのファイルは Documents/Kuarto に残ります。",
+    "autoTitle": "自動バックアップ",
+    "autoMsg": "自動バックアップを暗号化するパスワードを決めてください。復元するときに必要です。忘れると開けません。",
+    "activate": "オンにする",
+    "autoFirst": "最初のバックアップを作成中…",
+    "autoFirstFailed": "オンにしましたが、最初のバックアップを保存できませんでした。アプリを開いたときに再試行します。",
+    "autoEnabled": "自動バックアップをオンにしました。最初のバックアップは Documents/Kuarto にあります。",
+    "frequency": "頻度",
+    "daily": "毎日",
+    "weekly": "毎週",
+    "keep": "保存数",
+    "keepN": "直近 {count} 件",
+    "lastManual": "前回:{date}。スマホの外に保管する暗号化ファイル",
+    "beforeRestoreTitle": "復元の前に",
+    "beforeRestoreMsg": "今のデータに戻したくなったときのために、バックアップを作っておくと安心です。",
+    "savingCurrent": "現在のデータをバックアップ中…",
+    "replaceMsgAuto": "このバックアップには {count} 件の取引があります{range}。復元すると、アプリの現在のデータはすべて削除され、バックアップの内容に置き換わります。その前に、今のデータの自動バックアップを保存します。",
+    "currentFailed": "現在のデータをバックアップできませんでした。何も復元していません。",
+    "import": "Excel から取り込む",
+    "importSub": ".xlsx または .csv ファイルから取引を取り込みます(テンプレートあり)"
+  },
+  "seguridad": {
+    "changePin": "PINを変更",
+    "biometric": "指紋または顔でロック解除",
+    "biometricSub": "指紋が使えないときも PIN で解除できます",
+    "lockAfter": "アプリを離れてから再度求めるまで",
+    "removePin": "PINを解除",
+    "enablePin": "PINロックをオンにする",
+    "enablePinSub": "アプリを開いたときと戻ったときに求めます",
+    "privacy": "最近使ったアプリで隠す",
+    "privacySub": "アプリ切り替え時に画面を隠し、スクリーンショットを防ぎます",
+    "lockNow": "すぐに",
+    "lock1": "1分後",
+    "lock5": "5分後",
+    "lock15": "15分後",
+    "pinMsg": "4〜6桁の数字です。忘れると復旧できません。アプリを削除してバックアップから復元する必要があります。",
+    "newPin": "新しい PIN",
+    "repeatPin": "PINを再入力",
+    "pinsDiffer": "PINが一致しません。",
+    "savingPin": "PINを保存中…",
+    "pinOn": "PINロックをオンにしました。",
+    "currentPinMsg": "現在の PIN を入力してください。",
+    "currentPin": "現在の PIN",
+    "remove": "解除",
+    "checking": "確認中…",
+    "tooMany": "試行回数が多すぎます。{seconds} 秒お待ちください。",
+    "wrongPin": "PINが違います。",
+    "pinOff": "PINロックをオフにしました。",
+    "lockSaved": "ロックまでの時間を保存しました。",
+    "lockFailed": "ロックまでの時間を保存できませんでした。",
+    "privacyOn": "最近使ったアプリで隠し、スクリーンショットを防ぎます。",
+    "privacyOff": "最近使ったアプリにまた表示されます。",
+    "bioNotConfirmed": "指紋を確認できませんでした。オフのままです。",
+    "bioOn": "指紋でのロック解除をオンにしました。",
+    "bioOff": "指紋でのロック解除をオフにしました。"
+  },
+  "ajustes": {
+    "title": "設定",
+    "search": "項目を検索",
+    "searchPlaceholder": "バックアップ、PIN、通貨…",
+    "sectionsLabel": "セクション",
+    "noResults": "「{query}」に一致する項目はありません。",
+    "theme": "テーマ",
+    "themeSystem": "システム",
+    "themeLight": "ライト",
+    "themeDark": "ダーク",
+    "themeNote": "「システム」はスマホのライト/ダーク設定に合わせます。",
+    "currency": "通貨",
+    "currencyChange": "通貨:{label}。変更",
+    "currencyNote": "金額に表示する記号だけが変わります。保存済みの金額は換算されません。",
+    "currencyDOP": "ドミニカ・ペソ(RD$)",
+    "currencyUSD": "米ドル(US$)",
+    "currencyChanged": "通貨を {code} に変更しました",
+    "currencyFailed": "通貨を変更できませんでした。もう一度お試しください。",
+    "accounts": "口座とカード",
+    "accountsSub": "口座・現金・カードの追加、編集、非表示",
+    "categories": "カテゴリーを管理",
+    "categoriesSub": "カテゴリーの作成、変更、非表示",
+    "name": "あなたの名前",
+    "noName": "未設定。ホームのあいさつに使います",
+    "google": "Google アカウント",
+    "googleOff": "未接続。クラウドバックアップに使います",
+    "tourAgain": "ツアーをもう一度見る",
+    "helpAbout": "{topic}のヘルプ",
+    "news": "このバージョンの新機能",
+    "privacy": "プライバシー",
+    "privacyText": [
+      "Kuarto はすべてをこのスマホの中だけに保存します。アカウントもサーバーも広告もなく、あなたのデータを誰にも送りません。インターネットに接続するのは、新しいバージョンの確認と、Google でログインした場合の暗号化バックアップのアップロードだけです。",
+      "データがスマホの外に出るのは、あなたがバックアップを作る、ファイルを書き出す、クラウドバックアップをオンにする場合だけです。バックアップはあなたのパスワードで暗号化されるので、クラウド上では誰も読めません。Google も読めません。",
+      "求める権限は、通知の表示、指紋でのロック解除、スマホへのバックアップやファイルの保存、新しいバージョンのインストールのためのものです。",
+      "バックアップを取らずにアプリを削除すると、データは失われます。ほかに誰もコピーを持っていません。"
+    ],
+    "checkUpdate": "アップデートを確認",
+    "version": "Kuarto {version}",
+    "nameTitle": "あなたの名前",
+    "nameMsg": "ホームのあいさつに使います。空にすると削除されます。",
+    "nameSaved": "名前を保存しました",
+    "nameFailed": "名前を保存できませんでした。",
+    "sections": {
+      "apariencia": {
+        "title": "外観",
+        "sub": "テーマ、色、言語、通貨",
+        "options": [
+          "ライトモード",
+          "ダークモード",
+          "テーマ",
+          "色",
+          "カラーパレット",
+          "言語",
+          "通貨"
+        ]
+      },
+      "dinero": {
+        "title": "お金",
+        "sub": "口座、カード、カテゴリー",
+        "options": [
+          "口座とカード",
+          "カテゴリーを管理"
+        ]
+      },
+      "avisos": {
+        "title": "固定費と通知",
+        "sub": "期日の近い支払い、リマインダー",
+        "options": [
+          "通知",
+          "期日の近い固定費",
+          "予算",
+          "毎日のリマインダー",
+          "おやすみ時間"
+        ]
+      },
+      "datos": {
+        "title": "データとバックアップ",
+        "sub": "バックアップ、クラウド、書き出し",
+        "options": [
+          "バックアップを作成",
+          "自動バックアップ",
+          "バックアップの頻度",
+          "バックアップの保存数",
+          "クラウドバックアップ",
+          "バックアップから復元",
+          "取引を Excel に書き出す",
+          "すべてのデータを削除"
+        ]
+      },
+      "cuenta": {
+        "title": "アカウント",
+        "sub": "名前、Google",
+        "options": [
+          "あなたの名前",
+          "Google アカウント"
+        ]
+      },
+      "seguridad": {
+        "title": "セキュリティとプライバシー",
+        "sub": "PIN、指紋、最近使ったアプリで隠す",
+        "options": [
+          "PINロック",
+          "指紋または顔でロック解除",
+          "最近使ったアプリで隠す",
+          "スクリーンショット"
+        ]
+      },
+      "ayuda": {
+        "title": "ヘルプ",
+        "sub": "ツアー、ガイド",
+        "options": [
+          "ツアーをもう一度見る"
+        ]
+      },
+      "acerca": {
+        "title": "アプリについて",
+        "sub": "バージョン {version}",
+        "options": [
+          "このバージョンの新機能",
+          "プライバシー",
+          "アップデートを確認"
+        ]
+      }
+    },
+    "language": "言語",
+    "languageNote": "日付と数字の表記は言語に合わせます。通貨は変わりません。",
+    "languageChanged": "言語を変更しました"
+  },
+  "avisos": {
+    "title": "通知",
+    "notifications": "通知",
+    "fixed": "期日の近い固定費",
+    "fixedSub": "期日の前日と当日",
+    "hour": "時刻",
+    "budgets": "予算",
+    "budgetsSub": "85%に達したときと超えたとき(月1回)",
+    "daily": "毎日のリマインダー",
+    "dailySub": "「今日の支出を記録しましたか?」今日すでに記録していれば鳴りません",
+    "quiet": "おやすみ時間",
+    "quietSub": "この時間帯の通知は終わってから届きます",
+    "from": "開始",
+    "to": "終了",
+    "offNote": "アプリを開かなくても、期日の近い固定費や上限に近い予算をお知らせします。",
+    "denied": "Android で通知が許可されていません。スマホの設定 › アプリ › Kuarto › 通知 でオンにしてください。",
+    "toggleFailed": "通知を変更できませんでした。もう一度お試しください。",
+    "saveFailed": "変更を保存できませんでした。もう一度お試しください。"
+  },
+  "categorias": {
+    "title": "カテゴリー",
+    "note": "タップすると名前・アイコン・色を変えたり、非表示にしたりできます。",
+    "failed": "カテゴリーを読み込めませんでした。設定を開き直してください。",
+    "edit": "カテゴリー {name} を編集",
+    "editHidden": "カテゴリー {name} を編集(非表示)",
+    "hidden": "非表示",
+    "empty": "この種類のカテゴリーはありません。",
+    "add": "カテゴリーを追加",
+    "groups": {
+      "ingreso": "収入",
+      "fijo": "固定費",
+      "variable": "変動費"
+    }
+  },
+  "icons": {
+    "restaurant-outline": "食事",
+    "cart-outline": "カート",
+    "car-outline": "車",
+    "bus-outline": "バス",
+    "airplane-outline": "飛行機",
+    "home-outline": "家",
+    "bed-outline": "ベッド",
+    "flash-outline": "稲妻",
+    "water-outline": "水",
+    "wifi-outline": "Wi-Fi",
+    "phone-portrait-outline": "電話",
+    "tv-outline": "テレビ",
+    "play-circle-outline": "再生",
+    "medkit-outline": "救急箱",
+    "fitness-outline": "ジム",
+    "school-outline": "学校",
+    "shirt-outline": "服",
+    "gift-outline": "プレゼント",
+    "paw-outline": "ペット",
+    "game-controller-outline": "ゲーム",
+    "heart-outline": "ハート",
+    "card-outline": "カード",
+    "cash-outline": "紙幣",
+    "wallet-outline": "財布",
+    "briefcase-outline": "かばん",
+    "construct-outline": "工具",
+    "shield-checkmark-outline": "盾",
+    "pricetag-outline": "タグ"
+  },
+  "categoryType": {
+    "ingreso": "収入",
+    "fijo": "固定費",
+    "variable": "変動費"
+  },
+  "categoria": {
+    "edit": "カテゴリーを編集",
+    "new": "新しいカテゴリー",
+    "type": "種類",
+    "typeLabel": "カテゴリーの種類",
+    "namePlaceholder": "ペット、ジム、チップ",
+    "icon": "アイコン",
+    "color": "色",
+    "colorN": "色 {n}",
+    "hide": "非表示にする",
+    "hideSub": "選択肢に表示されなくなります。取引はそのままです。",
+    "save": "カテゴリーを保存",
+    "moveTitle": "取引や固定費があります。どのカテゴリーに移しますか?",
+    "moveNone": "先にこの種類の別のカテゴリーを作るか、非表示にしてください。",
+    "moveTo": "移動先",
+    "choose": "カテゴリーを選択",
+    "moveDelete": "移して削除",
+    "delete": "カテゴリーを削除",
+    "builtIn": "アプリのカテゴリーです。変更や非表示はできますが、削除はできません。",
+    "saved": "カテゴリーを保存しました",
+    "deleteMsg": "{name} を削除します。予算があれば一緒に削除されます。"
+  },
+  "accountType": {
+    "efectivo": "現金",
+    "banco": "銀行",
+    "ahorro": "貯蓄",
+    "tarjeta": "クレジットカード",
+    "inversion": "投資"
+  },
+  "cuenta": {
+    "edit": "口座を編集",
+    "new": "新しい口座",
+    "cardPlaceholder": "Visa、Mastercard",
+    "accountPlaceholder": "普通預金、給与口座",
+    "owedToday": "今日の未払い額({currency})",
+    "balanceToday": "今日の残高({currency})",
+    "adjustHint": "残高を変えても取引は作られず、収入にも支出にも数えられません。",
+    "creditLimit": "利用限度額({currency})",
+    "cutDay": "締め日",
+    "payDay": "支払日",
+    "last4": "下4桁(任意)",
+    "last4Hint": "見分けやすいようにカードに表示されます。",
+    "save": "口座を保存",
+    "unarchive": "再び使う",
+    "archive": "アーカイブ",
+    "delete": "口座を削除",
+    "saved": "口座を保存しました",
+    "deleteMsg": "{name} を削除します。取引・振替・固定費がない場合のみ削除できます。"
+  },
+  "cuentas": {
+    "failed": "口座を読み込めませんでした。別のセクションに移ってから戻ってください。",
+    "transfer": "振替またはカードの支払い",
+    "editOwes": "{name}を編集、未払い {amount}",
+    "editBalance": "{name}を編集、残高 {amount}",
+    "owes": "未払い",
+    "owesAmount": "未払い {amount}",
+    "used": "利用 {value}",
+    "minimum": "最低:{amount} · 変更",
+    "addMinimum": "最低支払額を記録",
+    "payName": "{name}を支払う",
+    "transfersOf": "{month}の振替",
+    "editTransfer": "{amount}の振替を編集、{text}",
+    "noTransfers": "今月の振替はありません。",
+    "hideArchived": "アーカイブを隠す",
+    "showArchived": "アーカイブを表示({count})",
+    "archived": "アーカイブ済み · {detail}",
+    "account": "口座",
+    "groups": {
+      "cuentas": {
+        "title": "口座",
+        "add": "口座を追加",
+        "empty": "最初の銀行口座を追加しましょう。"
+      },
+      "efectivo": {
+        "title": "現金",
+        "add": "現金を追加",
+        "empty": "現金は記録されていません。"
+      },
+      "tarjetas": {
+        "title": "クレジットカード",
+        "add": "カードを追加",
+        "empty": "利用限度額と締め日・支払日を入れて追加しましょう。"
+      }
+    },
+    "minTitle": "最低支払額",
+    "minMsg": "{date}締めの{name}の明細に書かれている額。空にすると削除されます。",
+    "invalidAmount": "金額が正しくありません。",
+    "minFailed": "最低支払額を保存できませんでした。",
+    "usedOf": "{limit}のうち{percent}を利用 · 締め日 {cut}日、支払日 {due}日",
+    "usedShort": "{limit}のうち{percent}",
+    "days": "締め日 {cut}日 · 支払日 {due}日",
+    "nothingToPay": "{cut}締めの支払いはありません",
+    "statementPaid": "{cut}締めの明細は支払い済み",
+    "overdue": "{due}に期限切れ:{cut}締めの {amount} が未払い",
+    "payBefore": "{due}までに {amount} を支払う({cut}締め)",
+    "newCharges": " · 新しい利用 {amount}"
+  },
+  "transfer": {
+    "edit": "振替を編集",
+    "payCard": "カードを支払う",
+    "title": "振替",
+    "from": "出金元",
+    "to": "入金先",
+    "swap": "入れ替え:もう一方の口座から出金",
+    "notePlaceholder": "入金、ATMで引き出し",
+    "hint": "振替は口座間でお金を移すだけなので、その月の収入にも支出にも数えられません。",
+    "savePayment": "支払いを保存",
+    "save": "振替を保存",
+    "delete": "振替を削除",
+    "paymentSaved": "支払いを保存しました",
+    "saved": "振替を保存しました",
+    "warning": "{name}は{amount}になります。「出金元」と「入金先」が正しいか確認してください。",
+    "deleteMsg": "この振替を削除し、2つの口座の残高を元に戻します。",
+    "deleted": "振替を削除しました"
+  },
+  "networth": {
+    "title": "純資産",
+    "open": "純資産 {amount}。口座を見る",
+    "available": "使えるお金 {amount}",
+    "inGoals": "目標の貯金 {amount}",
+    "owedToMe": "貸している {amount}",
+    "owe": "借りている {amount}"
+  },
+  "tabs": {
+    "inicio": {
+      "label": "ホーム",
+      "name": "ホーム",
+      "add": "取引を追加"
+    },
+    "movimientos": {
+      "label": "取引",
+      "name": "取引",
+      "add": "取引を追加"
+    },
+    "fijos": {
+      "label": "固定費",
+      "name": "固定費",
+      "add": "固定費を追加(支出または収入)"
+    },
+    "dinero": {
+      "label": "お金",
+      "name": "お金",
+      "add": "口座・現金・カードを追加"
+    },
+    "planes": {
+      "label": "計画",
+      "name": "計画:目標と借入",
+      "add": ""
+    },
+    "addGoal": "貯金目標を追加",
+    "addDebt": "借入やローンを追加"
+  },
+  "inicio": {
+    "settings": "設定:通貨とカテゴリー",
+    "hello": "こんにちは、{name}さん",
+    "failed": "今月のデータを読み込めませんでした。月を切り替えて戻るか、アプリを再起動してください。",
+    "emptyTitle": "{month}の取引はまだありません。",
+    "emptyText": "+ ボタンで最初の取引を記録すると、ここに収支とお金の使い道が表示されます。",
+    "balanceOf": "{month}の収支",
+    "negative": "マイナス:収入より支出が多くなっています",
+    "income": "収入",
+    "expenses": "支出",
+    "saved": "貯金",
+    "saving": "収入の{percent}を貯金 · {rating}",
+    "noIncome": "今月は収入がないので、貯金率はありません。",
+    "rating": {
+      "excelente": "とても良い",
+      "regular": "まずまず",
+      "bajo": "低い"
+    },
+    "whereTitle": "お金の使い道は?",
+    "noExpenses": "{month}の支出はまだありません。",
+    "recent": "最近の取引",
+    "seeAll": "すべて見る"
+  },
+  "alerts": {
+    "label": "アラート",
+    "two": "{a}と{b}",
+    "more": "{a}、{b} ほか {count} 件",
+    "overdue": {
+      "one": "未払いのまま期限切れ:{names}",
+      "other": "未払いのまま期限切れ:{names}"
+    },
+    "soon": {
+      "one": "3日以内に期日:{names}",
+      "other": "3日以内に期日:{names}"
+    },
+    "cardsDue": {
+      "one": "カード {names} を支払ってください:支払期日が近づいています",
+      "other": "カード {names} を支払ってください:支払期日が近づいています"
+    },
+    "exceeded": "上限を超えました:{names}",
+    "near": "上限に近づいています:{names}",
+    "cardsUse": "利用限度額の30%以上を使っています:{names}"
+  },
+  "compare": {
+    "title": "月ごとの比較",
+    "noPrev": "{month}に比較できる取引がありません。",
+    "last": "直近 {count} か月",
+    "empty": "取引なし",
+    "reports": "レポートとグラフを見る",
+    "same": "{month}と同じ",
+    "more": "{month}より{percent}多い({amount})",
+    "less": "{month}より{percent}少ない({amount})",
+    "detail": "収入 {income} · 支出 {expenses} · 貯金 {saved}"
+  },
+  "donut": {
+    "label": "カテゴリー別の支出:{summary}",
+    "spent": "支出",
+    "share": "支出の{percent}",
+    "others": "その他"
+  },
+  "movs": {
+    "done": "完了",
+    "select": "選択",
+    "failed": "取引を読み込めませんでした。月を切り替えて戻るか、アプリを再起動してください。",
+    "emptyTitle": "{month}の取引はありません。",
+    "emptyText": "+ ボタンで今月の収入や支出を記録しましょう。",
+    "filters": "検索と絞り込み",
+    "searchLabel": "メモ、カテゴリー、タグで検索",
+    "searchPlaceholder": "メモ、カテゴリー、タグを検索",
+    "kind": "取引の種類",
+    "kinds": {
+      "todos": "すべて",
+      "gasto": "支出",
+      "ingreso": "収入"
+    },
+    "byCategory": "カテゴリーで絞り込み",
+    "allCategories": "すべてのカテゴリー",
+    "byAccount": "口座で絞り込み",
+    "allAccounts": "すべての口座",
+    "summary": "{total}件中{shown}件 · 差引 {net}",
+    "clear": "絞り込みを解除",
+    "noMatch": "検索に一致する取引はありません。",
+    "selectHint": "変更したい取引をタップしてください。",
+    "selectAll": "{count}件すべて選択",
+    "selectRow": "{name}、{amount}を選択",
+    "withPhoto": "レシートの写真あり",
+    "moreFor": "{name}のその他の操作",
+    "actionsFor": "{name}の操作",
+    "edit": "編集",
+    "duplicate": "複製",
+    "transfers": "振替",
+    "editTransfer": "振替 {name}、{amount} を編集",
+    "bulkActions": "選択した取引の操作",
+    "selected": "{count}件を選択中",
+    "category": "カテゴリー",
+    "date": "日付",
+    "deleteTitle": "取引を削除",
+    "deleteMsg": "{name}({amount})を削除します。固定費の支払いだった場合、その固定費は未払いに戻ります。",
+    "deleted": "{name}を削除しました",
+    "deleteFailed": "取引を削除できませんでした。もう一度お試しください。",
+    "mixed": "カテゴリーを変えるには、支出だけ、または収入だけを選んでください。",
+    "changeCategory": "カテゴリーを変更",
+    "change": "変更",
+    "changeDate": "日付を変更",
+    "bulkDeleteTitle": "取引を削除",
+    "bulkDeleteMsg": "{count}件の取引を削除します。固定費の支払いは未払いに戻ります。",
+    "bulkDeleteFailed": "すべては削除できませんでした。もう一度お試しください。",
+    "bulkDeleted": "{count}件の取引を削除しました",
+    "changed": "{count}件の取引を変更しました。",
+    "skipped": " {count}件は変更されませんでした(分割済み、または種類が違います)。",
+    "changeFailed": "変更できませんでした。もう一度お試しください。",
+    "splitName": "{name} ほか {count} 件"
+  },
+  "tx": {
+    "edit": "取引を編集",
+    "duplicate": "取引を複製",
+    "new": "新しい取引",
+    "kind": "取引の種類",
+    "noSplit": "分割しない",
+    "split": "複数のカテゴリーに分割",
+    "parts": "取引の内訳",
+    "part": "内訳 {n}",
+    "amount": "金額",
+    "removePart": "内訳 {n} を削除",
+    "addPart": "内訳を追加",
+    "remaining": "未割り当て {amount}",
+    "over": "{amount} 超過しています",
+    "balanced": "内訳の合計が総額と一致しています",
+    "tags": "タグ(任意、カンマ区切り)",
+    "tagsPlaceholder": "旅行, 仕事",
+    "viewPhoto": "写真 {n} を見る",
+    "removePhoto": "写真 {n} を削除",
+    "photo": "レシートの写真",
+    "delete": "取引を削除",
+    "saveIncome": "収入を保存",
+    "saveExpense": "支出を保存",
+    "incomeSaved": "収入を保存しました",
+    "expenseSaved": "支出を保存しました",
+    "photoFailed": "写真を読み込めませんでした。別の画像でお試しください。",
+    "deleteMsg": "この取引を削除します。固定費の支払いだった場合、その固定費は未払いに戻ります。",
+    "deleted": "取引を削除しました",
+    "dupTitle": "重複していませんか?",
+    "dupMsg": "{date}に{name}で{amount}をすでに記録しています{note}。それでも保存しますか?",
+    "dupNote": "(「{note}」)",
+    "dontSave": "保存しない",
+    "saveAnyway": "このまま保存"
+  },
+  "due": {
+    "pastExpense": {
+      "one": "昨日が期日でした",
+      "other": "期日から {count} 日経過"
+    },
+    "pastIncome": {
+      "one": "昨日受け取る予定でした",
+      "other": "受け取り予定から {count} 日経過"
+    },
+    "todayExpense": "今日が期日",
+    "todayIncome": "今日受け取り",
+    "tomorrowExpense": "明日が期日",
+    "tomorrowIncome": "明日受け取り",
+    "inDaysExpense": "あと {count} 日で期日",
+    "inDaysIncome": "あと {count} 日で受け取り",
+    "onExpense": "期日 {date}",
+    "onIncome": "受け取り {date}"
+  },
+  "status": {
+    "received": "受け取り済み",
+    "paid": "支払い済み",
+    "overdue": "期限切れ",
+    "pending": "未払い",
+    "paidF": "支払い済み",
+    "overdueF": "期限切れ"
+  },
+  "fijos": {
+    "failed": "固定費を読み込めませんでした。月を切り替えて戻るか、アプリを再起動してください。",
+    "nothingIn": "{month}に支払うものはありません",
+    "otherMonths": "ほかの月の固定費は今月には該当しません。",
+    "add": "固定費を追加",
+    "firstTitle": "最初の固定費を追加しましょう",
+    "firstText": "家賃、電気、ネット、給料など。一度登録すれば毎月表示されます。",
+    "noneToPay": "支払う固定費はありません",
+    "toPayIn": "{month}の未払い",
+    "allPaid": "すべて支払い済み",
+    "progress": "支払い済みの固定費",
+    "paidOf": "{total}のうち{paid}を支払い済み · {percent}",
+    "toReceive": "受け取り予定の収入:{amount}",
+    "subscriptions": {
+      "one": "サブスク1件:月{monthly} · 年{yearly}",
+      "other": "サブスク{count}件:月{monthly} · 年{yearly}"
+    },
+    "edit": "編集",
+    "markReceived": "{name}を受け取り済みにする",
+    "markPaid": "{name}を支払い済みにする",
+    "installments": "借入の返済",
+    "installment": "{of}回中{n}回目 · {status}",
+    "registerPaymentOf": "{name}の支払いを記録",
+    "registerPayment": "支払いを記録",
+    "paused": "一時停止中",
+    "resumeName": "{name}を再開",
+    "resume": "再開",
+    "markedReceived": "{name}を受け取り済みにしました",
+    "markedPaid": "{name}を支払い済みにしました",
+    "payFailed": "{name}を支払い済みにできませんでした。もう一度お試しください。",
+    "resumed": "{name}を再開しました",
+    "resumeFailed": "再開できませんでした。もう一度お試しください。",
+    "pausedUntil": "{month}まで一時停止",
+    "frequency": {
+      "3": "3か月ごと",
+      "6": "6か月ごと",
+      "12": "毎年"
+    },
+    "chargeOn": "受け取り {date}",
+    "dueOn": "期日 {date}",
+    "upcoming": "今後7日間",
+    "upcomingRow": "{name}、{detail}、{amount}。固定費で見る"
+  },
+  "fijo": {
+    "edit": "固定費を編集",
+    "new": "新しい固定費",
+    "kind": "固定費の種類",
+    "incomePlaceholder": "給料、受け取る家賃",
+    "expensePlaceholder": "家賃、毎月の食費、ネット",
+    "howOften": "どのくらいの頻度で受け取りますか?",
+    "once": "月1回",
+    "biweekly": "月2回",
+    "other": "その他",
+    "payment": "{n}回目の受け取り",
+    "removePayment": "{n}回目の受け取りを削除",
+    "payDay": "受け取り日",
+    "dueDay": "期日",
+    "addPayment": "+ 受け取りを追加",
+    "repeats": "繰り返し",
+    "chargedTo": "入金先",
+    "paidWith": "支払い元",
+    "save": "固定費を保存",
+    "appliesFrom": "変更は{month}から適用されます。それ以前の月と支払い済みのものは変わりません。",
+    "pause": "一時停止…",
+    "createDebt": "この支払いから借入を作成",
+    "delete": "固定費を削除",
+    "saved": "固定費を保存しました",
+    "freq": {
+      "1": "毎月",
+      "3": "3か月ごと",
+      "6": "6か月ごと",
+      "12": "毎年"
+    },
+    "pauseFrom": "{month}から一時停止",
+    "pauseNote": "その期間の未払い分は削除されます。支払い済みのものは残ります。",
+    "months": {
+      "one": "1か月",
+      "other": "{count}か月"
+    },
+    "debtCreated": "借入を作成しました",
+    "debtCreatedMsg": "期間を設定した場合、返済はすでに固定費に表示されます。支払いを二重に数えないよう、{month}から「{name}」を外しますか?",
+    "removeFrom": "{month}から外す",
+    "keep": "そのままにする",
+    "removeFailed": "固定費を外せませんでした。もう一度お試しください。",
+    "deleteName": "{name}を削除",
+    "deleteMsg": "記録済みの支払いは取引に残ります。",
+    "onlyMonth": "{month}のみ",
+    "thisAndNext": "今月以降",
+    "endOfMonth": "月末",
+    "dayN": "{n}日"
+  },
+  "deudas": {
+    "failed": "借入を読み込めませんでした。この画面を開き直してください。",
+    "totals": "合計",
+    "owe": "借りている",
+    "owed": "貸している",
+    "iOwe": "借りている",
+    "theyOwe": "貸している",
+    "toPay": "{principal}のうち残り{balance}",
+    "toCollect": "{principal}のうち未回収{balance}",
+    "settled": "完済",
+    "paidOf": "{name}の返済状況",
+    "interestPaid": "支払った利息:{amount}",
+    "inFixed": "返済は固定費にあります。そこで支払うとこの残高が減ります。",
+    "toFixed": "返済を固定費に移す",
+    "hideSchedule": "返済予定を隠す",
+    "showSchedule": "返済予定を見る",
+    "registerPayment": "支払いを記録",
+    "registerCharge": "回収を記録",
+    "scheduleOf": "{name}の返済予定",
+    "month": "月",
+    "interest": "利息",
+    "principal": "元金",
+    "balance": "残高",
+    "payments": "支払い",
+    "deletePaymentLabel": "{date}の{amount}の支払いを削除",
+    "paymentSub": "元金 {principal} · 利息 {interest}",
+    "hideSettled": "完済分を隠す",
+    "showSettled": "完済分を表示({count})",
+    "whichFirst": "どれから返す?",
+    "strategyNote": "各借入の返済額を払い、毎月の追加返済を1つに集中させた場合。",
+    "extra": "毎月の追加返済",
+    "snowball": "スノーボール",
+    "snowballSub": "残高の少ないものから",
+    "avalanche": "アバランチ",
+    "avalancheSub": "金利の高いものから",
+    "interestTotal": "利息:{amount}",
+    "skipped": {
+      "one": "期間のない借入1件は、定額の返済がないため比較に含まれません。",
+      "other": "期間のない借入{count}件は、定額の返済がないため比較に含まれません。"
+    },
+    "emptyTitle": "登録された借入はありません。",
+    "emptyText": "+ をタップして、ローンや貸しているお金を記録し、残りを管理しましょう。",
+    "rate": "年{rate}%",
+    "noInterest": "無利息",
+    "installment": "返済 {amount} × {count}",
+    "endsIn": "{month}に完了",
+    "since": "{date}から",
+    "neverEnds": "この金額では返し終わりません",
+    "endsAt": "{month}に完済",
+    "savings": {
+      "one": "その追加返済で1か月早く終わり、利息を{amount}節約できます。",
+      "other": "その追加返済で{count}か月早く終わり、利息を{amount}節約できます。"
+    },
+    "nowFixed": "{name}の返済を固定費に移しました",
+    "toFixedFailed": "返済を固定費に移せませんでした。",
+    "deletePayment": "支払いを削除",
+    "deletePaymentMsg": "{date}の{name}への{amount}の支払いを削除します。",
+    "deletePaymentMsgTx": "{date}の{name}への{amount}の支払いと、その取引を削除します。",
+    "paymentDeleted": "支払いを削除しました",
+    "paymentDeleteFailed": "支払いを削除できませんでした。もう一度お試しください。"
+  },
+  "deuda": {
+    "edit": "借入を編集",
+    "new": "新しい借入",
+    "kind": "借入の種類",
+    "mePlaceholder": "自動車ローン、カード",
+    "themPlaceholder": "お金を貸している相手の名前",
+    "principal": "借入額({currency})",
+    "rate": "年利 %(任意)",
+    "term": "期間(月数、任意)",
+    "date": "借入日",
+    "save": "借入を保存",
+    "delete": "借入を削除",
+    "saved": "借入を保存しました",
+    "installment": "毎月の返済額:{amount}",
+    "deleteMsg": "{name}を支払い履歴ごと削除します。支払いで作った取引は取引に残ります。"
+  },
+  "pago": {
+    "collectFrom": "{name}からの回収",
+    "payTo": "{name}への支払い",
+    "asIncome": "取引にも収入として記録する",
+    "asExpense": "取引にも支出として記録する",
+    "saveCollect": "回収を保存",
+    "savePayment": "支払いを保存",
+    "collectSaved": "回収を保存しました",
+    "paymentSaved": "支払いを保存しました",
+    "preview": "利息 {interest} · 元金 {principal} · 残り {left}"
+  },
+  "metas": {
+    "failed": "目標を読み込めませんでした。月を切り替えて戻るか、アプリを再起動してください。",
+    "savedIn": "{month}の貯金",
+    "ofIncome": "収入の{percent} · {rating}",
+    "emptyTitle": "貯金目標はまだありません。",
+    "emptyText": "+ ボタンで最初の目標を作りましょう。たとえば生活防衛資金など。",
+    "viewLabel": "貯金を見る",
+    "total": "累計",
+    "thisMonth": "今月",
+    "goalsTitle": "目標と累計貯金",
+    "of": "/ {amount}",
+    "progressOf": "{name}の進み具合",
+    "reached": "目標達成",
+    "monthChange": "· 今月 {sign}{amount}",
+    "withdrawFrom": "{name}から引き出す",
+    "withdraw": "引き出す",
+    "contributeTo": "{name}に積み立てる",
+    "contribute": "積み立てる",
+    "contributionsOf": "{month}の積み立て",
+    "deleteWithdrawal": "{name}からの{amount}の引き出しを削除",
+    "deleteContribution": "{name}への{amount}の積み立てを削除",
+    "withdrawalTag": " · 引き出し",
+    "noContributions": "{month}の積み立てはありません。目標の「積み立てる」をタップして記録しましょう。",
+    "datePassed": "目標日({month})を過ぎています",
+    "needed": "{month}までに毎月{amount}",
+    "atPace": "このペースなら{month}に到達",
+    "noPace": "最近の積み立てがないため予測できません",
+    "deleteWithdrawalTitle": "引き出しを削除",
+    "deleteContributionTitle": "積み立てを削除",
+    "deleteWithdrawalMsg": "{date}の{name}からの{amount}の引き出しを削除します。",
+    "deleteContributionMsg": "{date}の{name}への{amount}の積み立てを削除します。",
+    "withdrawalDeleted": "引き出しを削除しました",
+    "contributionDeleted": "積み立てを削除しました",
+    "deleteFailed": "積み立てを削除できませんでした。もう一度お試しください。",
+    "deletedGoal": "削除された目標"
+  },
+  "planes": {
+    "section": "セクション",
+    "metas": "目標",
+    "deudas": "借入",
+    "title": "計画"
+  },
+  "meta": {
+    "edit": "目標を編集",
+    "new": "新しい目標",
+    "placeholder": "生活防衛資金、旅行、車の頭金",
+    "target": "貯めたい金額({currency})",
+    "date": "いつまでに(任意)",
+    "removeDate": "日付を削除",
+    "save": "目標を保存",
+    "delete": "目標を削除",
+    "saved": "目標を保存しました",
+    "deleteMsg": "{name}をすべての積み立てとともに削除します。それらの月の貯金にも数えられなくなります。"
+  },
+  "aporte": {
+    "withdrawFrom": "{name}から引き出す",
+    "contributeTo": "{name}に積み立てる",
+    "returnsTo": "戻し先",
+    "withdrawHint": "引き出しは目標と今月の貯金から差し引かれ、お金は口座に戻ります。収入には数えられません。",
+    "contributeHint": "積み立ては口座から出て、その日付の月の貯金に数えられます。支出には数えられません。",
+    "saveWithdrawal": "引き出しを保存",
+    "saveContribution": "積み立てを保存",
+    "withdrawalSaved": "引き出しを保存しました",
+    "contributionSaved": "積み立てを保存しました"
+  },
+  "budgets": {
+    "title": "{month}の予算",
+    "failed": "今月の予算を読み込めませんでした。",
+    "editLabel": "{name}の予算を編集。{text}",
+    "spentOf": "{limit}のうち{spent}",
+    "empty": "支出カテゴリーに上限を設定すると、残りがここに表示されます。",
+    "copy": "{month}の予算をコピー",
+    "add": "予算を追加",
+    "copied": "{month}から{count}件の予算をコピーしました",
+    "copyFailed": "予算をコピーできませんでした。もう一度お試しください。",
+    "over": "{amount} 超過",
+    "left": "残り {amount}",
+    "carryIn": " · 先月からの繰越 {amount} を含む",
+    "carryOut": " · 先月の超過 {amount} を差し引き"
+  },
+  "budget": {
+    "edit": "予算を編集",
+    "new": "新しい予算",
+    "categories": "カテゴリー",
+    "remove": "{name}を外す",
+    "allTaken": "すべての支出カテゴリーに{month}の予算があります。",
+    "addAnother": "カテゴリーを追加",
+    "category": "カテゴリー",
+    "shared": "同じ上限を共有します",
+    "choose": "支出カテゴリーを選択",
+    "nameOptional": "名前(任意)",
+    "limit": "{month}の上限({currency})",
+    "rollover": "余り(または超過)を翌月に繰り越す",
+    "rolloverHint": "同じ予算でこの設定がオンの月どうしでのみ繰り越されます。",
+    "save": "予算を保存",
+    "delete": "予算を削除",
+    "saved": "予算を保存しました",
+    "deleteMsg": "{month}の{name}の上限を外します。支出は変わりません。"
+  },
+  "reports": {
+    "title": "レポート",
+    "until": "{month}まで",
+    "creating": "PDFを作成中…",
+    "export": "{month}をPDFに書き出す",
+    "period": "期間",
+    "months": "{count}か月",
+    "failed": "レポートを準備できませんでした。この画面を開き直してください。",
+    "projection": "未払い・未受け取りの固定費がすべて済むと、今月の終わりは",
+    "today": "今日 {amount}",
+    "toCollect": "· 受け取り予定 {amount}",
+    "toPay": "· 支払い予定 {amount}",
+    "empty": "この期間の取引はありません。収入と支出を記録すると、ここで推移を見られます。",
+    "byMonth": "月別の収入と支出",
+    "hideTable": "表を隠す",
+    "showTable": "表を見る",
+    "tableCaption": "月別の収入・支出・貯金・収支",
+    "balance": "収支",
+    "byCategory": "カテゴリー別の支出",
+    "tapCategory": "タップすると月ごとの推移を見られます。",
+    "catLabel": "{name}、{amount}、支出の{percent}",
+    "spentIn": "{name}の支出",
+    "seeMoves": "{month}の取引を見る",
+    "accounts": "月末の口座残高",
+    "accountsSub": "すべての口座の合計(カードは差し引き)。",
+    "accountsName": "口座残高",
+    "pdfSaved": "PDFを {where} に保存しました。",
+    "pdfFailed": "PDFを作成できませんでした。もう一度お試しください。"
+  },
+  "pdf": {
+    "savingRate": "収入に対する貯金",
+    "noIncome": "収入なし",
+    "noExpenses": "今月の支出はありません。",
+    "movements": "取引({count})",
+    "date": "日付",
+    "category": "カテゴリー",
+    "note": "メモ",
+    "noteAccount": "メモ · 口座",
+    "amount": "金額",
+    "generated": "{date}に Kuarto で作成。"
+  },
+  "charts": {
+    "byMonth": "月別グラフ",
+    "lineByMonth": "月別の{name}"
+  },
+  "help": {
+    "inicio": {
+      "title": "ホーム",
+      "points": [
+        "今月の収支を確認:入ったお金から使った分と貯めた分を引いた額です。",
+        "矢印か月名のタップで月を切り替えられます。",
+        "+ をタップすれば支出や収入をすぐ記録できます。"
+      ]
+    },
+    "movimientos": {
+      "title": "取引",
+      "points": [
+        "メモ・カテゴリー・タグで検索し、種類や口座で絞り込めます。",
+        "取引をタップで編集、⋯ で複製や削除ができます。",
+        "「選択」で複数の取引をまとめて変更・削除できます。"
+      ]
+    },
+    "fijos": {
+      "title": "固定費",
+      "points": [
+        "毎月くり返す支払いや収入を一度だけ登録します。",
+        "支払ったり受け取ったりしたら、済みにします。",
+        "数か月だけ一時停止したり、今月だけ外したりできます。"
+      ]
+    },
+    "cuentas": {
+      "title": "お金",
+      "points": [
+        "お金のある場所を記録:口座、現金、クレジットカード。",
+        "「使えるお金」は口座と現金の合計。カードは借りている額なので含みません。",
+        "「振替」でお金を移したりカードを支払ったりしても支出に数えません。"
+      ]
+    },
+    "tarjetas": {
+      "title": "カード",
+      "points": [
+        "利用限度額と締め日・支払日を入れてカードを追加します。",
+        "締めの請求額と、支払いまでの残りを確認できます。",
+        "「振替」で支払うと、口座から出て借りている額が減ります。"
+      ]
+    },
+    "metas": {
+      "title": "目標",
+      "points": [
+        "目標額と、必要なら期限を決めて目標を作ります。",
+        "できるときに口座から積み立て、進み具合を確認します。",
+        "必要なら引き出せます。積み立ては支出に数えません。"
+      ]
+    },
+    "deudas": {
+      "title": "借入",
+      "points": [
+        "借りているお金や貸しているお金を、金利と返済回数とともに記録します。",
+        "支払うたびに記録して、残高が減るのを確認します。",
+        "毎月の返済は固定費の「借入の返済」から支払えます。"
+      ]
+    },
+    "reportes": {
+      "title": "レポート",
+      "points": [
+        "3・6・12か月の収入と支出を比べられます。",
+        "カテゴリーをタップすると月ごとの推移を見られます。",
+        "月のデータをPDFにして保存・共有できます。"
+      ]
+    }
+  },
+  "fields": {
+    "category": "カテゴリー",
+    "chooseCategory": "カテゴリーを選択",
+    "newCategory": "新しいカテゴリー",
+    "date": "日付",
+    "chooseDate": "日付を選択",
+    "chooseOption": "選択してください",
+    "prevMonth": "前の月",
+    "nextMonth": "次の月",
+    "today": "今日",
+    "noDate": "日付なし",
+    "chooseDay": "日を選択",
+    "lastDay": "月末",
+    "dayN": "{n}日",
+    "dayOfMonth": "日にち",
+    "loading": "読み込み中…",
+    "undo": "元に戻す",
+    "month": "月",
+    "chooseOtherMonth": "{month}。別の月を選ぶ",
+    "chooseMonth": "月を選択",
+    "prevYear": "前の年",
+    "nextYear": "次の年",
+    "goToday": "今月に移動"
+  },
+  "lock": {
+    "enterPin": "PINを入力してください",
+    "digits": "{max}桁中{count}桁",
+    "upTo6": "最大6",
+    "erase": "削除",
+    "enter": "入る",
+    "biometric": "指紋または顔を使う",
+    "wrong": "PINが違います",
+    "wait": "試行回数が多すぎます。{seconds} 秒お待ちください。",
+    "unlock": "Kuarto のロックを解除",
+    "useBiometric": "指紋または顔を使ってください",
+    "usePin": "PINを使う",
+    "confirm": "指紋を確認してください",
+    "confirmSub": "Kuarto でオンにするために確認します"
+  },
+  "update": {
+    "searching": "確認中…",
+    "latest": "最新バージョン({version})です。",
+    "available": "バージョン {version} が利用できます。",
+    "failed": "確認できませんでした。インターネット接続を確認してください。",
+    "newTitle": "新しいバージョンがあります",
+    "newMsg": "Kuarto {version} の準備ができました。データはそのまま残ります。",
+    "later": "あとで",
+    "update": "アップデート",
+    "downloading": "ダウンロード中…",
+    "permission": "Kuarto の「この提供元を許可」をオンにして戻り、もう一度「アップデートを確認」をタップしてください。",
+    "downloaded": "バージョン {version} をダウンロードしました。「インストール」をタップしてください。"
+  },
+  "notify": {
+    "tomorrow": "明日は{name}の期日です",
+    "today": "今日は{name}の期日です",
+    "cardTomorrow": "明日は{name}の支払期日です",
+    "cardToday": "今日は{name}の支払期日です",
+    "cardBody": "請求額のうち{amount}が未払いです{minimum}。利息がかからないよう、お金 › カードから支払いましょう。",
+    "cardMinimum": "(最低 {amount})",
+    "fixedBody": "{amount} · 固定費で支払い済みにしましょう。",
+    "exceeded": "{name}の上限を超えました",
+    "near": "{name}が上限に近づいています",
+    "exceededBody": "今月は{limit}のうち{spent}を使いました。",
+    "nearBody": "{limit}のうち{spent}を使いました。残り{left}です。",
+    "dailyTitle": "今日の支出を記録しましたか?",
+    "dailyBody": "その日のうちに記録すると、月の収支がきちんと合います。"
+  },
+  "news": {
+    "title": "Kuarto {version} の新機能",
+    "fallback": "修正と改善。"
+  },
+  "cloud": {
+    "yourAccount": "あなたの Google アカウント"
+  },
+  "startup": {
+    "dbFailed": "端末のデータベースを開けませんでした。アプリを閉じて開き直してください。\n\n詳細:{detail}"
+  },
+  "changelog": {
+    "1_0_10": [
+      "新しいアニメーションのウェルカム画面と最初の質問で、口座・給料・固定費・借入・目標をまとめて準備できます。",
+      "ツアーを一新:各セクションに例があり、最後にデータのバックアップ方法を紹介します。",
+      "色:パレット(オーシャン、ターコイズ、フューシャ、グラファイト)か好きな色を、ライトとダークで選べます。",
+      "取引 › ⋯ › 別の月からコピー:先月の支出をワンタップで今月に移せます。",
+      "Excel や CSV から取り込み:テンプレート、エラー確認、元に戻す付き。",
+      "自動バックアップを毎日または毎週にでき、残す数も選べます。復元の前に今のデータを保存します。",
+      "アプリが複数の言語に対応しました。設定 › 外観 で選べます。"
+    ],
+    "1_0_9": [
+      "設定をセクションごとに整理しました:外観、お金、固定費と通知、データとバックアップ、アカウント、セキュリティ、ヘルプ、アプリについて。",
+      "設定の虫めがねで、項目を名前で検索できます。"
+    ],
+    "1_0_8": [
+      "アップデートのたびに、ここで変更点を確認できます。設定 › このバージョンの新機能 からも見られます。",
+      "ダークモードの色を修正:カレンダー、選択画面、ヘルプ。"
+    ],
+    "1_0_7": [
+      "クラウドバックアップ:設定 › データ で Google にログインすると、毎週のバックアップが暗号化されてアカウントに保存されます。",
+      "スマホを替えたら「クラウドから復元」でデータを取り戻せます。"
+    ],
+    "1_0_6": [
+      "ライト/ダークモード:設定 › 外観 で選べます。",
+      "借入:「返済を固定費に移す」と、固定費で支払ったときに借入の残高が減ります。"
+    ],
+    "1_0_5": [
+      "設定の「アップデートを確認」をプライバシーとは別に表示しました。"
+    ],
+    "1_0_4": [
+      "アプリが自動でアップデートを知らせます。",
+      "バックアップ、CSV、PDF はスマホの Documents/Kuarto に保存されます。",
+      "銀行通知の読み取りを削除しました。"
+    ]
+  },
+  "copy": {
+    "title": "別の月からコピー",
+    "from": "コピー元",
+    "hint": "コピーは{month}の同じ日に入ります。コピーする前に金額を変えられます。",
+    "empty": "その月にはコピーできる取引がありません。",
+    "listLabel": "コピーする取引",
+    "amountOf": "{name}の金額",
+    "fixedNote": {
+      "one": "固定費の支払い1件はコピーしません。固定費が毎月自動で作ります。",
+      "other": "固定費の支払い{count}件はコピーしません。固定費が毎月自動で作ります。"
+    },
+    "account": "コピーに使う口座",
+    "accountHint": "アーカイブ済み、または存在しない口座を使っていたものがあります。",
+    "saveExpenses": {
+      "one": "支出1件をコピー · {amount}",
+      "other": "支出{count}件をコピー · {amount}"
+    },
+    "saveMoves": {
+      "one": "取引1件をコピー · {amount}",
+      "other": "取引{count}件をコピー · {amount}"
+    },
+    "loadFailed": "その月の取引を読み込めませんでした。",
+    "done": {
+      "one": "取引1件をコピーしました",
+      "other": "取引{count}件をコピーしました"
+    },
+    "more": "その他の操作"
+  },
+  "import": {
+    "title": "Excel から取り込む",
+    "intro": "Excel(.xlsx)または CSV ファイルから取引を取り込みます。保存する前に、取り込める行と直す必要がある行を確認できます。",
+    "pick": "ファイルを選択(.xlsx または .csv)",
+    "template": "テンプレートをダウンロード",
+    "howTitle": "Excel はどんな形式にすればいい?",
+    "howText": "1行に1件の取引。1行目にこの見出しを入れてください。列の順番は自由です。",
+    "colColumn": "列",
+    "colRequired": "必須",
+    "colExample": "例",
+    "colNotes": "メモ",
+    "yes": "はい",
+    "no": "いいえ",
+    "requiredNote": "* 必須。",
+    "columns": {
+      "date": "日付",
+      "type": "種類",
+      "amount": "金額",
+      "category": "カテゴリー",
+      "account": "口座",
+      "description": "説明",
+      "status": "状態"
+    },
+    "aliases": {
+      "date": [
+        "日付",
+        "年月日",
+        "Fecha",
+        "Date"
+      ],
+      "type": [
+        "種類",
+        "区分",
+        "Tipo",
+        "Type"
+      ],
+      "amount": [
+        "金額",
+        "Monto",
+        "Amount"
+      ],
+      "category": [
+        "カテゴリー",
+        "カテゴリ",
+        "Categoría",
+        "Category"
+      ],
+      "account": [
+        "口座",
+        "Cuenta",
+        "Account"
+      ],
+      "description": [
+        "説明",
+        "メモ",
+        "摘要",
+        "Descripción",
+        "Description"
+      ],
+      "status": [
+        "状態",
+        "Estado",
+        "Status"
+      ]
+    },
+    "words": {
+      "expense": [
+        "支出",
+        "出金",
+        "Gasto",
+        "Expense"
+      ],
+      "income": [
+        "収入",
+        "入金",
+        "Ingreso",
+        "Income"
+      ],
+      "pending": [
+        "未払い",
+        "未完了",
+        "Pendiente",
+        "Pending"
+      ]
+    },
+    "example": [
+      "2026-10-05",
+      "支出",
+      "1250.50",
+      "食費",
+      "現金",
+      "スーパー",
+      "支払い済み"
+    ],
+    "examplePlain": {
+      "date": "2026-10-05",
+      "type": "支出",
+      "amount": "1250.50",
+      "category": "食費",
+      "account": "現金",
+      "description": "スーパー",
+      "status": "支払い済み"
+    },
+    "notes": {
+      "date": "05/10/2026(日が先)の形式も使えます。",
+      "type": "支出または収入。",
+      "amount": "正の数。通貨記号は不要です。",
+      "category": "存在しない場合は作成を提案します。",
+      "account": "存在しない場合は作成を提案します。",
+      "description": "任意。",
+      "status": "支払い済み、受け取り済み、未払いのいずれか。省略時は支払い済みまたは受け取り済み。未払いの行は取り込まず、固定費で管理します。"
+    },
+    "dataSheet": "取引",
+    "instructionsSheet": [
+      "説明書",
+      "Instrucciones",
+      "Instructions"
+    ],
+    "templateSaved": "テンプレートを {where} に保存しました。",
+    "templateDownloaded": "テンプレートをダウンロードしました。",
+    "templateFailed": "テンプレートを作成できませんでした。もう一度お試しください。",
+    "readFailed": "ファイルを読み込めませんでした。1行目に見出しのある .xlsx か .csv でお試しください。",
+    "columnsIntro": "{file} のすべての列を認識できませんでした。各項目にファイルのどの列を使うか選んでください。",
+    "noColumn": "ファイルにない",
+    "columnN": "{n}列目",
+    "continue": "続ける",
+    "ready": "取り込める行",
+    "withErrors": "エラーのある行",
+    "repeated": "重複の可能性",
+    "seeErrors": {
+      "one": "エラーのある行を見る",
+      "other": "エラーのある{count}行を見る"
+    },
+    "problem": "{line}行目:{reason}",
+    "errors": {
+      "date": "日付が正しくないか空です",
+      "type": "種類は支出か収入にしてください",
+      "amount": "金額が空、ゼロ、または数字ではありません",
+      "category": "カテゴリーがありません",
+      "account": "口座がありません"
+    },
+    "errorsNote": "エラーのある行は取り込みません。ファイルで直してもう一度取り込むか、そのまま続けてください。",
+    "pendingNote": {
+      "one": "1行が未払いのため取り込みません。これからの支払いは固定費で管理します。",
+      "other": "{count}行が未払いのため取り込みません。これからの支払いは固定費で管理します。"
+    },
+    "skipRepeated": {
+      "one": "重複の可能性がある行を飛ばす(日付・金額・説明が同じ)",
+      "other": "重複の可能性がある{count}行を飛ばす(日付・金額・説明が同じ)"
+    },
+    "newCategories": "存在しないカテゴリー",
+    "newAccounts": "存在しない口座",
+    "create": "作成する",
+    "createAccount": "銀行口座として作成する",
+    "importN": {
+      "one": "1件の取引を取り込む",
+      "other": "{count}件の取引を取り込む"
+    },
+    "failed": "取り込めませんでした。何も保存されていません。",
+    "doneText": {
+      "one": "1件の取引を取り込みました。",
+      "other": "{count}件の取引を取り込みました。"
+    },
+    "seeMoves": "取引を見る",
+    "undoTitle": "前回の取り込み",
+    "undo": "取り込みを元に戻す",
+    "lastImport": {
+      "one": "{date} · 1件",
+      "other": "{date} · {count}件"
+    },
+    "undone": {
+      "one": "取り込んだ取引1件を削除しました。",
+      "other": "取り込んだ取引{count}件を削除しました。"
+    },
+    "undoFailed": "元に戻せませんでした。もう一度お試しください。"
+  },
+  "palette": {
+    "title": "色",
+    "names": {
+      "violeta": "バイオレット",
+      "oceano": "オーシャン",
+      "turquesa": "ターコイズ",
+      "fucsia": "フューシャ",
+      "grafito": "グラファイト",
+      "custom": "カスタム"
+    },
+    "customHint": "色合いを選ぶか、カラーコードを入力してください。",
+    "hex": "カラーコード",
+    "hexInvalid": "#RRGGBB の形式で入力してください。例:#2E86DE",
+    "preview": "プレビュー",
+    "previewBalance": "今月の収支",
+    "previewButton": "保存",
+    "adjusted": "文字が読みやすいように少し暗くしました。",
+    "clash": "{what}の色に似ているため、まぎらわしいかもしれません。",
+    "clashWhat": {
+      "positive": "収入",
+      "negative": "支出や期限切れ",
+      "warning": "未払い"
+    },
+    "apply": "この色を使う",
+    "applied": "色を変更しました",
+    "statusNote": "受け取り済み・支払い済み・未払い・期限切れの色は変わりません。いつも同じ意味です。"
+  },
+  "intro": {
+    "slogan": "お金の一番いい使い方は、何に使ったかを知ること",
+    "skip": "タップして続ける"
+  },
+  "onboarding": {
+    "progress": "ステップ {n}/{total}",
+    "continue": "続ける",
+    "skip": "スキップ",
+    "remove": "{name}を削除",
+    "nameTitle": "お名前は?",
+    "nameText": "ホームのあいさつに使います。このスマホの中だけに保存され、設定 › アカウント でいつでも変更できます。",
+    "firstName": "名",
+    "lastName": "姓(任意)",
+    "nameRequired": "続けるには名前を入力してください。",
+    "langTitle": "言語と通貨",
+    "langText": "通貨は金額の記号だけが変わります。どちらもあとで設定から変更できます。",
+    "goalTitle": "いちばんの目的は?",
+    "goalText": "ホームとツアーで最初に表示します。",
+    "goalShort": "目的",
+    "goals": {
+      "controlar": {
+        "title": "支出を管理したい",
+        "sub": "毎月お金が何に使われているか知りたい"
+      },
+      "ahorrar": {
+        "title": "貯金したい",
+        "sub": "何かのために貯める、生活防衛資金を作る"
+      },
+      "deudas": {
+        "title": "借金を返したい",
+        "sub": "残りと、どれから返すかを知りたい"
+      },
+      "organizar": {
+        "title": "整理したい",
+        "sub": "支払い、収入、期日を把握しておきたい"
+      }
+    },
+    "moneyTitle": "お金はどこにありますか?",
+    "moneyText": "今日の金額を入れると、「使えるお金」が実際の額を示します。口座やカードを今日の残高で追加しましょう。",
+    "cashToday": "今日の現金({currency})",
+    "cashInvalid": "現金は数字だけで入力してください。",
+    "addBank": "銀行口座を追加",
+    "addCard": "クレジットカードを追加",
+    "salaryTitle": "収入はいくらで、どのくらいの頻度ですか?",
+    "salaryText": "給料がほぼ毎月同じなら固定費に入れて、毎月受け取り済みにするだけで済みます。",
+    "salaryVaries": "給料は月によって大きく変わりますか?",
+    "salaryStable": "いいえ、ほぼ毎月同じ",
+    "salaryChanges": "はい、変わります",
+    "salaryVariesTip": "その場合は固定費に入れません。受け取ったら + をタップし、入った額を収入として記録してください。",
+    "salaryTip": "収入として固定費に入ります。タップで変更できます。",
+    "salaryName": "給料",
+    "payments": "{name} · 受け取り{count}回 · {amount}",
+    "fixedTitle": "毎月支払っているものは?",
+    "fixedText": "一度登録すると、毎月期日つきで固定費に表示されます。",
+    "fixedNames": {
+      "rent": "家賃",
+      "power": "電気",
+      "internet": "ネット",
+      "water": "水道",
+      "phone": "電話"
+    },
+    "otherFixed": "その他の支払い",
+    "debtTitle": "ローンや借金はありますか?",
+    "debtText": "借りているお金(または貸しているお金)を記録すると、残りといつ終わるかがわかります。",
+    "addDebt": "借入やローンを追加",
+    "debtToFixed": "返済を固定費から支払う(借入が自動で減ります)",
+    "goalsTitle": "何かのために貯金していますか?",
+    "goalsText": "貯めたい金額と、必要なら期限を決めた目標です。",
+    "addGoal": "貯金目標を追加",
+    "limitTitle": "1か月の支出の上限はいくらにしますか?",
+    "limitText": "任意。予算を立てるときの目安になります。",
+    "limitLabel": "1か月の上限({currency})",
+    "limitInvalid": "金額は0より大きい数字だけで入力してください。",
+    "summaryTitle": "これから作成する内容",
+    "summaryText": "保存前に確認してください。「すべて作成」をタップするまで何も保存されません。",
+    "summaryAccount": "口座",
+    "summarySalary": "固定費の給料",
+    "summaryFixed": "固定の支払い",
+    "summaryDebt": "借入",
+    "summaryInFixed": "返済は固定費",
+    "summaryGoal": "目標",
+    "summaryLimit": "1か月の支出上限",
+    "summaryEmpty": "作成する口座・固定費・借入・目標はありません。いつでも追加できます。",
+    "summaryEdit": "変更するには「戻る」で質問に戻ってください。",
+    "change": "戻る",
+    "create": "すべて作成",
+    "doneTitle": "準備完了、{name}さん",
+    "tourText": "使い方を見てみますか?各セクションの例つきの短いツアーです。あとで 設定 › ヘルプ からも見られます。",
+    "seeTour": "ツアーを見る",
+    "notNow": "今はしない",
+    "google": "Google で続ける",
+    "googleHint": "任意:Google アカウントから名前を入力します。クラウドバックアップにも使えます。アカウントがなくてもアプリは同じように使えます。",
+    "googleFailed": "Google でログインできませんでした。名前を入力してください。"
+  },
+  "profile": {
+    "askTitle": "お名前は?",
+    "askMsg": "ホームのあいさつに使います。このスマホの中だけに保存されます。スキップもできます。"
+  },
+  "goalLink": {
+    "controlar": "目的:支出を管理する · レポートを見る",
+    "ahorrar": "目的:貯金する · 目標を見る",
+    "deudas": "目的:借金を返す · 借入を見る",
+    "organizar": "目的:整理する · 固定費を見る"
+  },
+  "tour": {
+    "progress": "{n}/{total}",
+    "skip": "スキップ",
+    "next": "次へ",
+    "example": "例",
+    "activateBackup": "自動バックアップをオンにする",
+    "steps": {
+      "inicio": {
+        "title": "ホーム",
+        "text": "使えるお金がわかります。例:{income}の収入があって{spent}を使ったら、残りがいくらかわかります。"
+      },
+      "movimientos": {
+        "title": "取引",
+        "text": "+ で支出をすぐ記録。例:現金でガソリン代{gas}。"
+      },
+      "fijos": {
+        "title": "固定費",
+        "text": "毎月支払うものや受け取るもの。例:毎月5日の家賃。支払ったら支払い済みにします。"
+      },
+      "dinero": {
+        "title": "お金",
+        "text": "口座、現金、カード。カードには借りている額が表示されます。"
+      },
+      "metas": {
+        "title": "目標",
+        "text": "何かのために貯金。例:旅行のために{goal}。できるときに積み立てます。"
+      },
+      "deudas": {
+        "title": "借入",
+        "text": "借りている額と残り。固定費で返済すると、借入が自動で減ります。"
+      },
+      "resumen": {
+        "title": "まとめ",
+        "text": "月ごとの収支と貯金額がわかります。"
+      },
+      "respaldo": {
+        "title": "あなたのデータ",
+        "text": "すべてこのスマホの中だけにあります。バックアップがあれば、なくしたり機種変更したりしても安心です。"
+      }
+    },
+    "demo": {
+      "left": "残り",
+      "inOut": "収入 {income} · 支出 {spent}",
+      "gas": "ガソリン",
+      "fromCash": "交通 · 現金",
+      "rent": "家賃",
+      "due5": "毎月5日が期日",
+      "trip": "旅行",
+      "goalOf": "{goal}のうち{goalSaved}",
+      "carLoan": "自動車ローン",
+      "debtLeft": "{debt}のうち残り{debtLeft}",
+      "saved": "収入から貯金"
+    },
+    "backupPoints": [
+      "データはこのスマホの中だけにあります。ほかに誰もコピーを持っていません。",
+      "いつでもバックアップを作れます。毎日または毎週の自動バックアップも設定できます。",
+      "Google アカウントがあれば、バックアップは暗号化してクラウドにも保存されます。"
+    ]
+  },
+  "defaults": {
+    "categories": {
+      "cat-salario": "給料",
+      "cat-otros-ingresos": "その他の収入",
+      "cat-alquiler": "家賃",
+      "cat-servicios": "公共料金",
+      "cat-suscripciones": "サブスク",
+      "cat-comida": "食費",
+      "cat-transporte": "交通費",
+      "cat-salud": "医療・健康",
+      "cat-ocio": "娯楽",
+      "cat-otros-gastos": "その他の支出",
+      "cat-pago-deudas": "借入返済",
+      "cat-luz": "電気",
+      "cat-agua": "水道",
+      "cat-internet": "ネット・テレビ",
+      "cat-telefono": "電話",
+      "cat-seguros": "保険",
+      "cat-educacion": "教育",
+      "cat-supermercado": "スーパー",
+      "cat-gasolina": "ガソリン",
+      "cat-ropa": "衣服",
+      "cat-hogar": "日用品"
+    },
+    "cash": "現金"
+  }
+}

@@ -31,22 +31,22 @@ export class SaveAccount {
   /** Crea una cuenta, o la edita si llega `id`. Los datos de tarjeta solo se guardan en tarjetas. */
   async execute(input: AccountFields, id?: string): Promise<Account> {
     const current = id ? await this.accounts.get(id) : undefined;
-    if (id && !current) throw new NotFoundError('Cuenta');
+    if (id && !current) throw new NotFoundError('account');
     const name = input.name.trim();
-    if (!name) throw new ValidationError('Escribe un nombre para la cuenta');
-    if (!TYPES.includes(input.type)) throw new ValidationError('Tipo de cuenta inválido');
-    if (!Number.isInteger(input.initialBalance)) throw new ValidationError('Saldo inicial inválido');
-    if (id === CASH_ACCOUNT_ID && input.type !== 'efectivo') throw new ValidationError('Efectivo no puede cambiar de tipo');
+    if (!name) throw new ValidationError('accountName');
+    if (!TYPES.includes(input.type)) throw new ValidationError('accountType');
+    if (!Number.isInteger(input.initialBalance)) throw new ValidationError('initialBalance');
+    if (id === CASH_ACCOUNT_ID && input.type !== 'efectivo') throw new ValidationError('cashType');
     const last4 = input.cardLast4?.trim() || null;
-    if (last4 && !/^\d{4}$/.test(last4)) throw new ValidationError('Escribe los últimos 4 dígitos de la tarjeta');
+    if (last4 && !/^\d{4}$/.test(last4)) throw new ValidationError('cardLast4');
     if (last4 && (await this.accounts.list()).some((a) => a.id !== id && a.cardLast4 === last4)) {
-      throw new ValidationError('Otra cuenta ya usa esos 4 dígitos');
+      throw new ValidationError('cardLast4Taken');
     }
     const card = isCard(input);
     if (card) {
-      if (!isValidCents(input.creditLimit ?? 0)) throw new ValidationError('Escribe el límite de la tarjeta');
-      if (!validDay(input.cutDay)) throw new ValidationError('El día de corte debe estar entre 1 y 31');
-      if (!validDay(input.dueDay)) throw new ValidationError('El día de pago debe estar entre 1 y 31');
+      if (!isValidCents(input.creditLimit ?? 0)) throw new ValidationError('cardLimit');
+      if (!validDay(input.cutDay)) throw new ValidationError('cutDay');
+      if (!validDay(input.dueDay)) throw new ValidationError('payDay');
     }
     const account: Account = {
       id: id ?? this.ids.next(),
@@ -68,9 +68,9 @@ export class ArchiveAccount {
   constructor(private readonly accounts: IAccountRepository) {}
 
   async execute(id: string, archived: boolean): Promise<void> {
-    if (id === CASH_ACCOUNT_ID && archived) throw new ValidationError('Efectivo no se puede archivar');
+    if (id === CASH_ACCOUNT_ID && archived) throw new ValidationError('cashArchive');
     const account = await this.accounts.get(id);
-    if (!account) throw new NotFoundError('Cuenta');
+    if (!account) throw new NotFoundError('account');
     await this.accounts.save({ ...account, archived });
   }
 }
@@ -80,9 +80,9 @@ export class DeleteAccount {
 
   /** Solo cuentas sin historial; las que tienen movimientos se archivan para no perderlos. */
   async execute(id: string): Promise<void> {
-    if (id === CASH_ACCOUNT_ID) throw new ValidationError('Efectivo no se puede eliminar');
+    if (id === CASH_ACCOUNT_ID) throw new ValidationError('cashDelete');
     if (await this.accounts.isInUse(id)) {
-      throw new ValidationError('Esta cuenta tiene movimientos. Archívala para ocultarla sin perder su historial.');
+      throw new ValidationError('accountHasMovements');
     }
     await this.accounts.delete(id);
   }
@@ -96,9 +96,9 @@ export class AdjustAccountBalance {
    * así el ajuste no se cuenta como ingreso ni gasto del mes.
    */
   async execute(id: string, realBalance: number): Promise<void> {
-    if (!Number.isInteger(realBalance)) throw new ValidationError('Saldo inválido');
+    if (!Number.isInteger(realBalance)) throw new ValidationError('balance');
     const account = await this.accounts.get(id);
-    if (!account) throw new NotFoundError('Cuenta');
+    if (!account) throw new NotFoundError('account');
     const current = (await this.accounts.balances()).get(id) ?? account.initialBalance;
     await this.accounts.save({ ...account, initialBalance: account.initialBalance + (realBalance - current) });
   }
@@ -148,12 +148,12 @@ export class SaveTransfer {
 
   /** Crea una transferencia, o la edita si llega `id`. */
   async execute(input: TransferFields, id?: string): Promise<Transfer> {
-    if (id && !(await this.accounts.getTransfer(id))) throw new NotFoundError('Transferencia');
-    if (!isValidCents(input.amount)) throw new ValidationError('El monto debe ser mayor que cero');
-    if (!isValidIsoDate(input.date)) throw new ValidationError('Fecha inválida');
-    if (input.fromAccountId === input.toAccountId) throw new ValidationError('Elige dos cuentas distintas');
+    if (id && !(await this.accounts.getTransfer(id))) throw new NotFoundError('transfer');
+    if (!isValidCents(input.amount)) throw new ValidationError('amountPositive');
+    if (!isValidIsoDate(input.date)) throw new ValidationError('date');
+    if (input.fromAccountId === input.toAccountId) throw new ValidationError('sameAccounts');
     for (const accountId of [input.fromAccountId, input.toAccountId]) {
-      if (!(await this.accounts.get(accountId))) throw new NotFoundError('Cuenta');
+      if (!(await this.accounts.get(accountId))) throw new NotFoundError('account');
     }
     const transfer: Transfer = {
       id: id ?? this.ids.next(),
@@ -213,7 +213,7 @@ export class SetCardMinimum {
 
   /** Guarda (o borra, con null) el pago mínimo del estado que cortó en `cut`. */
   async execute(accountId: string, cut: IsoDate, amount: number | null): Promise<void> {
-    if (amount !== null && !isValidCents(amount)) throw new ValidationError('El pago mínimo debe ser mayor que cero');
+    if (amount !== null && !isValidCents(amount)) throw new ValidationError('minPayment');
     await this.settings.set(minimumKey(accountId, cut), amount === null ? '' : String(amount));
   }
 }

@@ -11,11 +11,11 @@ async function validName(
   exceptId?: string,
 ): Promise<string> {
   const trimmed = name.trim();
-  if (!trimmed) throw new ValidationError('Escribe un nombre para la categoría');
+  if (!trimmed) throw new ValidationError('categoryName');
   const taken = (await categories.list()).some(
     (c) => c.id !== exceptId && c.name.toLocaleLowerCase('es') === trimmed.toLocaleLowerCase('es'),
   );
-  if (taken) throw new ValidationError('Ya tienes una categoría con ese nombre');
+  if (taken) throw new ValidationError('categoryTaken');
   return trimmed;
 }
 
@@ -31,7 +31,7 @@ export class AddCategory {
   ) {}
 
   async execute(input: { name: string; type: CategoryType } & CategoryLook): Promise<Category> {
-    if (!TYPES.includes(input.type)) throw new ValidationError('Tipo de categoría inválido');
+    if (!TYPES.includes(input.type)) throw new ValidationError('categoryType');
     const category: Category = {
       id: this.ids.next(),
       name: await validName(input.name, this.categories),
@@ -50,7 +50,7 @@ export class UpdateCategory {
 
   async execute(id: string, changes: { name?: string; hidden?: boolean } & CategoryLook): Promise<Category> {
     const current = await this.categories.get(id);
-    if (!current) throw new NotFoundError('Categoría');
+    if (!current) throw new NotFoundError('category');
     const updated: Category = {
       ...current,
       ...changes,
@@ -70,14 +70,14 @@ export class DeleteCategory {
    */
   async execute(id: string, moveTo?: string): Promise<void> {
     const category = await this.categories.get(id);
-    if (!category) throw new NotFoundError('Categoría');
-    if (isBuiltIn(category)) throw new ValidationError('Las categorías de la app no se borran. Puedes ocultarla.');
+    if (!category) throw new NotFoundError('category');
+    if (isBuiltIn(category)) throw new ValidationError('categoryBuiltIn');
     if (!(await this.categories.isInUse(id))) return this.categories.delete(id);
 
-    if (!moveTo) throw new ValidationError('Elige a qué categoría pasar sus movimientos');
+    if (!moveTo) throw new ValidationError('categoryMoveTo');
     const target = await this.categories.get(moveTo);
-    if (!target || target.id === id) throw new NotFoundError('Categoría');
-    if (target.type !== category.type) throw new ValidationError('Elige una categoría del mismo tipo');
+    if (!target || target.id === id) throw new NotFoundError('category');
+    if (target.type !== category.type) throw new ValidationError('categorySameType');
     await this.categories.deleteMovingTo(id, moveTo);
   }
 }

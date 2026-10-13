@@ -1,0 +1,120 @@
+@use '../sheet';
+
+.hint {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--muted-on-light);
+}
+
+.rows {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 4px 12px;
+  border-radius: var(--radius-card);
+  background: var(--surface-soft-card);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+
+  & + .row {
+    border-top: 1px solid var(--line);
+  }
+
+  &.off .row-text {
+    opacity: 0.6;
+  }
+}
+
+/* Casilla propia (sin el control nativo de Android), con zona táctil de 48 px. */
+.check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-left: -10px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    grid-area: 1 / 1;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--muted-on-light);
+    border-radius: 7px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  &[aria-checked='true']::before {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  ion-icon {
+    grid-area: 1 / 1;
+    font-size: 18px;
+    color: var(--paper);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: -4px;
+    border-radius: 12px;
+  }
+}
+
+.row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.row-title {
+  overflow: hidden;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-on-light);
+}
+
+.row-sub {
+  font-size: 14px;
+  color: var(--muted-on-light);
+}
+
+.amount input {
+  width: 104px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  background: var(--surface-soft-chip);
+  color: var(--text-on-light);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+
+  &:focus {
+    border-color: var(--accent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.amount.income input {
+  color: var(--positive-on-light);
+}

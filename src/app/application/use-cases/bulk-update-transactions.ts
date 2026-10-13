@@ -19,9 +19,9 @@ export class BulkUpdateTransactions {
   ) {}
 
   async execute(ids: string[], change: BulkChange): Promise<{ updated: number; skipped: number }> {
-    if (change.date !== undefined && !isValidIsoDate(change.date)) throw new ValidationError('Fecha inválida');
+    if (change.date !== undefined && !isValidIsoDate(change.date)) throw new ValidationError('date');
     const target = change.categoryId ? await this.categories.get(change.categoryId) : undefined;
-    if (change.categoryId && !target) throw new NotFoundError('Categoría');
+    if (change.categoryId && !target) throw new NotFoundError('category');
 
     let updated = 0;
     let skipped = 0;

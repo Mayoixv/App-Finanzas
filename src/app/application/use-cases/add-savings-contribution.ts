@@ -22,14 +22,14 @@ export class AddSavingsContribution {
   ) {}
 
   async execute(input: AddSavingsContributionInput): Promise<SavingsContribution> {
-    if (!isValidCents(input.amount)) throw new ValidationError('El monto debe ser mayor que cero');
-    if (!isValidIsoDate(input.date)) throw new ValidationError('Fecha inválida');
+    if (!isValidCents(input.amount)) throw new ValidationError('amountPositive');
+    if (!isValidIsoDate(input.date)) throw new ValidationError('date');
     const goal = await this.savings.getGoal(input.goalId);
-    if (!goal) throw new NotFoundError('Meta de ahorro');
-    if (input.accountId && this.accounts && !(await this.accounts.get(input.accountId))) throw new NotFoundError('Cuenta');
+    if (!goal) throw new NotFoundError('goal');
+    if (input.accountId && this.accounts && !(await this.accounts.get(input.accountId))) throw new NotFoundError('account');
     if (input.withdrawal) {
       const { saved } = goalProgress(goal, await this.savings.listContributions());
-      if (input.amount > saved) throw new ValidationError('No puedes retirar más de lo ahorrado en esta meta');
+      if (input.amount > saved) throw new ValidationError('withdrawTooMuch');
     }
 
     const contribution: SavingsContribution = {

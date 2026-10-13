@@ -12,7 +12,7 @@ export class UpdateTransaction {
 
   async execute(id: string, input: AddTransactionInput): Promise<Transaction> {
     const current = await this.transactions.get(id);
-    if (!current) throw new NotFoundError('Movimiento');
+    if (!current) throw new NotFoundError('transaction');
     await validateTransactionInput(input, this.categories);
     // Se puede dejar en una cuenta archivada si ya estaba en ella; no moverlo a una archivada.
     await validateAccount(input.accountId, this.accounts, input.accountId === current.accountId);

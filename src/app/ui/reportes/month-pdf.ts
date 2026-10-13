@@ -3,10 +3,10 @@ import { CASH_ACCOUNT_ID } from '../../domain/account';
 import { MonthKey } from '../../domain/month';
 import { fileDate, saveBinaryFile } from '../file-io';
 import { formatDay, formatMoney, formatPercent, monthLabel } from '../format';
+import { t } from '../i18n';
 
 const MARGIN = 48;
 const LINE = 16;
-const RATING: Record<string, string> = { excelente: 'Excelente', regular: 'Regular', bajo: 'Bajo' };
 
 /**
  * PDF del mes: resumen, gasto por categoría y todos los movimientos.
@@ -51,23 +51,23 @@ export async function exportMonthPdf(container: AppContainer, month: MonthKey): 
 
   const s = overview.summary;
   const summary: [string, string][] = [
-    ['Ingresos', money(s.income)],
-    ['Gastos', money(s.expenses)],
-    ['Ahorrado', money(s.saved)],
-    ['Balance', money(s.balance)],
-    ['Ahorro del ingreso', s.income > 0 ? `${formatPercent(s.savingsPercent)} (${RATING[s.rating]})` : 'Sin ingresos'],
+    [t('inicio.income'), money(s.income)],
+    [t('inicio.expenses'), money(s.expenses)],
+    [t('inicio.saved'), money(s.saved)],
+    [t('reports.balance'), money(s.balance)],
+    [t('pdf.savingRate'), s.income > 0 ? `${formatPercent(s.savingsPercent)} (${t('inicio.rating.' + s.rating)})` : t('pdf.noIncome')],
   ];
   for (const [label, value] of summary) {
     text(label, MARGIN, { color: 90 });
-    text(value, width - MARGIN, { align: 'right', bold: label === 'Balance' });
+    text(value, width - MARGIN, { align: 'right', bold: label === t('reports.balance') });
     y += LINE + 2;
   }
 
   y += 14;
-  text('Gasto por categoría', MARGIN, { size: 13, bold: true });
+  text(t('reports.byCategory'), MARGIN, { size: 13, bold: true });
   y += 18;
   if (overview.breakdown.length === 0) {
-    text('Sin gastos este mes.', MARGIN, { color: 110 });
+    text(t('pdf.noExpenses'), MARGIN, { color: 110 });
     y += LINE;
   }
   for (const slice of overview.breakdown) {
@@ -80,35 +80,35 @@ export async function exportMonthPdf(container: AppContainer, month: MonthKey): 
 
   y += 18;
   ensure(60);
-  text(`Movimientos (${transactions.length})`, MARGIN, { size: 13, bold: true });
+  text(t('pdf.movements', { count: transactions.length }), MARGIN, { size: 13, bold: true });
   y += 18;
   const byId = new Map(categories.map((c) => [c.id, c]));
   const accountName = new Map(accounts.map((a) => [a.id, a.name]));
   const showAccount = accounts.length > 1;
   const cols = { date: MARGIN, category: MARGIN + 52, note: MARGIN + 170, amount: width - MARGIN };
-  text('Fecha', cols.date, { color: 110, size: 9 });
-  text('Categoría', cols.category, { color: 110, size: 9 });
-  text(showAccount ? 'Nota · cuenta' : 'Nota', cols.note, { color: 110, size: 9 });
-  text('Monto', cols.amount, { color: 110, size: 9, align: 'right' });
+  text(t('pdf.date'), cols.date, { color: 110, size: 9 });
+  text(t('pdf.category'), cols.category, { color: 110, size: 9 });
+  text(showAccount ? t('pdf.noteAccount') : t('pdf.note'), cols.note, { color: 110, size: 9 });
+  text(t('pdf.amount'), cols.amount, { color: 110, size: 9, align: 'right' });
   y += 6;
   rule();
   y += 14;
   doc.setFontSize(9);
-  for (const t of [...transactions].sort((a, b) => a.date.localeCompare(b.date))) {
+  for (const tx of [...transactions].sort((a, b) => a.date.localeCompare(b.date))) {
     ensure(LINE);
-    const category = byId.get(t.categoryId);
+    const category = byId.get(tx.categoryId);
     const income = category?.type === 'ingreso';
-    const note = [t.note, showAccount ? accountName.get(t.accountId ?? CASH_ACCOUNT_ID) : ''].filter(Boolean).join(' · ');
-    text(formatDay(t.date), cols.date, { size: 9 });
-    text(fit(doc, category?.name ?? 'Sin categoría', 110), cols.category, { size: 9 });
+    const note = [tx.note, showAccount ? accountName.get(tx.accountId ?? CASH_ACCOUNT_ID) : ''].filter(Boolean).join(' · ');
+    text(formatDay(tx.date), cols.date, { size: 9 });
+    text(fit(doc, category?.name ?? t('common.noCategory'), 110), cols.category, { size: 9 });
     text(fit(doc, note, cols.amount - cols.note - 90), cols.note, { size: 9, color: 80 });
-    text(`${income ? '+' : '-'}${money(t.amount)}`, cols.amount, { size: 9, align: 'right' });
+    text(`${income ? '+' : '-'}${money(tx.amount)}`, cols.amount, { size: 9, align: 'right' });
     y += LINE;
   }
 
   ensure(30);
   y += 14;
-  text(`Generado el ${formatDay(fileDate())} con Kuarto.`, MARGIN, { size: 8, color: 140 });
+  text(t('pdf.generated', { date: formatDay(fileDate()) }), MARGIN, { size: 8, color: 140 });
 
   const base64 = doc.output('datauristring').split(',')[1];
   return saveBinaryFile(`kuarto-${month}.pdf`, base64, 'application/pdf');

@@ -1,9 +1,9 @@
 <section class="card" aria-labelledby="presupuestos-title">
-  <h2 id="presupuestos-title" class="section-title">Presupuestos de {{ monthState.label() }}</h2>
+  <h2 id="presupuestos-title" class="section-title">{{ t('budgets.title', { month: monthState.label() }) }}</h2>
   <p class="sr-only" aria-live="polite">{{ liveMessage() }}</p>
 
   @if (failed()) {
-    <p class="card-empty">No se pudieron leer los presupuestos de este mes.</p>
+    <p class="card-empty">{{ t('budgets.failed') }}</p>
   } @else if (rows(); as list) {
     @if (list.length > 0) {
       <ul [class.t-still]="!monthState.animateLists()" class="budgets">
@@ -12,12 +12,12 @@
             <button
               type="button"
               class="budget"
-              [attr.aria-label]="'Editar presupuesto de ' + b.name + '. ' + b.text"
+              [attr.aria-label]="t('budgets.editLabel', { name: b.name, text: b.text })"
               (click)="edit(b)"
             >
               <span class="budget-head">
                 <span class="budget-name">{{ b.name }}</span>
-                <span class="budget-amounts">{{ money(b.spent) }} de {{ money(b.limit) }}</span>
+                <span class="budget-amounts">{{ t('budgets.spentOf', { spent: money(b.spent), limit: money(b.limit) }) }}</span>
               </span>
               <span class="bar" aria-hidden="true">
                 <span [class]="'bar-fill ' + b.state" [style.width.%]="b.bar"></span>
@@ -33,13 +33,13 @@
         }
       </ul>
     } @else {
-      <p class="card-empty">Ponle un límite a una categoría de gasto y aquí verás cuánto te queda.</p>
+      <p class="card-empty">{{ t('budgets.empty') }}</p>
       @if (previousCount() > 0) {
         <button type="button" class="btn-secondary action" (click)="copyPrevious()">
-          Copiar los de {{ previousLabel() }}
+          {{ t('budgets.copy', { month: previousLabel() }) }}
         </button>
       }
     }
-    <button type="button" class="btn-secondary action" (click)="add()">Agregar presupuesto</button>
+    <button type="button" class="btn-secondary action" (click)="add()">{{ t('budgets.add') }}</button>
   }
 </section>

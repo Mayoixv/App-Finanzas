@@ -21,29 +21,25 @@ import { TransactionFormService } from '../movimientos/transaction-form.service'
 import { DineroFormService } from '../dinero/dinero-form.service';
 import { DeudaModalComponent } from '../deudas/deuda.modal';
 import { PlanesSection, PlanesState } from '../planes/planes.page';
-
+import { t } from '../i18n';
 
 const PLANES_ADD_LABEL: Record<PlanesSection, string> = {
-  metas: 'Agregar meta de ahorro',
-  deudas: 'Agregar deuda o préstamo',
+  metas: 'tabs.addGoal',
+  deudas: 'tabs.addDebt',
 };
 
+/** Textos en es.json, tabs.<path>: `label` corto bajo el ícono, `name` completo (lectores de pantalla), `add` del botón +. */
 interface Tab {
   path: string;
-  /** Nombre corto bajo el ícono; `name` es el completo, para lectores de pantalla. */
-  label: string;
-  name: string;
   icon: string;
-  /** Qué agrega el botón + cuando esta pestaña está activa. */
-  addLabel: string;
 }
 
 const TABS: Tab[] = [
-  { path: 'inicio', label: 'Inicio', name: 'Inicio', icon: 'home-outline', addLabel: 'Agregar movimiento' },
-  { path: 'movimientos', label: 'Movim.', name: 'Movimientos', icon: 'list-outline', addLabel: 'Agregar movimiento' },
-  { path: 'fijos', label: 'Fijos', name: 'Fijos', icon: 'repeat-outline', addLabel: 'Agregar fijo (gasto o ingreso)' },
-  { path: 'dinero', label: 'Dinero', name: 'Dinero', icon: 'wallet-outline', addLabel: 'Agregar cuenta, efectivo o tarjeta' },
-  { path: 'planes', label: 'Planes', name: 'Planes: metas y deudas', icon: 'flag-outline', addLabel: '' },
+  { path: 'inicio', icon: 'home-outline' },
+  { path: 'movimientos', icon: 'list-outline' },
+  { path: 'fijos', icon: 'repeat-outline' },
+  { path: 'dinero', icon: 'wallet-outline' },
+  { path: 'planes', icon: 'flag-outline' },
 ];
 
 @Component({
@@ -53,6 +49,7 @@ const TABS: Tab[] = [
   imports: [IonRouterOutlet, IonIcon],
 })
 export class TabsPage {
+  protected readonly t = t;
   private readonly router = inject(Router);
   private readonly transactionForm = inject(TransactionFormService);
   private readonly recurringForm = inject(RecurringFormService);
@@ -90,8 +87,8 @@ export class TabsPage {
 
   protected addLabel(): string {
     const tab = TABS[this.active()];
-    if (tab.path === 'planes') return PLANES_ADD_LABEL[this.planes.section()];
-    return tab.addLabel;
+    if (tab.path === 'planes') return t(PLANES_ADD_LABEL[this.planes.section()]);
+    return t(`tabs.${tab.path}.add`);
   }
 
   protected add() {
@@ -119,7 +116,7 @@ export class TabsPage {
   }
 
   private indexOf(url: string): number {
-    const i = TABS.findIndex((t) => url.includes(`/tabs/${t.path}`));
+    const i = TABS.findIndex((tab) => url.includes(`/tabs/${tab.path}`));
     return i === -1 ? 0 : i;
   }
 

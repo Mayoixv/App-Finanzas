@@ -1,22 +1,22 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar deuda' : 'Nueva deuda' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ isEdit() ? t('deuda.edit') : t('deuda.new') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
-    <div class="kind" role="radiogroup" aria-label="Tipo de deuda">
-      <button type="button" role="radio" [attr.aria-checked]="direction() === 'debo'" (click)="direction.set('debo')">Debo</button>
-      <button type="button" role="radio" [attr.aria-checked]="direction() === 'me_deben'" (click)="direction.set('me_deben')">Me deben</button>
+    <div class="kind" role="radiogroup" [attr.aria-label]="t('deuda.kind')">
+      <button type="button" role="radio" [attr.aria-checked]="direction() === 'debo'" (click)="direction.set('debo')">{{ t('deudas.iOwe') }}</button>
+      <button type="button" role="radio" [attr.aria-checked]="direction() === 'me_deben'" (click)="direction.set('me_deben')">{{ t('deudas.theyOwe') }}</button>
     </div>
 
     <div class="field">
       <ion-input
-        label="Nombre"
+        [label]="t('common.name')"
         label-placement="floating"
-        [placeholder]="direction() === 'debo' ? 'Préstamo del carro, tarjeta' : 'Nombre de quien te debe'"
+        [placeholder]="direction() === 'debo' ? t('deuda.mePlaceholder') : t('deuda.themPlaceholder')"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -24,7 +24,7 @@
 
     <div class="field">
       <ion-input
-        label="Monto prestado ({{ currency() }})"
+        [label]="t('deuda.principal', { currency: currency() })"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -37,7 +37,7 @@
 
     <div class="field">
       <ion-input
-        label="Tasa de interés anual % (opcional)"
+        [label]="t('deuda.rate')"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -50,19 +50,19 @@
 
     <div class="field">
       <ion-input
-        label="Plazo en meses (opcional)"
+        [label]="t('deuda.term')"
         label-placement="floating"
         type="number"
         inputmode="numeric"
         min="1"
-        placeholder="Ej. 24"
+        [placeholder]="t('common.example', { value: 24 })"
         [value]="term()"
         (ionInput)="term.set(($event.detail.value ?? '').toString())"
       ></ion-input>
     </div>
 
     <div class="field">
-      <app-date-field label="Fecha del préstamo" [(value)]="startDate"></app-date-field>
+      <app-date-field [label]="t('deuda.date')" [(value)]="startDate"></app-date-field>
     </div>
 
     @if (preview(); as text) {
@@ -74,18 +74,18 @@
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isEdit() ? 'Guardar cambios' : 'Guardar deuda' }}
+      {{ isEdit() ? t('common.saveChanges') : t('deuda.save') }}
     </button>
 
-    @if (isEdit()) {
-      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar deuda</button>
+    @if (isEdit() && !draft) {
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">{{ t('deuda.delete') }}</button>
     }
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Deuda guardada' }}</p>
+      <p class="done-text">{{ isEdit() ? t('common.changesSaved') : t('deuda.saved') }}</p>
     }
   </div>
 </ion-content>

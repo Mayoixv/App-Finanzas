@@ -14,7 +14,7 @@ export class CurrencySettings {
   }
 
   async set(currency: Currency): Promise<void> {
-    if (!isCurrency(currency)) throw new ValidationError('Moneda no soportada');
+    if (!isCurrency(currency)) throw new ValidationError('currency');
     await this.settings.set(KEY, currency);
   }
 }

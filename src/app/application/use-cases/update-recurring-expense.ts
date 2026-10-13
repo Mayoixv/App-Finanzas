@@ -20,7 +20,7 @@ export class UpdateRecurringExpense {
     fromMonth: MonthKey,
   ): Promise<RecurringExpense> {
     const current = await this.recurring.get(id);
-    if (!current) throw new NotFoundError('Gasto fijo');
+    if (!current) throw new NotFoundError('fixed');
     const name = await validateRecurringInput(input, this.categories);
 
     const updated: RecurringExpense = {

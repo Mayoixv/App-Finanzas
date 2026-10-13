@@ -3,6 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 import { APP_VERSION } from '../../version';
+import { t } from '../i18n';
 
 /**
  * Firestore guarda documentos de hasta 1 MiB: el archivo cifrado se parte en trozos de este tamaño.
@@ -42,9 +43,11 @@ export class CloudBackupService {
       .catch(console.error);
   }
 
-  async signIn(): Promise<void> {
+  /** Entra con Google. Devuelve el nombre de la cuenta, para llenar el nombre y apellido si se quiere. */
+  async signIn(): Promise<string> {
     const { user } = await FirebaseAuthentication.signInWithGoogle();
     this.setUser(user);
+    return user?.displayName ?? '';
   }
 
   async signOut(): Promise<void> {
@@ -105,6 +108,6 @@ export class CloudBackupService {
 
   private setUser(user: { uid: string; email: string | null } | null) {
     this.uid = user?.uid ?? null;
-    this.email.set(user ? (user.email ?? 'tu cuenta de Google') : null);
+    this.email.set(user ? (user.email ?? t('cloud.yourAccount')) : null);
   }
 }

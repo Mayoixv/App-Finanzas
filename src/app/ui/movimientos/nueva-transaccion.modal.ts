@@ -14,7 +14,6 @@ import { addOutline, cameraOutline, close } from 'ionicons/icons';
 import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
 import { accountChoices, accountOptions, rememberAccount } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
-import { ValidationError } from '../../application/errors';
 import { Category, isExpenseType } from '../../domain/category';
 import { monthOf } from '../../domain/month';
 import { normalizeTags, Transaction } from '../../domain/transaction';
@@ -24,6 +23,7 @@ import { photoToDataUrl, pickImage } from '../image';
 import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 import { UndoService } from '../undo.service';
+import { t, errorText } from '../i18n';
 
 type Kind = 'gasto' | 'ingreso';
 
@@ -50,6 +50,7 @@ interface Photo {
   imports: [DateFieldComponent, SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class NuevaTransaccionModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
@@ -103,13 +104,13 @@ export class NuevaTransaccionModalComponent implements OnInit {
   );
 
   protected readonly saveLabel = computed(() => {
-    if (this.isEdit()) return 'Guardar cambios';
-    return this.kind() === 'ingreso' ? 'Guardar ingreso' : 'Guardar gasto';
+    if (this.isEdit()) return t('common.saveChanges');
+    return this.kind() === 'ingreso' ? t('tx.saveIncome') : t('tx.saveExpense');
   });
 
   protected readonly doneMessage = computed(() => {
-    if (this.isEdit()) return 'Cambios guardados';
-    return this.kind() === 'ingreso' ? 'Ingreso guardado' : 'Gasto guardado';
+    if (this.isEdit()) return t('common.changesSaved');
+    return this.kind() === 'ingreso' ? t('tx.incomeSaved') : t('tx.expenseSaved');
   });
 
   protected readonly canSave = computed(
@@ -130,30 +131,30 @@ export class NuevaTransaccionModalComponent implements OnInit {
     const categories = await this.container.categories.list();
     this.categories.set(categories);
 
-    const t = this.transaction ?? this.copyOf;
-    const choices = await accountChoices(this.container, t?.accountId);
+    const tx = this.transaction ?? this.copyOf;
+    const choices = await accountChoices(this.container, tx?.accountId);
     this.accounts.set(choices.accounts);
     this.accountId.set(choices.selected);
-    if (!t) {
+    if (!tx) {
       await this.applyLastCategory();
       return;
     }
-    const category = categories.find((c) => c.id === t.categoryId);
+    const category = categories.find((c) => c.id === tx.categoryId);
     this.isEdit.set(!!this.transaction);
     this.isCopy.set(!this.transaction);
     this.kind.set(category?.type === 'ingreso' ? 'ingreso' : 'gasto');
-    this.categoryId.set(t.categoryId);
-    this.amount.set(amountToInput(t.amount));
-    if (this.transaction) this.date.set(t.date);
-    this.note.set(t.note);
-    this.tags.set((t.tags ?? []).join(', '));
-    if (t.splits?.length) {
+    this.categoryId.set(tx.categoryId);
+    this.amount.set(amountToInput(tx.amount));
+    if (this.transaction) this.date.set(tx.date);
+    this.note.set(tx.note);
+    this.tags.set((tx.tags ?? []).join(', '));
+    if (tx.splits?.length) {
       this.splitOn.set(true);
-      this.parts.set(t.splits.map((s) => ({ categoryId: s.categoryId, amount: amountToInput(s.amount) })));
+      this.parts.set(tx.splits.map((s) => ({ categoryId: s.categoryId, amount: amountToInput(s.amount) })));
     }
     // Las fotos no se copian al duplicar: un recibo es de un solo gasto.
     if (this.transaction) {
-      const attachments = await this.container.transactions.listAttachments(t.id);
+      const attachments = await this.container.transactions.listAttachments(tx.id);
       this.photos.set(attachments.map((a) => ({ id: a.id, data: a.data, isNew: false })));
     }
   }
@@ -203,7 +204,7 @@ export class NuevaTransaccionModalComponent implements OnInit {
       this.photos.update((list) => [...list, { id: crypto.randomUUID(), data, isNew: true }]);
     } catch (e) {
       console.error(e);
-      this.error.set('No se pudo leer la foto. Prueba con otra imagen.');
+      this.error.set(t('tx.photoFailed'));
     }
   }
 
@@ -248,23 +249,21 @@ export class NuevaTransaccionModalComponent implements OnInit {
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
-      this.error.set(
-        e instanceof ValidationError ? e.message : 'No se pudo guardar. Inténtalo de nuevo.',
-      );
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }
 
   protected async confirmDelete() {
-    const t = this.transaction;
-    if (!t) return;
+    const tx = this.transaction;
+    if (!tx) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar movimiento',
-      message: 'Se borrará este movimiento. Si era el pago de un gasto fijo, ese gasto volverá a quedar pendiente.',
+      header: t('tx.delete'),
+      message: t('tx.deleteMsg'),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -274,12 +273,12 @@ export class NuevaTransaccionModalComponent implements OnInit {
     this.saving.set(true);
     this.error.set(null);
     try {
-      const deleted = await this.container.deleteTransaction.execute(t.id);
+      const deleted = await this.container.deleteTransaction.execute(tx.id);
       await this.modalCtrl.dismiss(null, 'deleted');
-      this.undo.offer('Movimiento eliminado', () => this.container.restoreTransaction.execute(deleted));
+      this.undo.offer(t('tx.deleted'), () => this.container.restoreTransaction.execute(deleted));
     } catch (e) {
       console.error(e);
-      this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(t('common.deleteFailed'));
       this.saving.set(false);
     }
   }
@@ -293,17 +292,22 @@ export class NuevaTransaccionModalComponent implements OnInit {
   /** Avisa (no bloquea) si ya hay un movimiento con la misma fecha, monto y categoría. */
   private async confirmIfDuplicate(date: string, amount: number, categoryId: string): Promise<boolean> {
     const same = (await this.container.transactions.listByMonth(monthOf(date))).find(
-      (t) => t.date === date && t.amount === amount && t.categoryId === categoryId,
+      (tx) => tx.date === date && tx.amount === amount && tx.categoryId === categoryId,
     );
     if (!same) return true;
     const name = this.categories().find((c) => c.id === categoryId)?.name ?? '';
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: '¿Está repetido?',
-      message: `Ya registraste ${formatMoney(amount)} en ${name} el ${formatDay(date)}${same.note ? ` («${same.note}»)` : ''}. ¿Guardarlo de todas formas?`,
+      header: t('tx.dupTitle'),
+      message: t('tx.dupMsg', {
+        amount: formatMoney(amount),
+        name,
+        date: formatDay(date),
+        note: same.note ? t('tx.dupNote', { note: same.note }) : '',
+      }),
       buttons: [
-        { text: 'No guardar', role: 'cancel' },
-        { text: 'Guardar igual', role: 'confirm' },
+        { text: t('tx.dontSave'), role: 'cancel' },
+        { text: t('tx.saveAnyway'), role: 'confirm' },
       ],
     });
     await alert.present();

@@ -7,6 +7,7 @@ import { Budget, budgetCategoryIds, budgetLevel, budgetName, BudgetStatus } from
 import { formatMoney, monthLabel, shiftMonth } from '../format';
 import { MonthState } from '../month-state';
 import { BudgetFormService } from './budget-form.service';
+import { t, listText } from '../i18n';
 
 interface BudgetRow {
   budget: Budget;
@@ -27,6 +28,7 @@ interface BudgetRow {
   imports: [IonIcon],
 })
 export class BudgetsCardComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly form = inject(BudgetFormService);
   protected readonly monthState = inject(MonthState);
@@ -64,11 +66,11 @@ export class BudgetsCardComponent {
     const month = this.monthState.month();
     try {
       const copied = await this.container.copyBudgets.execute(shiftMonth(month, -1), month);
-      this.liveMessage.set(`${copied} presupuestos copiados de ${this.previousLabel()}`);
+      this.liveMessage.set(t('budgets.copied', { count: copied, month: this.previousLabel() }));
       this.monthState.notifyChange();
     } catch (error) {
       console.error(error);
-      this.liveMessage.set('No se pudieron copiar los presupuestos. Inténtalo de nuevo.');
+      this.liveMessage.set(t('budgets.copyFailed'));
     }
   }
 
@@ -85,7 +87,7 @@ export class BudgetsCardComponent {
       const names = new Map(categories.map((c) => [c.id, c.name]));
       this.rows.set(
         statuses
-          .map(({ budget, status }) => toRow(budget, status, budgetName(budget, names)))
+          .map(({ budget, status }) => toRow(budget, status, budgetName(budget, names, listText)))
           .sort((a, b) => b.spent / Math.max(b.limit, 1) - a.spent / Math.max(a.limit, 1)),
       );
       this.previousCount.set(previousStatuses.length);
@@ -102,9 +104,9 @@ function toRow(budget: Budget, status: BudgetStatus, name: string): BudgetRow {
   const { spent, limit, remaining, carry } = status;
   const percent = limit > 0 ? (spent / limit) * 100 : spent > 0 ? 100 : 0;
   const state = budgetLevel(status);
-  const left = state === 'exceeded' ? `Te pasaste por ${formatMoney(-remaining)}` : `Te quedan ${formatMoney(remaining)}`;
+  const left = state === 'exceeded' ? t('budgets.over', { amount: formatMoney(-remaining) }) : t('budgets.left', { amount: formatMoney(remaining) });
   const carried =
-    carry > 0 ? ` · incluye ${formatMoney(carry)} del mes pasado` : carry < 0 ? ` · descuenta ${formatMoney(-carry)} del mes pasado` : '';
+    carry > 0 ? t('budgets.carryIn', { amount: formatMoney(carry) }) : carry < 0 ? t('budgets.carryOut', { amount: formatMoney(-carry) }) : '';
   return {
     budget,
     name,

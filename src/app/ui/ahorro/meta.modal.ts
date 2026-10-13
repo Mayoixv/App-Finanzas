@@ -4,11 +4,11 @@ import { AlertController, IonContent, IonIcon, IonInput, ModalController } from 
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { SavingsGoal } from '../../domain/savings';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, parseAmount } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
+import { t, errorText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -20,12 +20,15 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [DateFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class MetaModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
 
   /** Si llega, el formulario edita esta meta en vez de crear una. */
   @Input() goal?: SavingsGoal;
+  /** En las preguntas iniciales: no guarda, devuelve lo escrito (role 'draft') para guardarlo todo al final. */
+  @Input() draft = false;
 
   protected readonly name = signal('');
   protected readonly target = signal('');
@@ -65,6 +68,10 @@ export class MetaModalComponent implements OnInit {
       targetAmount: parseAmount(this.target()) ?? 0,
       targetDate: this.targetDate() || null,
     };
+    if (this.draft) {
+      await this.modalCtrl.dismiss(fields, 'draft');
+      return;
+    }
     try {
       if (this.goal) await this.container.updateSavingsGoal.execute(this.goal.id, fields);
       else await this.container.addSavingsGoal.execute(fields);
@@ -73,9 +80,7 @@ export class MetaModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
       this.error.set(
-        e instanceof ValidationError || e instanceof NotFoundError
-          ? e.message
-          : 'No se pudo guardar. Inténtalo de nuevo.',
+        errorText(e, 'common.saveFailed'),
       );
       this.saving.set(false);
     }
@@ -86,11 +91,11 @@ export class MetaModalComponent implements OnInit {
     if (!goal) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar meta',
-      message: `Se borrará ${goal.name} junto con todos sus aportes, y esos aportes dejarán de contar como ahorrado en sus meses.`,
+      header: t('meta.delete'),
+      message: t('meta.deleteMsg', { name: goal.name }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -104,7 +109,7 @@ export class MetaModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (err) {
       console.error(err);
-      this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(t('common.deleteFailed'));
       this.saving.set(false);
     }
   }

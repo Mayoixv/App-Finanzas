@@ -7,17 +7,18 @@ import { APP_CONTAINER } from '../../app.container';
 import { NetWorth } from '../../application/use-cases/accounts';
 import { formatMoney } from '../format';
 import { MonthState } from '../month-state';
+import { t } from '../i18n';
 
 /** Patrimonio en Inicio: una línea que lleva a la pestaña Dinero. */
 @Component({
   selector: 'app-net-worth-card',
   template: `
     @if (net(); as n) {
-      <button type="button" class="card" [attr.aria-label]="'Patrimonio ' + money(n.total) + '. Ver cuentas'" (click)="open()">
+      <button type="button" class="card" [attr.aria-label]="t('networth.open', { amount: money(n.total) })" (click)="open()">
         <span class="text">
-          <span class="label">Patrimonio</span>
+          <span class="label">{{ t('networth.title') }}</span>
           <span class="amount">{{ money(n.total) }}</span>
-          <span class="sub">Disponible {{ money(n.available) }}@if (n.inGoals > 0) { · En metas {{ money(n.inGoals) }}}@if (n.owedToMe > 0) { · Te deben {{ money(n.owedToMe) }}} · Debes {{ money(n.owe) }}</span>
+          <span class="sub">{{ t('networth.available', { amount: money(n.available) }) }}@if (n.inGoals > 0) { · {{ t('networth.inGoals', { amount: money(n.inGoals) }) }}}@if (n.owedToMe > 0) { · {{ t('networth.owedToMe', { amount: money(n.owedToMe) }) }}} · {{ t('networth.owe', { amount: money(n.owe) }) }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
@@ -70,6 +71,7 @@ import { MonthState } from '../month-state';
   imports: [IonIcon],
 })
 export class NetWorthCardComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly router = inject(Router);
   private readonly monthState = inject(MonthState);

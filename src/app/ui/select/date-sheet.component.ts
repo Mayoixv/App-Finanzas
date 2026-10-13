@@ -2,9 +2,11 @@ import { Component, computed, inject, Input, OnInit, signal } from '@angular/cor
 import { IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronBack, chevronForward } from 'ionicons/icons';
+import { t, locale } from '../i18n';
 
-const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+/** Iniciales de lunes a domingo; el 1 de enero de 2024 fue lunes. */
+const weekdays = () =>
+  Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(locale(), { weekday: 'narrow' }).format(new Date(2024, 0, 1 + i)));
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const iso = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
@@ -23,16 +25,16 @@ export function todayIso(): string {
     <div class="picker">
       <div class="grab" aria-hidden="true"></div>
       <div class="head">
-        <button type="button" class="nav" aria-label="Mes anterior" (click)="move(-1)">
+        <button type="button" class="nav" [attr.aria-label]="t('fields.prevMonth')" (click)="move(-1)">
           <ion-icon name="chevron-back" aria-hidden="true"></ion-icon>
         </button>
         <h2 class="month" aria-live="polite">{{ monthLabel() }}</h2>
-        <button type="button" class="nav" aria-label="Mes siguiente" (click)="move(1)">
+        <button type="button" class="nav" [attr.aria-label]="t('fields.nextMonth')" (click)="move(1)">
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
       </div>
       <div class="grid weekdays" aria-hidden="true">
-        @for (w of weekdays; track $index) {
+        @for (w of weekdays(); track $index) {
           <span>{{ w }}</span>
         }
       </div>
@@ -45,7 +47,7 @@ export function todayIso(): string {
                 class="day"
                 [class.today]="cell.iso === today"
                 [attr.aria-selected]="cell.iso === value"
-                [attr.aria-label]="cell.d + ' de ' + monthName()"
+                [attr.aria-label]="dayLabel(cell.d)"
                 (click)="pick(cell.iso)"
               >
                 <span class="num">{{ cell.d }}</span>
@@ -57,9 +59,9 @@ export function todayIso(): string {
         </div>
       }
       <div class="actions">
-        <button type="button" class="btn-secondary" (click)="pick(today)">Hoy</button>
+        <button type="button" class="btn-secondary" (click)="pick(today)">{{ t('fields.today') }}</button>
         @if (optional) {
-          <button type="button" class="clear" (click)="clear()">Sin fecha</button>
+          <button type="button" class="clear" (click)="clear()">{{ t('fields.noDate') }}</button>
         }
       </div>
     </div>
@@ -189,19 +191,26 @@ export function todayIso(): string {
   imports: [IonIcon],
 })
 export class DateSheetComponent implements OnInit {
+  protected readonly t = t;
   private readonly modalCtrl = inject(ModalController);
 
   @Input() value = '';
   @Input() optional = false;
 
-  protected readonly weekdays = WEEKDAYS;
+  protected readonly weekdays = computed(weekdays);
   protected readonly today = todayIso();
   protected readonly view = signal({ y: 0, m: 0 });
-  protected readonly monthName = computed(() => MONTHS[this.view().m]);
   protected readonly monthLabel = computed(() => {
-    const name = this.monthName();
-    return `${name.charAt(0).toUpperCase()}${name.slice(1)} de ${this.view().y}`;
+    const { y, m } = this.view();
+    const name = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(new Date(y, m, 1));
+    return name.charAt(0).toUpperCase() + name.slice(1);
   });
+
+  /** "5 de octubre", para lectores de pantalla. */
+  protected dayLabel(day: number) {
+    const { y, m } = this.view();
+    return new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long' }).format(new Date(y, m, day));
+  }
 
   /** Huecos vacíos hasta el día de la semana del 1 (lunes primero) y luego los días del mes. */
   protected readonly cells = computed(() => {

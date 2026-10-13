@@ -5,13 +5,13 @@ import { AlertController, IonContent, IonIcon, IonInput, ModalController } from 
 import { addIcons } from 'ionicons';
 import { close, swapVertical } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { Account, isCard, Transfer } from '../../domain/account';
 import { UndoService } from '../undo.service';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, formatMoney, parseAmount, todayIso } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
 import { accountOptions } from './account-choices';
+import { t, errorText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -23,6 +23,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [DateFieldComponent, SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class TransferenciaModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
@@ -66,7 +67,7 @@ export class TransferenciaModalComponent implements OnInit {
   protected readonly warning = computed(() => {
     const out = this.preview()?.[0];
     if (!out || isCard(out.account) || out.after >= 0) return null;
-    return `${out.name} quedaría en ${formatMoney(out.after)}. Revisa que "Sale de" y "Entra a" estén bien.`;
+    return t('transfer.warning', { name: out.name, amount: formatMoney(out.after) });
   });
   protected readonly toOptions = computed(() => this.accountOptions().filter((o) => o.value !== this.from()));
 
@@ -85,24 +86,24 @@ export class TransferenciaModalComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const t = this.transfer;
+    const tr = this.transfer;
     // Al editar, también las cuentas archivadas que use la transferencia.
     const active = (await this.container.accounts.list()).filter(
-      (a) => !a.archived || a.id === t?.fromAccountId || a.id === t?.toAccountId,
+      (a) => !a.archived || a.id === tr?.fromAccountId || a.id === tr?.toAccountId,
     );
     this.accounts.set(active);
     const balances = await this.container.accounts.balances();
-    if (t) {
-      balances.set(t.fromAccountId, (balances.get(t.fromAccountId) ?? 0) + t.amount);
-      balances.set(t.toAccountId, (balances.get(t.toAccountId) ?? 0) - t.amount);
+    if (tr) {
+      balances.set(tr.fromAccountId, (balances.get(tr.fromAccountId) ?? 0) + tr.amount);
+      balances.set(tr.toAccountId, (balances.get(tr.toAccountId) ?? 0) - tr.amount);
     }
     this.balances.set(balances);
-    if (t) {
-      this.from.set(t.fromAccountId);
-      this.to.set(t.toAccountId);
-      this.amount.set(amountToInput(t.amount));
-      this.date.set(t.date);
-      this.note.set(t.note);
+    if (tr) {
+      this.from.set(tr.fromAccountId);
+      this.to.set(tr.toAccountId);
+      this.amount.set(amountToInput(tr.amount));
+      this.date.set(tr.date);
+      this.note.set(tr.note);
       return;
     }
     this.from.set(active.find((a) => !isCard(a))?.id ?? null);
@@ -111,27 +112,27 @@ export class TransferenciaModalComponent implements OnInit {
   }
 
   protected async confirmDelete() {
-    const t = this.transfer;
-    if (!t) return;
+    const tr = this.transfer;
+    if (!tr) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar transferencia',
-      message: 'Se borrará esta transferencia y los saldos de las dos cuentas volverán a como estaban.',
+      header: t('transfer.delete'),
+      message: t('transfer.deleteMsg'),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
     if ((await alert.onDidDismiss()).role !== 'destructive') return;
     this.saving.set(true);
     try {
-      const removed = await this.container.deleteTransfer.execute(t.id);
-      if (removed) this.undo.offer('Transferencia eliminada', () => this.container.accounts.saveTransfer(removed));
+      const removed = await this.container.deleteTransfer.execute(tr.id);
+      if (removed) this.undo.offer(t('transfer.deleted'), () => this.container.accounts.saveTransfer(removed));
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (e) {
       console.error(e);
-      this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(t('common.deleteFailed'));
       this.saving.set(false);
     }
   }
@@ -161,7 +162,7 @@ export class TransferenciaModalComponent implements OnInit {
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
-      this.error.set(e instanceof ValidationError || e instanceof NotFoundError ? e.message : 'No se pudo guardar. Inténtalo de nuevo.');
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }

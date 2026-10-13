@@ -1,33 +1,33 @@
 @if (lock.locked()) {
   <div class="lock" role="dialog" aria-modal="true" aria-labelledby="lock-title">
     <h1 id="lock-title" class="screen-title">Kuarto</h1>
-    <p class="hint">Escribe tu PIN</p>
+    <p class="hint">{{ t('lock.enterPin') }}</p>
 
     <div class="dots" aria-hidden="true" [class.shake]="shake()">
       @for (i of slots(); track i) {
         <span class="dot" [class.filled]="i < pin().length"></span>
       }
     </div>
-    <p class="sr-only" aria-live="polite">{{ pin().length }} de {{ lock.pinLength() ? maxDigits() : 'hasta 6' }} números</p>
+    <p class="sr-only" aria-live="polite">{{ t('lock.digits', { count: pin().length, max: lock.pinLength() ? maxDigits() : t('lock.upTo6') }) }}</p>
     <p class="message" role="alert">{{ message() }}</p>
 
     <div class="keypad">
       @for (k of keys; track k) {
         <button type="button" class="key" [disabled]="blocked()" (click)="press(k)">{{ k }}</button>
       }
-      <button type="button" class="key small" aria-label="Borrar" [disabled]="blocked() || !pin().length" (click)="erase()">
+      <button type="button" class="key small" [attr.aria-label]="t('lock.erase')" [disabled]="blocked() || !pin().length" (click)="erase()">
         <ion-icon name="backspace-outline" aria-hidden="true"></ion-icon>
       </button>
       <button type="button" class="key" [disabled]="blocked()" (click)="press('0')">0</button>
       <button type="button" class="key small enter" [disabled]="blocked() || pin().length < 4" (click)="submit()">
-        Entrar
+        {{ t('lock.enter') }}
       </button>
     </div>
 
     @if (lock.biometricOn()) {
       <button type="button" class="bio" [disabled]="blocked()" (click)="lock.unlockWithBiometry()">
         <ion-icon name="finger-print" aria-hidden="true"></ion-icon>
-        Usar huella o rostro
+        {{ t('lock.biometric') }}
       </button>
     }
   </div>

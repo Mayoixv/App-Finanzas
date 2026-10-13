@@ -157,7 +157,7 @@
     content: '';
     position: absolute;
     inset: -60px -20px;
-    background: radial-gradient(ellipse at 50% 38%, rgba(143, 107, 255, 0.5), transparent 68%);
+    background: radial-gradient(ellipse at 50% 38%, rgba(var(--violet-400-rgb), 0.5), transparent 68%);
     pointer-events: none;
   }
 

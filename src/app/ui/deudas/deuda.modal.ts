@@ -4,11 +4,11 @@ import { AlertController, IonContent, IonIcon, IonInput, ModalController } from 
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { Debt, DebtDirection, installment } from '../../domain/debts';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, formatMoney, parseAmount, todayIso } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
+import { t, errorText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -20,6 +20,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [DateFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class DeudaModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
@@ -28,6 +29,8 @@ export class DeudaModalComponent implements OnInit {
   @Input() debt?: Debt;
   /** Nombre con que empieza una deuda nueva (desde un pago fijo). */
   @Input() presetName?: string;
+  /** En las preguntas iniciales: no guarda, devuelve lo escrito (role 'draft') para guardarlo todo al final. */
+  @Input() draft = false;
 
   protected readonly direction = signal<DebtDirection>('debo');
   protected readonly name = signal('');
@@ -50,7 +53,7 @@ export class DeudaModalComponent implements OnInit {
     const term = this.termMonths();
     const rate = this.annualRate();
     if (!principal || !term || !Number.isInteger(term) || term < 1 || !(rate >= 0)) return '';
-    return `Cuota mensual: ${formatMoney(installment(principal, rate, term))}`;
+    return t('deuda.installment', { amount: formatMoney(installment(principal, rate, term)) });
   });
 
   protected readonly canSave = computed(
@@ -81,27 +84,27 @@ export class DeudaModalComponent implements OnInit {
   }
 
   protected async save() {
+    const fields = {
+      name: this.name(),
+      direction: this.direction(),
+      principal: parseAmount(this.principal()) ?? 0,
+      annualRate: this.annualRate(),
+      termMonths: this.termMonths(),
+      startDate: this.startDate(),
+    };
+    if (this.draft) {
+      await this.modalCtrl.dismiss(fields, 'draft');
+      return;
+    }
     this.saving.set(true);
     this.error.set(null);
     try {
-      await this.container.saveDebt.execute(
-        {
-          name: this.name(),
-          direction: this.direction(),
-          principal: parseAmount(this.principal()) ?? 0,
-          annualRate: this.annualRate(),
-          termMonths: this.termMonths(),
-          startDate: this.startDate(),
-        },
-        this.debt?.id,
-      );
+      await this.container.saveDebt.execute(fields, this.debt?.id);
       this.saved.set(true);
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
-      this.error.set(
-        e instanceof ValidationError || e instanceof NotFoundError ? e.message : 'No se pudo guardar. Inténtalo de nuevo.',
-      );
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }
@@ -111,11 +114,11 @@ export class DeudaModalComponent implements OnInit {
     if (!debt) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar deuda',
-      message: `Se borrará ${debt.name} con su historial de pagos. Los movimientos que creaste con esos pagos se quedan en Movimientos.`,
+      header: t('deuda.delete'),
+      message: t('deuda.deleteMsg', { name: debt.name }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -126,7 +129,7 @@ export class DeudaModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (err) {
       console.error(err);
-      this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(t('common.deleteFailed'));
       this.saving.set(false);
     }
   }

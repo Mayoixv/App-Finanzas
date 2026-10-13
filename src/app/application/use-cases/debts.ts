@@ -23,14 +23,14 @@ export interface DebtFields {
 
 function validateDebt(input: DebtFields): string {
   const name = input.name.trim();
-  if (!name) throw new ValidationError('Escribe un nombre para la deuda');
-  if (input.direction !== 'debo' && input.direction !== 'me_deben') throw new ValidationError('Tipo de deuda inválido');
-  if (!isValidCents(input.principal)) throw new ValidationError('El monto debe ser mayor que cero');
-  if (!(input.annualRate >= 0 && input.annualRate <= 200)) throw new ValidationError('La tasa debe estar entre 0% y 200%');
+  if (!name) throw new ValidationError('debtName');
+  if (input.direction !== 'debo' && input.direction !== 'me_deben') throw new ValidationError('debtType');
+  if (!isValidCents(input.principal)) throw new ValidationError('amountPositive');
+  if (!(input.annualRate >= 0 && input.annualRate <= 200)) throw new ValidationError('rate');
   if (input.termMonths !== null && !(Number.isInteger(input.termMonths) && input.termMonths >= 1 && input.termMonths <= 600)) {
-    throw new ValidationError('El plazo debe ser de 1 a 600 meses');
+    throw new ValidationError('term');
   }
-  if (!isValidIsoDate(input.startDate)) throw new ValidationError('Fecha inválida');
+  if (!isValidIsoDate(input.startDate)) throw new ValidationError('date');
   return name;
 }
 
@@ -42,7 +42,7 @@ export class SaveDebt {
 
   /** Crea una deuda, o la edita si llega `id`. */
   async execute(input: DebtFields, id?: string): Promise<Debt> {
-    if (id && !(await this.debts.get(id))) throw new NotFoundError('Deuda');
+    if (id && !(await this.debts.get(id))) throw new NotFoundError('debt');
     const debt: Debt = { ...input, id: id ?? this.ids.next(), name: validateDebt(input) };
     await this.debts.save(debt);
     return debt;
@@ -111,14 +111,14 @@ export class AddDebtAsFixed {
 
   async execute(debtId: string, fromMonth: string): Promise<RecurringExpense> {
     const view = (await this.debts.execute()).find((d) => d.debt.id === debtId);
-    if (!view) throw new NotFoundError('Deuda');
+    if (!view) throw new NotFoundError('debt');
     if (view.debt.direction !== 'debo' || view.installment <= 0) {
-      throw new ValidationError('Solo una deuda tuya con plazo tiene una cuota fija para pasar a Fijos');
+      throw new ValidationError('debtNoInstallment');
     }
-    if (view.fixedId) throw new ValidationError('Esta deuda ya está en Fijos');
-    if (view.balance <= 0) throw new ValidationError('Esta deuda ya está saldada');
+    if (view.fixedId) throw new ValidationError('debtAlreadyFixed');
+    if (view.balance <= 0) throw new ValidationError('debtPaid');
     if (!(await this.categories.get(PAYMENT_CATEGORY.debo))) {
-      throw new ValidationError('Falta la categoría "Pago de deudas"; créala en Ajustes');
+      throw new ValidationError('debtCategoryMissing');
     }
     const fixed: RecurringExpense = {
       id: this.ids.next(),
@@ -171,14 +171,14 @@ export class RegisterDebtPayment {
    */
   async execute(debtId: string, date: string, amount: number, asMovement: boolean, accountId?: string): Promise<DebtPayment> {
     const debt = await this.debts.get(debtId);
-    if (!debt) throw new NotFoundError('Deuda');
-    if (!isValidCents(amount)) throw new ValidationError('El monto debe ser mayor que cero');
-    if (!isValidIsoDate(date)) throw new ValidationError('Fecha inválida');
+    if (!debt) throw new NotFoundError('debt');
+    if (!isValidCents(amount)) throw new ValidationError('amountPositive');
+    if (!isValidIsoDate(date)) throw new ValidationError('date');
     const balance = outstanding(debt, await this.debts.listPayments(debtId));
-    if (balance <= 0) throw new ValidationError('Esta deuda ya está saldada');
+    if (balance <= 0) throw new ValidationError('debtPaid');
     const split = splitPayment(balance, debt.annualRate, amount);
     if (split.interest + split.principal < amount) {
-      throw new ValidationError('El pago es mayor que lo que queda por pagar');
+      throw new ValidationError('paymentTooBig');
     }
 
     let transactionId: string | undefined;
@@ -186,8 +186,8 @@ export class RegisterDebtPayment {
       if (!(await this.categories.get(PAYMENT_CATEGORY[debt.direction]))) {
         throw new ValidationError(
           debt.direction === 'debo'
-            ? 'Falta la categoría "Pago de deudas"; créala en Ajustes o registra el pago sin movimiento'
-            : 'Falta la categoría "Otros ingresos"; créala en Ajustes o registra el cobro sin movimiento',
+            ? 'debtPaymentCategory'
+            : 'debtIncomeCategory',
         );
       }
       transactionId = this.ids.next();

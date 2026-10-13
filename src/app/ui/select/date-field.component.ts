@@ -3,8 +3,8 @@ import { IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { calendarOutline } from 'ionicons/icons';
 import { DateSheetComponent } from './date-sheet.component';
+import { t, locale } from '../i18n';
 
-const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic'];
 
 /** Campo de fecha con el estilo de la app: abre un calendario propio en vez del nativo de Android. Valor 'AAAA-MM-DD'. */
 @Component({
@@ -66,17 +66,20 @@ const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 
   imports: [IonIcon],
 })
 export class DateFieldComponent {
+  protected readonly t = t;
   private readonly modals = inject(ModalController);
 
-  readonly label = input('Fecha');
+  readonly label = input(t('fields.date'));
   /** Con `optional`, la hoja ofrece "Sin fecha". */
   readonly optional = input(false);
-  readonly placeholder = input('Elige una fecha');
+  readonly placeholder = input(t('fields.chooseDate'));
   readonly value = model('');
 
   protected readonly text = computed(() => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(this.value());
-    return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${m[1]}` : this.placeholder();
+    if (!m) return this.placeholder();
+    const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(date).replace(' de ', ' ');
   });
   private isOpen = false;
 

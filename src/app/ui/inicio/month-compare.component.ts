@@ -7,9 +7,10 @@ import { APP_CONTAINER } from '../../app.container';
 import { change, MonthlySummary } from '../../domain/monthly-summary';
 import { formatMoney } from '../format';
 import { MonthState } from '../month-state';
+import { t, locale } from '../i18n';
 
-const MONTH_NAME = new Intl.DateTimeFormat('es-DO', { month: 'long' });
-const MONTH_SHORT = new Intl.DateTimeFormat('es-DO', { month: 'short', year: 'numeric' });
+const monthName = (d: Date) => new Intl.DateTimeFormat(locale(), { month: 'long' }).format(d);
+const monthShort = (d: Date) => new Intl.DateTimeFormat(locale(), { month: 'short', year: 'numeric' }).format(d);
 
 const dateOf = (month: string) => {
   const [y, m] = month.split('-').map(Number);
@@ -38,7 +39,7 @@ const isEmpty = (s: MonthlySummary) => s.income === 0 && s.expenses === 0 && s.s
 
 function line(label: string, current: number, previous: number, prevName: string, upIsGood: boolean): Line {
   const { diff, percent } = change(current, previous);
-  if (diff === 0) return { label, icon: 'remove', tone: 'same', text: `Igual que ${prevName}` };
+  if (diff === 0) return { label, icon: 'remove', tone: 'same', text: t('compare.same', { month: prevName }) };
   const up = diff > 0;
   const amount = `${up ? '+' : '−'}${formatMoney(Math.abs(diff))}`;
   const howMuch = percent === null ? '' : `${Math.round(Math.abs(percent))}% `;
@@ -46,7 +47,7 @@ function line(label: string, current: number, previous: number, prevName: string
     label,
     icon: up ? 'arrow-up' : 'arrow-down',
     tone: up === upIsGood ? 'good' : 'bad',
-    text: `${howMuch}${up ? 'más' : 'menos'} que ${prevName} (${amount})`,
+    text: t(up ? 'compare.more' : 'compare.less', { percent: howMuch, month: prevName, amount }),
   };
 }
 
@@ -58,6 +59,7 @@ function line(label: string, current: number, previous: number, prevName: string
   imports: [IonIcon, RouterLink],
 })
 export class MonthCompareComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly monthState = inject(MonthState);
 
@@ -81,14 +83,14 @@ export class MonthCompareComponent {
       const history = await this.container.getMonthHistory.execute(month);
       if (seq !== this.loadSeq) return;
       const [current, previous] = history;
-      const prevName = MONTH_NAME.format(dateOf(previous.month));
+      const prevName = monthName(dateOf(previous.month));
       this.prevName.set(prevName);
       this.lines.set(
         isEmpty(previous)
           ? null
           : [
-              line('Gastos', current.expenses, previous.expenses, prevName, false),
-              line('Ingresos', current.income, previous.income, prevName, true),
+              line(t('inicio.expenses'), current.expenses, previous.expenses, prevName, false),
+              line(t('inicio.income'), current.income, previous.income, prevName, true),
             ],
       );
       // Los meses anteriores al primer movimiento no dicen nada: se recortan.
@@ -97,12 +99,12 @@ export class MonthCompareComponent {
       this.rows.set(
         history.slice(0, last + 1).map((s, i) => ({
           month: s.month,
-          label: MONTH_SHORT.format(dateOf(s.month)),
+          label: monthShort(dateOf(s.month)),
           current: i === 0,
           empty: isEmpty(s),
           balance: formatMoney(s.balance),
           negative: s.balance < 0,
-          detail: `Ingresos ${formatMoney(s.income)} · Gastos ${formatMoney(s.expenses)} · Ahorrado ${formatMoney(s.saved)}`,
+          detail: t('compare.detail', { income: formatMoney(s.income), expenses: formatMoney(s.expenses), saved: formatMoney(s.saved) }),
         })),
       );
     } catch (error) {

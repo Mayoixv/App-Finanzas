@@ -1,6 +1,7 @@
 import { Component, computed, input, model } from '@angular/core';
 import { formatMoney } from '../format';
 import { compactMoney, niceMax } from './scale';
+import { t } from '../i18n';
 
 export interface ColumnSeries {
   name: string;
@@ -28,6 +29,7 @@ const RADIUS = 4;
   styleUrls: ['charts.scss'],
 })
 export class ColumnChartComponent {
+  protected readonly t = t;
   readonly labels = input.required<string[]>();
   /** Nombre completo de cada mes para la lectura y los lectores de pantalla. */
   readonly fullLabels = input.required<string[]>();

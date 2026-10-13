@@ -2,11 +2,13 @@ import { Component, computed, input, model, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { chevronDown } from 'ionicons/icons';
+import { t } from './i18n';
 
 /** El 31 significa "último día del mes": en meses cortos cae el 28, 29 o 30. */
 export const LAST_DAY = 31;
 
-export const dayLabel = (day: number | null) => (day === null ? 'Elige un día' : day === LAST_DAY ? 'Último día' : `Día ${day}`);
+export const dayLabel = (day: number | null) =>
+  day === null ? t('fields.chooseDay') : day === LAST_DAY ? t('fields.lastDay') : t('fields.dayN', { n: day });
 
 /**
  * Elegir un día del mes sin escribir: un botón que abre una cuadrícula 1–30 + "Último día".
@@ -36,14 +38,14 @@ export const dayLabel = (day: number | null) => (day === null ? 'Elige un día' 
             role="option"
             class="day"
             [attr.aria-selected]="value() === d"
-            [attr.aria-label]="'Día ' + d"
+            [attr.aria-label]="t('fields.dayN', { n: d })"
             (click)="pick(d)"
           >
             {{ d }}
           </button>
         }
         <button type="button" role="option" class="day last" [attr.aria-selected]="value() === lastDay" (click)="pick(lastDay)">
-          Último día
+          {{ t('fields.lastDay') }}
         </button>
       </div>
     }
@@ -147,7 +149,8 @@ export const dayLabel = (day: number | null) => (day === null ? 'Elige un día' 
   imports: [IonIcon],
 })
 export class DayPickerComponent {
-  readonly label = input('Día del mes');
+  protected readonly t = t;
+  readonly label = input(t('fields.dayOfMonth'));
   readonly value = model<number | null>(null);
 
   protected readonly open = signal(false);

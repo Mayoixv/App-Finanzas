@@ -1,60 +1,66 @@
 <ion-content class="surface-dark" [fullscreen]="true">
   <header class="screen-head">
     <div class="title-row">
-      <h1 class="screen-title">Inicio</h1>
+      <h1 class="screen-title">{{ t('common.home') }}</h1>
       <span class="head-icons">
         <app-help-button topic="inicio"></app-help-button>
-        <a routerLink="/ajustes" class="settings" aria-label="Ajustes: moneda y categorías">
+        <a routerLink="/ajustes" class="settings" [attr.aria-label]="t('inicio.settings')">
           <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
         </a>
       </span>
     </div>
     @if (userName(); as name) {
-      <p class="greeting">Hola, {{ name }}</p>
+      <p class="greeting">{{ t('inicio.hello', { name }) }}</p>
+    }
+    @if (goal(); as g) {
+      <a class="goal-link" [routerLink]="goalRoute[g].path" [queryParams]="goalRoute[g].query">
+        {{ t('goalLink.' + g) }}
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </a>
     }
     <app-month-switcher></app-month-switcher>
   </header>
 
   <app-loading [show]="!overview() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="notice">No se pudieron leer los datos de este mes. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+    <p class="notice">{{ t('inicio.failed') }}</p>
   } @else if (overview(); as o) {
     @if (isEmpty(o.summary)) {
       <section class="empty">
-        <p class="empty-title">Aún no registras movimientos en {{ monthState.label() }}.</p>
-        <p class="empty-text">Toca el botón + para registrar el primero y aquí verás tu balance y en qué se va el gasto.</p>
+        <p class="empty-title">{{ t('inicio.emptyTitle', { month: monthState.label() }) }}</p>
+        <p class="empty-text">{{ t('inicio.emptyText') }}</p>
       </section>
       <app-alerts-row></app-alerts-row>
       <app-net-worth-card></app-net-worth-card>
     } @else {
       <section class="hero" aria-labelledby="balance-label">
-        <p id="balance-label" class="hero-label">Balance de {{ monthState.label() }}</p>
+        <p id="balance-label" class="hero-label">{{ t('inicio.balanceOf', { month: monthState.label() }) }}</p>
         <app-balance-reel class="hero-amount" [text]="money(o.summary.balance)"></app-balance-reel>
         @if (o.summary.balance < 0) {
           <p class="hero-alert">
             <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
-            Negativo, gastas más de lo que ganas
+            {{ t('inicio.negative') }}
           </p>
         }
         <dl class="hero-stats">
           <div>
-            <dt>Ingresos</dt>
+            <dt>{{ t('inicio.income') }}</dt>
             <dd>{{ money(o.summary.income) }}</dd>
           </div>
           <div>
-            <dt>Gastos</dt>
+            <dt>{{ t('inicio.expenses') }}</dt>
             <dd>{{ money(o.summary.expenses) }}</dd>
           </div>
           <div>
-            <dt>Ahorrado</dt>
+            <dt>{{ t('inicio.saved') }}</dt>
             <dd>{{ money(o.summary.saved) }}</dd>
           </div>
         </dl>
         <p class="hero-saving">
           @if (o.summary.income > 0) {
-            Ahorro {{ percent(o.summary.savingsPercent) }} del ingreso · {{ ratingText[o.summary.rating] }}
+            {{ t('inicio.saving', { percent: percent(o.summary.savingsPercent), rating: t('inicio.rating.' + o.summary.rating) }) }}
           } @else {
-            Sin ingresos este mes, no hay porcentaje de ahorro.
+            {{ t('inicio.noIncome') }}
           }
         </p>
       </section>
@@ -63,11 +69,11 @@
       <app-net-worth-card></app-net-worth-card>
 
       <section class="card" aria-labelledby="gasto-title">
-        <h2 id="gasto-title" class="section-title">¿En qué se va el gasto?</h2>
+        <h2 id="gasto-title" class="section-title">{{ t('inicio.whereTitle') }}</h2>
         @if (o.breakdown.length > 0) {
           <app-expense-donut [slices]="o.breakdown" [categories]="categories()"></app-expense-donut>
         } @else {
-          <p class="card-empty">Aún no registras gastos en {{ monthState.label() }}.</p>
+          <p class="card-empty">{{ t('inicio.noExpenses', { month: monthState.label() }) }}</p>
         }
       </section>
 
@@ -75,13 +81,13 @@
 
       <section class="card" aria-labelledby="ultimos-title">
         <div class="card-head">
-          <h2 id="ultimos-title" class="section-title">Últimos movimientos</h2>
-          <a routerLink="/tabs/movimientos" class="link">Ver todos</a>
+          <h2 id="ultimos-title" class="section-title">{{ t('inicio.recent') }}</h2>
+          <a routerLink="/tabs/movimientos" class="link">{{ t('inicio.seeAll') }}</a>
         </div>
         <ul [class.t-still]="!monthState.animateLists()" class="rows">
           @for (row of recent(); track row.id) {
             <li animate.enter="t-row-enter" animate.leave="t-row-leave">
-              <button type="button" class="row" [attr.aria-label]="'Editar ' + row.title + ', ' + row.amount" (click)="edit(row)">
+              <button type="button" class="row" [attr.aria-label]="t('common.editAmount', { name: row.title, amount: row.amount })" (click)="edit(row)">
                 <span class="avatar cat" [style.background]="row.color" aria-hidden="true"><ion-icon [name]="row.icon"></ion-icon></span>
                 <span class="row-text">
                   <span class="row-title">{{ row.title }}</span>

@@ -1,11 +1,11 @@
-<section class="block" aria-labelledby="datos-title">
-  <h2 id="datos-title" class="section-title">Tus datos</h2>
+@if (part() === 'datos') {
+<section class="block" [attr.aria-label]="t('ajustes.sections.datos.title')">
   <ul class="rows">
     <li>
       <button type="button" class="row" (click)="createBackup()">
         <span class="row-text">
-          <span class="row-title">Crear respaldo</span>
-          <span class="row-sub">Archivo cifrado con contraseña para guardar fuera del teléfono</span>
+          <span class="row-title">{{ t('datos.createBackup') }}</span>
+          <span class="row-sub">{{ lastManual() ? t('datos.lastManual', { date: lastManual()! }) : t('datos.createBackupSub') }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
@@ -18,17 +18,37 @@
         [checked]="autoBackup.enabled()"
         (ionChange)="toggleAutoBackup($event.detail.checked)"
       >
-        <span class="toggle-title">Respaldo automático semanal</span>
+        <span class="toggle-title">{{ t('datos.autoBackup') }}</span>
         <span class="row-sub">{{ autoBackupDetail() }}</span>
       </ion-toggle>
     </li>
+    @if (autoBackup.enabled()) {
+      <li class="select-row">
+        <app-select-field
+          [label]="t('datos.frequency')"
+          [inline]="true"
+          [options]="frequencyOptions()"
+          [value]="autoBackup.frequency()"
+          (valueChange)="setFrequency($event!)"
+        ></app-select-field>
+      </li>
+      <li class="select-row">
+        <app-select-field
+          [label]="t('datos.keep')"
+          [inline]="true"
+          [options]="keepOptions()"
+          [value]="autoBackup.keep()"
+          (valueChange)="setKeep($event!)"
+        ></app-select-field>
+      </li>
+    }
     @if (cloud.available) {
       @if (cloud.email(); as email) {
         <li>
           <button type="button" class="row" (click)="cloudUpload()">
             <span class="row-text">
-              <span class="row-title">Subir a la nube ahora</span>
-              <span class="row-sub">Cuenta: {{ email }}. El respaldo semanal también se sube solo.</span>
+              <span class="row-title">{{ t('datos.cloudUpload') }}</span>
+              <span class="row-sub">{{ t('datos.cloudUploadSub', { email }) }}</span>
             </span>
             <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
           </button>
@@ -36,15 +56,15 @@
         <li>
           <button type="button" class="row" (click)="cloudRestore()">
             <span class="row-text">
-              <span class="row-title">Restaurar desde la nube</span>
-              <span class="row-sub">Para un teléfono nuevo o si se perdieron los datos</span>
+              <span class="row-title">{{ t('datos.cloudRestore') }}</span>
+              <span class="row-sub">{{ t('datos.cloudRestoreSub') }}</span>
             </span>
             <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
           </button>
         </li>
         <li>
           <button type="button" class="row" (click)="cloudSignOut()">
-            <span class="row-title">Salir de la cuenta de Google</span>
+            <span class="row-title">{{ t('datos.cloudSignOut') }}</span>
             <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
           </button>
         </li>
@@ -52,8 +72,8 @@
         <li>
           <button type="button" class="row" (click)="cloudSignIn()">
             <span class="row-text">
-              <span class="row-title">Respaldo en la nube</span>
-              <span class="row-sub">Entra con Google: tu respaldo semanal se guarda cifrado en tu cuenta</span>
+              <span class="row-title">{{ t('datos.cloudSignIn') }}</span>
+              <span class="row-sub">{{ t('datos.cloudSignInSub') }}</span>
             </span>
             <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
           </button>
@@ -63,17 +83,26 @@
     <li>
       <button type="button" class="row" (click)="restoreBackup()">
         <span class="row-text">
-          <span class="row-title">Restaurar respaldo</span>
-          <span class="row-sub">Reemplaza los datos de la app por los del archivo</span>
+          <span class="row-title">{{ t('datos.restore') }}</span>
+          <span class="row-sub">{{ t('datos.restoreSub') }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
     </li>
     <li>
+      <a routerLink="/ajustes/importar" class="row">
+        <span class="row-text">
+          <span class="row-title">{{ t('datos.import') }}</span>
+          <span class="row-sub">{{ t('datos.importSub') }}</span>
+        </span>
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </a>
+    </li>
+    <li>
       <button type="button" class="row" (click)="exportCsv()">
         <span class="row-text">
-          <span class="row-title">Exportar movimientos a Excel</span>
-          <span class="row-sub">Archivo CSV con todos tus movimientos</span>
+          <span class="row-title">{{ t('datos.exportCsv') }}</span>
+          <span class="row-sub">{{ t('datos.exportCsvSub') }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
@@ -81,8 +110,8 @@
     <li>
       <button type="button" class="row" (click)="wipeAll()">
         <span class="row-text">
-          <span class="row-title danger">Borrar todos los datos</span>
-          <span class="row-sub">Deja la app como recién instalada; te ofrece un respaldo antes</span>
+          <span class="row-title danger">{{ t('datos.wipe') }}</span>
+          <span class="row-sub">{{ t('datos.wipeSub') }}</span>
         </span>
         <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
       </button>
@@ -90,13 +119,15 @@
   </ul>
 </section>
 
-<section class="block" aria-labelledby="seguridad-title">
-  <h2 id="seguridad-title" class="section-title">Seguridad</h2>
+}
+
+@if (part() === 'seguridad') {
+<section class="block" [attr.aria-label]="t('ajustes.sections.seguridad.title')">
   <ul class="rows">
     @if (pinEnabled()) {
       <li>
         <button type="button" class="row" (click)="enablePin()">
-          <span class="row-title">Cambiar PIN</span>
+          <span class="row-title">{{ t('seguridad.changePin') }}</span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
       </li>
@@ -108,23 +139,23 @@
             [checked]="lock.biometricOn()"
             (ionChange)="toggleBiometric($event.detail.checked)"
           >
-            <span class="toggle-title">Desbloquear con huella o rostro</span>
-            <span class="row-sub">El PIN sigue sirviendo si la huella falla</span>
+            <span class="toggle-title">{{ t('seguridad.biometric') }}</span>
+            <span class="row-sub">{{ t('seguridad.biometricSub') }}</span>
           </ion-toggle>
         </li>
       }
       <li class="select-row">
         <app-select-field
-          label="Volver a pedirlo tras salir"
+          [label]="t('seguridad.lockAfter')"
           [inline]="true"
-          [options]="lockOptions"
+          [options]="lockOptions()"
           [value]="lock.lockAfterSeconds()"
           (valueChange)="setLockAfter($event!)"
         ></app-select-field>
       </li>
       <li>
         <button type="button" class="row" (click)="disablePin()">
-          <span class="row-title danger">Quitar PIN</span>
+          <span class="row-title danger">{{ t('seguridad.removePin') }}</span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
       </li>
@@ -132,8 +163,8 @@
       <li>
         <button type="button" class="row" (click)="enablePin()">
           <span class="row-text">
-            <span class="row-title">Activar bloqueo con PIN</span>
-            <span class="row-sub">Se pide al abrir la app y al volver a ella</span>
+            <span class="row-title">{{ t('seguridad.enablePin') }}</span>
+            <span class="row-sub">{{ t('seguridad.enablePinSub') }}</span>
           </span>
           <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
         </button>
@@ -147,14 +178,12 @@
         [checked]="privacy()"
         (ionChange)="togglePrivacy($event.detail.checked)"
       >
-        <span class="toggle-title">Ocultar en recientes</span>
-        <span class="row-sub">{{
-          privacyAvailable
-            ? 'Oscurece la app al cambiar de app e impide capturas de pantalla'
-            : 'Disponible en la app del teléfono'
-        }}</span>
+        <span class="toggle-title">{{ t('seguridad.privacy') }}</span>
+        <span class="row-sub">{{ privacyAvailable ? t('seguridad.privacySub') : t('common.phoneOnly') }}</span>
       </ion-toggle>
     </li>
   </ul>
-  <p class="status" aria-live="polite">{{ status() }}</p>
 </section>
+}
+
+<p class="status" aria-live="polite">{{ status() }}</p>

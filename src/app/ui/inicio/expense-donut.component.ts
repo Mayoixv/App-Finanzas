@@ -3,6 +3,7 @@ import { ExpenseSlice } from '../../domain/expense-breakdown';
 import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { formatMoney, formatPercent } from '../format';
+import { t } from '../i18n';
 
 /** Color de "Otras" y de las categorías que ya no existen. */
 const OTHER_COLOR = '#7d7898';
@@ -32,7 +33,7 @@ export function groupSlices(slices: Slice[]): Slice[] {
     ...head,
     {
       categoryId: undefined,
-      name: 'Otras',
+      name: t('donut.others'),
       amount: rest.reduce((s, r) => s + r.amount, 0),
       percent: rest.reduce((s, r) => s + r.percent, 0),
     },
@@ -45,6 +46,7 @@ export function groupSlices(slices: Slice[]): Slice[] {
   styleUrls: ['expense-donut.component.scss'],
 })
 export class ExpenseDonutComponent {
+  protected readonly t = t;
   readonly slices = input.required<ExpenseSlice[]>();
   /** Para pintar cada arco con el color que el usuario eligió para su categoría. */
   readonly categories = input<Category[]>([]);

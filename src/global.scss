@@ -109,7 +109,7 @@ ion-content.surface-light {
   border: 0;
   background: var(--violet-600);
   color: #fff;
-  box-shadow: 0 8px 24px rgba(106, 61, 240, 0.45);
+  box-shadow: 0 8px 24px rgba(var(--violet-600-rgb), 0.45);
 
   &:active:not(:disabled) {
     background: #5530c4;
@@ -300,7 +300,7 @@ ion-toast.app-toast {
   --background: var(--ink-800);
   --color: var(--text-on-dark);
   --border-radius: var(--radius-field);
-  --button-color: #c9b8ff;
+  --button-color: var(--violet-200);
   --box-shadow: 0 16px 40px -12px rgba(10, 10, 18, 0.6);
 }
 

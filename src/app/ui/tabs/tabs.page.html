@@ -1,6 +1,6 @@
 <ion-router-outlet [animated]="false"></ion-router-outlet>
 
-<nav class="t-tabs" role="tablist" aria-label="Secciones">
+<nav class="t-tabs" role="tablist" [attr.aria-label]="t('common.sections')">
   <span #pill class="t-tabs-pill" aria-hidden="true"></span>
   @for (tab of tabs; track tab.path; let i = $index) {
     <button
@@ -9,11 +9,11 @@
       class="t-tab"
       role="tab"
       [attr.aria-selected]="active() === i"
-      [attr.aria-label]="tab.name"
+      [attr.aria-label]="t('tabs.' + tab.path + '.name')"
       (click)="go(tab)"
     >
       <ion-icon [name]="tab.icon" aria-hidden="true"></ion-icon>
-      <span class="t-tab-label">{{ tab.label }}</span>
+      <span class="t-tab-label">{{ t('tabs.' + tab.path + '.label') }}</span>
     </button>
   }
 </nav>

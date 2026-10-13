@@ -1,10 +1,11 @@
-import { Component, effect, inject, Injectable, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, Injectable, input, signal } from '@angular/core';
 import { IonContent } from '@ionic/angular';
 import { MetasViewComponent } from '../ahorro/metas-view.component';
 import { DeudasViewComponent } from '../deudas/deudas-view.component';
 import { HelpButtonComponent } from '../help/help-button.component';
 import { MonthSwitcherComponent } from '../month-switcher.component';
 import { PillOption, PillToggleComponent } from '../pill-toggle.component';
+import { t } from '../i18n';
 
 export type PlanesSection = 'metas' | 'deudas';
 const SECTIONS: PlanesSection[] = ['metas', 'deudas'];
@@ -22,13 +23,13 @@ export class PlanesState {
     <ion-content class="surface-light" [fullscreen]="true">
       <header class="screen-head">
         <div class="title-row">
-          <h1 class="screen-title">Planes</h1>
+          <h1 class="screen-title">{{ t('planes.title') }}</h1>
           <app-help-button [topic]="state.section()"></app-help-button>
         </div>
         <app-month-switcher></app-month-switcher>
       </header>
 
-      <app-pill-toggle class="sections" label="Sección" [options]="options" [value]="state.section()" (valueChange)="setSection($event)"></app-pill-toggle>
+      <app-pill-toggle class="sections" [label]="t('planes.section')" [options]="options()" [value]="state.section()" (valueChange)="setSection($event)"></app-pill-toggle>
 
       <div class="section">
         @if (state.section() === 'metas') {
@@ -43,15 +44,13 @@ export class PlanesState {
   imports: [IonContent, HelpButtonComponent, MonthSwitcherComponent, PillToggleComponent, MetasViewComponent, DeudasViewComponent],
 })
 export class PlanesPage {
+  protected readonly t = t;
   protected readonly state = inject(PlanesState);
 
   /** `?ver=deudas` en la dirección abre esa sección. */
   readonly ver = input<string>();
 
-  protected readonly options: PillOption[] = [
-    { value: 'metas', label: 'Metas' },
-    { value: 'deudas', label: 'Deudas' },
-  ];
+  protected readonly options = computed<PillOption[]>(() => SECTIONS.map((value) => ({ value, label: t(`planes.${value}`) })));
 
   constructor() {
     effect(() => {

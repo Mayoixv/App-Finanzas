@@ -3,20 +3,14 @@ import { AlertController, IonContent, IonIcon, IonInput, IonToggle, ModalControl
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { Category, CategoryType, isBuiltIn } from '../../domain/category';
-import { CATEGORY_COLORS, CATEGORY_ICONS, ICON_LABEL, lookOf } from '../category-look';
+import { CATEGORY_COLORS, CATEGORY_ICONS, lookOf } from '../category-look';
 import { SelectFieldComponent, SelectOption } from '../select/select-field.component';
 import { SuccessCheckComponent } from '../success-check.component';
+import { t, errorText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
-
-export const TYPE_LABEL: Record<CategoryType, string> = {
-  ingreso: 'Ingreso',
-  fijo: 'Gasto fijo',
-  variable: 'Gasto variable',
-};
 
 /** Crear o editar una categoría. Al guardar devuelve la categoría (role 'saved'). */
 @Component({
@@ -26,6 +20,7 @@ export const TYPE_LABEL: Record<CategoryType, string> = {
   imports: [IonContent, IonIcon, IonInput, IonToggle, SuccessCheckComponent, SelectFieldComponent],
 })
 export class CategoriaModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
@@ -36,9 +31,7 @@ export class CategoriaModalComponent implements OnInit {
   @Input() newType?: CategoryType;
 
   protected readonly types: CategoryType[] = ['variable', 'fijo', 'ingreso'];
-  protected readonly typeLabel = TYPE_LABEL;
   protected readonly icons = CATEGORY_ICONS;
-  protected readonly iconLabel = ICON_LABEL;
   protected readonly colors = CATEGORY_COLORS;
   protected readonly name = signal('');
   protected readonly type = signal<CategoryType>('variable');
@@ -93,11 +86,7 @@ export class CategoriaModalComponent implements OnInit {
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(saved, 'saved');
     } catch (e) {
-      this.error.set(
-        e instanceof ValidationError || e instanceof NotFoundError
-          ? e.message
-          : 'No se pudo guardar. Inténtalo de nuevo.',
-      );
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }
@@ -114,11 +103,11 @@ export class CategoriaModalComponent implements OnInit {
     }
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar categoría',
-      message: `Se eliminará ${category.name}. Si tiene presupuestos, también se borran.`,
+      header: t('categoria.delete'),
+      message: t('categoria.deleteMsg', { name: category.name }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -135,7 +124,7 @@ export class CategoriaModalComponent implements OnInit {
       await this.container.deleteCategory.execute(category.id, this.moveTo() ?? undefined);
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (e) {
-      this.error.set(e instanceof ValidationError ? e.message : 'No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(errorText(e, 'common.deleteFailed'));
       this.saving.set(false);
     }
   }

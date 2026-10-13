@@ -31,8 +31,9 @@ import {
   todayIso,
 } from '../format';
 import { MonthState } from '../month-state';
-import { ACCOUNT_TYPE_LABEL } from './account-choices';
+import { accountTypeLabel } from './account-choices';
 import { LoadingComponent } from '../loading.component';
+import { t } from '../i18n';
 
 interface Row {
   view: AccountView;
@@ -68,6 +69,12 @@ interface Group {
   empty: string;
 }
 
+const groupText = (key: GroupKey) => ({
+  title: t(`cuentas.groups.${key}.title`),
+  addLabel: t(`cuentas.groups.${key}.add`),
+  empty: t(`cuentas.groups.${key}.empty`),
+});
+
 const groupOf = (a: Account): GroupKey => (isCard(a) ? 'tarjetas' : a.type === 'efectivo' ? 'efectivo' : 'cuentas');
 
 /** Contenido de la pestaña Dinero: Cuentas, Efectivo y Tarjetas, cada grupo con su total y su botón de agregar. */
@@ -78,6 +85,7 @@ const groupOf = (a: Account): GroupKey => (isCard(a) ? 'tarjetas' : a.type === '
   imports: [LoadingComponent, IonIcon, TiltDirective],
 })
 export class CuentasViewComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   protected readonly forms = inject(DineroFormService);
   private readonly alerts = inject(AlertController);
@@ -95,7 +103,7 @@ export class CuentasViewComponent {
   protected readonly money = formatMoney;
   protected readonly day = formatDay;
   protected readonly min = Math.min;
-  protected readonly monthName = monthLabel(currentMonth());
+  protected readonly monthName = () => monthLabel(currentMonth());
 
   protected readonly loaded = computed(() => this.views() !== null);
   protected readonly groups = computed<Group[]>(() => {
@@ -105,9 +113,15 @@ export class CuentasViewComponent {
     const sum = (key: GroupKey) => of(key).reduce((t, v) => t + v.balance, 0);
     const rows = (key: GroupKey) => of(key).map((v) => withStatus(toRow(v), statuses.get(v.account.id)));
     return [
-      { key: 'cuentas', title: 'Cuentas', total: formatMoney(sum('cuentas')), rows: rows('cuentas'), addLabel: 'Agregar cuenta', addType: 'banco', empty: 'Agrega tu primera cuenta de banco.' },
-      { key: 'efectivo', title: 'Efectivo', total: formatMoney(sum('efectivo')), rows: rows('efectivo'), addLabel: 'Agregar efectivo', addType: 'efectivo', empty: 'Sin efectivo anotado.' },
-      { key: 'tarjetas', title: 'Tarjetas de crédito', total: 'Debes ' + formatMoney(Math.max(0, -sum('tarjetas'))), rows: rows('tarjetas'), addLabel: 'Agregar tarjeta', addType: 'tarjeta', empty: 'Agrega una con su límite y sus días de corte y pago.' },
+      { key: 'cuentas', ...groupText('cuentas'), total: formatMoney(sum('cuentas')), rows: rows('cuentas'), addType: 'banco' },
+      { key: 'efectivo', ...groupText('efectivo'), total: formatMoney(sum('efectivo')), rows: rows('efectivo'), addType: 'efectivo' },
+      {
+        key: 'tarjetas',
+        ...groupText('tarjetas'),
+        total: t('cuentas.owesAmount', { amount: formatMoney(Math.max(0, -sum('tarjetas'))) }),
+        rows: rows('tarjetas'),
+        addType: 'tarjeta',
+      },
     ];
   });
   protected readonly archived = computed(() =>
@@ -131,9 +145,9 @@ export class CuentasViewComponent {
     });
   }
 
-  protected transferText(t: Transfer): string {
+  protected transferText(transfer: Transfer): string {
     const n = this.names();
-    return `${n.get(t.fromAccountId) ?? 'Cuenta'} → ${n.get(t.toAccountId) ?? 'Cuenta'}`;
+    return `${n.get(transfer.fromAccountId) ?? t('cuentas.account')} → ${n.get(transfer.toAccountId) ?? t('cuentas.account')}`;
   }
 
   protected openAccount(view: AccountView) {
@@ -161,8 +175,8 @@ export class CuentasViewComponent {
     if (!status) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Pago mínimo',
-      message: `Lo que dice el estado de ${r.name} del corte del ${formatDay(status.lastCut)}. Déjalo vacío para quitarlo.`,
+      header: t('cuentas.minTitle'),
+      message: t('cuentas.minMsg', { name: r.name, date: formatDay(status.lastCut) }),
       inputs: [
         {
           name: 'min',
@@ -173,8 +187,8 @@ export class CuentasViewComponent {
         },
       ],
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Guardar', role: 'confirm' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.save'), role: 'confirm' },
       ],
     });
     await alert.present();
@@ -183,7 +197,7 @@ export class CuentasViewComponent {
     const text = String(data?.values?.min ?? '').trim();
     const amount = text ? parseAmount(text) : null;
     if (text && amount === null) {
-      this.liveMessage.set('Monto no válido.');
+      this.liveMessage.set(t('cuentas.invalidAmount'));
       return;
     }
     try {
@@ -195,7 +209,7 @@ export class CuentasViewComponent {
       this.monthState.notifyChange();
     } catch (error) {
       console.error(error);
-      this.liveMessage.set('No se pudo guardar el pago mínimo.');
+      this.liveMessage.set(t('cuentas.minFailed'));
     }
   }
 
@@ -221,18 +235,18 @@ export class CuentasViewComponent {
 
 function toRow(view: AccountView): Row {
   const a = view.account;
-  let detail = ACCOUNT_TYPE_LABEL[a.type];
+  let detail = accountTypeLabel(a.type);
   if (isCard(a) && a.creditLimit) {
     const used = Math.max(0, -view.balance);
-    detail = `Usado ${formatPercent((used / a.creditLimit) * 100)} de ${formatMoney(a.creditLimit)} · corte día ${a.cutDay}, pago día ${a.dueDay}`;
+    detail = t('cuentas.usedOf', { percent: formatPercent((used / a.creditLimit) * 100), limit: formatMoney(a.creditLimit), cut: a.cutDay ?? '', due: a.dueDay ?? '' });
   }
   const owed = Math.max(0, -view.balance);
   const card = isCard(a)
     ? {
         last4: a.cardLast4 ?? null,
         usedPercent: a.creditLimit ? Math.min(100, (owed / a.creditLimit) * 100) : null,
-        usedText: a.creditLimit ? `${formatPercent((owed / a.creditLimit) * 100)} de ${formatMoney(a.creditLimit)}` : null,
-        days: `Corte día ${a.cutDay} · Pago día ${a.dueDay}`,
+        usedText: a.creditLimit ? t('cuentas.usedShort', { percent: formatPercent((owed / a.creditLimit) * 100), limit: formatMoney(a.creditLimit) }) : null,
+        days: t('cuentas.days', { cut: a.cutDay ?? '', due: a.dueDay ?? '' }),
       }
     : undefined;
   return {
@@ -250,16 +264,13 @@ function withStatus(row: Row, status: CardStatus | undefined): Row {
   if (!status) return row;
   const cut = formatDay(status.lastCut);
   const due = formatDay(status.dueDate);
+  const amount = formatMoney(status.pending);
   let statusText: string;
-  if (status.statementDebt === 0)
-    statusText = `Nada que pagar del corte del ${cut}`;
-  else if (status.pending === 0) statusText = `Estado del ${cut} pagado`;
-  else if (status.daysToDue < 0)
-    statusText = `Venció el ${due}: falta ${formatMoney(status.pending)} del corte del ${cut}`;
-  else
-    statusText = `Paga ${formatMoney(status.pending)} antes del ${due} (corte del ${cut})`;
-  if (status.cycleCharges > 0)
-    statusText += ` · ${formatMoney(status.cycleCharges)} en compras nuevas`;
+  if (status.statementDebt === 0) statusText = t('cuentas.nothingToPay', { cut });
+  else if (status.pending === 0) statusText = t('cuentas.statementPaid', { cut });
+  else if (status.daysToDue < 0) statusText = t('cuentas.overdue', { due, amount, cut });
+  else statusText = t('cuentas.payBefore', { amount, due, cut });
+  if (status.cycleCharges > 0) statusText += t('cuentas.newCharges', { amount: formatMoney(status.cycleCharges) });
   return {
     ...row,
     status,

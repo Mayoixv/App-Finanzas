@@ -4,13 +4,13 @@ import { AlertController, IonContent, IonIcon, IonInput, ModalController } from 
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { AccountView } from '../../application/use-cases/accounts';
 import { AccountType, CASH_ACCOUNT_ID, isCard } from '../../domain/account';
 import { CurrencyState } from '../currency-state';
 import { amountToInput, parseAmount, parseBalance } from '../format';
 import { SuccessCheckComponent } from '../success-check.component';
-import { ACCOUNT_TYPE_LABEL } from './account-choices';
+import { ACCOUNT_TYPES, accountTypeLabel } from './account-choices';
+import { t, errorText } from '../i18n';
 
 /** Cuánto se ve el check de éxito antes de cerrar (design.md, 10.2). */
 const SUCCESS_VISIBLE_MS = 1200;
@@ -22,6 +22,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [SelectFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
 export class CuentaModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly alerts = inject(AlertController);
@@ -30,8 +31,10 @@ export class CuentaModalComponent implements OnInit {
   @Input() view?: AccountView;
   /** Tipo propuesto al crear (desde la sección Tarjetas, una tarjeta). */
   @Input() presetType?: AccountType;
+  /** En las preguntas iniciales: no guarda, devuelve lo escrito (role 'draft') para guardarlo todo al final. */
+  @Input() draft = false;
 
-  protected readonly types = (Object.keys(ACCOUNT_TYPE_LABEL) as AccountType[]).map((t) => ({ value: t, label: ACCOUNT_TYPE_LABEL[t] }));
+  protected readonly types = computed(() => ACCOUNT_TYPES.map((type) => ({ value: type, label: accountTypeLabel(type) })));
   protected readonly type = signal<AccountType>('banco');
   protected readonly name = signal('');
   /** Saldo de hoy; en una tarjeta, lo que se debe (en positivo). */
@@ -90,6 +93,10 @@ export class CuentaModalComponent implements OnInit {
       dueDay: this.dueDay() ? Number(this.dueDay()) : null,
       cardLast4: this.cardLast4(),
     };
+    if (this.draft) {
+      await this.modalCtrl.dismiss({ ...fields, initialBalance: balance }, 'draft');
+      return;
+    }
     this.saving.set(true);
     this.error.set(null);
     try {
@@ -102,7 +109,7 @@ export class CuentaModalComponent implements OnInit {
       await new Promise((resolve) => setTimeout(resolve, SUCCESS_VISIBLE_MS));
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
-      this.error.set(e instanceof ValidationError || e instanceof NotFoundError ? e.message : 'No se pudo guardar. Inténtalo de nuevo.');
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }
@@ -118,11 +125,11 @@ export class CuentaModalComponent implements OnInit {
     if (!a) return;
     const alert = await this.alerts.create({
       cssClass: 'app-alert',
-      header: 'Eliminar cuenta',
-      message: `Se eliminará ${a.name}. Solo se puede si no tiene movimientos, transferencias ni fijos.`,
+      header: t('cuenta.delete'),
+      message: t('cuenta.deleteMsg', { name: a.name }),
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive' },
+        { text: t('common.cancel'), role: 'cancel' },
+        { text: t('common.delete'), role: 'destructive' },
       ],
     });
     await alert.present();
@@ -137,7 +144,7 @@ export class CuentaModalComponent implements OnInit {
       await work();
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (e) {
-      this.error.set(e instanceof ValidationError ? e.message : 'No se pudo guardar. Inténtalo de nuevo.');
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
   }

@@ -1,15 +1,32 @@
 <ion-content class="surface-light" [fullscreen]="true">
   <header class="screen-head">
     <div class="title-row">
-      <h1 class="screen-title">Movimientos</h1>
+      <h1 class="screen-title">{{ t('tabs.movimientos.name') }}</h1>
       <span class="head-icons">
         @if (rows()?.length) {
           @if (selecting()) {
-            <button type="button" class="head-action" (click)="stopSelecting()">Listo</button>
+            <button type="button" class="head-action" (click)="stopSelecting()">{{ t('movs.done') }}</button>
           } @else {
-            <button type="button" class="head-action" (click)="startSelecting()">Seleccionar</button>
+            <button type="button" class="head-action" (click)="startSelecting()">{{ t('movs.select') }}</button>
           }
         }
+        <span class="anchor">
+          <button
+            type="button"
+            class="head-more"
+            aria-haspopup="menu"
+            [attr.aria-expanded]="headMenuOpen()"
+            [attr.aria-label]="t('copy.more')"
+            (click)="headMenuOpen.set(!headMenuOpen())"
+          >
+            <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
+          </button>
+          <app-dropdown class="head-menu" origin="top-right" [label]="t('copy.more')" [(open)]="headMenuOpen">
+            <button type="button" role="menuitem" class="t-menu-item" (click)="copyFromMonth()">
+              {{ t('copy.title') }} <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
+            </button>
+          </app-dropdown>
+        </span>
         <app-help-button topic="movimientos"></app-help-button>
       </span>
     </div>
@@ -20,26 +37,27 @@
 
   <app-loading [show]="!rows() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="notice">No se pudieron leer los movimientos. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+    <p class="notice">{{ t('movs.failed') }}</p>
   } @else if (rows(); as list) {
     @if (list.length === 0) {
       <section class="empty">
-        <p class="empty-title">Sin movimientos en {{ monthState.label() }}.</p>
-        <p class="empty-text">Toca el botón + para registrar un ingreso o un gasto de este mes.</p>
+        <p class="empty-title">{{ t('movs.emptyTitle', { month: monthState.label() }) }}</p>
+        <p class="empty-text">{{ t('movs.emptyText') }}</p>
+        <button type="button" class="btn-secondary empty-copy" (click)="copyFromMonth()">{{ t('copy.title') }}</button>
       </section>
     } @else {
-      <section class="filters" aria-label="Buscar y filtrar">
+      <section class="filters" [attr.aria-label]="t('movs.filters')">
         <label class="search">
           <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
-          <span class="sr-only">Buscar por nota, categoría o etiqueta</span>
+          <span class="sr-only">{{ t('movs.searchLabel') }}</span>
           <input
             type="search"
-            placeholder="Buscar nota, categoría o etiqueta"
+            [placeholder]="t('movs.searchPlaceholder')"
             [value]="search()"
             (input)="search.set($any($event.target).value)"
           />
         </label>
-        <app-pill-toggle label="Tipo de movimiento" [options]="kindOptions" [(value)]="kindFilter"></app-pill-toggle>
+        <app-pill-toggle [label]="t('movs.kind')" [options]="kindOptions()" [(value)]="kindFilter"></app-pill-toggle>
         <div class="anchor">
           <button
             type="button"
@@ -51,9 +69,9 @@
             {{ categoryFilterLabel() }}
             <ion-icon name="chevron-down" aria-hidden="true"></ion-icon>
           </button>
-          <app-dropdown class="category-menu" origin="top-left" label="Filtrar por categoría" [(open)]="categoryMenuOpen">
+          <app-dropdown class="category-menu" origin="top-left" [label]="t('movs.byCategory')" [(open)]="categoryMenuOpen">
             <button type="button" role="menuitemradio" class="t-menu-item" [attr.aria-checked]="!categoryFilter()" (click)="setCategoryFilter(null)">
-              Todas las categorías
+              {{ t('movs.allCategories') }}
               @if (!categoryFilter()) {
                 <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
               }
@@ -80,9 +98,9 @@
               {{ accountFilterLabel() }}
               <ion-icon name="chevron-down" aria-hidden="true"></ion-icon>
             </button>
-            <app-dropdown class="category-menu" origin="top-left" label="Filtrar por cuenta" [(open)]="accountMenuOpen">
+            <app-dropdown class="category-menu" origin="top-left" [label]="t('movs.byAccount')" [(open)]="accountMenuOpen">
               <button type="button" role="menuitemradio" class="t-menu-item" [attr.aria-checked]="!accountFilter()" (click)="setAccountFilter(null)">
-                Todas las cuentas
+                {{ t('movs.allAccounts') }}
                 @if (!accountFilter()) {
                   <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
                 }
@@ -100,19 +118,19 @@
         }
         @if (filtering()) {
           <p class="filter-summary" aria-live="polite">
-            {{ visible().length }} de {{ list.length }} · Neto {{ money(visibleTotal()) }}
-            <button type="button" class="link" (click)="clearFilters()">Quitar filtros</button>
+            {{ t('movs.summary', { shown: visible().length, total: list.length, net: money(visibleTotal()) }) }}
+            <button type="button" class="link" (click)="clearFilters()">{{ t('movs.clear') }}</button>
           </p>
         }
       </section>
 
       @if (visible().length === 0) {
-        <p class="notice">Ningún movimiento coincide con la búsqueda.</p>
+        <p class="notice">{{ t('movs.noMatch') }}</p>
       } @else {
         @if (selecting()) {
           <p class="select-hint">
-            Toca los movimientos que quieras cambiar.
-            <button type="button" class="link" (click)="selectAllVisible()">Seleccionar los {{ visible().length }}</button>
+            {{ t('movs.selectHint') }}
+            <button type="button" class="link" (click)="selectAllVisible()">{{ t('movs.selectAll', { count: visible().length }) }}</button>
           </p>
         }
         <ul [class.t-still]="!monthState.animateLists()" class="rows">
@@ -122,7 +140,7 @@
                 type="button"
                 class="row"
                 [attr.aria-pressed]="selecting() ? selected().has(row.id) : null"
-                [attr.aria-label]="(selecting() ? 'Seleccionar ' : 'Editar ') + row.title + ', ' + row.amount"
+                [attr.aria-label]="t(selecting() ? 'movs.selectRow' : 'common.editAmount', { name: row.title, amount: row.amount })"
                 (click)="tapRow(row)"
               >
                 @if (selecting()) {
@@ -138,14 +156,14 @@
                   <span class="row-title">{{ row.title }}</span>
                   <span class="row-sub">
                     @if (row.hasPhotos) {
-                      <ion-icon name="attach-outline" class="clip" aria-label="con foto del recibo"></ion-icon>
+                      <ion-icon name="attach-outline" class="clip" [attr.aria-label]="t('movs.withPhoto')"></ion-icon>
                     }
                     {{ row.subtitle }}
                   </span>
                   @if (row.tags.length) {
                     <span class="row-tags">
-                      @for (t of row.tags; track t) {
-                        <span class="tag">#{{ t }}</span>
+                      @for (tag of row.tags; track tag) {
+                        <span class="tag">#{{ tag }}</span>
                       }
                     </span>
                   }
@@ -159,7 +177,7 @@
                     class="more"
                     aria-haspopup="menu"
                     [attr.aria-expanded]="menuFor() === row.id"
-                    [attr.aria-label]="'Más acciones para ' + row.title"
+                    [attr.aria-label]="t('movs.moreFor', { name: row.title })"
                     (click)="toggleMenu(row, $event)"
                   >
                     <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
@@ -168,18 +186,18 @@
                     class="row-menu"
                     [class.up]="menuUp()"
                     [origin]="menuUp() ? 'bottom-right' : 'top-right'"
-                    [label]="'Acciones para ' + row.title"
+                    [label]="t('movs.actionsFor', { name: row.title })"
                     [open]="menuFor() === row.id"
                     (openChange)="setMenu(row, $event)"
                   >
                     <button type="button" role="menuitem" class="t-menu-item" (click)="edit(row)">
-                      Editar <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                      {{ t('movs.edit') }} <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
                     </button>
                     <button type="button" role="menuitem" class="t-menu-item" (click)="duplicate(row)">
-                      Duplicar <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
+                      {{ t('movs.duplicate') }} <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
                     </button>
                     <button type="button" role="menuitem" class="t-menu-item danger" (click)="remove(row)">
-                      Eliminar <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+                      {{ t('common.delete') }} <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
                     </button>
                   </app-dropdown>
                 </div>
@@ -191,17 +209,17 @@
     }
 
     @if (visibleTransfers().length && !selecting()) {
-      <h2 class="section-title transfers-title">Transferencias</h2>
+      <h2 class="section-title transfers-title">{{ t('movs.transfers') }}</h2>
       <ul [class.t-still]="!monthState.animateLists()" class="rows">
-        @for (t of visibleTransfers(); track t.transfer.id) {
+        @for (tr of visibleTransfers(); track tr.transfer.id) {
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
-            <button type="button" class="row" [attr.aria-label]="'Editar transferencia ' + t.title + ', ' + t.amount" (click)="editTransfer(t.transfer)">
+            <button type="button" class="row" [attr.aria-label]="t('movs.editTransfer', { name: tr.title, amount: tr.amount })" (click)="editTransfer(tr.transfer)">
               <span class="avatar transfer" aria-hidden="true"><ion-icon name="swap-horizontal"></ion-icon></span>
               <span class="row-text">
-                <span class="row-title">{{ t.title }}</span>
-                <span class="row-sub">{{ t.sub }}</span>
+                <span class="row-title">{{ tr.title }}</span>
+                <span class="row-sub">{{ tr.sub }}</span>
               </span>
-              <span class="row-amount">{{ t.amount }}</span>
+              <span class="row-amount">{{ tr.amount }}</span>
             </button>
           </li>
         }
@@ -211,10 +229,10 @@
 </ion-content>
 
 @if (selecting()) {
-  <div class="selection-bar" role="toolbar" aria-label="Acciones para los seleccionados">
-    <span class="count" aria-live="polite">{{ selected().size }} seleccionados</span>
-    <button type="button" [disabled]="!selected().size" (click)="bulkCategory()">Categoría</button>
-    <button type="button" [disabled]="!selected().size" (click)="bulkDate()">Fecha</button>
-    <button type="button" class="danger" [disabled]="!selected().size" (click)="bulkDelete()">Eliminar</button>
+  <div class="selection-bar" role="toolbar" [attr.aria-label]="t('movs.bulkActions')">
+    <span class="count" aria-live="polite">{{ t('movs.selected', { count: selected().size }) }}</span>
+    <button type="button" [disabled]="!selected().size" (click)="bulkCategory()">{{ t('movs.category') }}</button>
+    <button type="button" [disabled]="!selected().size" (click)="bulkDate()">{{ t('movs.date') }}</button>
+    <button type="button" class="danger" [disabled]="!selected().size" (click)="bulkDelete()">{{ t('common.delete') }}</button>
   </div>
 }

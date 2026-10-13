@@ -2,7 +2,8 @@ import { Component, inject, Input } from '@angular/core';
 import { IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { helpCircle, sparkles } from 'ionicons/icons';
-import { HELP, HelpTopic } from './help.content';
+import { helpEntry, HelpTopic } from './help.content';
+import { t } from '../i18n';
 
 /** Hoja inferior corta con la ayuda de una pantalla (o las novedades de una versión). Se cierra al tocar fuera o con "Entendido"; no cambia nada. */
 @Component({
@@ -19,7 +20,7 @@ import { HELP, HelpTopic } from './help.content';
           <li [style.--i]="i">{{ p }}</li>
         }
       </ul>
-      <button type="button" class="btn-primary ok" (click)="close()">Entendido</button>
+      <button type="button" class="btn-primary ok" (click)="close()">{{ t('common.understood') }}</button>
     </div>
   `,
   styles: `
@@ -94,13 +95,14 @@ import { HELP, HelpTopic } from './help.content';
   imports: [IonIcon],
 })
 export class HelpSheetComponent {
+  protected readonly t = t;
   private readonly modalCtrl = inject(ModalController);
   @Input() topic: HelpTopic = 'inicio';
   /** En vez de la ayuda de una pantalla, las novedades de una versión (NewsService). */
   @Input() news?: { title: string; points: string[] };
 
   protected get entry() {
-    return this.news ?? HELP[this.topic];
+    return this.news ?? helpEntry(this.topic);
   }
 
   constructor() {

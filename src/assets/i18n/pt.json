@@ -1,0 +1,1679 @@
+{
+  "_meta": {
+    "draft": "Borrador traducido sin revisión de una persona nativa. Rascunho de tradução, sem revisão de um falante nativo."
+  },
+  "errors": {
+    "notBackup": "Este arquivo não é um backup deste app",
+    "wrongPassword": "Senha incorreta ou arquivo danificado",
+    "accountName": "Digite um nome para a conta",
+    "accountType": "Tipo de conta inválido",
+    "initialBalance": "Saldo inicial inválido",
+    "cashType": "Dinheiro não pode mudar de tipo",
+    "cardLast4": "Digite os últimos 4 dígitos do cartão",
+    "cardLast4Taken": "Outra conta já usa esses 4 dígitos",
+    "cardLimit": "Digite o limite do cartão",
+    "cutDay": "O dia de fechamento deve estar entre 1 e 31",
+    "payDay": "O dia de pagamento deve estar entre 1 e 31",
+    "cashArchive": "Dinheiro não pode ser arquivado",
+    "cashDelete": "Dinheiro não pode ser excluído",
+    "accountHasMovements": "Esta conta tem lançamentos. Arquive-a para ocultá-la sem perder o histórico.",
+    "balance": "Saldo inválido",
+    "amountPositive": "O valor deve ser maior que zero",
+    "date": "Data inválida",
+    "sameAccounts": "Escolha duas contas diferentes",
+    "minPayment": "O pagamento mínimo deve ser maior que zero",
+    "fixedName": "Digite um nome para o item fixo",
+    "dueDay": "O dia de vencimento deve estar entre 1 e 31",
+    "frequency": "Frequência inválida",
+    "oneIncome": "Adicione pelo menos um recebimento",
+    "sameDayIncome": "Há dois recebimentos no mesmo dia",
+    "withdrawTooMuch": "Você não pode retirar mais do que guardou nesta meta",
+    "goalName": "Digite um nome para a meta",
+    "goalAmount": "A meta deve ser maior que zero",
+    "goalDate": "Data-alvo inválida",
+    "splitTwo": "Para dividir são necessárias pelo menos duas categorias",
+    "splitDistinct": "Cada parte deve ter uma categoria diferente",
+    "splitPositive": "Cada parte deve ser maior que zero",
+    "splitSum": "As partes devem somar o valor total",
+    "splitType": "Todas as partes devem ser do mesmo tipo (despesa ou receita)",
+    "accountArchived": "Essa conta está arquivada; escolha outra",
+    "backupIncomplete": "O backup está incompleto",
+    "autoBackupOff": "O backup automático não está ativado",
+    "currency": "Moeda não suportada",
+    "debtName": "Digite um nome para a dívida",
+    "debtType": "Tipo de dívida inválido",
+    "rate": "A taxa deve estar entre 0% e 200%",
+    "term": "O prazo deve ser de 1 a 600 meses",
+    "debtNoInstallment": "Só uma dívida sua com prazo tem uma parcela fixa para passar para Fixos",
+    "debtAlreadyFixed": "Esta dívida já está em Fixos",
+    "debtPaid": "Esta dívida já está quitada",
+    "debtCategoryMissing": "Falta a categoria \"Pagamento de dívidas\"; crie-a em Ajustes",
+    "paymentTooBig": "O pagamento é maior do que falta pagar",
+    "debtPaymentCategory": "Falta a categoria \"Pagamento de dívidas\"; crie-a em Ajustes ou registre o pagamento sem lançamento",
+    "debtIncomeCategory": "Falta a categoria \"Outras receitas\"; crie-a em Ajustes ou registre o recebimento sem lançamento",
+    "categoryName": "Digite um nome para a categoria",
+    "categoryTaken": "Você já tem uma categoria com esse nome",
+    "categoryType": "Tipo de categoria inválido",
+    "categoryBuiltIn": "As categorias do app não podem ser excluídas. Você pode ocultá-la.",
+    "categoryMoveTo": "Escolha para qual categoria passar os lançamentos",
+    "categorySameType": "Escolha uma categoria do mesmo tipo",
+    "pause": "Pausa de 1 a 24 meses",
+    "alreadyPaid": "Esta conta já está paga",
+    "lockAfter": "Tempo de bloqueio inválido",
+    "pin": "O PIN deve ter de 4 a 6 números",
+    "budgetLimit": "O limite deve ser maior que zero",
+    "budgetCategories": "Escolha pelo menos uma categoria",
+    "budgetExpenseOnly": "Só categorias de despesa podem ter orçamento",
+    "backupNewer": "Este backup é de uma versão mais nova do app. Atualize-o para restaurar.",
+    "passwordLength": "A senha deve ter pelo menos {min} caracteres",
+    "wipeConfirm": "Digite {word} para confirmar.",
+    "budgetTaken": "{name} já está em outro orçamento deste mês",
+    "nameLength": "O nome pode ter até {max} caracteres",
+    "notFound": {
+      "account": "Conta não encontrada",
+      "transfer": "Transferência não encontrada",
+      "category": "Categoria não encontrada",
+      "goal": "Meta de economia não encontrada",
+      "debt": "Dívida não encontrada",
+      "transaction": "Lançamento não encontrado",
+      "fixed": "Item fixo não encontrado",
+      "fixedMonth": "Item fixo do mês não encontrado",
+      "budget": "Orçamento não encontrado"
+    },
+    "backupKeep": "Escolha quantos backups manter",
+    "copySameMonth": "Escolha um mês diferente do destino",
+    "copyFixed": "Os pagamentos de Fixos não são copiados: Fixos já os cria todo mês"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "understood": "Entendi",
+    "tryAgain": "Algo deu errado. Tente de novo.",
+    "saveFailed": "Não foi possível salvar. Tente de novo.",
+    "changeFailed": "Não foi possível mudar. Tente de novo.",
+    "failedTitle": "Não foi possível",
+    "phoneOnly": "Disponível no app do celular",
+    "back": "Voltar para {to}",
+    "home": "Início",
+    "delete": "Excluir",
+    "saveChanges": "Salvar alterações",
+    "name": "Nome",
+    "deleteFailed": "Não foi possível excluir. Tente de novo.",
+    "close": "Fechar",
+    "type": "Tipo",
+    "changesSaved": "Alterações salvas",
+    "example": "Ex. {value}",
+    "pay": "Pagar",
+    "edit": "Editar {name}",
+    "chooseAccount": "Escolha uma conta",
+    "amount": "Valor ({currency})",
+    "date": "Data",
+    "noteOptional": "Nota (opcional)",
+    "becomes": "passa a",
+    "noCategory": "Sem categoria",
+    "sections": "Seções",
+    "editAmount": "Editar {name}, {amount}",
+    "expense": "Despesa",
+    "income": "Receita",
+    "goBack": "Voltar"
+  },
+  "datos": {
+    "createBackup": "Criar backup",
+    "createBackupSub": "Arquivo criptografado com senha para guardar fora do celular",
+    "autoBackup": "Backup automático",
+    "autoOff": "Criptografado, todo dia ou toda semana, em Documentos/Kuarto do celular",
+    "autoError": "Não foi possível salvar o último; tenta de novo ao abrir o app",
+    "autoLast": "Último: {date} · Documentos/Kuarto",
+    "autoPending": "Pendente; é feito ao abrir o app",
+    "cloudUpload": "Enviar para a nuvem agora",
+    "cloudUploadSub": "Conta: {email}. O backup automático também é enviado sozinho.",
+    "cloudRestore": "Restaurar da nuvem",
+    "cloudRestoreSub": "Para um celular novo ou se os dados se perderam",
+    "cloudSignOut": "Sair da conta Google",
+    "cloudSignIn": "Backup na nuvem",
+    "cloudSignInSub": "Entre com o Google: seu backup automático fica criptografado na sua conta",
+    "restore": "Restaurar backup",
+    "restoreSub": "Substitui os dados do app pelos do arquivo",
+    "exportCsv": "Exportar lançamentos para o Excel",
+    "exportCsvSub": "Arquivo CSV com todos os seus lançamentos",
+    "wipe": "Apagar todos os dados",
+    "wipeSub": "Deixa o app como recém-instalado; oferece um backup antes",
+    "createBackupMsg": "Escolha uma senha para criptografar o backup. Se você esquecê-la, o backup não poderá ser aberto.",
+    "passwordMin": "Senha (mínimo 6)",
+    "passwordRepeat": "Repita a senha",
+    "create": "Criar",
+    "passwordsDiffer": "As senhas não coincidem.",
+    "encrypting": "Criptografando backup…",
+    "savedAt": "Backup salvo em {where}. Copie também esse arquivo para fora do celular (Drive, e-mail).",
+    "downloaded": "Backup baixado.",
+    "wipeMsg": "Seus lançamentos, fixos, metas, orçamentos, dívidas e ajustes são apagados, incluindo o PIN. Não dá para desfazer. É melhor criar um backup antes.",
+    "wipeNoBackup": "Continuar sem backup",
+    "wipeConfirmTitle": "Confirmar exclusão",
+    "wipeConfirmMsg": "Digite {word} para apagar tudo.",
+    "wipeAll": "Apagar tudo",
+    "wiping": "Apagando…",
+    "restorePasswordMsg": "Digite a senha com que você criou o backup.",
+    "password": "Senha",
+    "open": "Abrir",
+    "opening": "Abrindo backup…",
+    "rangeOne": " (de {month})",
+    "rangeMany": " (de {from} a {to})",
+    "replaceTitle": "Substituir seus dados",
+    "replaceMsg": "O backup tem {count} lançamentos{range}. Restaurá-lo apaga TODOS os dados atuais do app e os troca pelos do backup.",
+    "restoreBtn": "Restaurar",
+    "restoring": "Restaurando…",
+    "preparing": "Preparando arquivo…",
+    "exported": "{count} lançamentos exportados.",
+    "exportedAt": "{count} lançamentos exportados para {where}.",
+    "cloudSigningIn": "Entrando com o Google…",
+    "cloudUploading": "Enviando backup criptografado…",
+    "cloudUploaded": "Backup enviado para a nuvem, criptografado com a senha do backup automático.",
+    "cloudSearching": "Procurando backups…",
+    "cloudEmpty": "Não há backups na nuvem com esta conta.",
+    "cloudChooseMsg": "Escolha o backup. Depois ele pede a senha do backup automático com que foi criado.",
+    "cloudLatest": "{date} (o mais recente)",
+    "downloading": "Baixando…",
+    "signingOut": "Saindo…",
+    "signedOut": "Você saiu da conta. Os backups já enviados continuam na nuvem.",
+    "autoDisabled": "Backup automático desativado. Os arquivos já salvos ficam em Documentos/Kuarto.",
+    "autoTitle": "Backup automático",
+    "autoMsg": "Escolha a senha que vai criptografar os backups automáticos. Você vai precisar dela para restaurá-los; se esquecê-la, não poderão ser abertos.",
+    "activate": "Ativar",
+    "autoFirst": "Criando o primeiro backup…",
+    "autoFirstFailed": "Foi ativado, mas não foi possível salvar o primeiro backup. Tenta de novo ao abrir o app.",
+    "autoEnabled": "Backup automático ativado. O primeiro já está em Documentos/Kuarto.",
+    "frequency": "Frequência",
+    "daily": "Todo dia",
+    "weekly": "Toda semana",
+    "keep": "Manter",
+    "keepN": "Os últimos {count}",
+    "lastManual": "Último: {date}. Arquivo criptografado para guardar fora do celular",
+    "beforeRestoreTitle": "Antes de restaurar",
+    "beforeRestoreMsg": "Vale a pena fazer um backup do que você tem agora, caso queira voltar a isto.",
+    "savingCurrent": "Fazendo backup dos dados atuais…",
+    "replaceMsgAuto": "O backup tem {count} lançamentos{range}. Restaurá-lo apaga TODOS os dados atuais do app e os troca pelos do backup. Antes é salvo um backup automático do que você tem agora.",
+    "currentFailed": "Não foi possível fazer backup dos dados atuais. Nada foi restaurado.",
+    "import": "Importar do Excel",
+    "importSub": "Lançamentos de um arquivo .xlsx ou .csv, com modelo"
+  },
+  "seguridad": {
+    "changePin": "Mudar PIN",
+    "biometric": "Desbloquear com digital ou rosto",
+    "biometricSub": "O PIN continua funcionando se a digital falhar",
+    "lockAfter": "Pedir de novo depois de sair",
+    "removePin": "Remover PIN",
+    "enablePin": "Ativar bloqueio com PIN",
+    "enablePinSub": "É pedido ao abrir o app e ao voltar para ele",
+    "privacy": "Ocultar nos recentes",
+    "privacySub": "Escurece o app ao trocar de app e impede capturas de tela",
+    "lockNow": "Na hora",
+    "lock1": "Após 1 minuto",
+    "lock5": "Após 5 minutos",
+    "lock15": "Após 15 minutos",
+    "pinMsg": "De 4 a 6 números. Se você esquecê-lo, não há como recuperá-lo: teria que apagar o app e restaurar um backup.",
+    "newPin": "PIN novo",
+    "repeatPin": "Repita o PIN",
+    "pinsDiffer": "Os PINs não coincidem.",
+    "savingPin": "Salvando PIN…",
+    "pinOn": "Bloqueio com PIN ativado.",
+    "currentPinMsg": "Digite seu PIN atual.",
+    "currentPin": "PIN atual",
+    "remove": "Remover",
+    "checking": "Verificando…",
+    "tooMany": "Muitas tentativas. Espere {seconds} s.",
+    "wrongPin": "PIN incorreto.",
+    "pinOff": "Bloqueio com PIN desativado.",
+    "lockSaved": "Tempo de bloqueio salvo.",
+    "lockFailed": "Não foi possível salvar o tempo de bloqueio.",
+    "privacyOn": "O app fica oculto nos recentes e não permite capturas.",
+    "privacyOff": "O app volta a aparecer nos recentes.",
+    "bioNotConfirmed": "A digital não foi confirmada; continua desativada.",
+    "bioOn": "Desbloqueio com digital ativado.",
+    "bioOff": "Desbloqueio com digital desativado."
+  },
+  "ajustes": {
+    "title": "Ajustes",
+    "search": "Buscar uma opção",
+    "searchPlaceholder": "Backup, PIN, moeda…",
+    "sectionsLabel": "Seções",
+    "noResults": "Nada com \"{query}\".",
+    "theme": "Tema",
+    "themeSystem": "Sistema",
+    "themeLight": "Claro",
+    "themeDark": "Escuro",
+    "themeNote": "Sistema segue o modo claro ou escuro do seu celular.",
+    "currency": "Moeda",
+    "currencyChange": "Moeda: {label}. Mudar",
+    "currencyNote": "Só muda o símbolo com que os valores são mostrados. Os valores salvos não são convertidos.",
+    "currencyDOP": "Peso dominicano (RD$)",
+    "currencyUSD": "Dólar americano (US$)",
+    "currencyChanged": "Moeda mudada para {code}",
+    "currencyFailed": "Não foi possível mudar a moeda. Tente de novo.",
+    "accounts": "Contas e cartões",
+    "accountsSub": "Adicionar, editar ou ocultar contas, dinheiro e cartões",
+    "categories": "Gerenciar categorias",
+    "categoriesSub": "Criar, mudar ou ocultar categorias",
+    "name": "Seu nome",
+    "noName": "Sem nome. É usado para cumprimentar você no Início",
+    "google": "Conta Google",
+    "googleOff": "Não conectada. É usada para o backup na nuvem",
+    "tourAgain": "Ver o tour de novo",
+    "helpAbout": "Ajuda sobre {topic}",
+    "news": "Novidades desta versão",
+    "privacy": "Privacidade",
+    "privacyText": [
+      "O Kuarto guarda tudo só neste celular. Não há contas, servidores nem publicidade, e o app não envia seus dados a ninguém. Ele só se conecta à internet para ver se há uma versão nova e, se você entrar com o Google, para enviar seu backup criptografado.",
+      "Seus dados só saem do celular quando você cria um backup, exporta um arquivo ou ativa o backup na nuvem. Os backups são criptografados com sua senha: na nuvem ninguém consegue lê-los, nem o Google.",
+      "As permissões que ele pede são para mostrar avisos, desbloquear com digital, salvar backups ou arquivos no celular e instalar as versões novas.",
+      "Se você apagar o app sem um backup, seus dados se perdem: ninguém mais tem uma cópia."
+    ],
+    "checkUpdate": "Buscar atualização",
+    "version": "Kuarto {version}",
+    "nameTitle": "Seu nome",
+    "nameMsg": "Para cumprimentar você no Início. Deixe vazio para removê-lo.",
+    "nameSaved": "Nome salvo",
+    "nameFailed": "Não foi possível salvar o nome.",
+    "sections": {
+      "apariencia": {
+        "title": "Aparência",
+        "sub": "Tema, cor, idioma e moeda",
+        "options": [
+          "Modo claro",
+          "Modo escuro",
+          "Tema",
+          "Cor",
+          "Paleta de cores",
+          "Idioma",
+          "Moeda"
+        ]
+      },
+      "dinero": {
+        "title": "Dinheiro",
+        "sub": "Contas, cartões, categorias",
+        "options": [
+          "Contas e cartões",
+          "Gerenciar categorias"
+        ]
+      },
+      "avisos": {
+        "title": "Fixos e avisos",
+        "sub": "Contas a vencer, lembretes",
+        "options": [
+          "Notificações",
+          "Contas fixas a vencer",
+          "Orçamentos",
+          "Lembrete diário",
+          "Horário de silêncio"
+        ]
+      },
+      "datos": {
+        "title": "Dados e backup",
+        "sub": "Backup, nuvem, exportar",
+        "options": [
+          "Criar backup",
+          "Backup automático",
+          "Frequência do backup",
+          "Manter backups",
+          "Backup na nuvem",
+          "Restaurar backup",
+          "Exportar lançamentos para o Excel",
+          "Apagar todos os dados"
+        ]
+      },
+      "cuenta": {
+        "title": "Conta",
+        "sub": "Nome, Google",
+        "options": [
+          "Seu nome",
+          "Conta Google"
+        ]
+      },
+      "seguridad": {
+        "title": "Segurança e privacidade",
+        "sub": "PIN, digital, ocultar nos recentes",
+        "options": [
+          "Bloqueio com PIN",
+          "Desbloquear com digital ou rosto",
+          "Ocultar nos recentes",
+          "Capturas de tela"
+        ]
+      },
+      "ayuda": {
+        "title": "Ajuda",
+        "sub": "Tour, guias",
+        "options": [
+          "Ver o tour de novo"
+        ]
+      },
+      "acerca": {
+        "title": "Sobre",
+        "sub": "Versão {version}",
+        "options": [
+          "Novidades desta versão",
+          "Privacidade",
+          "Buscar atualização"
+        ]
+      }
+    },
+    "language": "Idioma",
+    "languageNote": "Datas e números seguem o idioma. A moeda não muda.",
+    "languageChanged": "Idioma alterado"
+  },
+  "avisos": {
+    "title": "Avisos",
+    "notifications": "Notificações",
+    "fixed": "Contas fixas a vencer",
+    "fixedSub": "Um dia antes e no dia do vencimento",
+    "hour": "Hora",
+    "budgets": "Orçamentos",
+    "budgetsSub": "Ao chegar a 85% e ao passar, uma vez por mês",
+    "daily": "Lembrete diário",
+    "dailySub": "\"Você registrou os gastos de hoje?\" Se já anotou algo hoje, não toca",
+    "quiet": "Horário de silêncio",
+    "quietSub": "O que cair nesse intervalo toca quando ele terminar",
+    "from": "Das",
+    "to": "Até",
+    "offNote": "Avisa sobre contas fixas a vencer e orçamentos no limite, mesmo sem abrir o app.",
+    "denied": "O Android não permitiu notificações. Ative-as em Configurações do celular › Apps › Kuarto › Notificações.",
+    "toggleFailed": "Não foi possível mudar as notificações. Tente de novo.",
+    "saveFailed": "Não foi possível salvar a mudança. Tente de novo."
+  },
+  "categorias": {
+    "title": "Categorias",
+    "note": "Toque em uma para mudar o nome, o ícone ou a cor, ou para ocultá-la.",
+    "failed": "Não foi possível ler as categorias. Abra Ajustes de novo.",
+    "edit": "Editar categoria {name}",
+    "editHidden": "Editar categoria {name}, oculta",
+    "hidden": "Oculta",
+    "empty": "Sem categorias deste tipo.",
+    "add": "Adicionar categoria",
+    "groups": {
+      "ingreso": "Receitas",
+      "fijo": "Despesas fixas",
+      "variable": "Despesas variáveis"
+    }
+  },
+  "icons": {
+    "restaurant-outline": "Comida",
+    "cart-outline": "Carrinho",
+    "car-outline": "Carro",
+    "bus-outline": "Ônibus",
+    "airplane-outline": "Avião",
+    "home-outline": "Casa",
+    "bed-outline": "Cama",
+    "flash-outline": "Raio",
+    "water-outline": "Água",
+    "wifi-outline": "Wi-Fi",
+    "phone-portrait-outline": "Celular",
+    "tv-outline": "Televisão",
+    "play-circle-outline": "Reproduzir",
+    "medkit-outline": "Kit de primeiros socorros",
+    "fitness-outline": "Academia",
+    "school-outline": "Escola",
+    "shirt-outline": "Roupa",
+    "gift-outline": "Presente",
+    "paw-outline": "Pet",
+    "game-controller-outline": "Jogos",
+    "heart-outline": "Coração",
+    "card-outline": "Cartão",
+    "cash-outline": "Notas",
+    "wallet-outline": "Carteira",
+    "briefcase-outline": "Maleta",
+    "construct-outline": "Ferramentas",
+    "shield-checkmark-outline": "Escudo",
+    "pricetag-outline": "Etiqueta"
+  },
+  "categoryType": {
+    "ingreso": "Receita",
+    "fijo": "Despesa fixa",
+    "variable": "Despesa variável"
+  },
+  "categoria": {
+    "edit": "Editar categoria",
+    "new": "Nova categoria",
+    "type": "Tipo",
+    "typeLabel": "Tipo de categoria",
+    "namePlaceholder": "Pets, academia, gorjetas",
+    "icon": "Ícone",
+    "color": "Cor",
+    "colorN": "Cor {n}",
+    "hide": "Ocultar",
+    "hideSub": "Não aparece na hora de escolher. Os lançamentos não mudam.",
+    "save": "Salvar categoria",
+    "moveTitle": "Tem lançamentos ou fixos. Para qual categoria os passamos?",
+    "moveNone": "Crie outra categoria deste tipo primeiro, ou oculte-a.",
+    "moveTo": "Passar para",
+    "choose": "Escolha uma categoria",
+    "moveDelete": "Passar e excluir",
+    "delete": "Excluir categoria",
+    "builtIn": "É uma categoria do app: você pode mudá-la ou ocultá-la, mas não excluí-la.",
+    "saved": "Categoria salva",
+    "deleteMsg": "{name} será excluída. Se tiver orçamentos, eles também são apagados."
+  },
+  "accountType": {
+    "efectivo": "Dinheiro",
+    "banco": "Banco",
+    "ahorro": "Poupança",
+    "tarjeta": "Cartão de crédito",
+    "inversion": "Investimento"
+  },
+  "cuenta": {
+    "edit": "Editar conta",
+    "new": "Nova conta",
+    "cardPlaceholder": "Visa, Mastercard",
+    "accountPlaceholder": "Poupança, conta salário",
+    "owedToday": "O que você deve hoje ({currency})",
+    "balanceToday": "Saldo de hoje ({currency})",
+    "adjustHint": "Se você mudar o saldo, ele é ajustado sem criar um lançamento, então não conta como receita nem despesa.",
+    "creditLimit": "Limite de crédito ({currency})",
+    "cutDay": "Dia de fechamento",
+    "payDay": "Dia de pagamento",
+    "last4": "Últimos 4 dígitos (opcional)",
+    "last4Hint": "Aparecem no cartão para você reconhecê-lo.",
+    "save": "Salvar conta",
+    "unarchive": "Voltar a usar",
+    "archive": "Arquivar",
+    "delete": "Excluir conta",
+    "saved": "Conta salva",
+    "deleteMsg": "{name} será excluída. Só é possível se não tiver lançamentos, transferências nem fixos."
+  },
+  "cuentas": {
+    "failed": "Não foi possível ler as contas. Mude de seção e volte.",
+    "transfer": "Transferir ou pagar cartão",
+    "editOwes": "Editar {name}, você deve {amount}",
+    "editBalance": "Editar {name}, saldo {amount}",
+    "owes": "Você deve",
+    "owesAmount": "Você deve {amount}",
+    "used": "Usado {value}",
+    "minimum": "Mínimo: {amount} · mudar",
+    "addMinimum": "Anotar pagamento mínimo",
+    "payName": "Pagar {name}",
+    "transfersOf": "Transferências de {month}",
+    "editTransfer": "Editar transferência de {amount}, {text}",
+    "noTransfers": "Sem transferências este mês.",
+    "hideArchived": "Ocultar arquivadas",
+    "showArchived": "Ver arquivadas ({count})",
+    "archived": "Arquivada · {detail}",
+    "account": "Conta",
+    "groups": {
+      "cuentas": {
+        "title": "Contas",
+        "add": "Adicionar conta",
+        "empty": "Adicione sua primeira conta bancária."
+      },
+      "efectivo": {
+        "title": "Dinheiro",
+        "add": "Adicionar dinheiro",
+        "empty": "Nenhum dinheiro anotado."
+      },
+      "tarjetas": {
+        "title": "Cartões de crédito",
+        "add": "Adicionar cartão",
+        "empty": "Adicione um com o limite e os dias de fechamento e pagamento."
+      }
+    },
+    "minTitle": "Pagamento mínimo",
+    "minMsg": "O que diz a fatura de {name} fechada em {date}. Deixe vazio para removê-lo.",
+    "invalidAmount": "Valor inválido.",
+    "minFailed": "Não foi possível salvar o pagamento mínimo.",
+    "usedOf": "Usado {percent} de {limit} · fecha dia {cut}, vence dia {due}",
+    "usedShort": "{percent} de {limit}",
+    "days": "Fecha dia {cut} · Vence dia {due}",
+    "nothingToPay": "Nada a pagar da fatura de {cut}",
+    "statementPaid": "Fatura de {cut} paga",
+    "overdue": "Venceu em {due}: falta {amount} da fatura de {cut}",
+    "payBefore": "Pague {amount} antes de {due} (fatura de {cut})",
+    "newCharges": " · {amount} em compras novas"
+  },
+  "transfer": {
+    "edit": "Editar transferência",
+    "payCard": "Pagar cartão",
+    "title": "Transferir",
+    "from": "Sai de",
+    "to": "Entra em",
+    "swap": "Inverter: que saia da outra conta",
+    "notePlaceholder": "Depósito, saque no caixa",
+    "hint": "Uma transferência move dinheiro entre suas contas: não conta como receita nem como despesa do mês.",
+    "savePayment": "Salvar pagamento",
+    "save": "Salvar transferência",
+    "delete": "Excluir transferência",
+    "paymentSaved": "Pagamento salvo",
+    "saved": "Transferência salva",
+    "warning": "{name} ficaria em {amount}. Confira se \"Sai de\" e \"Entra em\" estão certos.",
+    "deleteMsg": "Esta transferência será excluída e os saldos das duas contas voltarão a ser como eram.",
+    "deleted": "Transferência excluída"
+  },
+  "networth": {
+    "title": "Patrimônio",
+    "open": "Patrimônio {amount}. Ver contas",
+    "available": "Disponível {amount}",
+    "inGoals": "Em metas {amount}",
+    "owedToMe": "Devem a você {amount}",
+    "owe": "Você deve {amount}"
+  },
+  "tabs": {
+    "inicio": {
+      "label": "Início",
+      "name": "Início",
+      "add": "Adicionar lançamento"
+    },
+    "movimientos": {
+      "label": "Lançam.",
+      "name": "Lançamentos",
+      "add": "Adicionar lançamento"
+    },
+    "fijos": {
+      "label": "Fixos",
+      "name": "Fixos",
+      "add": "Adicionar fixo (despesa ou receita)"
+    },
+    "dinero": {
+      "label": "Dinheiro",
+      "name": "Dinheiro",
+      "add": "Adicionar conta, dinheiro ou cartão"
+    },
+    "planes": {
+      "label": "Planos",
+      "name": "Planos: metas e dívidas",
+      "add": ""
+    },
+    "addGoal": "Adicionar meta de economia",
+    "addDebt": "Adicionar dívida ou empréstimo"
+  },
+  "inicio": {
+    "settings": "Ajustes: moeda e categorias",
+    "hello": "Olá, {name}",
+    "failed": "Não foi possível ler os dados deste mês. Mude de mês e volte, ou reinicie o app.",
+    "emptyTitle": "Ainda não há lançamentos em {month}.",
+    "emptyText": "Toque no botão + para registrar o primeiro e aqui você verá seu saldo e para onde vai o dinheiro.",
+    "balanceOf": "Saldo de {month}",
+    "negative": "Negativo, você gasta mais do que ganha",
+    "income": "Receitas",
+    "expenses": "Despesas",
+    "saved": "Guardado",
+    "saving": "Economia de {percent} da receita · {rating}",
+    "noIncome": "Sem receitas este mês, não há porcentagem de economia.",
+    "rating": {
+      "excelente": "Excelente",
+      "regular": "Regular",
+      "bajo": "Baixo"
+    },
+    "whereTitle": "Para onde vai o dinheiro?",
+    "noExpenses": "Ainda não há despesas em {month}.",
+    "recent": "Últimos lançamentos",
+    "seeAll": "Ver todos"
+  },
+  "alerts": {
+    "label": "Alertas",
+    "two": "{a} e {b}",
+    "more": "{a}, {b} e mais {count}",
+    "overdue": {
+      "one": "Venceu sem pagar: {names}",
+      "other": "Venceram sem pagar: {names}"
+    },
+    "soon": {
+      "one": "Vence em 3 dias ou menos: {names}",
+      "other": "Vencem em 3 dias ou menos: {names}"
+    },
+    "cardsDue": {
+      "one": "Pague o cartão {names}: o pagamento vence em breve",
+      "other": "Pague os cartões {names}: o pagamento vence em breve"
+    },
+    "exceeded": "Você passou do limite em {names}",
+    "near": "Perto do limite: {names}",
+    "cardsUse": "Você usa 30% ou mais do limite: {names}"
+  },
+  "compare": {
+    "title": "Mês a mês",
+    "noPrev": "Sem lançamentos em {month} para comparar.",
+    "last": "Últimos {count} meses",
+    "empty": "Sem lançamentos",
+    "reports": "Ver relatórios e gráficos",
+    "same": "Igual a {month}",
+    "more": "{percent}mais que {month} ({amount})",
+    "less": "{percent}menos que {month} ({amount})",
+    "detail": "Receitas {income} · Despesas {expenses} · Guardado {saved}"
+  },
+  "donut": {
+    "label": "Gasto por categoria: {summary}",
+    "spent": "gasto",
+    "share": "{percent} do gasto",
+    "others": "Outras"
+  },
+  "movs": {
+    "done": "Pronto",
+    "select": "Selecionar",
+    "failed": "Não foi possível ler os lançamentos. Mude de mês e volte, ou reinicie o app.",
+    "emptyTitle": "Sem lançamentos em {month}.",
+    "emptyText": "Toque no botão + para registrar uma receita ou uma despesa deste mês.",
+    "filters": "Buscar e filtrar",
+    "searchLabel": "Buscar por nota, categoria ou etiqueta",
+    "searchPlaceholder": "Buscar nota, categoria ou etiqueta",
+    "kind": "Tipo de lançamento",
+    "kinds": {
+      "todos": "Todos",
+      "gasto": "Despesas",
+      "ingreso": "Receitas"
+    },
+    "byCategory": "Filtrar por categoria",
+    "allCategories": "Todas as categorias",
+    "byAccount": "Filtrar por conta",
+    "allAccounts": "Todas as contas",
+    "summary": "{shown} de {total} · Líquido {net}",
+    "clear": "Limpar filtros",
+    "noMatch": "Nenhum lançamento corresponde à busca.",
+    "selectHint": "Toque nos lançamentos que quer mudar.",
+    "selectAll": "Selecionar os {count}",
+    "selectRow": "Selecionar {name}, {amount}",
+    "withPhoto": "com foto do recibo",
+    "moreFor": "Mais ações para {name}",
+    "actionsFor": "Ações para {name}",
+    "edit": "Editar",
+    "duplicate": "Duplicar",
+    "transfers": "Transferências",
+    "editTransfer": "Editar transferência {name}, {amount}",
+    "bulkActions": "Ações para os selecionados",
+    "selected": "{count} selecionados",
+    "category": "Categoria",
+    "date": "Data",
+    "deleteTitle": "Excluir lançamento",
+    "deleteMsg": "{name} ({amount}) será excluído. Se era o pagamento de um fixo, esse fixo voltará a ficar pendente.",
+    "deleted": "{name} excluído",
+    "deleteFailed": "Não foi possível excluir o lançamento. Tente de novo.",
+    "mixed": "Escolha só despesas ou só receitas para mudar a categoria.",
+    "changeCategory": "Mudar categoria",
+    "change": "Mudar",
+    "changeDate": "Mudar data",
+    "bulkDeleteTitle": "Excluir lançamentos",
+    "bulkDeleteMsg": "{count} lançamentos serão excluídos. Os pagamentos de fixos voltarão a ficar pendentes.",
+    "bulkDeleteFailed": "Não foi possível excluir todos. Tente de novo.",
+    "bulkDeleted": "{count} lançamentos excluídos",
+    "changed": "{count} lançamentos alterados.",
+    "skipped": " {count} não foram alterados (divididos ou de outro tipo).",
+    "changeFailed": "Não foi possível alterar. Tente de novo.",
+    "splitName": "{name} e mais {count}"
+  },
+  "tx": {
+    "edit": "Editar lançamento",
+    "duplicate": "Duplicar lançamento",
+    "new": "Novo lançamento",
+    "kind": "Tipo de lançamento",
+    "noSplit": "Não dividir",
+    "split": "Dividir em várias categorias",
+    "parts": "Partes do lançamento",
+    "part": "Parte {n}",
+    "amount": "Valor",
+    "removePart": "Remover parte {n}",
+    "addPart": "Adicionar parte",
+    "remaining": "Falta atribuir {amount}",
+    "over": "Passou {amount}",
+    "balanced": "As partes somam o total",
+    "tags": "Etiquetas (opcional, separadas por vírgula)",
+    "tagsPlaceholder": "viagem, trabalho",
+    "viewPhoto": "Ver foto {n}",
+    "removePhoto": "Remover foto {n}",
+    "photo": "Foto do recibo",
+    "delete": "Excluir lançamento",
+    "saveIncome": "Salvar receita",
+    "saveExpense": "Salvar despesa",
+    "incomeSaved": "Receita salva",
+    "expenseSaved": "Despesa salva",
+    "photoFailed": "Não foi possível ler a foto. Tente outra imagem.",
+    "deleteMsg": "Este lançamento será excluído. Se era o pagamento de um fixo, esse fixo voltará a ficar pendente.",
+    "deleted": "Lançamento excluído",
+    "dupTitle": "Está repetido?",
+    "dupMsg": "Você já registrou {amount} em {name} em {date}{note}. Salvar mesmo assim?",
+    "dupNote": " («{note}»)",
+    "dontSave": "Não salvar",
+    "saveAnyway": "Salvar mesmo assim"
+  },
+  "due": {
+    "pastExpense": {
+      "one": "Venceu ontem",
+      "other": "Venceu há {count} dias"
+    },
+    "pastIncome": {
+      "one": "Deveria ter entrado ontem",
+      "other": "Deveria ter entrado há {count} dias"
+    },
+    "todayExpense": "Vence hoje",
+    "todayIncome": "Entra hoje",
+    "tomorrowExpense": "Vence amanhã",
+    "tomorrowIncome": "Entra amanhã",
+    "inDaysExpense": "Vence em {count} dias",
+    "inDaysIncome": "Entra em {count} dias",
+    "onExpense": "Vence em {date}",
+    "onIncome": "Entra em {date}"
+  },
+  "status": {
+    "received": "Recebido",
+    "paid": "Pago",
+    "overdue": "Vencido",
+    "pending": "Pendente",
+    "paidF": "Paga",
+    "overdueF": "Vencida"
+  },
+  "fijos": {
+    "failed": "Não foi possível ler os fixos. Mude de mês e volte, ou reinicie o app.",
+    "nothingIn": "Nada a pagar em {month}",
+    "otherMonths": "Seus fixos de outros meses não caem neste mês.",
+    "add": "Adicionar pagamento fixo",
+    "firstTitle": "Adicione seu primeiro pagamento fixo",
+    "firstText": "Aluguel, luz, internet ou seu salário. Você anota uma vez e aparece todo mês.",
+    "noneToPay": "Nenhuma conta a pagar",
+    "toPayIn": "A pagar em {month}",
+    "allPaid": "Tudo pago",
+    "progress": "Contas fixas pagas",
+    "paidOf": "Pago {paid} de {total} · {percent}",
+    "toReceive": "Receitas a receber: {amount}",
+    "subscriptions": {
+      "one": "1 assinatura: {monthly} por mês · {yearly} por ano",
+      "other": "{count} assinaturas: {monthly} por mês · {yearly} por ano"
+    },
+    "edit": "Editar",
+    "markReceived": "Marcar {name} como recebido",
+    "markPaid": "Marcar {name} como pago",
+    "installments": "Parcelas de dívidas",
+    "installment": "Parcela {n} de {of} · {status}",
+    "registerPaymentOf": "Registrar pagamento de {name}",
+    "registerPayment": "Registrar pagamento",
+    "paused": "Em pausa",
+    "resumeName": "Retomar {name}",
+    "resume": "Retomar",
+    "markedReceived": "{name} marcado como recebido",
+    "markedPaid": "{name} marcado como pago",
+    "payFailed": "Não foi possível marcar {name} como pago. Tente de novo.",
+    "resumed": "{name} retomado",
+    "resumeFailed": "Não foi possível retomar. Tente de novo.",
+    "pausedUntil": "Em pausa até {month}",
+    "frequency": {
+      "3": "Trimestral",
+      "6": "Semestral",
+      "12": "Anual"
+    },
+    "chargeOn": "Entra em {date}",
+    "dueOn": "Vencimento {date}",
+    "upcoming": "Próximos 7 dias",
+    "upcomingRow": "{name}, {detail}, {amount}. Ver em Fixos"
+  },
+  "fijo": {
+    "edit": "Editar fixo",
+    "new": "Novo fixo",
+    "kind": "Tipo de fixo",
+    "incomePlaceholder": "Salário, aluguel que você recebe",
+    "expensePlaceholder": "Aluguel, mercado do mês, internet",
+    "howOften": "Com que frequência você recebe?",
+    "once": "Uma vez",
+    "biweekly": "Quinzenal",
+    "other": "Outra",
+    "payment": "{n}º recebimento",
+    "removePayment": "Remover recebimento {n}",
+    "payDay": "Dia do recebimento",
+    "dueDay": "Dia do vencimento",
+    "addPayment": "+ Adicionar outro recebimento",
+    "repeats": "Repete",
+    "chargedTo": "Entra em",
+    "paidWith": "Pago com",
+    "save": "Salvar fixo",
+    "appliesFrom": "As mudanças valem a partir de {month}. Os meses anteriores e o que já foi pago não mudam.",
+    "pause": "Pausar…",
+    "createDebt": "Criar dívida a partir deste pagamento",
+    "delete": "Excluir fixo",
+    "saved": "Fixo salvo",
+    "freq": {
+      "1": "Todo mês",
+      "3": "A cada 3 meses",
+      "6": "A cada 6 meses",
+      "12": "Todo ano"
+    },
+    "pauseFrom": "Pausar a partir de {month}",
+    "pauseNote": "O que está pendente nesses meses é removido; o que já foi pago fica.",
+    "months": {
+      "one": "1 mês",
+      "other": "{count} meses"
+    },
+    "debtCreated": "Dívida criada",
+    "debtCreatedMsg": "Se você definiu um prazo, as parcelas já aparecem em Fixos. Remover \"{name}\" a partir de {month} para não contar o pagamento duas vezes?",
+    "removeFrom": "Remover a partir de {month}",
+    "keep": "Manter",
+    "removeFailed": "Não foi possível remover o fixo. Tente de novo.",
+    "deleteName": "Excluir {name}",
+    "deleteMsg": "Os pagamentos já registrados ficam em Lançamentos.",
+    "onlyMonth": "Só {month}",
+    "thisAndNext": "Este mês e os seguintes",
+    "endOfMonth": "fim do mês",
+    "dayN": "dia {n}"
+  },
+  "deudas": {
+    "failed": "Não foi possível ler as dívidas. Abra esta tela de novo.",
+    "totals": "Totais",
+    "owe": "Você deve",
+    "owed": "Devem a você",
+    "iOwe": "Eu devo",
+    "theyOwe": "Me devem",
+    "toPay": "{balance} a pagar de {principal}",
+    "toCollect": "{balance} a receber de {principal}",
+    "settled": "Quitada",
+    "paidOf": "Pago de {name}",
+    "interestPaid": "Juros pagos: {amount}",
+    "inFixed": "A parcela está em Fixos: ao pagá-la lá, este saldo diminui.",
+    "toFixed": "Passar a parcela para Fixos",
+    "hideSchedule": "Ocultar cronograma",
+    "showSchedule": "Ver cronograma",
+    "registerPayment": "Registrar pagamento",
+    "registerCharge": "Registrar recebimento",
+    "scheduleOf": "Cronograma de parcelas de {name}",
+    "month": "Mês",
+    "interest": "Juros",
+    "principal": "Principal",
+    "balance": "Saldo",
+    "payments": "Pagamentos",
+    "deletePaymentLabel": "Excluir pagamento de {amount} de {date}",
+    "paymentSub": "Principal {principal} · juros {interest}",
+    "hideSettled": "Ocultar quitadas",
+    "showSettled": "Ver quitadas ({count})",
+    "whichFirst": "Qual pagar primeiro?",
+    "strategyNote": "Pagando a parcela de cada dívida e colocando um extra todo mês em uma só.",
+    "extra": "Extra por mês",
+    "snowball": "Bola de neve",
+    "snowballSub": "Primeiro a de menor saldo",
+    "avalanche": "Avalanche",
+    "avalancheSub": "Primeiro a de maior taxa",
+    "interestTotal": "Juros: {amount}",
+    "skipped": {
+      "one": "Uma dívida sem prazo não entra na comparação porque não tem parcela fixa.",
+      "other": "{count} dívidas sem prazo não entram na comparação porque não têm parcela fixa."
+    },
+    "emptyTitle": "Você não tem dívidas registradas.",
+    "emptyText": "Toque em + para anotar um empréstimo ou o que alguém te deve e acompanhar quanto falta.",
+    "rate": "{rate}% ao ano",
+    "noInterest": "Sem juros",
+    "installment": "parcela {amount} × {count}",
+    "endsIn": "termina em {month}",
+    "since": "desde {date}",
+    "neverEnds": "Não termina de pagar com esses valores",
+    "endsAt": "Você termina em {month}",
+    "savings": {
+      "one": "Com esse extra você termina 1 mês antes e economiza {amount} em juros.",
+      "other": "Com esse extra você termina {count} meses antes e economiza {amount} em juros."
+    },
+    "nowFixed": "A parcela de {name} agora está em Fixos",
+    "toFixedFailed": "Não foi possível passar a parcela para Fixos.",
+    "deletePayment": "Excluir pagamento",
+    "deletePaymentMsg": "O pagamento de {amount} de {date} para {name} será excluído.",
+    "deletePaymentMsgTx": "O pagamento de {amount} de {date} para {name} será excluído, e também o lançamento dele.",
+    "paymentDeleted": "Pagamento excluído",
+    "paymentDeleteFailed": "Não foi possível excluir o pagamento. Tente de novo."
+  },
+  "deuda": {
+    "edit": "Editar dívida",
+    "new": "Nova dívida",
+    "kind": "Tipo de dívida",
+    "mePlaceholder": "Financiamento do carro, cartão",
+    "themPlaceholder": "Nome de quem te deve",
+    "principal": "Valor emprestado ({currency})",
+    "rate": "Taxa de juros anual % (opcional)",
+    "term": "Prazo em meses (opcional)",
+    "date": "Data do empréstimo",
+    "save": "Salvar dívida",
+    "delete": "Excluir dívida",
+    "saved": "Dívida salva",
+    "installment": "Parcela mensal: {amount}",
+    "deleteMsg": "{name} será excluída com o histórico de pagamentos. Os lançamentos que você criou com esses pagamentos ficam em Lançamentos."
+  },
+  "pago": {
+    "collectFrom": "Recebimento de {name}",
+    "payTo": "Pagamento a {name}",
+    "asIncome": "Anotar também como receita em Lançamentos",
+    "asExpense": "Anotar também como despesa em Lançamentos",
+    "saveCollect": "Salvar recebimento",
+    "savePayment": "Salvar pagamento",
+    "collectSaved": "Recebimento salvo",
+    "paymentSaved": "Pagamento salvo",
+    "preview": "Juros {interest} · principal {principal} · resta {left}"
+  },
+  "metas": {
+    "failed": "Não foi possível ler suas metas. Mude de mês e volte, ou reinicie o app.",
+    "savedIn": "Guardado em {month}",
+    "ofIncome": "{percent} da receita · {rating}",
+    "emptyTitle": "Você ainda não tem metas de economia.",
+    "emptyText": "Toque no botão + para criar a primeira, por exemplo uma reserva de emergência.",
+    "viewLabel": "Ver economia",
+    "total": "Acumulado",
+    "thisMonth": "Este mês",
+    "goalsTitle": "Metas, economia acumulada",
+    "of": "de {amount}",
+    "progressOf": "Progresso de {name}",
+    "reached": "Meta cumprida",
+    "monthChange": "· {sign}{amount} este mês",
+    "withdrawFrom": "Retirar de {name}",
+    "withdraw": "Retirar",
+    "contributeTo": "Guardar em {name}",
+    "contribute": "Guardar",
+    "contributionsOf": "Aportes de {month}",
+    "deleteWithdrawal": "Excluir retirada de {amount} de {name}",
+    "deleteContribution": "Excluir aporte de {amount} de {name}",
+    "withdrawalTag": " · Retirada",
+    "noContributions": "Sem aportes em {month}. Toque em Guardar em uma meta para registrar um.",
+    "datePassed": "A data-alvo ({month}) já passou",
+    "needed": "Para {month}: {amount} por mês",
+    "atPace": "No seu ritmo você chega em {month}",
+    "noPace": "Sem aportes recentes para projetar",
+    "deleteWithdrawalTitle": "Excluir retirada",
+    "deleteContributionTitle": "Excluir aporte",
+    "deleteWithdrawalMsg": "A retirada de {amount} de {name} em {date} será excluída.",
+    "deleteContributionMsg": "O aporte de {amount} em {name} em {date} será excluído.",
+    "withdrawalDeleted": "Retirada excluída",
+    "contributionDeleted": "Aporte excluído",
+    "deleteFailed": "Não foi possível excluir o aporte. Tente de novo.",
+    "deletedGoal": "Meta excluída"
+  },
+  "planes": {
+    "section": "Seção",
+    "metas": "Metas",
+    "deudas": "Dívidas",
+    "title": "Planos"
+  },
+  "meta": {
+    "edit": "Editar meta",
+    "new": "Nova meta",
+    "placeholder": "Reserva de emergência, viagem, entrada do carro",
+    "target": "Quanto você quer juntar ({currency})",
+    "date": "Para quando (opcional)",
+    "removeDate": "Remover data",
+    "save": "Salvar meta",
+    "delete": "Excluir meta",
+    "saved": "Meta salva",
+    "deleteMsg": "{name} será excluída junto com todos os aportes, e eles deixarão de contar como guardado nos seus meses."
+  },
+  "aporte": {
+    "withdrawFrom": "Retirar de {name}",
+    "contributeTo": "Guardar em {name}",
+    "returnsTo": "Volta para",
+    "withdrawHint": "A retirada sai da meta e do guardado do mês, e o dinheiro volta para a conta. Não conta como receita.",
+    "contributeHint": "O aporte sai da conta e conta como guardado no mês da sua data. Não conta como despesa.",
+    "saveWithdrawal": "Salvar retirada",
+    "saveContribution": "Salvar aporte",
+    "withdrawalSaved": "Retirada salva",
+    "contributionSaved": "Aporte salvo"
+  },
+  "budgets": {
+    "title": "Orçamentos de {month}",
+    "failed": "Não foi possível ler os orçamentos deste mês.",
+    "editLabel": "Editar orçamento de {name}. {text}",
+    "spentOf": "{spent} de {limit}",
+    "empty": "Coloque um limite numa categoria de despesa e aqui você verá quanto falta.",
+    "copy": "Copiar os de {month}",
+    "add": "Adicionar orçamento",
+    "copied": "{count} orçamentos copiados de {month}",
+    "copyFailed": "Não foi possível copiar os orçamentos. Tente de novo.",
+    "over": "Você passou {amount}",
+    "left": "Restam {amount}",
+    "carryIn": " · inclui {amount} do mês passado",
+    "carryOut": " · desconta {amount} do mês passado"
+  },
+  "budget": {
+    "edit": "Editar orçamento",
+    "new": "Novo orçamento",
+    "categories": "Categorias",
+    "remove": "Remover {name}",
+    "allTaken": "Todas as suas categorias de despesa já têm orçamento em {month}.",
+    "addAnother": "Adicionar outra categoria",
+    "category": "Categoria",
+    "shared": "Compartilham o mesmo limite",
+    "choose": "Escolha uma categoria de despesa",
+    "nameOptional": "Nome (opcional)",
+    "limit": "Limite para {month} ({currency})",
+    "rollover": "Levar o que sobrar (ou faltar) para o mês seguinte",
+    "rolloverHint": "Só passa entre meses que tenham esta opção ativa no mesmo orçamento.",
+    "save": "Salvar orçamento",
+    "delete": "Excluir orçamento",
+    "saved": "Orçamento salvo",
+    "deleteMsg": "O limite de {name} em {month} será removido. Suas despesas não mudam."
+  },
+  "reports": {
+    "title": "Relatórios",
+    "until": "Até {month}",
+    "creating": "Criando PDF…",
+    "export": "Exportar {month} para PDF",
+    "period": "Período",
+    "months": "{count} meses",
+    "failed": "Não foi possível preparar os relatórios. Abra esta tela de novo.",
+    "projection": "Se os fixos pendentes entrarem e forem pagos, você termina o mês com",
+    "today": "Hoje {amount}",
+    "toCollect": "· a receber {amount}",
+    "toPay": "· a pagar {amount}",
+    "empty": "Sem lançamentos nestes meses. Quando você registrar receitas e despesas, aqui verá como mudam.",
+    "byMonth": "Receitas e despesas por mês",
+    "hideTable": "Ocultar tabela",
+    "showTable": "Ver tabela",
+    "tableCaption": "Receitas, despesas, guardado e saldo por mês",
+    "balance": "Saldo",
+    "byCategory": "Gasto por categoria",
+    "tapCategory": "Toque em uma para ver como mudou mês a mês.",
+    "catLabel": "{name}, {amount}, {percent} do gasto",
+    "spentIn": "Gasto em {name}",
+    "seeMoves": "Ver os lançamentos de {month}",
+    "accounts": "Saldo nas contas no fechamento",
+    "accountsSub": "Todas as suas contas somadas, com os cartões subtraindo.",
+    "accountsName": "Saldo nas contas",
+    "pdfSaved": "PDF salvo em {where}.",
+    "pdfFailed": "Não foi possível criar o PDF. Tente de novo."
+  },
+  "pdf": {
+    "savingRate": "Economia da receita",
+    "noIncome": "Sem receitas",
+    "noExpenses": "Sem despesas este mês.",
+    "movements": "Lançamentos ({count})",
+    "date": "Data",
+    "category": "Categoria",
+    "note": "Nota",
+    "noteAccount": "Nota · conta",
+    "amount": "Valor",
+    "generated": "Gerado em {date} com o Kuarto."
+  },
+  "charts": {
+    "byMonth": "Gráfico por mês",
+    "lineByMonth": "{name} por mês"
+  },
+  "help": {
+    "inicio": {
+      "title": "Início",
+      "points": [
+        "Veja o saldo do mês: o que entrou menos o que você gastou e guardou.",
+        "Mude de mês com as setas ou tocando no nome do mês.",
+        "Toque em + para anotar uma despesa ou receita em segundos."
+      ]
+    },
+    "movimientos": {
+      "title": "Lançamentos",
+      "points": [
+        "Busque por nota, categoria ou etiqueta, e filtre por tipo ou conta.",
+        "Toque num lançamento para editá-lo; com ⋯ você duplica ou exclui.",
+        "Use Selecionar para mudar ou excluir vários de uma vez."
+      ]
+    },
+    "fijos": {
+      "title": "Fixos",
+      "points": [
+        "Adicione uma só vez os pagamentos e receitas que se repetem todo mês.",
+        "Marque-os como pagos ou recebidos quando acontecerem.",
+        "Pause um pagamento por alguns meses ou exclua-o só deste mês."
+      ]
+    },
+    "cuentas": {
+      "title": "Dinheiro",
+      "points": [
+        "Anote onde está seu dinheiro: contas, dinheiro e cartões de crédito.",
+        "Disponível soma contas e dinheiro; os cartões não, porque é o que você deve.",
+        "Use Transferir para mover dinheiro ou pagar um cartão sem contar como despesa."
+      ]
+    },
+    "tarjetas": {
+      "title": "Cartões",
+      "points": [
+        "Adicione seu cartão com o limite e os dias de fechamento e pagamento.",
+        "Veja quanto deve da fatura e quanto falta para pagá-la.",
+        "Pague o cartão com Transferir: sai de uma conta e diminui o que você deve."
+      ]
+    },
+    "metas": {
+      "title": "Metas",
+      "points": [
+        "Crie uma meta com um valor-alvo e, se quiser, uma data.",
+        "Guarde de uma conta quando puder e veja quanto já tem.",
+        "Retire se precisar: o que você guarda não conta como despesa."
+      ]
+    },
+    "deudas": {
+      "title": "Dívidas",
+      "points": [
+        "Anote o que você deve ou o que te devem, com taxa e parcelas.",
+        "Registre cada pagamento e veja o saldo diminuir.",
+        "Pague as parcelas do mês em Fixos, em \"Parcelas de dívidas\"."
+      ]
+    },
+    "reportes": {
+      "title": "Relatórios",
+      "points": [
+        "Compare suas receitas e despesas de 3, 6 ou 12 meses.",
+        "Toque numa categoria para ver como mudou mês a mês.",
+        "Exporte o mês em PDF para guardar ou compartilhar."
+      ]
+    }
+  },
+  "fields": {
+    "category": "Categoria",
+    "chooseCategory": "Escolha uma categoria",
+    "newCategory": "Nova categoria",
+    "date": "Data",
+    "chooseDate": "Escolha uma data",
+    "chooseOption": "Escolha uma opção",
+    "prevMonth": "Mês anterior",
+    "nextMonth": "Próximo mês",
+    "today": "Hoje",
+    "noDate": "Sem data",
+    "chooseDay": "Escolha um dia",
+    "lastDay": "Último dia",
+    "dayN": "Dia {n}",
+    "dayOfMonth": "Dia do mês",
+    "loading": "Carregando…",
+    "undo": "Desfazer",
+    "month": "Mês",
+    "chooseOtherMonth": "{month}. Escolher outro mês",
+    "chooseMonth": "Escolher mês",
+    "prevYear": "Ano anterior",
+    "nextYear": "Próximo ano",
+    "goToday": "Ir para o mês atual"
+  },
+  "lock": {
+    "enterPin": "Digite seu PIN",
+    "digits": "{count} de {max} números",
+    "upTo6": "até 6",
+    "erase": "Apagar",
+    "enter": "Entrar",
+    "biometric": "Usar digital ou rosto",
+    "wrong": "PIN incorreto",
+    "wait": "Muitas tentativas. Espere {seconds} s.",
+    "unlock": "Desbloquear o Kuarto",
+    "useBiometric": "Use sua digital ou seu rosto",
+    "usePin": "Usar PIN",
+    "confirm": "Confirme sua digital",
+    "confirmSub": "Confirme para ativá-la no Kuarto"
+  },
+  "update": {
+    "searching": "Buscando…",
+    "latest": "Você tem a versão mais recente ({version}).",
+    "available": "Versão {version} disponível.",
+    "failed": "Não foi possível verificar. Confira sua conexão com a internet.",
+    "newTitle": "Há uma versão nova",
+    "newMsg": "O Kuarto {version} está pronto. Seus dados ficam como estão.",
+    "later": "Depois",
+    "update": "Atualizar",
+    "downloading": "Baixando…",
+    "permission": "Ative \"Permitir desta fonte\" para o Kuarto, volte e toque em Buscar atualização de novo.",
+    "downloaded": "Versão {version} baixada: toque em Instalar."
+  },
+  "notify": {
+    "tomorrow": "{name} vence amanhã",
+    "today": "{name} vence hoje",
+    "cardTomorrow": "O pagamento de {name} vence amanhã",
+    "cardToday": "O pagamento de {name} vence hoje",
+    "cardBody": "Falta pagar {amount} da fatura{minimum}. Pague em Dinheiro › Cartões para não pagar juros.",
+    "cardMinimum": " (mínimo {amount})",
+    "fixedBody": "{amount} · Marque como pago em Fixos.",
+    "exceeded": "Você passou do limite em {name}",
+    "near": "Perto do limite em {name}",
+    "exceededBody": "Você já gastou {spent} de {limit} este mês.",
+    "nearBody": "Você já gastou {spent} de {limit}; restam {left}.",
+    "dailyTitle": "Você registrou os gastos de hoje?",
+    "dailyBody": "Anotar no mesmo dia é o que faz o saldo do mês fechar."
+  },
+  "news": {
+    "title": "Novidades do Kuarto {version}",
+    "fallback": "Correções e melhorias."
+  },
+  "cloud": {
+    "yourAccount": "sua conta Google"
+  },
+  "startup": {
+    "dbFailed": "Não foi possível abrir o banco de dados local. Feche e abra o app de novo.\n\nDetalhe: {detail}"
+  },
+  "changelog": {
+    "1_0_10": [
+      "Nova boas-vindas animada e perguntas iniciais que deixam prontas suas contas, salário, fixos, dívidas e metas.",
+      "Tour renovado: um exemplo em cada seção e, no fim, como fazer backup dos seus dados.",
+      "Cores: escolha uma paleta (Oceano, Turquesa, Fúcsia, Grafite) ou sua própria cor, no claro e no escuro.",
+      "Lançamentos › ⋯ › Copiar de outro mês: traga as despesas do mês passado para este com um toque.",
+      "Importar do Excel ou CSV, com modelo, revisão de erros e desfazer.",
+      "Backup automático diário ou semanal, e você escolhe quantos manter. Antes de restaurar, os dados atuais são salvos.",
+      "O app agora está pronto para vários idiomas: escolha o seu em Ajustes › Aparência."
+    ],
+    "1_0_9": [
+      "Os Ajustes agora estão organizados em seções: Aparência, Dinheiro, Fixos e avisos, Dados e backup, Conta, Segurança, Ajuda e Sobre.",
+      "Toque na lupa em Ajustes para buscar uma opção pelo nome."
+    ],
+    "1_0_8": [
+      "Depois de cada atualização você verá aqui o que mudou. Também em Ajustes › Novidades desta versão.",
+      "Correções de cores no modo escuro: calendário, seletores e folhas de ajuda."
+    ],
+    "1_0_7": [
+      "Backup na nuvem: entre com o Google em Ajustes › Seus dados e seu backup semanal fica criptografado na sua conta.",
+      "Se você trocar de celular, use \"Restaurar da nuvem\" para recuperar seus dados."
+    ],
+    "1_0_6": [
+      "Modo claro ou escuro: escolha em Ajustes › Aparência.",
+      "Dívidas: com \"Passar a parcela para Fixos\", pagar a parcela em Fixos diminui o saldo da dívida."
+    ],
+    "1_0_5": [
+      "\"Buscar atualização\" aparece separado de Privacidade em Ajustes."
+    ],
+    "1_0_4": [
+      "O app se atualiza sozinho: avisa quando há uma versão nova.",
+      "Os backups, o CSV e os PDF são salvos em Documentos/Kuarto do celular.",
+      "A leitura de avisos do banco foi removida."
+    ]
+  },
+  "copy": {
+    "title": "Copiar de outro mês",
+    "from": "Copiar de",
+    "hint": "As cópias vão para {month}, no mesmo dia do mês. Você pode mudar cada valor antes de copiar.",
+    "empty": "Esse mês não tem lançamentos para copiar.",
+    "listLabel": "Lançamentos para copiar",
+    "amountOf": "Valor de {name}",
+    "fixedNote": {
+      "one": "1 pagamento de Fixos não é copiado: Fixos já o cria todo mês.",
+      "other": "{count} pagamentos de Fixos não são copiados: Fixos já os cria todo mês."
+    },
+    "account": "Conta para as cópias",
+    "accountHint": "Alguns usavam uma conta arquivada ou que não existe mais.",
+    "saveExpenses": {
+      "one": "Copiar 1 despesa · {amount}",
+      "other": "Copiar {count} despesas · {amount}"
+    },
+    "saveMoves": {
+      "one": "Copiar 1 lançamento · {amount}",
+      "other": "Copiar {count} lançamentos · {amount}"
+    },
+    "loadFailed": "Não foi possível ler os lançamentos desse mês.",
+    "done": {
+      "one": "1 lançamento copiado",
+      "other": "{count} lançamentos copiados"
+    },
+    "more": "Mais ações"
+  },
+  "import": {
+    "title": "Importar do Excel",
+    "intro": "Traga seus lançamentos de um arquivo do Excel (.xlsx) ou CSV. Antes de salvar qualquer coisa, você verá quais linhas entram e quais precisam de ajuste.",
+    "pick": "Escolher arquivo (.xlsx ou .csv)",
+    "template": "Baixar modelo",
+    "howTitle": "Como deve ser meu Excel?",
+    "howText": "Uma linha por lançamento, com estes cabeçalhos na primeira linha. A ordem das colunas não importa.",
+    "colColumn": "Coluna",
+    "colRequired": "Obrigatória",
+    "colExample": "Exemplo",
+    "colNotes": "Notas",
+    "yes": "Sim",
+    "no": "Não",
+    "requiredNote": "* Obrigatória.",
+    "columns": {
+      "date": "Data",
+      "type": "Tipo",
+      "amount": "Valor",
+      "category": "Categoria",
+      "account": "Conta",
+      "description": "Descrição",
+      "status": "Status"
+    },
+    "aliases": {
+      "date": [
+        "Data",
+        "Dia",
+        "Fecha",
+        "Date"
+      ],
+      "type": [
+        "Tipo",
+        "Type"
+      ],
+      "amount": [
+        "Valor",
+        "Montante",
+        "Quantia",
+        "Monto",
+        "Amount"
+      ],
+      "category": [
+        "Categoria",
+        "Categoría",
+        "Category"
+      ],
+      "account": [
+        "Conta",
+        "Cuenta",
+        "Account"
+      ],
+      "description": [
+        "Descrição",
+        "Nota",
+        "Histórico",
+        "Descripción",
+        "Description"
+      ],
+      "status": [
+        "Status",
+        "Situação",
+        "Estado"
+      ]
+    },
+    "words": {
+      "expense": [
+        "Despesa",
+        "Despesas",
+        "Saída",
+        "Débito",
+        "Gasto",
+        "Expense"
+      ],
+      "income": [
+        "Receita",
+        "Receitas",
+        "Entrada",
+        "Crédito",
+        "Ingreso",
+        "Income"
+      ],
+      "pending": [
+        "Pendente",
+        "Pendiente",
+        "Pending"
+      ]
+    },
+    "example": [
+      "2026-10-05",
+      "Despesa",
+      "1250.50",
+      "Comida",
+      "Dinheiro",
+      "Mercado",
+      "Pago"
+    ],
+    "examplePlain": {
+      "date": "2026-10-05",
+      "type": "Despesa",
+      "amount": "1250.50",
+      "category": "Comida",
+      "account": "Dinheiro",
+      "description": "Mercado",
+      "status": "Pago"
+    },
+    "notes": {
+      "date": "Também aceita 05/10/2026 (dia primeiro).",
+      "type": "Despesa ou Receita.",
+      "amount": "Positivo, sem símbolo de moeda.",
+      "category": "Se não existir, você pode criá-la.",
+      "account": "Se não existir, você pode criá-la.",
+      "description": "Opcional.",
+      "status": "Pago, Recebido ou Pendente. Por padrão, Pago ou Recebido. Os pendentes não são importados: vão em Fixos."
+    },
+    "dataSheet": "Lançamentos",
+    "instructionsSheet": [
+      "Instruções",
+      "Instrucciones",
+      "Instructions"
+    ],
+    "templateSaved": "Modelo salvo em {where}.",
+    "templateDownloaded": "Modelo baixado.",
+    "templateFailed": "Não foi possível criar o modelo. Tente de novo.",
+    "readFailed": "Não foi possível ler o arquivo. Tente um .xlsx ou .csv com cabeçalhos na primeira linha.",
+    "columnsIntro": "Não reconhecemos todas as colunas de {file}. Escolha qual coluna do arquivo vai em cada dado.",
+    "noColumn": "Não está no arquivo",
+    "columnN": "Coluna {n}",
+    "continue": "Continuar",
+    "ready": "Prontas para importar",
+    "withErrors": "Com erros",
+    "repeated": "Parecem repetidas",
+    "seeErrors": {
+      "one": "Ver a linha com erro",
+      "other": "Ver as {count} linhas com erro"
+    },
+    "problem": "Linha {line}: {reason}",
+    "errors": {
+      "date": "data inválida ou vazia",
+      "type": "o tipo deve ser Despesa ou Receita",
+      "amount": "valor vazio, zero ou não é um número",
+      "category": "falta a categoria",
+      "account": "falta a conta"
+    },
+    "errorsNote": "As linhas com erro não são importadas. Corrija-as no arquivo e importe de novo, ou continue sem elas.",
+    "pendingNote": {
+      "one": "1 linha está Pendente e não é importada: os pagamentos a fazer vão em Fixos.",
+      "other": "{count} linhas estão Pendente e não são importadas: os pagamentos a fazer vão em Fixos."
+    },
+    "skipRepeated": {
+      "one": "Pular a que parece repetida (mesma data, valor e descrição)",
+      "other": "Pular as {count} que parecem repetidas (mesma data, valor e descrição)"
+    },
+    "newCategories": "Categorias que não existem",
+    "newAccounts": "Contas que não existem",
+    "create": "Criá-la",
+    "createAccount": "Criá-la como conta bancária",
+    "importN": {
+      "one": "Importar 1 lançamento",
+      "other": "Importar {count} lançamentos"
+    },
+    "failed": "Não foi possível importar. Nada foi salvo.",
+    "doneText": {
+      "one": "1 lançamento foi importado.",
+      "other": "{count} lançamentos foram importados."
+    },
+    "seeMoves": "Ver lançamentos",
+    "undoTitle": "Última importação",
+    "undo": "Desfazer importação",
+    "lastImport": {
+      "one": "{date} · 1 lançamento",
+      "other": "{date} · {count} lançamentos"
+    },
+    "undone": {
+      "one": "1 lançamento importado foi removido.",
+      "other": "{count} lançamentos importados foram removidos."
+    },
+    "undoFailed": "Não foi possível desfazer. Tente de novo."
+  },
+  "palette": {
+    "title": "Cor",
+    "names": {
+      "violeta": "Violeta",
+      "oceano": "Oceano",
+      "turquesa": "Turquesa",
+      "fucsia": "Fúcsia",
+      "grafito": "Grafite",
+      "custom": "Personalizada"
+    },
+    "customHint": "Escolha um tom ou digite o código.",
+    "hex": "Código da cor",
+    "hexInvalid": "Digite a cor como #RRGGBB, por exemplo #2E86DE.",
+    "preview": "Prévia",
+    "previewBalance": "Saldo deste mês",
+    "previewButton": "Salvar",
+    "adjusted": "Escurecemos um pouco para que o texto fique legível.",
+    "clash": "Parece a cor de {what}: pode confundir.",
+    "clashWhat": {
+      "positive": "receitas",
+      "negative": "despesas e vencidos",
+      "warning": "pendentes"
+    },
+    "apply": "Usar esta cor",
+    "applied": "Cor alterada",
+    "statusNote": "As cores de Recebido, Pago, Pendente e Vencido não mudam: sempre significam a mesma coisa."
+  },
+  "intro": {
+    "slogan": "A melhor forma de gastar seu dinheiro é sabendo no que você gastou",
+    "skip": "Toque para continuar"
+  },
+  "onboarding": {
+    "progress": "Passo {n} de {total}",
+    "continue": "Continuar",
+    "skip": "Pular",
+    "remove": "Remover {name}",
+    "nameTitle": "Como você se chama?",
+    "nameText": "Para cumprimentar você no Início. Fica salvo só neste celular e você pode mudar quando quiser em Ajustes › Conta.",
+    "firstName": "Nome",
+    "lastName": "Sobrenome (opcional)",
+    "nameRequired": "Digite seu nome para continuar.",
+    "langTitle": "Idioma e moeda",
+    "langText": "A moeda só muda o símbolo dos valores. Você pode mudar os dois depois em Ajustes.",
+    "goalTitle": "Qual é seu objetivo principal?",
+    "goalText": "Vamos colocá-lo primeiro no Início e no tour.",
+    "goalShort": "Objetivo",
+    "goals": {
+      "controlar": {
+        "title": "Controlar meus gastos",
+        "sub": "Saber para onde vai o dinheiro todo mês"
+      },
+      "ahorrar": {
+        "title": "Economizar",
+        "sub": "Juntar para algo ou ter uma reserva de emergência"
+      },
+      "deudas": {
+        "title": "Sair das dívidas",
+        "sub": "Ver quanto falta e o que pagar primeiro"
+      },
+      "organizar": {
+        "title": "Me organizar",
+        "sub": "Ter à mão pagamentos, recebimentos e datas"
+      }
+    },
+    "moneyTitle": "Onde está seu dinheiro?",
+    "moneyText": "Com o que você tem hoje, Disponível mostra o que você realmente tem. Adicione suas contas e cartões com o saldo de hoje.",
+    "cashToday": "Dinheiro que você tem hoje ({currency})",
+    "cashInvalid": "Digite o dinheiro só com números.",
+    "addBank": "Adicionar conta bancária",
+    "addCard": "Adicionar cartão de crédito",
+    "salaryTitle": "Quanto você recebe e com que frequência?",
+    "salaryText": "Se seu salário é quase sempre igual, colocamos em Fixos e todo mês você só marca como recebido.",
+    "salaryVaries": "Seu salário muda muito de um mês para outro?",
+    "salaryStable": "Não, é quase sempre igual",
+    "salaryChanges": "Sim, muda",
+    "salaryVariesTip": "Então não colocamos em Fixos: quando receber, toque em + e anote como receita o que entrou.",
+    "salaryTip": "Vai em Fixos como receita. Toque para mudar.",
+    "salaryName": "Salário",
+    "payments": "{name} · {count} recebimentos · {amount}",
+    "fixedTitle": "Quais contas você paga todo mês?",
+    "fixedText": "Você anota uma vez e elas aparecem todo mês em Fixos, com o dia do vencimento.",
+    "fixedNames": {
+      "rent": "Aluguel",
+      "power": "Luz",
+      "internet": "Internet",
+      "water": "Água",
+      "phone": "Telefone"
+    },
+    "otherFixed": "Outro pagamento",
+    "debtTitle": "Você tem empréstimos ou dívidas?",
+    "debtText": "Anote o que você deve (ou o que te devem) e verá quanto falta e quando termina.",
+    "addDebt": "Adicionar dívida ou empréstimo",
+    "debtToFixed": "Pagar a parcela em Fixos (assim a dívida diminui sozinha)",
+    "goalsTitle": "Você está juntando para algo?",
+    "goalsText": "Uma meta com quanto quer juntar e, se quiser, para quando.",
+    "addGoal": "Adicionar meta de economia",
+    "limitTitle": "Quanto você quer gastar no máximo por mês?",
+    "limitText": "Opcional. Serve de referência para seus orçamentos.",
+    "limitLabel": "Máximo por mês ({currency})",
+    "limitInvalid": "Digite o valor só com números, maior que zero.",
+    "summaryTitle": "Isto é o que vamos criar",
+    "summaryText": "Confira antes de salvar: até você tocar em Criar, nada é salvo.",
+    "summaryAccount": "Conta",
+    "summarySalary": "Salário em Fixos",
+    "summaryFixed": "Pagamento fixo",
+    "summaryDebt": "Dívida",
+    "summaryInFixed": "parcela em Fixos",
+    "summaryGoal": "Meta",
+    "summaryLimit": "Gasto máximo por mês",
+    "summaryEmpty": "Não há contas, fixos, dívidas nem metas para criar: você pode adicioná-los quando quiser.",
+    "summaryEdit": "Para mudar algo, toque em Voltar e volte à pergunta.",
+    "change": "Voltar",
+    "create": "Criar tudo",
+    "doneTitle": "Pronto, {name}",
+    "tourText": "Quer que mostremos como funciona? É um tour curto com um exemplo em cada seção. Você pode vê-lo depois em Ajustes › Ajuda.",
+    "seeTour": "Ver o tour",
+    "notNow": "Agora não",
+    "google": "Continuar com o Google",
+    "googleHint": "Opcional: preencha seu nome com sua conta Google. Também serve para o backup na nuvem; o app funciona igual sem conta.",
+    "googleFailed": "Não foi possível entrar com o Google. Você pode digitar seu nome."
+  },
+  "profile": {
+    "askTitle": "Como você se chama?",
+    "askMsg": "Para cumprimentar você no Início. Fica salvo só neste celular; você pode pular."
+  },
+  "goalLink": {
+    "controlar": "Seu objetivo: controlar seus gastos · Ver relatórios",
+    "ahorrar": "Seu objetivo: economizar · Ver suas metas",
+    "deudas": "Seu objetivo: sair das dívidas · Ver suas dívidas",
+    "organizar": "Seu objetivo: se organizar · Ver seus fixos"
+  },
+  "tour": {
+    "progress": "{n} de {total}",
+    "skip": "Pular",
+    "next": "Seguinte",
+    "example": "Exemplo",
+    "activateBackup": "Ativar backup automático",
+    "steps": {
+      "inicio": {
+        "title": "Início",
+        "text": "Aqui você vê o que tem disponível. Exemplo: se recebeu {income} e gastou {spent}, verá quanto sobra."
+      },
+      "movimientos": {
+        "title": "Lançamentos",
+        "text": "Registre cada gasto em segundos com +. Exemplo: {gas} de gasolina, do Dinheiro."
+      },
+      "fijos": {
+        "title": "Fixos",
+        "text": "O que você paga ou recebe todo mês. Exemplo: o aluguel no dia 5. Você marca como pago quando pagar."
+      },
+      "dinero": {
+        "title": "Dinheiro",
+        "text": "Suas contas, dinheiro e cartões. O cartão mostra o que você deve."
+      },
+      "metas": {
+        "title": "Metas",
+        "text": "Junte para algo. Exemplo: {goal} para uma viagem; você guarda quando puder."
+      },
+      "deudas": {
+        "title": "Dívidas",
+        "text": "O que você deve e quanto falta. Ao pagar a parcela em Fixos, a dívida diminui sozinha."
+      },
+      "resumen": {
+        "title": "Resumo",
+        "text": "Como foi seu mês e quanto você guardou, mês a mês."
+      },
+      "respaldo": {
+        "title": "Seus dados",
+        "text": "Tudo fica só neste celular. Um backup protege você se perdê-lo ou trocar de celular."
+      }
+    },
+    "demo": {
+      "left": "Sobra",
+      "inOut": "Recebeu {income} · Gastou {spent}",
+      "gas": "Gasolina",
+      "fromCash": "Transporte · Dinheiro",
+      "rent": "Aluguel",
+      "due5": "Vence no dia 5",
+      "trip": "Viagem",
+      "goalOf": "{goalSaved} de {goal}",
+      "carLoan": "Financiamento do carro",
+      "debtLeft": "Faltam {debtLeft} de {debt}",
+      "saved": "Guardou da receita"
+    },
+    "backupPoints": [
+      "Seus dados ficam só neste celular: ninguém mais tem uma cópia.",
+      "Crie um backup quando quiser, ou ative o automático todo dia ou toda semana.",
+      "Com sua conta Google, o backup também fica criptografado na nuvem."
+    ]
+  },
+  "defaults": {
+    "categories": {
+      "cat-salario": "Salário",
+      "cat-otros-ingresos": "Outras receitas",
+      "cat-alquiler": "Aluguel",
+      "cat-servicios": "Serviços",
+      "cat-suscripciones": "Assinaturas",
+      "cat-comida": "Comida",
+      "cat-transporte": "Transporte",
+      "cat-salud": "Saúde",
+      "cat-ocio": "Lazer",
+      "cat-otros-gastos": "Outras despesas",
+      "cat-pago-deudas": "Pagamento de dívidas",
+      "cat-luz": "Luz",
+      "cat-agua": "Água",
+      "cat-internet": "Internet e TV",
+      "cat-telefono": "Telefone",
+      "cat-seguros": "Seguros",
+      "cat-educacion": "Educação",
+      "cat-supermercado": "Mercado",
+      "cat-gasolina": "Gasolina",
+      "cat-ropa": "Roupas",
+      "cat-hogar": "Casa"
+    },
+    "cash": "Dinheiro"
+  }
+}

@@ -27,12 +27,12 @@ export class PayRecurringExpense {
 
   async execute(input: PayRecurringExpenseInput): Promise<RecurringExpenseInstance> {
     const expense = await this.recurring.get(input.recurringExpenseId);
-    if (!expense) throw new NotFoundError('Gasto fijo');
+    if (!expense) throw new NotFoundError('fixed');
 
     const instances = await this.recurring.listInstances(input.month);
     const instance = instances.find((i) => i.recurringExpenseId === expense.id);
-    if (!instance) throw new NotFoundError('Gasto fijo del mes');
-    if (instance.status === 'pagado') throw new ValidationError('Este gasto ya está pagado');
+    if (!instance) throw new NotFoundError('fixedMonth');
+    if (instance.status === 'pagado') throw new ValidationError('alreadyPaid');
 
     const transactionId = this.ids.next();
     await this.transactions.save({

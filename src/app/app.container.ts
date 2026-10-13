@@ -19,6 +19,9 @@ import {
   SaveTransfer,
 } from './application/use-cases/accounts';
 import { AutoBackup, CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from './application/use-cases/backup';
+import { CopyFromMonth } from './application/use-cases/copy-month';
+import { LocalizeDefaultNames } from './application/use-cases/localize-defaults';
+import { ImportTransactions } from './application/use-cases/import-transactions';
 import { ExportTransactionsCsv } from './application/use-cases/export-csv';
 import { PinLock } from './application/use-cases/pin-lock';
 import { BulkUpdateTransactions } from './application/use-cases/bulk-update-transactions';
@@ -30,7 +33,7 @@ import {
   RegisterDebtPayment,
   SaveDebt,
 } from './application/use-cases/debts';
-import { Onboarding } from './application/use-cases/onboarding';
+import { CompleteOnboarding, Onboarding } from './application/use-cases/onboarding';
 import { UserProfile } from './application/use-cases/user-profile';
 import { GetAlerts } from './application/use-cases/get-alerts';
 import { GetMonthHistory } from './application/use-cases/get-month-history';
@@ -101,6 +104,9 @@ export interface AppContainer {
   categories: ICategoryRepository;
   transactions: ITransactionRepository;
   addTransaction: AddTransaction;
+  copyFromMonth: CopyFromMonth;
+  localizeDefaults: LocalizeDefaultNames;
+  importTransactions: ImportTransactions;
   updateTransaction: UpdateTransaction;
   deleteTransaction: DeleteTransaction;
   addRecurringExpense: AddRecurringExpense;
@@ -156,6 +162,7 @@ export interface AppContainer {
   deleteDebtPayment: DeleteDebtPayment;
   addDebtAsFixed: AddDebtAsFixed;
   onboarding: Onboarding;
+  completeOnboarding: CompleteOnboarding;
   profile: UserProfile;
   getAlerts: GetAlerts;
   getNotificationPlan: GetNotificationPlan;
@@ -172,19 +179,40 @@ export const uuidGenerator: IdGenerator = { next: () => crypto.randomUUID() };
 export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGenerator): AppContainer {
   const getMonthRecurringExpenses = new GetMonthRecurringExpenses(repos.recurring);
   const createBackup = new CreateBackup(repos.backup);
+  const addTransaction = new AddTransaction(repos.transactions, repos.categories, ids, repos.accounts);
+  const addRecurringExpenses = new AddRecurringExpenses(repos.recurring, repos.categories, ids);
+  const addSavingsGoal = new AddSavingsGoal(repos.savings, ids);
+  const currencySettings = new CurrencySettings(repos.settings);
+  const saveAccount = new SaveAccount(repos.accounts, ids);
+  const adjustAccountBalance = new AdjustAccountBalance(repos.accounts);
+  const saveDebt = new SaveDebt(repos.debts, ids);
+  const profile = new UserProfile(repos.settings);
+  const onboarding = new Onboarding(repos.settings, repos.transactions, repos.recurring);
   const getCardStatuses = new GetCardStatuses(repos.accounts, repos.settings);
   const getDebtsOverview = new GetDebtsOverview(repos.debts, repos.recurring);
+  const addDebtAsFixed = new AddDebtAsFixed(getDebtsOverview, repos.recurring, repos.categories, ids);
   const getAccountsOverview = new GetAccountsOverview(repos.accounts);
   const getBudgetStatuses = new GetBudgetStatuses(repos.budgets, repos.transactions);
   const getUpcomingRecurring = new GetUpcomingRecurring(getMonthRecurringExpenses);
   return {
     categories: repos.categories,
     transactions: repos.transactions,
-    addTransaction: new AddTransaction(repos.transactions, repos.categories, ids, repos.accounts),
+    addTransaction,
+    copyFromMonth: new CopyFromMonth(repos.transactions, repos.categories, repos.recurring, repos.debts, addTransaction),
+    localizeDefaults: new LocalizeDefaultNames(repos.categories, repos.accounts),
+    importTransactions: new ImportTransactions(
+      repos.transactions,
+      repos.categories,
+      repos.accounts,
+      repos.settings,
+      addTransaction,
+      new AddCategory(repos.categories, ids),
+      saveAccount,
+    ),
     updateTransaction: new UpdateTransaction(repos.transactions, repos.categories, repos.accounts),
     deleteTransaction: new DeleteTransaction(repos.transactions, repos.recurring, repos.debts),
     addRecurringExpense: new AddRecurringExpense(repos.recurring, repos.categories, ids),
-    addRecurringExpenses: new AddRecurringExpenses(repos.recurring, repos.categories, ids),
+    addRecurringExpenses,
     updateRecurringExpense: new UpdateRecurringExpense(repos.recurring, repos.categories),
     removeRecurringExpense: new RemoveRecurringExpense(repos.recurring),
     getMonthOverview: new GetMonthOverview(repos.transactions, repos.categories, repos.savings),
@@ -195,7 +223,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     getMonthRecurringExpenses,
     payRecurringExpense: new PayRecurringExpense(repos.recurring, repos.transactions, ids, repos.debts),
     getSavingsOverview: new GetSavingsOverview(repos.savings),
-    addSavingsGoal: new AddSavingsGoal(repos.savings, ids),
+    addSavingsGoal,
     updateSavingsGoal: new UpdateSavingsGoal(repos.savings),
     deleteSavingsGoal: new DeleteSavingsGoal(repos.savings),
     addSavingsContribution: new AddSavingsContribution(repos.savings, ids, repos.accounts),
@@ -204,7 +232,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     setBudget: new SetBudget(repos.budgets, repos.categories, ids),
     deleteBudget: new DeleteBudget(repos.budgets),
     copyBudgets: new CopyBudgets(repos.budgets, ids),
-    currencySettings: new CurrencySettings(repos.settings),
+    currencySettings,
     addCategory: new AddCategory(repos.categories, ids),
     updateCategory: new UpdateCategory(repos.categories),
     deleteCategory: new DeleteCategory(repos.categories),
@@ -216,10 +244,10 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     wipeAllData: new WipeAllData(repos.backup),
     autoBackup: new AutoBackup(repos.settings, createBackup),
     accounts: repos.accounts,
-    saveAccount: new SaveAccount(repos.accounts, ids),
+    saveAccount,
     archiveAccount: new ArchiveAccount(repos.accounts),
     deleteAccount: new DeleteAccount(repos.accounts),
-    adjustAccountBalance: new AdjustAccountBalance(repos.accounts),
+    adjustAccountBalance,
     getAccountsOverview,
     setCardMinimum: new SetCardMinimum(repos.settings),
     getNetWorth: new GetNetWorth(getAccountsOverview, getDebtsOverview, repos.savings),
@@ -235,14 +263,25 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     getUpcomingRecurring,
     getAlerts: new GetAlerts(getUpcomingRecurring, getBudgetStatuses, repos.categories, getCardStatuses),
     getNotificationPlan: new GetNotificationPlan(getMonthRecurringExpenses, getBudgetStatuses, repos.categories, getCardStatuses),
-    saveDebt: new SaveDebt(repos.debts, ids),
+    saveDebt,
     deleteDebt: new DeleteDebt(repos.debts),
     getDebtsOverview,
     registerDebtPayment: new RegisterDebtPayment(repos.debts, repos.transactions, repos.categories, ids),
     deleteDebtPayment: new DeleteDebtPayment(repos.debts, repos.transactions, repos.recurring),
-    addDebtAsFixed: new AddDebtAsFixed(getDebtsOverview, repos.recurring, repos.categories, ids),
-    profile: new UserProfile(repos.settings),
-    onboarding: new Onboarding(repos.settings, repos.transactions, repos.recurring),
+    addDebtAsFixed,
+    profile,
+    onboarding,
+    completeOnboarding: new CompleteOnboarding(
+      onboarding,
+      profile,
+      currencySettings,
+      saveAccount,
+      adjustAccountBalance,
+      addRecurringExpenses,
+      saveDebt,
+      addDebtAsFixed,
+      addSavingsGoal,
+    ),
   };
 }
 

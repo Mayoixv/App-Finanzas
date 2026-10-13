@@ -45,7 +45,7 @@ export class SqliteBackupStore implements IBackupStore {
   async restore(data: BackupData): Promise<void> {
     const latest = Math.max(...this.migrations.map((m) => m.version));
     if (data.schemaVersion > latest) {
-      throw new ValidationError('Este respaldo es de una versión más nueva de la app. Actualízala para restaurarlo.');
+      throw new ValidationError('backupNewer');
     }
     const before = await this.dump();
     try {

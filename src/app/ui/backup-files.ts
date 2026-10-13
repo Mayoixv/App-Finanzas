@@ -5,7 +5,6 @@ import { FILES_FOLDER, fileDate } from './file-io';
 
 /** Carpeta visible en "Mis archivos" del teléfono: Documentos/Kuarto. */
 export const AUTO_BACKUP_FOLDER = FILES_FOLDER;
-const AUTO_BACKUP_KEEP = 4;
 const SAFETY_FOLDER = 'respaldos';
 const SAFETY_KEEP = 3;
 
@@ -21,23 +20,23 @@ async function prune(directory: Directory, folder: string, prefix: string, keep:
 }
 
 /**
- * Copia de los datos antes de actualizar la base, dentro del almacenamiento privado de la app (sin cifrar,
- * igual que la base misma). Solo en el teléfono.
+ * Copia de los datos antes de actualizar la base (o de restaurar un respaldo), dentro del almacenamiento privado de
+ * la app (sin cifrar, igual que la base misma). Solo en el teléfono.
  */
-export async function saveSafetyCopy(data: BackupData): Promise<void> {
+export async function saveSafetyCopy(data: BackupData, prefix = 'antes-de-actualizar-'): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   await Filesystem.writeFile({
-    path: `${SAFETY_FOLDER}/antes-de-actualizar-${fileDate()}-v${data.schemaVersion}.json`,
+    path: `${SAFETY_FOLDER}/${prefix}${fileDate()}-v${data.schemaVersion}.json`,
     data: JSON.stringify(data),
     directory: Directory.Data,
     encoding: Encoding.UTF8,
     recursive: true,
   });
-  await prune(Directory.Data, SAFETY_FOLDER, 'antes-de-actualizar-', SAFETY_KEEP);
+  await prune(Directory.Data, SAFETY_FOLDER, prefix, SAFETY_KEEP);
 }
 
-/** Guarda el respaldo automático (ya cifrado) en Documentos/Kuarto y deja los 4 más recientes. */
-export async function saveAutoBackup(content: string): Promise<string> {
+/** Guarda el respaldo automático (ya cifrado) en Documentos/Kuarto y deja los `keep` más recientes. */
+export async function saveAutoBackup(content: string, keep: number): Promise<string> {
   const name = `kuarto-auto-${fileDate()}.finanzas`;
   await Filesystem.writeFile({
     path: `${AUTO_BACKUP_FOLDER}/${name}`,
@@ -46,6 +45,6 @@ export async function saveAutoBackup(content: string): Promise<string> {
     encoding: Encoding.UTF8,
     recursive: true,
   });
-  await prune(Directory.Documents, AUTO_BACKUP_FOLDER, 'kuarto-auto-', AUTO_BACKUP_KEEP);
+  await prune(Directory.Documents, AUTO_BACKUP_FOLDER, 'kuarto-auto-', keep);
   return name;
 }

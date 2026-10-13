@@ -15,7 +15,6 @@ import { close } from 'ionicons/icons';
 import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
 import { accountChoices, accountOptions } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
-import { NotFoundError, ValidationError } from '../../application/errors';
 import { Category } from '../../domain/category';
 import { Frequency, RecurringExpense } from '../../domain/recurring-expense';
 import { CurrencyState } from '../currency-state';
@@ -24,6 +23,7 @@ import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 import { DayPickerComponent, LAST_DAY } from '../day-picker.component';
 import { paymentName } from '../../application/use-cases/add-recurring-expense';
+import { t, tn, errorText } from '../i18n';
 
 /** Cuántas veces se cobra al mes un ingreso. Cada cobro se guarda como un fijo aparte. */
 type PayMode = 'una' | 'quincenal' | 'otra';
@@ -44,6 +44,7 @@ const SUCCESS_VISIBLE_MS = 1200;
   imports: [SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent, DayPickerComponent],
 })
 export class NuevoGastoFijoModalComponent implements OnInit {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
   private readonly monthState = inject(MonthState);
@@ -51,6 +52,14 @@ export class NuevoGastoFijoModalComponent implements OnInit {
 
   /** Si llega, el formulario edita este gasto fijo en vez de crear uno. */
   @Input() expense?: RecurringExpense;
+  /** En las preguntas iniciales: no guarda, devuelve lo escrito (role 'draft') para guardarlo todo al final. */
+  @Input() draft = false;
+  /** Cuentas aún sin guardar (preguntas iniciales) que también se pueden elegir. */
+  @Input() draftAccounts: Account[] = [];
+  /** Para empezar ya con el tipo, el nombre y la categoría (por ejemplo, "Sueldo"). */
+  @Input() presetKind?: 'gasto' | 'ingreso';
+  @Input() presetName?: string;
+  @Input() presetCategoryId?: string;
 
   private readonly allCategories = signal<Category[]>([]);
   /** Un fijo puede ser un gasto (alquiler) o un ingreso (sueldo); lo decide su categoría. */
@@ -69,12 +78,9 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected readonly accounts = signal<Account[]>([]);
   protected readonly accountId = signal(CASH_ACCOUNT_ID);
   protected readonly accountOptions = computed(() => accountOptions(this.accounts()));
-  protected readonly frequencies: { value: Frequency; label: string }[] = [
-    { value: 1, label: 'Cada mes' },
-    { value: 3, label: 'Cada 3 meses' },
-    { value: 6, label: 'Cada 6 meses' },
-    { value: 12, label: 'Cada año' },
-  ];
+  protected readonly frequencies = computed<{ value: Frequency; label: string }[]>(() =>
+    ([1, 3, 6, 12] as Frequency[]).map((value) => ({ value, label: t(`fijo.freq.${value}`) })),
+  );
   /** Está en pausa en el mes que se ve: se ofrece reanudar en vez de pausar. */
   protected readonly isPaused = computed(() => {
     const until = this.expense?.pausedUntil;
@@ -114,8 +120,14 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     const all = await this.container.categories.list();
     this.allCategories.set(all);
     const choices = await accountChoices(this.container, this.expense?.accountId);
-    this.accounts.set(choices.accounts);
+    this.accounts.set([...choices.accounts, ...this.draftAccounts]);
     this.accountId.set(choices.selected);
+    if (this.expense?.accountId && this.draftAccounts.some((a) => a.id === this.expense!.accountId)) {
+      this.accountId.set(this.expense.accountId);
+    }
+    if (this.presetKind) this.kind.set(this.presetKind);
+    if (this.presetName) this.name.set(this.presetName);
+    if (this.presetCategoryId && all.some((c) => c.id === this.presetCategoryId)) this.categoryId.set(this.presetCategoryId);
 
     const e = this.expense;
     if (e) {
@@ -163,9 +175,9 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     const sheet = await this.modalCtrl.create({
       component: SelectSheetComponent,
       componentProps: {
-        title: `Pausar desde ${this.monthState.label()}`,
-        note: 'Lo pendiente de esos meses se quita; lo ya pagado se queda.',
-        options: [1, 2, 3, 6].map((n) => ({ value: n, label: n === 1 ? '1 mes' : `${n} meses` })),
+        title: t('fijo.pauseFrom', { month: this.monthState.label() }),
+        note: t('fijo.pauseNote'),
+        options: [1, 2, 3, 6].map((n) => ({ value: n, label: tn('fijo.months', n) })),
       },
       cssClass: 'select-modal',
     });
@@ -188,7 +200,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'saved');
     } catch (err) {
       console.error(err);
-      this.error.set(err instanceof ValidationError ? err.message : 'No se pudo guardar. Inténtalo de nuevo.');
+      this.error.set(errorText(err, 'common.saveFailed'));
       this.saving.set(false);
     }
   }
@@ -200,13 +212,14 @@ export class NuevoGastoFijoModalComponent implements OnInit {
   protected async save() {
     const categoryId = this.categoryId();
     if (!categoryId) return;
+    if (this.draft) return this.dismissDraft(categoryId);
     this.saving.set(true);
     this.error.set(null);
     try {
       if (this.multi()) {
         await this.container.addRecurringExpenses.execute(
           this.payments().map((p) => ({
-            name: paymentName(this.name(), p.day ?? 0),
+            name: paymentName(this.name(), p.day ?? 0, t),
             amount: parseAmount(p.amount) ?? 0,
             categoryId,
             dueDay: p.day ?? 0,
@@ -238,13 +251,35 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       }
       await this.showSaved();
     } catch (e) {
-      this.error.set(
-        e instanceof ValidationError || e instanceof NotFoundError
-          ? e.message
-          : 'No se pudo guardar. Inténtalo de nuevo.',
-      );
+      this.error.set(errorText(e, 'common.saveFailed'));
       this.saving.set(false);
     }
+  }
+
+  /** Preguntas iniciales: devuelve los fijos a crear (varios si es un ingreso con varios cobros). */
+  private dismissDraft(categoryId: string) {
+    const startMonth = this.monthState.month();
+    const inputs = this.multi()
+      ? this.payments().map((p) => ({
+          name: paymentName(this.name(), p.day ?? 0, t),
+          amount: parseAmount(p.amount) ?? 0,
+          categoryId,
+          dueDay: p.day ?? 0,
+          accountId: this.accountId(),
+          startMonth,
+        }))
+      : [
+          {
+            name: this.name(),
+            amount: parseAmount(this.amount()) ?? 0,
+            categoryId,
+            dueDay: this.dueDay() ?? 0,
+            frequency: this.frequency(),
+            accountId: this.accountId(),
+            startMonth,
+          },
+        ];
+    return this.modalCtrl.dismiss(inputs, 'draft');
   }
 
   private async showSaved() {
@@ -264,14 +299,14 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     await form.present();
     if ((await form.onDidDismiss()).role !== 'saved') return;
     const label = this.monthState.label();
-    const month = label.charAt(0).toLocaleLowerCase('es') + label.slice(1);
+    const month = label.charAt(0).toLocaleLowerCase() + label.slice(1);
     const alert = await this.alerts.create({
       cssClass: 'app-alert choices',
-      header: 'Deuda creada',
-      message: `Si le pusiste plazo, sus cuotas ya aparecen en Fijos. ¿Quitas "${e.name}" desde ${month} para no contar el pago dos veces?`,
+      header: t('fijo.debtCreated'),
+      message: t('fijo.debtCreatedMsg', { name: e.name, month }),
       buttons: [
-        { text: `Quitar desde ${month}`, role: 'forward' },
-        { text: 'Dejarlo', role: 'cancel' },
+        { text: t('fijo.removeFrom', { month }), role: 'forward' },
+        { text: t('fijo.keep'), role: 'cancel' },
       ],
     });
     await alert.present();
@@ -282,7 +317,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (err) {
       console.error(err);
-      this.error.set('No se pudo quitar el fijo. Inténtalo de nuevo.');
+      this.error.set(t('fijo.removeFailed'));
       this.saving.set(false);
     }
   }
@@ -291,15 +326,15 @@ export class NuevoGastoFijoModalComponent implements OnInit {
     const e = this.expense;
     if (!e) return;
     const label = this.monthState.label();
-    const month = label.charAt(0).toLocaleLowerCase('es') + label.slice(1);
+    const month = label.charAt(0).toLocaleLowerCase() + label.slice(1);
     const alert = await this.alerts.create({
       cssClass: 'app-alert choices',
-      header: `Eliminar ${e.name}`,
-      message: `Los pagos ya registrados se quedan en Movimientos.`,
+      header: t('fijo.deleteName', { name: e.name }),
+      message: t('fijo.deleteMsg'),
       buttons: [
-        { text: `Solo ${month}`, role: 'month' },
-        { text: 'Este mes y los siguientes', role: 'forward', cssClass: 'danger' },
-        { text: 'Cancelar', role: 'cancel' },
+        { text: t('fijo.onlyMonth', { month }), role: 'month' },
+        { text: t('fijo.thisAndNext'), role: 'forward', cssClass: 'danger' },
+        { text: t('common.cancel'), role: 'cancel' },
       ],
     });
     await alert.present();
@@ -313,7 +348,7 @@ export class NuevoGastoFijoModalComponent implements OnInit {
       await this.modalCtrl.dismiss(null, 'deleted');
     } catch (err) {
       console.error(err);
-      this.error.set('No se pudo eliminar. Inténtalo de nuevo.');
+      this.error.set(t('common.deleteFailed'));
       this.saving.set(false);
     }
   }

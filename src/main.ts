@@ -11,11 +11,13 @@ import { pageTransition, sheetEnter, sheetLeave } from './app/ui/motion';
 import { applyPrivacy, isPrivacyOn } from './app/ui/privacy';
 import { saveSafetyCopy } from './app/ui/backup-files';
 import { loadAppearance } from './app/ui/theme';
+import { loadLanguage, t } from './app/ui/i18n';
 
 async function start() {
   const container = await createSqliteContainer(saveSafetyCopy);
   setDisplayCurrency(await container.currencySettings.get());
   await loadAppearance(container.settings);
+  await loadLanguage(container.settings);
   setInitialLock(await container.pinLock.isEnabled(), await container.pinLock.length());
   // Antes de mostrar nada, para que el balance no aparezca en la vista de recientes.
   if (await isPrivacyOn(container.settings)) await applyPrivacy(true).catch(console.error);
@@ -38,6 +40,5 @@ start().catch((error) => {
   // El detalle técnico va debajo para poder diagnosticar fallos que solo pasan en el teléfono.
   const detail = error instanceof Error ? error.message : String(error);
   document.body.style.cssText = 'padding:24px;font-family:sans-serif;color:#14121f;background:#e2deee';
-  document.body.innerText =
-    'No se pudo abrir la base de datos local. Cierra y vuelve a abrir la aplicación.\n\nDetalle: ' + detail;
+  document.body.innerText = t('startup.dbFailed', { detail });
 });

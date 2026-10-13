@@ -1,6 +1,7 @@
 import { Currency } from '../domain/currency';
 import { Cents } from '../domain/money';
 import { addMonths, dateInMonth, daysBetween, IsoDate, MonthKey, monthOf } from '../domain/month';
+import { t, tn, locale } from './i18n';
 
 // El símbolo va fijo: el WebView de Android trae datos de idioma recortados y con style 'currency'
 // escribe "DOP 12.50" en vez de "RD$12.50".
@@ -67,7 +68,7 @@ export function shiftMonth(month: MonthKey, delta: number): MonthKey {
 
 export function monthLabel(month: MonthKey): string {
   const [y, m] = month.split('-').map(Number);
-  const name = new Intl.DateTimeFormat('es-DO', { month: 'long', year: 'numeric' }).format(
+  const name = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(
     new Date(y, m - 1, 1),
   );
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -75,7 +76,7 @@ export function monthLabel(month: MonthKey): string {
 
 export function formatDay(date: string): string {
   const [y, m, d] = date.split('-').map(Number);
-  return new Intl.DateTimeFormat('es-DO', { day: 'numeric', month: 'short' }).format(
+  return new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short' }).format(
     new Date(y, m - 1, d),
   );
 }
@@ -91,15 +92,11 @@ export interface DueLabel {
 /** Texto de vencimiento de un gasto fijo pendiente, relativo a hoy. */
 /** Con `income`, habla de cobrar en vez de vencer (sueldo y otros ingresos fijos). */
 export function dueLabel(dueDate: IsoDate, today: IsoDate, income = false): DueLabel {
-  const [past, now] = income ? ['Debió cobrarse', 'Se cobra'] : ['Venció', 'Vence'];
+  const kind = income ? 'Income' : 'Expense';
   const diff = daysBetween(today, dueDate);
-  if (diff < 0) {
-    const n = -diff;
-    return { text: n === 1 ? `${past} ayer` : `${past} hace ${n} días`, urgent: true, overdue: true };
-  }
-  if (diff === 0) return { text: `${now} hoy`, urgent: true, overdue: false };
-  if (diff === 1) return { text: `${now} mañana`, urgent: true, overdue: false };
-  if (diff <= 3) return { text: `${now} en ${diff} días`, urgent: true, overdue: false };
-  if (diff <= 7) return { text: `${now} en ${diff} días`, urgent: false, overdue: false };
-  return { text: `${now} el ${formatDay(dueDate)}`, urgent: false, overdue: false };
+  if (diff < 0) return { text: tn(`due.past${kind}`, -diff), urgent: true, overdue: true };
+  if (diff === 0) return { text: t(`due.today${kind}`), urgent: true, overdue: false };
+  if (diff === 1) return { text: t(`due.tomorrow${kind}`), urgent: true, overdue: false };
+  if (diff <= 7) return { text: t(`due.inDays${kind}`, { count: diff }), urgent: diff <= 3, overdue: false };
+  return { text: t(`due.on${kind}`, { date: formatDay(dueDate) }), urgent: false, overdue: false };
 }

@@ -30,7 +30,7 @@ export class PinLock {
   }
 
   async setLockAfter(seconds: number): Promise<void> {
-    if (!(LOCK_AFTER_OPTIONS as readonly number[]).includes(seconds)) throw new ValidationError('Tiempo de bloqueo no válido');
+    if (!(LOCK_AFTER_OPTIONS as readonly number[]).includes(seconds)) throw new ValidationError('lockAfter');
     await this.settings.set('lock_after', String(seconds));
   }
 
@@ -41,7 +41,7 @@ export class PinLock {
   }
 
   async enable(pin: string): Promise<void> {
-    if (!/^\d{4,6}$/.test(pin)) throw new ValidationError('El PIN debe tener de 4 a 6 números');
+    if (!/^\d{4,6}$/.test(pin)) throw new ValidationError('pin');
     const salt = randomBytes(16);
     await this.settings.set('pin_salt', toB64(salt));
     await this.settings.set('pin_hash', toB64(new Uint8Array(await pbkdf2(pin, salt))));

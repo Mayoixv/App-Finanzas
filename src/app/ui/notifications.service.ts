@@ -8,6 +8,7 @@ import { addDays, monthOf } from '../domain/month';
 import { formatMoney, todayIso } from './format';
 import { deferPastQuiet, fitInSameDay } from './quiet-hours';
 import { MonthState } from './month-state';
+import { t } from './i18n';
 
 const ENABLED_KEY = 'notifications_enabled';
 /** Días hacia adelante que se programa el recordatorio diario; se reprograma cada vez que se abre la app. */
@@ -67,11 +68,16 @@ function reminderOf(r: PaymentReminder, hour: number): LocalNotificationSchema |
   if (at.getTime() <= Date.now()) return null;
   return {
     id: idOf(r.key),
-    title: r.when === 'antes' ? `Mañana vence ${r.name}` : `Hoy vence ${r.name}`,
+    title: t(r.kind === 'tarjeta' ? (r.when === 'antes' ? 'notify.cardTomorrow' : 'notify.cardToday') : r.when === 'antes' ? 'notify.tomorrow' : 'notify.today', {
+      name: r.name,
+    }),
     body:
       r.kind === 'tarjeta'
-        ? `Te falta ${formatMoney(r.amount)} del estado${r.minimum && r.minimum < r.amount ? ` (mínimo ${formatMoney(r.minimum)})` : ''}. Págalo desde Dinero › Tarjetas para no pagar intereses.`
-        : `${formatMoney(r.amount)} · Márcalo como pagado en Fijos.`,
+        ? t('notify.cardBody', {
+            amount: formatMoney(r.amount),
+            minimum: r.minimum && r.minimum < r.amount ? t('notify.cardMinimum', { amount: formatMoney(r.minimum) }) : '',
+          })
+        : t('notify.fixedBody', { amount: formatMoney(r.amount) }),
     schedule: { at, allowWhileIdle: true },
     extra: { target: r.kind === 'tarjeta' ? '/tabs/dinero?ver=tarjetas' : '/tabs/fijos' },
   };
@@ -80,11 +86,12 @@ function reminderOf(r: PaymentReminder, hour: number): LocalNotificationSchema |
 function budgetOf(b: BudgetNotice): LocalNotificationSchema {
   return {
     id: idOf(b.key),
-    title: b.level === 'exceeded' ? `Te pasaste en ${b.name}` : `Cerca del límite en ${b.name}`,
-    body:
-      b.level === 'exceeded'
-        ? `Llevas ${formatMoney(b.spent)} de ${formatMoney(b.limit)} este mes.`
-        : `Llevas ${formatMoney(b.spent)} de ${formatMoney(b.limit)}; te quedan ${formatMoney(b.limit - b.spent)}.`,
+    title: t(b.level === 'exceeded' ? 'notify.exceeded' : 'notify.near', { name: b.name }),
+    body: t(b.level === 'exceeded' ? 'notify.exceededBody' : 'notify.nearBody', {
+      spent: formatMoney(b.spent),
+      limit: formatMoney(b.limit),
+      left: formatMoney(b.limit - b.spent),
+    }),
     extra: { target: '/tabs/inicio', kind: 'presupuesto' },
   };
 }
@@ -219,8 +226,8 @@ export class NotificationsService {
       if (at.getTime() <= Date.now()) continue;
       out.push({
         id: idOf(`diario:${date}`),
-        title: '¿Registraste tus gastos de hoy?',
-        body: 'Anotarlos el mismo día es lo que hace que el balance del mes cuadre.',
+        title: t('notify.dailyTitle'),
+        body: t('notify.dailyBody'),
         schedule: { at, allowWhileIdle: true },
         extra: { target: '/tabs/movimientos' },
       });

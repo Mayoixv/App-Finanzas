@@ -1,6 +1,6 @@
 @if (rows().length) {
   <section class="card" aria-labelledby="mes-a-mes-title">
-    <h2 id="mes-a-mes-title" class="section-title">Mes a mes</h2>
+    <h2 id="mes-a-mes-title" class="section-title">{{ t('compare.title') }}</h2>
 
     @if (lines(); as list) {
       <dl class="compare">
@@ -16,19 +16,19 @@
       </dl>
     } @else {
       <p class="card-empty">
-        Sin movimientos en {{ prevName() }} para comparar.
+        {{ t('compare.noPrev', { month: prevName() }) }}
       </p>
     }
 
     @if (rows().length > 1) {
-      <h3 class="sub-title">Últimos {{ rows().length }} meses</h3>
+      <h3 class="sub-title">{{ t('compare.last', { count: rows().length }) }}</h3>
       <ul class="months">
         @for (r of rows(); track r.month) {
           <li [class.current]="r.current">
             <span class="month-head">
               <span class="month-label">{{ r.label }}</span>
               @if (r.empty) {
-                <span class="month-empty">Sin movimientos</span>
+                <span class="month-empty">{{ t('compare.empty') }}</span>
               } @else {
                 <span class="month-balance" [class.negative]="r.negative">{{
                   r.balance
@@ -42,6 +42,6 @@
         }
       </ul>
     }
-    <a routerLink="/reportes" class="reports-link">Ver reportes y gráficas</a>
+    <a routerLink="/reportes" class="reports-link">{{ t('compare.reports') }}</a>
   </section>
 }

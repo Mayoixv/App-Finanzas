@@ -1,10 +1,10 @@
 @if (visible()) {
   <section class="card" aria-labelledby="proximos-title">
-    <h2 id="proximos-title" class="section-title">Próximos 7 días</h2>
+    <h2 id="proximos-title" class="section-title">{{ t('fijos.upcoming') }}</h2>
     <ul class="rows">
       @for (r of rows(); track r.key) {
         <li>
-          <button type="button" class="row" [attr.aria-label]="r.name + ', ' + r.detail + ', ' + r.amount + '. Ver en Fijos'" (click)="open(r)">
+          <button type="button" class="row" [attr.aria-label]="t('fijos.upcomingRow', { name: r.name, detail: r.detail, amount: r.amount })" (click)="open(r)">
             <span class="row-text">
               <span class="row-title">{{ r.name }}</span>
               <span class="row-sub" [class.urgent]="r.urgent" [class.overdue]="r.overdue">{{ r.detail }}</span>

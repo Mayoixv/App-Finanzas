@@ -1,106 +1,371 @@
 <ion-content class="surface-light" [fullscreen]="true">
-  <div class="wrap">
-    @if (stepNumber() > 0) {
-      <p class="progress" aria-live="polite">Paso {{ stepNumber() }} de {{ total }}</p>
-    }
-
-    @switch (step()) {
-      @case ('portada') {
-        <div class="step cover">
-          <img class="cover-icon" src="assets/icon/app-cat.png" alt="" width="160" height="160" />
-          <h1 class="title cover-title">Tu mejor decisión financiera es confiar en nosotros</h1>
-          <p class="text">Kuarto te ayuda a saber en qué se va tu dinero, mes a mes. Todo se queda en este teléfono.</p>
-          <button type="button" class="btn-primary main" (click)="next()">Empezar</button>
-        </div>
-      }
-
-      @case ('nombre') {
-        <div class="step">
-          <h1 class="title">¿Cómo te llamas?</h1>
-          <p class="text">Solo para saludarte en Inicio. Puedes dejarlo en blanco o cambiarlo luego en Ajustes.</p>
-          <div class="field">
-            <ion-input
-              label="Tu nombre"
-              label-placement="floating"
-              autocapitalize="words"
-              autocomplete="given-name"
-              [maxlength]="40"
-              [value]="name()"
-              (ionInput)="name.set(($event.detail.value ?? '').toString())"
-              (keyup.enter)="saveName()"
-            ></ion-input>
-          </div>
-          @if (error(); as message) {
-            <p class="error" role="alert">{{ message }}</p>
+  @if (step() === 'intro') {
+    <app-intro (done)="next()"></app-intro>
+  } @else {
+    <div class="wrap">
+      @if (stepNumber() > 0) {
+        <div class="top">
+          @if (stepNumber() > 1) {
+            <button type="button" class="back" (click)="back()">{{ t('common.goBack') }}</button>
           }
-          <button type="button" class="btn-primary main" [disabled]="busy()" (click)="saveName()">
-            {{ name().trim() ? 'Seguir' : 'Saltar' }}
-          </button>
+          <p class="progress" aria-live="polite">{{ t('onboarding.progress', { n: stepNumber(), total: total }) }}</p>
+        </div>
+        <div class="bar" role="progressbar" aria-valuemin="0" [attr.aria-valuemax]="total" [attr.aria-valuenow]="stepNumber()" [attr.aria-label]="t('onboarding.progress', { n: stepNumber(), total: total })">
+          <span class="bar-fill" [style.width.%]="(stepNumber() / total) * 100"></span>
         </div>
       }
 
-      @case ('moneda') {
-        <div class="step">
-        <h1 class="title">¿En qué moneda?</h1>
-        <p class="text">Solo cambia el símbolo de los montos. Puedes cambiarla luego en Ajustes.</p>
-        <div class="choices" role="radiogroup" aria-label="Moneda">
-          @for (c of currencies; track c.code) {
-            <button
-              type="button"
-              role="radio"
-              class="choice"
-              [attr.aria-checked]="currencyState.currency() === c.code"
-              (click)="pickCurrency(c.code)"
-            >
-              {{ c.label }}
-            </button>
-          }
-        </div>
-        </div>
-      }
-
-      @case ('dinero') {
-        <div class="step">
-          <h1 class="title">¿Dónde tienes tu dinero?</h1>
-          <p class="text">Así Disponible muestra lo que de verdad tienes. Puedes omitirlo y agregarlo luego en Dinero.</p>
-          <div class="field">
-            <ion-input
-              label="Efectivo que tienes hoy"
-              label-placement="floating"
-              type="number"
-              inputmode="decimal"
-              placeholder="0.00"
-              [value]="cash()"
-              (ionInput)="cash.set(($event.detail.value ?? '').toString())"
-            ></ion-input>
+      @switch (step()) {
+        @case ('nombre') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.nameTitle') }}</h1>
+            <p class="text">{{ t('onboarding.nameText') }}</p>
+            <div class="field">
+              <ion-input
+                [label]="t('onboarding.firstName')"
+                label-placement="floating"
+                autocapitalize="words"
+                autocomplete="given-name"
+                [maxlength]="40"
+                [value]="firstName()"
+                (ionInput)="firstName.set(($event.detail.value ?? '').toString())"
+              ></ion-input>
+            </div>
+            <div class="field">
+              <ion-input
+                [label]="t('onboarding.lastName')"
+                label-placement="floating"
+                autocapitalize="words"
+                autocomplete="family-name"
+                [maxlength]="40"
+                [value]="lastName()"
+                (ionInput)="lastName.set(($event.detail.value ?? '').toString())"
+                (keyup.enter)="saveName()"
+              ></ion-input>
+            </div>
+            @if (error(); as message) {
+              <p class="error" role="alert">{{ message }}</p>
+            }
+            <button type="button" class="btn-primary main" (click)="saveName()">{{ t('onboarding.continue') }}</button>
+            @if (cloud.available) {
+              <button type="button" class="btn-secondary add google" [disabled]="busy()" (click)="withGoogle()">{{ t('onboarding.google') }}</button>
+              <p class="hint-small">{{ t('onboarding.googleHint') }}</p>
+            }
           </div>
-          @if (added().length) {
-            <ul class="added" aria-label="Agregadas">
-              @for (a of added(); track a.id) {
-                <li>{{ a.name }} · {{ typeLabel[a.type] }}</li>
+        }
+
+        @case ('idioma') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.langTitle') }}</h1>
+            <p class="text">{{ t('onboarding.langText') }}</p>
+            <p class="group-label">{{ t('ajustes.language') }}</p>
+            <div class="choices" role="radiogroup" [attr.aria-label]="t('ajustes.language')">
+              @for (l of languages; track l.code) {
+                <button type="button" role="radio" class="choice" [attr.lang]="l.code" [attr.aria-checked]="language() === l.code" (click)="pickLanguage(l.code)">
+                  {{ l.label }}
+                </button>
               }
-            </ul>
-          }
-          <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="addAccount('banco')">Agregar cuenta de banco</button>
-          <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="addAccount('tarjeta')">Agregar tarjeta de crédito</button>
-          @if (error(); as message) {
-            <p class="error" role="alert">{{ message }}</p>
-          }
-          <button type="button" class="btn-primary main" [disabled]="busy()" (click)="saveCash()">
-            {{ cash().trim() || added().length ? 'Seguir' : 'Omitir' }}
-          </button>
-        </div>
-      }
+            </div>
+            <p class="group-label">{{ t('ajustes.currency') }}</p>
+            <div class="choices" role="radiogroup" [attr.aria-label]="t('ajustes.currency')">
+              @for (c of currencies(); track c.code) {
+                <button type="button" role="radio" class="choice" [attr.aria-checked]="currency() === c.code" (click)="pickCurrency(c.code)">
+                  {{ c.label }}
+                </button>
+              }
+            </div>
+            <button type="button" class="btn-primary main" (click)="next()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
 
-      @case ('recorrido') {
-        <div class="step">
-          <h1 class="title">{{ name().trim() ? '¿Te mostramos cómo funciona, ' + name().trim() + '?' : '¿Te mostramos cómo funciona?' }}</h1>
-          <p class="text">Un recorrido corto por lo que puedes hacer en cada sección. También lo encuentras luego en Ajustes.</p>
-          <button type="button" class="btn-primary main" [disabled]="busy()" (click)="finish(true)">Ver el recorrido</button>
-          <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="finish()">Saltar</button>
-        </div>
-      }
+        @case ('objetivo') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.goalTitle') }}</h1>
+            <p class="text">{{ t('onboarding.goalText') }}</p>
+            <div class="choices" role="radiogroup" [attr.aria-label]="t('onboarding.goalTitle')">
+              @for (g of goals; track g) {
+                <button type="button" role="radio" class="choice with-sub" [attr.aria-checked]="goal() === g" (click)="pickGoal(g)">
+                  <span>{{ t('onboarding.goals.' + g + '.title') }}</span>
+                  <span class="choice-sub">{{ t('onboarding.goals.' + g + '.sub') }}</span>
+                </button>
+              }
+            </div>
+            <button type="button" class="skip" (click)="next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
 
-    }
-  </div>
+        @case ('dinero') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.moneyTitle') }}</h1>
+            <p class="text">{{ t('onboarding.moneyText') }}</p>
+            <div class="field">
+              <ion-input
+                [label]="t('onboarding.cashToday', { currency: currency() })"
+                label-placement="floating"
+                type="number"
+                inputmode="decimal"
+                placeholder="0.00"
+                [value]="cash()"
+                (ionInput)="cash.set(($event.detail.value ?? '').toString())"
+              ></ion-input>
+            </div>
+            @if (accounts().length) {
+              <ul class="drafts">
+                @for (a of accounts(); track a.tempId) {
+                  <li>
+                    <button type="button" class="draft" (click)="addAccount(a.fields.type, a)">
+                      <span class="draft-text">{{ accountLabel(a) }}</span>
+                      <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                    <button type="button" class="remove" [attr.aria-label]="t('onboarding.remove', { name: a.fields.name })" (click)="removeAccount(a)">
+                      <ion-icon name="close" aria-hidden="true"></ion-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+            <button type="button" class="btn-secondary add" (click)="addAccount('banco')">{{ t('onboarding.addBank') }}</button>
+            <button type="button" class="btn-secondary add" (click)="addAccount('tarjeta')">{{ t('onboarding.addCard') }}</button>
+            @if (error(); as message) {
+              <p class="error" role="alert">{{ message }}</p>
+            }
+            <button type="button" class="btn-primary main" (click)="saveCash()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="cash.set(''); next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
+
+        @case ('sueldo') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.salaryTitle') }}</h1>
+            <p class="text">{{ t('onboarding.salaryText') }}</p>
+            <p class="group-label">{{ t('onboarding.salaryVaries') }}</p>
+            <div class="choices" role="radiogroup" [attr.aria-label]="t('onboarding.salaryVaries')">
+              <button type="button" role="radio" class="choice" [attr.aria-checked]="salaryVaries() === false" (click)="setSalaryVaries(false)">
+                {{ t('onboarding.salaryStable') }}
+              </button>
+              <button type="button" role="radio" class="choice" [attr.aria-checked]="salaryVaries() === true" (click)="setSalaryVaries(true)">
+                {{ t('onboarding.salaryChanges') }}
+              </button>
+            </div>
+            @if (salaryVaries() === true) {
+              <p class="tip">{{ t('onboarding.salaryVariesTip') }}</p>
+            }
+            @if (salary(); as s) {
+              <ul class="drafts">
+                <li>
+                  <button type="button" class="draft" (click)="editSalary()">
+                    <span class="draft-text">{{ groupLabel(s) }}</span>
+                    <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                  </button>
+                </li>
+              </ul>
+              <p class="tip">{{ t('onboarding.salaryTip') }}</p>
+            }
+            <button type="button" class="btn-primary main" (click)="next()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="salary.set(null); salaryVaries.set(null); next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
+
+        @case ('fijos') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.fixedTitle') }}</h1>
+            <p class="text">{{ t('onboarding.fixedText') }}</p>
+            <div class="chips">
+              @for (f of commonFixed; track f.key) {
+                <button type="button" class="chip" (click)="addFixed(f.key, f.categoryId)">
+                  <ion-icon name="add" aria-hidden="true"></ion-icon>
+                  {{ t('onboarding.fixedNames.' + f.key) }}
+                </button>
+              }
+              <button type="button" class="chip" (click)="addFixed()">
+                <ion-icon name="add" aria-hidden="true"></ion-icon>
+                {{ t('onboarding.otherFixed') }}
+              </button>
+            </div>
+            @if (fixed().length) {
+              <ul class="drafts">
+                @for (g of fixed(); track $index) {
+                  <li>
+                    <button type="button" class="draft" (click)="addFixed(undefined, undefined, g)">
+                      <span class="draft-text">{{ groupLabel(g) }}</span>
+                      <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                    <button type="button" class="remove" [attr.aria-label]="t('onboarding.remove', { name: g[0].name })" (click)="removeFixed(g)">
+                      <ion-icon name="close" aria-hidden="true"></ion-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+            <button type="button" class="btn-primary main" (click)="next()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
+
+        @case ('deudas') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.debtTitle') }}</h1>
+            <p class="text">{{ t('onboarding.debtText') }}</p>
+            @if (debts().length) {
+              <ul class="drafts">
+                @for (d of debts(); track $index) {
+                  <li class="with-toggle">
+                    <div class="draft-row">
+                      <button type="button" class="draft" (click)="addDebt(d)">
+                        <span class="draft-text">{{ d.fields.name }} · {{ money(d.fields.principal) }}</span>
+                        <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                      </button>
+                      <button type="button" class="remove" [attr.aria-label]="t('onboarding.remove', { name: d.fields.name })" (click)="removeDebt(d)">
+                        <ion-icon name="close" aria-hidden="true"></ion-icon>
+                      </button>
+                    </div>
+                    @if (d.fields.direction === 'debo' && d.fields.termMonths) {
+                      <ion-toggle justify="space-between" [checked]="d.asFixed" (ionChange)="setDebtFixed(d, $event.detail.checked)">
+                        <span class="toggle-text">{{ t('onboarding.debtToFixed') }}</span>
+                      </ion-toggle>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            <button type="button" class="btn-secondary add" (click)="addDebt()">{{ t('onboarding.addDebt') }}</button>
+            <button type="button" class="btn-primary main" (click)="next()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
+
+        @case ('metas') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.goalsTitle') }}</h1>
+            <p class="text">{{ t('onboarding.goalsText') }}</p>
+            @if (savingGoals().length) {
+              <ul class="drafts">
+                @for (g of savingGoals(); track $index) {
+                  <li>
+                    <button type="button" class="draft" (click)="addGoal(g)">
+                      <span class="draft-text">{{ g.name }} · {{ money(g.targetAmount) }}</span>
+                      <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                    <button type="button" class="remove" [attr.aria-label]="t('onboarding.remove', { name: g.name })" (click)="removeGoal(g)">
+                      <ion-icon name="close" aria-hidden="true"></ion-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+            <button type="button" class="btn-secondary add" (click)="addGoal()">{{ t('onboarding.addGoal') }}</button>
+            <button type="button" class="btn-primary main" (click)="next()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
+
+        @case ('limite') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.limitTitle') }}</h1>
+            <p class="text">{{ t('onboarding.limitText') }}</p>
+            <div class="field">
+              <ion-input
+                [label]="t('onboarding.limitLabel', { currency: currency() })"
+                label-placement="floating"
+                type="number"
+                inputmode="decimal"
+                placeholder="0.00"
+                [value]="limit()"
+                (ionInput)="limit.set(($event.detail.value ?? '').toString())"
+              ></ion-input>
+            </div>
+            @if (error(); as message) {
+              <p class="error" role="alert">{{ message }}</p>
+            }
+            <button type="button" class="btn-primary main" (click)="saveLimit()">{{ t('onboarding.continue') }}</button>
+            <button type="button" class="skip" (click)="limit.set(''); next()">{{ t('onboarding.skip') }}</button>
+          </div>
+        }
+
+        @case ('resumen') {
+          <div class="step">
+            <h1 class="title">{{ t('onboarding.summaryTitle') }}</h1>
+            <p class="text">{{ t('onboarding.summaryText') }}</p>
+            <dl class="summary">
+              <div>
+                <dt>{{ t('onboarding.firstName') }}</dt>
+                <dd>{{ firstName() }} {{ lastName() }}</dd>
+              </div>
+              <div>
+                <dt>{{ t('ajustes.currency') }}</dt>
+                <dd>{{ currency() }}</dd>
+              </div>
+              @if (goal(); as g) {
+                <div>
+                  <dt>{{ t('onboarding.goalShort') }}</dt>
+                  <dd>{{ t('onboarding.goals.' + g + '.title') }}</dd>
+                </div>
+              }
+              @if (cashCents()) {
+                <div>
+                  <dt>{{ t('accountType.efectivo') }}</dt>
+                  <dd>{{ money(cashCents()!) }}</dd>
+                </div>
+              }
+              @for (a of accounts(); track a.tempId) {
+                <div>
+                  <dt>{{ t('onboarding.summaryAccount') }}</dt>
+                  <dd>{{ accountLabel(a) }}</dd>
+                </div>
+              }
+              @if (salary(); as s) {
+                <div>
+                  <dt>{{ t('onboarding.summarySalary') }}</dt>
+                  <dd>{{ groupLabel(s) }}</dd>
+                </div>
+              }
+              @for (g of fixed(); track $index) {
+                <div>
+                  <dt>{{ t('onboarding.summaryFixed') }}</dt>
+                  <dd>{{ groupLabel(g) }}</dd>
+                </div>
+              }
+              @for (d of debts(); track $index) {
+                <div>
+                  <dt>{{ t('onboarding.summaryDebt') }}</dt>
+                  <dd>{{ d.fields.name }} · {{ money(d.fields.principal) }}{{ d.asFixed ? ' · ' + t('onboarding.summaryInFixed') : '' }}</dd>
+                </div>
+              }
+              @for (g of savingGoals(); track $index) {
+                <div>
+                  <dt>{{ t('onboarding.summaryGoal') }}</dt>
+                  <dd>{{ g.name }} · {{ money(g.targetAmount) }}</dd>
+                </div>
+              }
+              @if (limitCents(); as l) {
+                <div>
+                  <dt>{{ t('onboarding.summaryLimit') }}</dt>
+                  <dd>{{ money(l) }}</dd>
+                </div>
+              }
+            </dl>
+            @if (nothingToCreate()) {
+              <p class="tip">{{ t('onboarding.summaryEmpty') }}</p>
+            }
+            <p class="tip">{{ t('onboarding.summaryEdit') }}</p>
+            @if (error(); as message) {
+              <p class="error" role="alert">{{ message }}</p>
+            }
+            <button type="button" class="btn-primary main" [disabled]="busy()" (click)="confirm()">{{ t('onboarding.create') }}</button>
+            <button type="button" class="btn-secondary add" [disabled]="busy()" (click)="back()">{{ t('onboarding.change') }}</button>
+          </div>
+        }
+
+        @case ('listo') {
+          <div class="step cover">
+            <h1 class="title">{{ t('onboarding.doneTitle', { name: firstName().trim() }) }}</h1>
+            <p class="text">{{ t('onboarding.tourText') }}</p>
+            <button type="button" class="btn-primary main" (click)="finish(true)">{{ t('onboarding.seeTour') }}</button>
+            <button type="button" class="btn-secondary add" (click)="finish(false)">{{ t('onboarding.notNow') }}</button>
+          </div>
+        }
+      }
+    </div>
+  }
 </ion-content>

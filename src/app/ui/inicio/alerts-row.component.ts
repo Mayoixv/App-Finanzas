@@ -7,6 +7,7 @@ import { APP_CONTAINER } from '../../app.container';
 import { Alerts } from '../../application/use-cases/get-alerts';
 import { currentMonth, todayIso } from '../format';
 import { MonthState } from '../month-state';
+import { t, tn } from '../i18n';
 
 interface Alert {
   key: string;
@@ -18,8 +19,9 @@ interface Alert {
 
 /** "Luz", "Luz y Agua", "Luz, Agua y 2 más". */
 function names(list: string[]): string {
-  if (list.length <= 2) return list.join(' y ');
-  return `${list.slice(0, 2).join(', ')} y ${list.length - 2} más`;
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return t('alerts.two', { a: list[0], b: list[1] });
+  return t('alerts.more', { a: list[0], b: list[1], count: list.length - 2 });
 }
 
 function toAlerts(a: Alerts): Alert[] {
@@ -29,7 +31,7 @@ function toAlerts(a: Alerts): Alert[] {
       key: 'overdue',
       icon: 'alert-circle',
       tone: 'danger',
-      text: `${a.overdue.length === 1 ? 'Venció' : 'Vencieron'} sin pagar: ${names(a.overdue)}`,
+      text: tn('alerts.overdue', a.overdue.length, { names: names(a.overdue) }),
       target: 'fijos',
     });
   }
@@ -38,7 +40,7 @@ function toAlerts(a: Alerts): Alert[] {
       key: 'soon',
       icon: 'time-outline',
       tone: 'warning',
-      text: `${a.dueSoon.length === 1 ? 'Vence' : 'Vencen'} en 3 días o menos: ${names(a.dueSoon)}`,
+      text: tn('alerts.soon', a.dueSoon.length, { names: names(a.dueSoon) }),
       target: 'fijos',
     });
   }
@@ -47,19 +49,19 @@ function toAlerts(a: Alerts): Alert[] {
       key: 'cards-due',
       icon: 'card-outline',
       tone: 'danger',
-      text: `Paga ${a.cardsDue.length === 1 ? 'la tarjeta' : 'las tarjetas'} ${names(a.cardsDue)}: el pago vence pronto`,
+      text: tn('alerts.cardsDue', a.cardsDue.length, { names: names(a.cardsDue) }),
       target: 'cuentas',
     });
   }
   if (a.exceeded.length) {
-    out.push({ key: 'exceeded', icon: 'alert-circle', tone: 'danger', text: `Te pasaste en ${names(a.exceeded)}`, target: 'presupuestos' });
+    out.push({ key: 'exceeded', icon: 'alert-circle', tone: 'danger', text: t('alerts.exceeded', { names: names(a.exceeded) }), target: 'presupuestos' });
   }
   if (a.nearLimit.length) {
     out.push({
       key: 'near',
       icon: 'trending-up-outline',
       tone: 'warning',
-      text: `Cerca del límite: ${names(a.nearLimit)}`,
+      text: t('alerts.near', { names: names(a.nearLimit) }),
       target: 'presupuestos',
     });
   }
@@ -68,7 +70,7 @@ function toAlerts(a: Alerts): Alert[] {
       key: 'cards-use',
       icon: 'card-outline',
       tone: 'warning',
-      text: `Usas el 30% o más del límite: ${names(a.cardsHighUse)}`,
+      text: t('alerts.cardsUse', { names: names(a.cardsHighUse) }),
       target: 'cuentas',
     });
   }
@@ -83,6 +85,7 @@ function toAlerts(a: Alerts): Alert[] {
   imports: [IonIcon],
 })
 export class AlertsRowComponent {
+  protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly router = inject(Router);
   private readonly monthState = inject(MonthState);

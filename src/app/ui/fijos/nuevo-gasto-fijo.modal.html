@@ -1,22 +1,22 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar fijo' : 'Nuevo fijo' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ isEdit() ? t('fijo.edit') : t('fijo.new') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
-    <div class="kind" role="radiogroup" aria-label="Tipo de fijo">
-      <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">Gasto</button>
-      <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">Ingreso</button>
+    <div class="kind" role="radiogroup" [attr.aria-label]="t('fijo.kind')">
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">{{ t('common.expense') }}</button>
+      <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">{{ t('common.income') }}</button>
     </div>
 
     <div class="field">
       <ion-input
-        label="Nombre"
+        [label]="t('common.name')"
         label-placement="floating"
-        [placeholder]="kind() === 'ingreso' ? 'Sueldo, alquiler que cobras' : 'Alquiler, comida del mes, internet'"
+        [placeholder]="kind() === 'ingreso' ? t('fijo.incomePlaceholder') : t('fijo.expensePlaceholder')"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -32,11 +32,11 @@
     </div>
 
     @if (kind() === 'ingreso' && !isEdit()) {
-      <p class="group-label" id="pay-mode">¿Cada cuánto cobras?</p>
+      <p class="group-label" id="pay-mode">{{ t('fijo.howOften') }}</p>
       <div class="kind three" role="radiogroup" aria-labelledby="pay-mode">
-        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'una'" (click)="setPayMode('una')">Una vez</button>
-        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'quincenal'" (click)="setPayMode('quincenal')">Quincenal</button>
-        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'otra'" (click)="setPayMode('otra')">Otra</button>
+        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'una'" (click)="setPayMode('una')">{{ t('fijo.once') }}</button>
+        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'quincenal'" (click)="setPayMode('quincenal')">{{ t('fijo.biweekly') }}</button>
+        <button type="button" role="radio" [attr.aria-checked]="payMode() === 'otra'" (click)="setPayMode('otra')">{{ t('fijo.other') }}</button>
       </div>
     }
 
@@ -44,16 +44,16 @@
       @for (p of payments(); track $index; let i = $index) {
         <div class="payment-row t-row-enter">
           <div class="payment-head">
-            <span class="payment-title">{{ i + 1 }}.º cobro</span>
+            <span class="payment-title">{{ t('fijo.payment', { n: i + 1 }) }}</span>
             @if (payMode() === 'otra' && payments().length > 2) {
-              <button type="button" class="remove" [attr.aria-label]="'Quitar cobro ' + (i + 1)" (click)="removePayment(i)">
+              <button type="button" class="remove" [attr.aria-label]="t('fijo.removePayment', { n: i + 1 })" (click)="removePayment(i)">
                 <ion-icon name="close" aria-hidden="true"></ion-icon>
               </button>
             }
           </div>
-          <app-day-picker label="Día de cobro" [value]="p.day" (valueChange)="updatePayment(i, { day: $event })"></app-day-picker>
+          <app-day-picker [label]="t('fijo.payDay')" [value]="p.day" (valueChange)="updatePayment(i, { day: $event })"></app-day-picker>
           <ion-input
-            label="Monto ({{ currency() }})"
+            [label]="t('common.amount', { currency: currency() })"
             label-placement="floating"
             type="number"
             inputmode="decimal"
@@ -65,12 +65,12 @@
         </div>
       }
       @if (payMode() === 'otra' && payments().length < maxPayments) {
-        <button type="button" class="btn-secondary add-payment" (click)="addPayment()">+ Agregar otro cobro</button>
+        <button type="button" class="btn-secondary add-payment" (click)="addPayment()">{{ t('fijo.addPayment') }}</button>
       }
     } @else {
       <div class="field">
         <ion-input
-          label="Monto ({{ currency() }})"
+          [label]="t('common.amount', { currency: currency() })"
           label-placement="floating"
           type="number"
           inputmode="decimal"
@@ -83,7 +83,7 @@
 
       <div class="field">
         <app-day-picker
-          [label]="kind() === 'ingreso' ? 'Día de cobro' : 'Día en que vence'"
+          [label]="kind() === 'ingreso' ? t('fijo.payDay') : t('fijo.dueDay')"
           [value]="dueDay()"
           (valueChange)="dueDay.set($event)"
         ></app-day-picker>
@@ -92,14 +92,14 @@
 
     @if (!multi()) {
       <div class="field">
-        <app-select-field label="Se repite" [options]="frequencies" [value]="frequency()" (valueChange)="frequency.set($event!)"></app-select-field>
+        <app-select-field [label]="t('fijo.repeats')" [options]="frequencies()" [value]="frequency()" (valueChange)="frequency.set($event!)"></app-select-field>
       </div>
     }
 
     @if (accounts().length > 1) {
       <div class="field">
         <app-select-field
-          [label]="kind() === 'ingreso' ? 'Se cobra en' : 'Se paga con'"
+          [label]="kind() === 'ingreso' ? t('fijo.chargedTo') : t('fijo.paidWith')"
           [options]="accountOptions()"
           [value]="accountId()"
           (valueChange)="accountId.set($event!)"
@@ -112,21 +112,21 @@
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isEdit() ? 'Guardar cambios' : 'Guardar fijo' }}
+      {{ isEdit() ? t('common.saveChanges') : t('fijo.save') }}
     </button>
 
-    @if (isEdit()) {
-      <p class="hint">Los cambios aplican desde {{ monthLabel() }}. Los meses anteriores y lo ya pagado no cambian.</p>
+    @if (isEdit() && !draft) {
+      <p class="hint">{{ t('fijo.appliesFrom', { month: monthLabel() }) }}</p>
       @if (isPaused()) {
-        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="resume()">Reanudar</button>
+        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="resume()">{{ t('fijos.resume') }}</button>
       } @else {
-        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="pause()">Pausar…</button>
+        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="pause()">{{ t('fijo.pause') }}</button>
       }
       @if (categoryId() === 'cat-pago-deudas') {
-        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="createDebt()">Crear deuda a partir de este pago</button>
+        <button type="button" class="btn-secondary pause" [disabled]="saving()" (click)="createDebt()">{{ t('fijo.createDebt') }}</button>
       }
       <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">
-        Eliminar fijo
+        {{ t('fijo.delete') }}
       </button>
     }
   </div>
@@ -134,7 +134,7 @@
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Fijo guardado' }}</p>
+      <p class="done-text">{{ isEdit() ? t('common.changesSaved') : t('fijo.saved') }}</p>
     }
   </div>
 </ion-content>

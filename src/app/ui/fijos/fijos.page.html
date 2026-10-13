@@ -1,7 +1,7 @@
 <ion-content class="surface-dark" [fullscreen]="true">
   <header class="screen-head">
     <div class="title-row">
-      <h1 class="screen-title">Fijos</h1>
+      <h1 class="screen-title">{{ t('tabs.fijos.name') }}</h1>
       <app-help-button topic="fijos"></app-help-button>
     </div>
     <app-month-switcher></app-month-switcher>
@@ -11,37 +11,37 @@
 
   <app-loading [show]="!rows() && !failed()"></app-loading>
   @if (failed()) {
-    <p class="notice">No se pudieron leer los gastos fijos. Cambia de mes y vuelve, o reinicia la aplicación.</p>
+    <p class="notice">{{ t('fijos.failed') }}</p>
   } @else if (rows(); as list) {
     @if (list.length === 0) {
       <section class="empty">
         @if (hasAny()) {
-          <p class="empty-title">Nada que pagar en {{ monthState.label() }}</p>
-          <p class="empty-text">Tus fijos de otros meses no tocan este mes.</p>
-          <button type="button" class="btn-primary empty-action" (click)="add()">Agregar pago fijo</button>
+          <p class="empty-title">{{ t('fijos.nothingIn', { month: monthState.label() }) }}</p>
+          <p class="empty-text">{{ t('fijos.otherMonths') }}</p>
+          <button type="button" class="btn-primary empty-action" (click)="add()">{{ t('fijos.add') }}</button>
         } @else {
-          <p class="empty-title">Agrega tu primer pago fijo</p>
-          <p class="empty-text">Alquiler, luz, internet o tu sueldo. Lo anotas una vez y aparece cada mes.</p>
-          <button type="button" class="btn-primary empty-action" (click)="add()">Agregar pago fijo</button>
+          <p class="empty-title">{{ t('fijos.firstTitle') }}</p>
+          <p class="empty-text">{{ t('fijos.firstText') }}</p>
+          <button type="button" class="btn-primary empty-action" (click)="add()">{{ t('fijos.add') }}</button>
         }
       </section>
     } @else {
       <section class="summary" aria-labelledby="pendiente-label">
         @if (totals().total === 0) {
           <p id="pendiente-label" class="summary-label">{{ monthState.label() }}</p>
-          <p class="summary-amount">Sin gastos por pagar</p>
+          <p class="summary-amount">{{ t('fijos.noneToPay') }}</p>
         } @else if (totals().pending > 0) {
-          <p id="pendiente-label" class="summary-label">Por pagar en {{ monthState.label() }}</p>
+          <p id="pendiente-label" class="summary-label">{{ t('fijos.toPayIn', { month: monthState.label() }) }}</p>
           <p class="summary-amount">{{ money(totals().pending) }}</p>
         } @else {
           <p id="pendiente-label" class="summary-label">{{ monthState.label() }}</p>
-          <p class="summary-amount">Todo pagado</p>
+          <p class="summary-amount">{{ t('fijos.allPaid') }}</p>
         }
         @if (totals().total > 0) {
           <div
             class="bar"
             role="progressbar"
-            aria-label="Gastos fijos pagados"
+            [attr.aria-label]="t('fijos.progress')"
             aria-valuemin="0"
             aria-valuemax="100"
             [attr.aria-valuenow]="totals().percentPaid"
@@ -49,15 +49,15 @@
             <span class="bar-fill" [style.width.%]="totals().percentPaid"></span>
           </div>
           <p class="summary-note">
-            Pagado {{ money(totals().paid) }} de {{ money(totals().total) }} · {{ percent(totals().percentPaid) }}
+            {{ t('fijos.paidOf', { paid: money(totals().paid), total: money(totals().total), percent: percent(totals().percentPaid) }) }}
           </p>
         }
         @if (totals().toReceive > 0) {
-          <p class="summary-note">Ingresos por recibir: {{ money(totals().toReceive) }}</p>
+          <p class="summary-note">{{ t('fijos.toReceive', { amount: money(totals().toReceive) }) }}</p>
         }
         @if (subscriptions(); as sub) {
           <p class="summary-note">
-            {{ sub.count === 1 ? '1 suscripción' : sub.count + ' suscripciones' }}: {{ money(sub.monthly) }} al mes · {{ money(sub.yearly) }} al año
+            {{ tn('fijos.subscriptions', sub.count, { monthly: money(sub.monthly), yearly: money(sub.yearly) }) }}
           </p>
         }
       </section>
@@ -67,7 +67,7 @@
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
             <!-- Toda la fila abre la edición: una zona táctil grande en vez de un lápiz pequeño. -->
             <button type="button" class="item-head item-main" [class.income]="row.isIncome" (click)="edit(row)">
-              <span class="sr-only">Editar</span>
+              <span class="sr-only">{{ t('fijos.edit') }}</span>
               <span class="avatar" [style.background]="row.color" aria-hidden="true"><ion-icon [name]="row.icon"></ion-icon></span>
               <span class="item-text">
                 <span class="item-name">{{ row.name }}</span>
@@ -81,12 +81,12 @@
                 @if (row.isIncome) {
                   <span class="status-chip received">
                     <ion-icon name="arrow-down-circle-outline" aria-hidden="true"></ion-icon>
-                    Recibido
+                    {{ t('status.received') }}
                   </span>
                 } @else {
                   <span class="status-chip paid">
                     <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-                    Pagado
+                    {{ t('status.paid') }}
                   </span>
                 }
                 @if (flashId() === row.id) {
@@ -96,22 +96,22 @@
                 @if (row.overdue) {
                   <span class="status-chip overdue">
                     <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
-                    Vencido
+                    {{ t('status.overdue') }}
                   </span>
                 } @else {
                   <span class="status-chip pending">
                     <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
-                    Pendiente
+                    {{ t('status.pending') }}
                   </span>
                 }
                 <button
                   type="button"
                   class="btn-secondary pay"
-                  [attr.aria-label]="'Marcar ' + row.name + (row.isIncome ? ' como recibido' : ' como pagado')"
+                  [attr.aria-label]="t(row.isIncome ? 'fijos.markReceived' : 'fijos.markPaid', { name: row.name })"
                   [disabled]="payingId() === row.id"
                   (click)="pay(row)"
                 >
-                  {{ row.isIncome ? 'Recibido' : 'Pagar' }}
+                  {{ row.isIncome ? t('status.received') : t('common.pay') }}
                 </button>
               }
             </div>
@@ -121,7 +121,7 @@
     }
 
     @if (installments().length) {
-      <h2 class="section-title paused-title">Cuotas de deudas</h2>
+      <h2 class="section-title paused-title">{{ t('fijos.installments') }}</h2>
       <ul [class.t-still]="!monthState.animateLists()" class="list">
         @for (c of installments(); track c.view.debt.id) {
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item">
@@ -129,7 +129,7 @@
               <div class="item-text">
                 <span class="item-name">{{ c.view.debt.name }}</span>
                 <span class="item-detail" [class.urgent]="!c.paid && installmentDue(c).urgent" [class.overdue]="!c.paid && installmentDue(c).overdue">
-                  Cuota {{ c.number }} de {{ c.of }} · {{ c.paid ? 'Pagada' : installmentDue(c).text }}
+                  {{ t('fijos.installment', { n: c.number, of: c.of, status: c.paid ? t('status.paidF') : installmentDue(c).text }) }}
                 </span>
               </div>
               <span class="item-amount">{{ money(c.amount) }}</span>
@@ -138,20 +138,20 @@
               @if (c.paid) {
                 <span class="status-chip paid">
                   <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-                  Pagada
+                  {{ t('status.paidF') }}
                 </span>
               } @else if (installmentDue(c).overdue) {
                 <span class="status-chip overdue">
                   <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
-                  Vencida
+                  {{ t('status.overdueF') }}
                 </span>
               } @else {
                 <span class="status-chip pending">
                   <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
-                  Pendiente
+                  {{ t('status.pending') }}
                 </span>
-                <button type="button" class="btn-secondary pay" [attr.aria-label]="'Registrar pago de ' + c.view.debt.name" (click)="payInstallment(c)">
-                  Registrar pago
+                <button type="button" class="btn-secondary pay" [attr.aria-label]="t('fijos.registerPaymentOf', { name: c.view.debt.name })" (click)="payInstallment(c)">
+                  {{ t('fijos.registerPayment') }}
                 </button>
               }
             </div>
@@ -161,7 +161,7 @@
     }
 
     @if (paused().length) {
-      <h2 class="section-title paused-title">En pausa</h2>
+      <h2 class="section-title paused-title">{{ t('fijos.paused') }}</h2>
       <ul [class.t-still]="!monthState.animateLists()" class="list">
         @for (p of paused(); track p.id) {
           <li animate.enter="t-row-enter" animate.leave="t-row-leave" class="item paused">
@@ -173,7 +173,7 @@
               <span class="item-amount">{{ money(p.amount) }}</span>
             </div>
             <div class="item-foot">
-              <button type="button" class="btn-secondary pay" [attr.aria-label]="'Reanudar ' + p.name" (click)="resume(p)">Reanudar</button>
+              <button type="button" class="btn-secondary pay" [attr.aria-label]="t('fijos.resumeName', { name: p.name })" (click)="resume(p)">{{ t('fijos.resume') }}</button>
             </div>
           </li>
         }

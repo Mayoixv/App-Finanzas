@@ -1,5 +1,5 @@
 @if (visible()) {
-  <section class="alerts" aria-label="Alertas">
+  <section class="alerts" [attr.aria-label]="t('alerts.label')">
     @for (a of alerts(); track a.key) {
       <button type="button" [class]="'alert ' + a.tone" (click)="open(a)">
         <ion-icon class="icon" [name]="a.icon" aria-hidden="true"></ion-icon>

@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { t } from './i18n';
 
 /**
  * Indicador de carga. Aparece solo si la espera pasa de 0.3 s (un retraso en CSS), para no parpadear en cargas
@@ -10,7 +11,7 @@ import { Component, input } from '@angular/core';
     @if (show()) {
       <div class="loading" role="status">
         <span class="spinner" aria-hidden="true"></span>
-        <span class="sr-only">Cargando…</span>
+        <span class="sr-only">{{ t('fields.loading') }}</span>
       </div>
     }
   `,
@@ -25,7 +26,7 @@ import { Component, input } from '@angular/core';
     .spinner {
       width: 28px;
       height: 28px;
-      border: 3px solid rgba(143, 107, 255, 0.25);
+      border: 3px solid rgba(var(--violet-400-rgb), 0.25);
       border-top-color: var(--violet-600);
       border-radius: 50%;
       animation: t-spin 0.8s linear infinite;
@@ -48,5 +49,6 @@ import { Component, input } from '@angular/core';
   `,
 })
 export class LoadingComponent {
+  protected readonly t = t;
   readonly show = input(false);
 }

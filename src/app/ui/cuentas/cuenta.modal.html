@@ -1,23 +1,23 @@
 <ion-content class="surface-light">
   <div class="sheet" [class.is-saved]="saved()">
     <header class="sheet-head">
-      <h1 class="screen-title">{{ isEdit() ? 'Editar cuenta' : 'Nueva cuenta' }}</h1>
-      <button type="button" class="close" aria-label="Cancelar" (click)="cancel()">
+      <h1 class="screen-title">{{ isEdit() ? t('cuenta.edit') : t('cuenta.new') }}</h1>
+      <button type="button" class="close" [attr.aria-label]="t('common.cancel')" (click)="cancel()">
         <ion-icon name="close" aria-hidden="true"></ion-icon>
       </button>
     </header>
 
     @if (!isCash()) {
       <div class="field">
-        <app-select-field label="Tipo" [options]="types" [value]="type()" (valueChange)="type.set($event!)"></app-select-field>
+        <app-select-field [label]="t('common.type')" [options]="types()" [value]="type()" (valueChange)="type.set($event!)"></app-select-field>
       </div>
     }
 
     <div class="field">
       <ion-input
-        label="Nombre"
+        [label]="t('common.name')"
         label-placement="floating"
-        [placeholder]="isCard() ? 'Visa Popular, Mastercard BHD' : 'Cuenta de ahorro, nómina'"
+        [placeholder]="isCard() ? t('cuenta.cardPlaceholder') : t('cuenta.accountPlaceholder')"
         [value]="name()"
         (ionInput)="name.set(($event.detail.value ?? '').toString())"
       ></ion-input>
@@ -25,7 +25,7 @@
 
     <div class="field">
       <ion-input
-        [label]="(isCard() ? 'Lo que debes hoy' : 'Saldo de hoy') + ' (' + currency() + ')'"
+        [label]="t(isCard() ? 'cuenta.owedToday' : 'cuenta.balanceToday', { currency: currency() })"
         label-placement="floating"
         type="number"
         inputmode="decimal"
@@ -35,13 +35,13 @@
       ></ion-input>
     </div>
     @if (isEdit()) {
-      <p class="hint">Si cambias el saldo, se ajusta sin crear un movimiento, así no cuenta como ingreso ni gasto.</p>
+      <p class="hint">{{ t('cuenta.adjustHint') }}</p>
     }
 
     @if (isCard()) {
       <div class="field">
         <ion-input
-          label="Límite de crédito ({{ currency() }})"
+          [label]="t('cuenta.creditLimit', { currency: currency() })"
           label-placement="floating"
           type="number"
           inputmode="decimal"
@@ -54,26 +54,26 @@
       <div class="days">
         <div class="field">
           <ion-input
-            label="Día de corte"
+            [label]="t('cuenta.cutDay')"
             label-placement="floating"
             type="number"
             inputmode="numeric"
             min="1"
             max="31"
-            placeholder="Ej. 15"
+            [placeholder]="t('common.example', { value: 15 })"
             [value]="cutDay()"
             (ionInput)="cutDay.set(($event.detail.value ?? '').toString())"
           ></ion-input>
         </div>
         <div class="field">
           <ion-input
-            label="Día de pago"
+            [label]="t('cuenta.payDay')"
             label-placement="floating"
             type="number"
             inputmode="numeric"
             min="1"
             max="31"
-            placeholder="Ej. 5"
+            [placeholder]="t('common.example', { value: 5 })"
             [value]="dueDay()"
             (ionInput)="dueDay.set(($event.detail.value ?? '').toString())"
           ></ion-input>
@@ -84,17 +84,17 @@
     @if (isCard()) {
       <div class="field">
         <ion-input
-          label="Últimos 4 dígitos (opcional)"
+          [label]="t('cuenta.last4')"
           label-placement="floating"
           type="text"
           inputmode="numeric"
           maxlength="4"
-          placeholder="Ej. 8462"
+          [placeholder]="t('common.example', { value: 8462 })"
           [value]="cardLast4()"
           (ionInput)="cardLast4.set(($event.detail.value ?? '').toString())"
         ></ion-input>
       </div>
-      <p class="hint">Se muestran en la tarjeta para reconocerla.</p>
+      <p class="hint">{{ t('cuenta.last4Hint') }}</p>
     }
 
     @if (error(); as message) {
@@ -102,21 +102,21 @@
     }
 
     <button type="button" class="btn-primary save" [disabled]="!canSave()" (click)="save()">
-      {{ isEdit() ? 'Guardar cambios' : 'Guardar cuenta' }}
+      {{ isEdit() ? t('common.saveChanges') : t('cuenta.save') }}
     </button>
 
-    @if (isEdit() && !isCash()) {
+    @if (isEdit() && !isCash() && !draft) {
       <button type="button" class="btn-secondary archive" [disabled]="saving()" (click)="toggleArchived()">
-        {{ view?.account?.archived ? 'Volver a usar' : 'Archivar' }}
+        {{ view?.account?.archived ? t('cuenta.unarchive') : t('cuenta.archive') }}
       </button>
-      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">Eliminar cuenta</button>
+      <button type="button" class="delete" [disabled]="saving()" (click)="confirmDelete()">{{ t('cuenta.delete') }}</button>
     }
   </div>
 
   <div class="done" [class.visible]="saved()" aria-live="polite">
     @if (saved()) {
       <app-success-check state="in"></app-success-check>
-      <p class="done-text">{{ isEdit() ? 'Cambios guardados' : 'Cuenta guardada' }}</p>
+      <p class="done-text">{{ isEdit() ? t('common.changesSaved') : t('cuenta.saved') }}</p>
     }
   </div>
 </ion-content>

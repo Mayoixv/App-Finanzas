@@ -40,6 +40,14 @@ export const routes: Routes = [
     loadComponent: () => import('./ui/ajustes/ajustes.page').then((m) => m.AjustesPage),
   },
   {
+    path: 'ajustes/importar',
+    loadComponent: () => import('./ui/ajustes/importar.page').then((m) => m.ImportarPage),
+  },
+  {
+    path: 'ajustes/:seccion',
+    loadComponent: () => import('./ui/ajustes/ajustes.page').then((m) => m.AjustesPage),
+  },
+  {
     path: 'reportes',
     loadComponent: () => import('./ui/reportes/reportes.page').then((m) => m.ReportesPage),
   },

@@ -1,6 +1,7 @@
 import { Component, computed, input, model } from '@angular/core';
 import { formatMoney } from '../format';
 import { compactMoney, niceMax } from './scale';
+import { t } from '../i18n';
 
 const W = 340;
 const H = 170;
@@ -16,6 +17,7 @@ const TOP = 12;
   styleUrls: ['charts.scss'],
 })
 export class LineChartComponent {
+  protected readonly t = t;
   readonly labels = input.required<string[]>();
   readonly fullLabels = input.required<string[]>();
   readonly values = input.required<number[]>();

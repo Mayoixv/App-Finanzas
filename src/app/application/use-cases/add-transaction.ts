@@ -28,26 +28,26 @@ export async function validateTransactionInput(
   input: AddTransactionInput,
   categories: ICategoryRepository,
 ): Promise<void> {
-  if (!isValidCents(input.amount)) throw new ValidationError('El monto debe ser mayor que cero');
-  if (!isValidIsoDate(input.date)) throw new ValidationError('Fecha inválida');
+  if (!isValidCents(input.amount)) throw new ValidationError('amountPositive');
+  if (!isValidIsoDate(input.date)) throw new ValidationError('date');
   const main = await categories.get(input.categoryId);
-  if (!main) throw new NotFoundError('Categoría');
+  if (!main) throw new NotFoundError('category');
 
   const splits = input.splits ?? [];
   if (splits.length === 0) return;
-  if (splits.length < 2) throw new ValidationError('Para dividir hacen falta al menos dos categorías');
+  if (splits.length < 2) throw new ValidationError('splitTwo');
   if (new Set(splits.map((s) => s.categoryId)).size !== splits.length) {
-    throw new ValidationError('Cada parte debe tener una categoría distinta');
+    throw new ValidationError('splitDistinct');
   }
-  if (!splits.every((s) => isValidCents(s.amount))) throw new ValidationError('Cada parte debe ser mayor que cero');
+  if (!splits.every((s) => isValidCents(s.amount))) throw new ValidationError('splitPositive');
   if (splits.reduce((sum, s) => sum + s.amount, 0) !== input.amount) {
-    throw new ValidationError('Las partes deben sumar el monto total');
+    throw new ValidationError('splitSum');
   }
   for (const s of splits) {
     const category = await categories.get(s.categoryId);
-    if (!category) throw new NotFoundError('Categoría');
+    if (!category) throw new NotFoundError('category');
     if (isExpenseType(category.type) !== isExpenseType(main.type)) {
-      throw new ValidationError('Todas las partes deben ser del mismo tipo (gasto o ingreso)');
+      throw new ValidationError('splitType');
     }
   }
 }
@@ -75,8 +75,8 @@ export async function validateAccount(
 ): Promise<void> {
   if (!accountId || !accounts) return;
   const account = await accounts.get(accountId);
-  if (!account) throw new NotFoundError('Cuenta');
-  if (account.archived && !allowArchived) throw new ValidationError('Esa cuenta está archivada; elige otra');
+  if (!account) throw new NotFoundError('account');
+  if (account.archived && !allowArchived) throw new ValidationError('accountArchived');
 }
 
 export class AddTransaction {
