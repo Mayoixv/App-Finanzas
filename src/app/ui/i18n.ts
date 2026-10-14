@@ -78,6 +78,23 @@ export function defaultNames(dictionary: Dictionary = dict()): DefaultNames {
 
 export const spanishNames = () => defaultNames(SPANISH);
 
+const NAMES_KEY = 'defaults_language';
+
+/**
+ * Las categorías de la app y la cuenta Efectivo se guardan con nombre en la base: si el idioma de la app cambió
+ * (a mano, o porque el teléfono está en otro idioma), pasan al idioma actual. No toca los que la persona renombró.
+ */
+export async function syncDefaultNames(
+  settings: ISettingsRepository,
+  localize: { execute(from: DefaultNames[], to: DefaultNames): Promise<number> },
+): Promise<void> {
+  const from = pick(await settings.get(NAMES_KEY)) ?? 'es';
+  if (from === current()) return;
+  const before = defaultNames(await LOADERS[from]());
+  await localize.execute([before, spanishNames()], defaultNames());
+  await settings.set(NAMES_KEY, current());
+}
+
 /** El texto de un error de la app en el idioma actual; para fallos inesperados, `fallbackKey`. */
 export function errorText(error: unknown, fallbackKey = 'common.tryAgain'): string {
   return error instanceof AppError ? t(error.key, error.params) : t(fallbackKey);

@@ -47,7 +47,8 @@ export class GetNotificationPlan {
     private readonly cards: GetCardStatuses,
   ) {}
 
-  async execute(today: IsoDate): Promise<NotificationPlan> {
+  /** `list` une los nombres de un presupuesto con varias categorías en el idioma de la interfaz. */
+  async execute(today: IsoDate, list?: (items: string[]) => string): Promise<NotificationPlan> {
     const month = monthOf(today);
     const [current, next, statuses, categories, cards] = await Promise.all([
       this.recurring.execute(month),
@@ -109,7 +110,7 @@ export class GetNotificationPlan {
       if (level === 'ok') continue;
       budgets.push({
         key: `presupuesto:${budget.categoryId}:${month}:${level}`,
-        name: budgetName(budget, names),
+        name: budgetName(budget, names, list),
         level,
         spent: status.spent,
         limit: status.limit,

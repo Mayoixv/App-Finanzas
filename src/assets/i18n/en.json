@@ -131,7 +131,7 @@
     "cloudRestoreSub": "For a new phone or if your data was lost",
     "cloudSignOut": "Sign out of Google",
     "cloudSignIn": "Cloud backup",
-    "cloudSignInSub": "Sign in with Google: your automatic backup is saved encrypted in your account",
+    "cloudSignInSub": "Sign in with Google and your automatic backup will be saved encrypted in your account",
     "restore": "Restore backup",
     "restoreSub": "Replaces the app's data with the file's",
     "exportCsv": "Export transactions to Excel",
@@ -177,7 +177,7 @@
     "signedOut": "You signed out. Backups already uploaded stay in the cloud.",
     "autoDisabled": "Automatic backup turned off. Files already saved stay in Documents/Kuarto.",
     "autoTitle": "Automatic backup",
-    "autoMsg": "Choose the password that will encrypt the automatic backups. You'll need it to restore them; if you forget it, they can't be opened.",
+    "autoMsg": "Choose the password that will protect your automatic backups. You'll need it to restore them: if you forget it, you can't open them.",
     "activate": "Turn on",
     "autoFirst": "Creating the first backup…",
     "autoFirstFailed": "It's on, but the first backup couldn't be saved. It retries when you open the app.",
@@ -1164,7 +1164,9 @@
     "chooseMonth": "Choose month",
     "prevYear": "Previous year",
     "nextYear": "Next year",
-    "goToday": "Go to current month"
+    "goToday": "Go to current month",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "lock": {
     "enterPin": "Enter your PIN",
@@ -1220,6 +1222,11 @@
     "dbFailed": "Couldn't open the local database. Close and reopen the app.\n\nDetails: {detail}"
   },
   "changelog": {
+    "1_0_11": [
+      "When typing a password or PIN, tap the eye to see it.",
+      "Clearer texts across the app, and categories translated when your phone is in another language.",
+      "The tour now shows that you can save your backup to the cloud."
+    ],
     "1_0_10": [
       "New animated welcome and first questions that set up your accounts, salary, recurring items, debts and goals.",
       "Renewed tour: an example in each section and, at the end, how to back up your data.",
@@ -1620,7 +1627,7 @@
       },
       "respaldo": {
         "title": "Your data",
-        "text": "Everything lives only on this phone. A backup protects you if you lose it or change phones."
+        "text": "Your data is only on this phone. Back it up so you don't lose it: save it on the phone or in the cloud with your Google account."
       }
     },
     "demo": {
@@ -1634,13 +1641,17 @@
       "goalOf": "{goalSaved} of {goal}",
       "carLoan": "Car loan",
       "debtLeft": "{debtLeft} left of {debt}",
-      "saved": "Saved from income"
+      "saved": "Saved from income",
+      "phone": "On the phone",
+      "phoneSub": "Documents/Kuarto",
+      "cloud": "In the cloud",
+      "cloudSub": "Your Google account"
     },
     "backupPoints": [
-      "Your data lives only on this phone: nobody else has a copy.",
-      "Create a backup whenever you want, or turn on automatic backups daily or weekly.",
-      "With your Google account, the backup is also saved encrypted in the cloud."
-    ]
+      "Automatic: every day or every week, without having to remember.",
+      "Protected with your password: nobody else can open it, not even Google."
+    ],
+    "saveCloud": "Save to the cloud"
   },
   "defaults": {
     "categories": {

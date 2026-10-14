@@ -24,7 +24,7 @@ export function budgetCategoryIds(budget: Budget): string[] {
 export function budgetName(
   budget: Budget,
   categoryNames: Map<string, string>,
-  list: (items: string[]) => string = (items) => new Intl.ListFormat('es', { type: 'conjunction' }).format(items),
+  list: (items: string[]) => string = (items: string[]) => new Intl.ListFormat('es', { type: 'conjunction' }).format(items),
 ): string {
   if (budget.name?.trim()) return budget.name.trim();
   return list(budgetCategoryIds(budget).map((id) => categoryNames.get(id) ?? '?'));

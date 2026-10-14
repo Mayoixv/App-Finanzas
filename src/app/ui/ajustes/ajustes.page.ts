@@ -36,7 +36,7 @@ import { Appearance, appearance as savedAppearance, currentPalette, paletteVars,
 import { generatePalette, hexToRgb, PRESETS } from '../palette';
 import { CloudBackupService } from '../cloud/cloud-backup.service';
 import { askName } from '../profile-name';
-import { defaultNames, Lang, language, LANGUAGES, setLanguage, spanishNames, t, tList } from '../i18n';
+import { Lang, language, LANGUAGES, setLanguage, syncDefaultNames, t, tList } from '../i18n';
 
 /** Título, descripción y opciones (para la búsqueda) de cada sección están en es.json, en ajustes.sections.<id>. */
 interface Section {
@@ -88,6 +88,8 @@ export class AjustesPage {
   readonly seccion = input<string>();
   /** `?activar=1` (fin del recorrido): en Datos y respaldo, empieza a activar el respaldo automático. */
   readonly activar = input<string>();
+  /** `?nube=1` (fin del recorrido): en Datos y respaldo, empieza a entrar con Google para el respaldo en la nube. */
+  readonly nube = input<string>();
   protected readonly sections = SECTIONS;
   protected readonly section = computed(() => SECTIONS.find((s) => s.id === this.seccion()));
   protected readonly searching = signal(false);
@@ -125,9 +127,8 @@ export class AjustesPage {
   /** Cambia los textos al instante; las pantallas recargan sus datos para rehacer los textos que arman al cargar. */
   protected async changeLanguage(code: Lang) {
     if (code === language()) return;
-    const before = defaultNames();
     await setLanguage(this.container.settings, code);
-    await this.container.localizeDefaults.execute([before, spanishNames()], defaultNames()).catch(console.error);
+    await syncDefaultNames(this.container.settings, this.container.localizeDefaults).catch(console.error);
     this.monthState.notifyChange();
     this.liveMessage.set(t('ajustes.languageChanged'));
   }

@@ -8,7 +8,7 @@ import { addDays, monthOf } from '../domain/month';
 import { formatMoney, todayIso } from './format';
 import { deferPastQuiet, fitInSameDay } from './quiet-hours';
 import { MonthState } from './month-state';
-import { t } from './i18n';
+import { listText, t } from './i18n';
 
 const ENABLED_KEY = 'notifications_enabled';
 /** Días hacia adelante que se programa el recordatorio diario; se reprograma cada vez que se abre la app. */
@@ -181,7 +181,7 @@ export class NotificationsService {
     if ((await LocalNotifications.checkPermissions()).display !== 'granted') return;
 
     const today = todayIso();
-    const plan = await this.container.getNotificationPlan.execute(today);
+    const plan = await this.container.getNotificationPlan.execute(today, listText);
 
     // Todo lo programado se rehace: así un fijo pagado, editado o borrado, o un aviso apagado, deja de sonar.
     await this.cancelPending(true);

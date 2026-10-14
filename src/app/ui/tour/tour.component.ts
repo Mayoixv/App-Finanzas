@@ -3,6 +3,10 @@ import { Router } from '@angular/router';
 import { formatMoney } from '../format';
 import { t, tList } from '../i18n';
 import { TourService, TourStep } from './tour.service';
+import { CloudBackupService } from '../cloud/cloud-backup.service';
+import { IonIcon } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { cloudUploadOutline, phonePortraitOutline } from 'ionicons/icons';
 
 interface Box {
   x: number;
@@ -137,6 +141,14 @@ const DEMO = {
                   </div>
                 }
                 @case ('respaldo') {
+                  <div class="demo-row">
+                    <ion-icon class="demo-icon" name="phone-portrait-outline" aria-hidden="true"></ion-icon>
+                    <span class="demo-text"><b>{{ t('tour.demo.phone') }}</b><small>{{ t('tour.demo.phoneSub') }}</small></span>
+                  </div>
+                  <div class="demo-row">
+                    <ion-icon class="demo-icon" name="cloud-upload-outline" aria-hidden="true"></ion-icon>
+                    <span class="demo-text"><b>{{ t('tour.demo.cloud') }}</b><small>{{ t('tour.demo.cloudSub') }}</small></span>
+                  </div>
                   <ul class="demo-list">
                     @for (p of tList('tour.backupPoints'); track $index) {
                       <li>{{ p }}</li>
@@ -156,22 +168,27 @@ const DEMO = {
               <button type="button" class="btn-secondary back" (click)="tour.back()">{{ t('onboarding.change') }}</button>
             }
             @if (tour.isLast()) {
-              <button type="button" class="btn-primary next" (click)="finish(true)">{{ t('tour.activateBackup') }}</button>
+              <button type="button" class="btn-primary next" (click)="finish('activar')">{{ t('tour.activateBackup') }}</button>
             } @else {
               <button type="button" class="btn-primary next" (click)="tour.next()">{{ t('tour.next') }}</button>
             }
           </span>
           @if (tour.isLast()) {
-            <button type="button" class="later" (click)="finish(false)">{{ t('onboarding.notNow') }}</button>
+            @if (cloud.available) {
+              <button type="button" class="btn-secondary cloud" (click)="finish('nube')">{{ t('tour.saveCloud') }}</button>
+            }
+            <button type="button" class="later" (click)="finish(null)">{{ t('onboarding.notNow') }}</button>
           }
         </footer>
       </section>
     }
   `,
   styleUrls: ['tour.component.scss'],
+  imports: [IonIcon],
 })
 export class TourComponent {
   protected readonly tour = inject(TourService);
+  protected readonly cloud = inject(CloudBackupService);
   private readonly router = inject(Router);
   private readonly card = viewChild<ElementRef<HTMLElement>>('card');
   protected readonly t = t;
@@ -205,6 +222,7 @@ export class TourComponent {
   });
 
   constructor() {
+    addIcons({ cloudUploadOutline, phonePortraitOutline });
     effect(() => {
       // Detrás del recorrido la app no responde a toques, desplazamiento ni teclado (ni la barra de pestañas).
       document.querySelector('ion-router-outlet')?.toggleAttribute('inert', this.tour.active());
@@ -269,10 +287,10 @@ export class TourComponent {
     this.tour.stop();
   }
 
-  /** Último paso: con `activate`, se queda en Datos y respaldo y empieza a activar el respaldo automático. */
-  protected finish(activate: boolean) {
+  /** Último paso: va a Datos y respaldo y empieza a activar el respaldo automático o el de la nube; o vuelve a Inicio. */
+  protected finish(start: 'activar' | 'nube' | null) {
     this.tour.stop();
-    this.router.navigateByUrl(activate ? '/ajustes/datos?activar=1' : '/tabs/inicio');
+    this.router.navigateByUrl(start ? `/ajustes/datos?${start}=1` : '/tabs/inicio');
   }
 
   @HostListener('document:keydown.escape')

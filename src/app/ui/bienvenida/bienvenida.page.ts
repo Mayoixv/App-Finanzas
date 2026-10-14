@@ -21,7 +21,7 @@ import { CurrencyState } from '../currency-state';
 import { DeudaModalComponent } from '../deudas/deuda.modal';
 import { NuevoGastoFijoModalComponent } from '../fijos/nuevo-gasto-fijo.modal';
 import { formatMoney, parseAmount, parseBalance, currentMonth } from '../format';
-import { defaultNames, errorText, Lang, language, LANGUAGES, previewLanguage, setLanguage, spanishNames, t, tn } from '../i18n';
+import { errorText, Lang, language, LANGUAGES, previewLanguage, setLanguage, syncDefaultNames, t, tn } from '../i18n';
 import { TourService } from '../tour/tour.service';
 import { IntroComponent } from './intro.component';
 import { CloudBackupService } from '../cloud/cloud-backup.service';
@@ -317,7 +317,7 @@ export class BienvenidaPage {
         currentMonth(),
       );
       await setLanguage(this.container.settings, language());
-      await this.container.localizeDefaults.execute([spanishNames()], defaultNames());
+      await syncDefaultNames(this.container.settings, this.container.localizeDefaults);
       await this.currencyState.change(this.currency());
       this.step.set('listo');
     } catch (e) {

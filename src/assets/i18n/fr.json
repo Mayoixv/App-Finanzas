@@ -131,7 +131,7 @@
     "cloudRestoreSub": "Pour un nouveau téléphone ou si les données ont été perdues",
     "cloudSignOut": "Se déconnecter de Google",
     "cloudSignIn": "Sauvegarde dans le cloud",
-    "cloudSignInSub": "Connectez-vous avec Google : votre sauvegarde automatique est gardée chiffrée dans votre compte",
+    "cloudSignInSub": "Connectez-vous avec Google et votre sauvegarde automatique sera gardée chiffrée dans votre compte",
     "restore": "Restaurer une sauvegarde",
     "restoreSub": "Remplace les données de l'appli par celles du fichier",
     "exportCsv": "Exporter les opérations vers Excel",
@@ -177,7 +177,7 @@
     "signedOut": "Vous êtes déconnecté. Les sauvegardes déjà envoyées restent dans le cloud.",
     "autoDisabled": "Sauvegarde automatique désactivée. Les fichiers déjà enregistrés restent dans Documents/Kuarto.",
     "autoTitle": "Sauvegarde automatique",
-    "autoMsg": "Choisissez le mot de passe qui chiffrera les sauvegardes automatiques. Il vous faudra pour les restaurer ; si vous l'oubliez, elles ne pourront pas être ouvertes.",
+    "autoMsg": "Choisissez le mot de passe qui protégera vos sauvegardes automatiques. Il vous faudra pour les restaurer : si vous l'oubliez, vous ne pourrez pas les ouvrir.",
     "activate": "Activer",
     "autoFirst": "Création de la première sauvegarde…",
     "autoFirstFailed": "Elle est activée, mais la première sauvegarde n'a pas pu être enregistrée. Nouvel essai à l'ouverture de l'appli.",
@@ -1164,7 +1164,9 @@
     "chooseMonth": "Choisir le mois",
     "prevYear": "Année précédente",
     "nextYear": "Année suivante",
-    "goToday": "Aller au mois en cours"
+    "goToday": "Aller au mois en cours",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe"
   },
   "lock": {
     "enterPin": "Saisissez votre code PIN",
@@ -1220,6 +1222,11 @@
     "dbFailed": "Impossible d'ouvrir la base de données locale. Fermez et rouvrez l'appli.\n\nDétail : {detail}"
   },
   "changelog": {
+    "1_0_11": [
+      "En saisissant un mot de passe ou un code PIN, touchez l'œil pour le voir.",
+      "Des textes plus clairs dans toute l'appli, et les catégories traduites quand le téléphone est dans une autre langue.",
+      "La visite guidée montre maintenant que vous pouvez sauvegarder dans le cloud."
+    ],
     "1_0_10": [
       "Nouvel accueil animé et questions de départ qui préparent vos comptes, salaire, fixes, dettes et objectifs.",
       "Visite guidée renouvelée : un exemple dans chaque section et, à la fin, comment sauvegarder vos données.",
@@ -1627,7 +1634,7 @@
       },
       "respaldo": {
         "title": "Vos données",
-        "text": "Tout reste uniquement sur ce téléphone. Une sauvegarde vous protège si vous le perdez ou en changez."
+        "text": "Vos données sont uniquement sur ce téléphone. Sauvegardez-les pour ne pas les perdre : sur le téléphone ou dans le cloud avec votre compte Google."
       }
     },
     "demo": {
@@ -1641,13 +1648,17 @@
       "goalOf": "{goalSaved} sur {goal}",
       "carLoan": "Prêt auto",
       "debtLeft": "Il reste {debtLeft} sur {debt}",
-      "saved": "Épargné sur le revenu"
+      "saved": "Épargné sur le revenu",
+      "phone": "Sur le téléphone",
+      "phoneSub": "Documents/Kuarto",
+      "cloud": "Dans le cloud",
+      "cloudSub": "Votre compte Google"
     },
     "backupPoints": [
-      "Vos données restent uniquement sur ce téléphone : personne d'autre n'en a une copie.",
-      "Créez une sauvegarde quand vous voulez, ou activez la sauvegarde automatique chaque jour ou chaque semaine.",
-      "Avec votre compte Google, la sauvegarde est aussi gardée chiffrée dans le cloud."
-    ]
+      "Automatique : chaque jour ou chaque semaine, sans avoir à y penser.",
+      "Protégée par votre mot de passe : personne d'autre ne peut l'ouvrir, pas même Google."
+    ],
+    "saveCloud": "Sauvegarder dans le cloud"
   },
   "defaults": {
     "categories": {

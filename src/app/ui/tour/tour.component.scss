@@ -246,6 +246,19 @@
   line-height: 1.5;
 }
 
+.demo-icon {
+  flex: none;
+  font-size: 24px;
+  color: var(--violet-200);
+}
+
+.cloud {
+  width: 100%;
+  min-height: 48px;
+  border-color: var(--violet-400);
+  color: var(--text-on-dark);
+}
+
 .later {
   width: 100%;
   min-height: 44px;

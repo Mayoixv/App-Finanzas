@@ -33,7 +33,8 @@ export class GetAlerts {
     private readonly cards: GetCardStatuses,
   ) {}
 
-  async execute(today: IsoDate): Promise<Alerts> {
+  /** `list` une los nombres de un presupuesto con varias categorías en el idioma de la interfaz. */
+  async execute(today: IsoDate, list?: (items: string[]) => string): Promise<Alerts> {
     const [items, statuses, categories, cards] = await Promise.all([
       this.upcoming.execute(today, DUE_SOON_DAYS),
       this.budgets.execute(monthOf(today)),
@@ -45,7 +46,7 @@ export class GetAlerts {
     // Un ingreso fijo sin cobrar no es una alerta de pago.
     const payments = items.filter((i) => types.get(i.expense.categoryId) !== 'ingreso');
     const budgetNames = (level: string) =>
-      statuses.filter((b) => budgetLevel(b.status) === level).map((b) => budgetName(b.budget, names));
+      statuses.filter((b) => budgetLevel(b.status) === level).map((b) => budgetName(b.budget, names, list));
     return {
       overdue: payments.filter((i) => daysBetween(today, i.instance.dueDate) < 0).map((i) => i.expense.name),
       dueSoon: payments.filter((i) => daysBetween(today, i.instance.dueDate) >= 0).map((i) => i.expense.name),

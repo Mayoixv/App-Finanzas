@@ -11,13 +11,14 @@ import { pageTransition, sheetEnter, sheetLeave } from './app/ui/motion';
 import { applyPrivacy, isPrivacyOn } from './app/ui/privacy';
 import { saveSafetyCopy } from './app/ui/backup-files';
 import { loadAppearance } from './app/ui/theme';
-import { loadLanguage, t } from './app/ui/i18n';
+import { loadLanguage, syncDefaultNames, t } from './app/ui/i18n';
 
 async function start() {
   const container = await createSqliteContainer(saveSafetyCopy);
   setDisplayCurrency(await container.currencySettings.get());
   await loadAppearance(container.settings);
   await loadLanguage(container.settings);
+  await syncDefaultNames(container.settings, container.localizeDefaults).catch(console.error);
   setInitialLock(await container.pinLock.isEnabled(), await container.pinLock.length());
   // Antes de mostrar nada, para que el balance no aparezca en la vista de recientes.
   if (await isPrivacyOn(container.settings)) await applyPrivacy(true).catch(console.error);

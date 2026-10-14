@@ -1,7 +1,8 @@
 import { Component, computed, inject, input, OnInit, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SelectFieldComponent } from '../select/select-field.component';
-import { AlertController, IonIcon, IonToggle, LoadingController } from '@ionic/angular';
+import { AlertController, IonIcon, IonToggle, LoadingController, ModalController } from '@ionic/angular';
+import { FormSheetComponent, FormSheetField } from '../select/form-sheet.component';
 import { applyPrivacy, isPrivacyOn, privacyAvailable, setPrivacy } from '../privacy';
 import { NotificationsService } from '../notifications.service';
 import { AutoBackupService } from '../auto-backup.service';
@@ -20,6 +21,12 @@ import { LockState } from '../lock/lock-state';
 import { t, errorText } from '../i18n';
 
 type Values = Record<string, string>;
+interface AskInput {
+  name: string;
+  type: 'text' | 'password';
+  placeholder: string;
+  attributes?: { inputmode?: string; maxlength?: number; autocomplete?: string; autocapitalize?: string };
+}
 
 /** Fecha (ISO) del último respaldo creado a mano. */
 const LAST_MANUAL_KEY = 'backup_last_manual';
@@ -37,9 +44,12 @@ export class DatosComponent implements OnInit {
   readonly part = input<'datos' | 'seguridad'>('datos');
   /** Empieza a activar el respaldo automático al abrir (desde el final del recorrido). */
   readonly startAuto = input(false);
+  /** Empieza a entrar con Google para el respaldo en la nube (desde el final del recorrido). */
+  readonly startCloud = input(false);
   private readonly container = inject(APP_CONTAINER);
   private readonly alerts = inject(AlertController);
   private readonly loading = inject(LoadingController);
+  private readonly modals = inject(ModalController);
   protected readonly lock = inject(LockState);
   private readonly notifications = inject(NotificationsService);
   protected readonly autoBackup = inject(AutoBackupService);
@@ -85,6 +95,7 @@ export class DatosComponent implements OnInit {
     const last = await this.container.settings.get(LAST_MANUAL_KEY);
     this.lastManual.set(last ? formatDay(last) : null);
     if (this.startAuto() && this.autoBackup.available && !this.autoBackup.enabled()) await this.toggleAutoBackup(true);
+    else if (this.startCloud() && this.cloud.available && !this.cloud.email()) await this.cloudSignIn();
     this.biometryAvailable.set(await this.lock.biometryAvailable().catch(() => false));
   }
 
@@ -286,20 +297,25 @@ export class DatosComponent implements OnInit {
     this.status.set(t('seguridad.pinOff'));
   }
 
-  private async ask(header: string, message: string, inputs: object[], okText: string): Promise<Values | null> {
-    const alert = await this.alerts.create({
-      cssClass: 'app-alert',
-      header,
-      message,
-      inputs,
-      buttons: [
-        { text: t('common.cancel'), role: 'cancel' },
-        { text: okText, role: 'confirm' },
-      ],
+  /** Pide uno o dos campos en una hoja propia (las contraseñas con su ojo para verlas). Null si se cancela. */
+  private async ask(header: string, message: string, inputs: AskInput[], okText: string): Promise<Values | null> {
+    const fields: FormSheetField[] = inputs.map((i) => ({
+      name: i.name,
+      type: i.type,
+      placeholder: i.placeholder,
+      numeric: i.attributes?.inputmode === 'numeric',
+      maxlength: i.attributes?.maxlength,
+      autocomplete: i.attributes?.autocomplete,
+      autocapitalize: i.attributes?.autocapitalize,
+    }));
+    const sheet = await this.modals.create({
+      component: FormSheetComponent,
+      componentProps: { header, message, fields, okText },
+      cssClass: 'select-modal',
     });
-    await alert.present();
-    const { role, data } = await alert.onDidDismiss();
-    return role === 'confirm' ? (data?.values as Values) : null;
+    await sheet.present();
+    const { data, role } = await sheet.onWillDismiss<Values>();
+    return role === 'confirm' && data ? data : null;
   }
 
   /** Muestra "cargando" mientras corre `work`; los errores se explican y devuelven undefined. */

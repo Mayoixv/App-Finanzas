@@ -7,7 +7,7 @@ import { APP_CONTAINER } from '../../app.container';
 import { Alerts } from '../../application/use-cases/get-alerts';
 import { currentMonth, todayIso } from '../format';
 import { MonthState } from '../month-state';
-import { t, tn } from '../i18n';
+import { listText, t, tn } from '../i18n';
 
 interface Alert {
   key: string;
@@ -112,7 +112,7 @@ export class AlertsRowComponent {
 
   private async load() {
     try {
-      this.alerts.set(toAlerts(await this.container.getAlerts.execute(todayIso())));
+      this.alerts.set(toAlerts(await this.container.getAlerts.execute(todayIso(), listText)));
     } catch (error) {
       // Es una ayuda: si falla, no se muestra y el resto de Inicio sigue funcionando.
       console.error(error);

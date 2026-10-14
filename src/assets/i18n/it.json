@@ -131,7 +131,7 @@
     "cloudRestoreSub": "Per un telefono nuovo o se i dati sono andati persi",
     "cloudSignOut": "Esci dall'account Google",
     "cloudSignIn": "Backup nel cloud",
-    "cloudSignInSub": "Accedi con Google: il tuo backup automatico viene salvato cifrato nel tuo account",
+    "cloudSignInSub": "Accedi con Google e il tuo backup automatico verrà salvato cifrato nel tuo account",
     "restore": "Ripristina backup",
     "restoreSub": "Sostituisce i dati dell'app con quelli del file",
     "exportCsv": "Esporta i movimenti in Excel",
@@ -177,7 +177,7 @@
     "signedOut": "Sei uscito dall'account. I backup già caricati restano nel cloud.",
     "autoDisabled": "Backup automatico disattivato. I file già salvati restano in Documenti/Kuarto.",
     "autoTitle": "Backup automatico",
-    "autoMsg": "Scegli la password con cui verranno cifrati i backup automatici. Ti servirà per ripristinarli; se la dimentichi, non si potranno aprire.",
+    "autoMsg": "Scegli la password che proteggerà i backup automatici. Ti servirà per ripristinarli: se la dimentichi, non potrai aprirli.",
     "activate": "Attiva",
     "autoFirst": "Creazione del primo backup…",
     "autoFirstFailed": "È attivo, ma non è stato possibile salvare il primo backup. Riprova all'apertura dell'app.",
@@ -1164,7 +1164,9 @@
     "chooseMonth": "Scegli il mese",
     "prevYear": "Anno precedente",
     "nextYear": "Anno successivo",
-    "goToday": "Vai al mese corrente"
+    "goToday": "Vai al mese corrente",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password"
   },
   "lock": {
     "enterPin": "Inserisci il tuo PIN",
@@ -1220,6 +1222,11 @@
     "dbFailed": "Impossibile aprire il database locale. Chiudi e riapri l'app.\n\nDettaglio: {detail}"
   },
   "changelog": {
+    "1_0_11": [
+      "Mentre scrivi una password o un PIN, tocca l'occhio per vederla.",
+      "Testi più chiari in tutta l'app e categorie tradotte quando il telefono è in un'altra lingua.",
+      "Il tour ora mostra che puoi salvare il backup nel cloud."
+    ],
     "1_0_10": [
       "Nuovo benvenuto animato e domande iniziali che preparano conti, stipendio, voci fisse, debiti e obiettivi.",
       "Tour rinnovato: un esempio in ogni sezione e, alla fine, come fare il backup dei tuoi dati.",
@@ -1627,7 +1634,7 @@
       },
       "respaldo": {
         "title": "I tuoi dati",
-        "text": "Tutto vive solo su questo telefono. Un backup ti protegge se lo perdi o cambi telefono."
+        "text": "I tuoi dati sono solo su questo telefono. Fai un backup per non perderli: salvalo sul telefono o nel cloud con il tuo account Google."
       }
     },
     "demo": {
@@ -1641,13 +1648,17 @@
       "goalOf": "{goalSaved} di {goal}",
       "carLoan": "Finanziamento auto",
       "debtLeft": "Mancano {debtLeft} di {debt}",
-      "saved": "Risparmiato sulle entrate"
+      "saved": "Risparmiato sulle entrate",
+      "phone": "Sul telefono",
+      "phoneSub": "Documenti/Kuarto",
+      "cloud": "Nel cloud",
+      "cloudSub": "Il tuo account Google"
     },
     "backupPoints": [
-      "I tuoi dati vivono solo su questo telefono: nessun altro ne ha una copia.",
-      "Crea un backup quando vuoi, o attiva quello automatico ogni giorno o ogni settimana.",
-      "Con il tuo account Google, il backup viene salvato cifrato anche nel cloud."
-    ]
+      "Automatico: ogni giorno o ogni settimana, senza doverti ricordare.",
+      "Protetto dalla tua password: nessun altro può aprirlo, nemmeno Google."
+    ],
+    "saveCloud": "Salva nel cloud"
   },
   "defaults": {
     "categories": {

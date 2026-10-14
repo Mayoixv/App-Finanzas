@@ -217,7 +217,7 @@
     }
 
     @case ('datos') {
-      <app-datos part="datos" [startAuto]="activar() === '1'"></app-datos>
+      <app-datos part="datos" [startAuto]="activar() === '1'" [startCloud]="nube() === '1'"></app-datos>
     }
 
     @case ('seguridad') {
