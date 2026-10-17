@@ -3,15 +3,18 @@ import { HelpButtonComponent } from '../help/help-button.component';
 import { Category } from '../../domain/category';
 import { lookOf } from '../category-look';
 import { RouterLink } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular';
+import { IonContent, IonIcon, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline, chevronForward, settingsOutline } from 'ionicons/icons';
+import { alertCircleOutline, chevronForward, settingsOutline, sparkles, walletOutline } from 'ionicons/icons';
+import { RecapComponent } from '../recap/recap.component';
+import { addMonths, MonthKey, monthOf } from '../../domain/month';
+import { AffordSheetComponent } from './afford-sheet.component';
 import { OnboardingGoal } from '../../application/use-cases/user-profile';
 import { APP_CONTAINER } from '../../app.container';
 import { MonthOverview } from '../../application/use-cases/get-month-overview';
 import { MonthlySummary } from '../../domain/monthly-summary';
 import { Transaction } from '../../domain/transaction';
-import { formatDay, formatMoney, formatPercent } from '../format';
+import { formatDay, formatMoney, formatPercent, monthLabel, todayIso } from '../format';
 import { MonthSwitcherComponent } from '../month-switcher.component';
 import { MonthState } from '../month-state';
 import { TransactionFormService } from '../movimientos/transaction-form.service';
@@ -61,6 +64,7 @@ export class InicioPage {
   private readonly container = inject(APP_CONTAINER);
   protected readonly monthState = inject(MonthState);
   private readonly transactionForm = inject(TransactionFormService);
+  private readonly modalCtrl = inject(ModalController);
 
   protected readonly overview = signal<MonthOverview | null>(null);
   protected readonly userName = signal('');
@@ -73,6 +77,9 @@ export class InicioPage {
     organizar: { path: '/tabs/fijos' },
   };
   protected readonly recent = signal<RecentRow[]>([]);
+  /** Mes con resumen "en 30 segundos" para ofrecer: el que se ve si ya terminó, o el anterior en la primera semana. */
+  protected readonly recapMonth = signal<MonthKey | null>(null);
+  protected readonly label = (m: MonthKey) => monthLabel(m, false);
   protected readonly failed = signal(false);
   protected readonly money = formatMoney;
   protected readonly percent = formatPercent;
@@ -81,7 +88,7 @@ export class InicioPage {
   private loadSeq = 0;
 
   constructor() {
-    addIcons({ alertCircleOutline, chevronForward, settingsOutline });
+    addIcons({ alertCircleOutline, chevronForward, settingsOutline, sparkles, walletOutline });
     effect(() => {
       const month = this.monthState.month();
       this.monthState.version();
@@ -91,6 +98,24 @@ export class InicioPage {
 
   protected isEmpty(s: MonthlySummary): boolean {
     return s.income === 0 && s.expenses === 0 && s.saved === 0;
+  }
+
+  protected async afford() {
+    const modal = await this.modalCtrl.create({ component: AffordSheetComponent, cssClass: 'select-modal' });
+    await modal.present();
+  }
+
+  protected async recap(month: MonthKey) {
+    const modal = await this.modalCtrl.create({ component: RecapComponent, componentProps: { month } });
+    await modal.present();
+  }
+
+  private async recapFor(month: MonthKey, overview: MonthOverview): Promise<MonthKey | null> {
+    const today = todayIso();
+    if (month < monthOf(today)) return this.isEmpty(overview.summary) ? null : month;
+    if (month !== monthOf(today) || Number(today.slice(8, 10)) > 7) return null;
+    const previous = addMonths(month, -1);
+    return (await this.container.getMonthRecap.execute(previous, today)).length > 0 ? previous : null;
   }
 
   protected edit(row: RecentRow) {
@@ -106,8 +131,10 @@ export class InicioPage {
         this.container.getMonthOverview.execute(month),
         this.container.categories.list(),
       ]);
+      const recapMonth = await this.recapFor(month, overview);
       if (seq !== this.loadSeq) return;
       this.overview.set(overview);
+      this.recapMonth.set(recapMonth);
       this.categories.set(categories);
       this.recent.set(
         overview.recent.map(({ transaction: tx, category }) => {

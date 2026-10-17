@@ -66,12 +66,13 @@ export function shiftMonth(month: MonthKey, delta: number): MonthKey {
   return addMonths(month, delta);
 }
 
-export function monthLabel(month: MonthKey): string {
+/** "Septiembre de 2026"; con `capital` en false, como va en medio de una frase ("tu septiembre de 2026"). */
+export function monthLabel(month: MonthKey, capital = true): string {
   const [y, m] = month.split('-').map(Number);
   const name = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(
     new Date(y, m - 1, 1),
   );
-  return name.charAt(0).toUpperCase() + name.slice(1);
+  return capital ? name.charAt(0).toUpperCase() + name.slice(1) : name;
 }
 
 export function formatDay(date: string): string {

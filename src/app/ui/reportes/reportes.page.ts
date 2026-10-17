@@ -65,7 +65,7 @@ export class ReportesPage {
     (this.report()?.months ?? []).map(shortMonth),
   );
   protected readonly fullLabels = computed(() =>
-    (this.report()?.months ?? []).map(monthLabel),
+    (this.report()?.months ?? []).map((m) => monthLabel(m)),
   );
   protected readonly isEmpty = computed(() => {
     const r = this.report();

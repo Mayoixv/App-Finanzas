@@ -1222,6 +1222,15 @@
     "dbFailed": "Couldn't open the local database. Close and reopen the app.\n\nDetails: {detail}"
   },
   "changelog": {
+    "1_0_13": [
+      "Mic button to dictate: tap the mic in \"New entry\", say \"spent 500 on gas\" and the form fills itself.",
+      "\"Can I afford it?\" now answers first with this month's money and, below, counting your whole net worth."
+    ],
+    "1_0_12": [
+      "Can I afford it?: type a price and Kuarto tells you if it fits, how much you'd have per day and, if not, when you get paid.",
+      "Your month in 30 seconds: a card recap of last month that you can share without showing amounts.",
+      "Log faster: type or say \"spent 500 on gas\" and the form fills itself."
+    ],
     "1_0_11": [
       "When typing a password or PIN, tap the eye to see it.",
       "Clearer texts across the app, and categories translated when your phone is in another language.",
@@ -1678,5 +1687,77 @@
       "cat-hogar": "Home"
     },
     "cash": "Cash"
+  },
+  "afford": {
+    "title": "Can I afford it?",
+    "label": "How much does it cost?",
+    "verdict": {
+      "si": "Yes, you can afford it",
+      "justo": "You can, but it's tight",
+      "espera": "Better wait until {date}",
+      "no": "You can't afford it right now"
+    },
+    "left": "You'd have {amount} left for the rest of the month.",
+    "perDay": {
+      "one": "That's {amount} for today.",
+      "other": "About {amount} a day for {count} days."
+    },
+    "short": "You'd be {amount} short.",
+    "waitSub": "You get paid that day and it'll fit.",
+    "pending": "{amount} in bills still due this month is already taken out.",
+    "hint": "First it uses this month's money: what came in minus what you spent and saved. Below you'll see the answer counting everything in your accounts and cash.",
+    "monthTitle": "With this month's money",
+    "totalTitle": "Counting your whole net worth",
+    "totalLeft": "You'd have {amount} left in total."
+  },
+  "recap": {
+    "title": "Your month in 30 seconds",
+    "cta": "Your {month} in 30 seconds",
+    "ctaSub": "The highlights of your month, no amounts shown.",
+    "cardOf": "{n} of {total}",
+    "next": "Next",
+    "prev": "Previous",
+    "share": "Share",
+    "done": "Done",
+    "count": {
+      "one": "You logged 1 entry",
+      "other": "You logged {count} entries"
+    },
+    "countSub": "Each one helps you see where your money goes.",
+    "top": "{name} weighed the most",
+    "topSub": "It took {percent} of your spending.",
+    "up": "{name} went up {percent}",
+    "down": "{name} went down {percent}",
+    "changeSub": "Compared with {month}.",
+    "weekday": "Your priciest day: {day}",
+    "weekdaySub": "{percent} of your spending happened on that weekday.",
+    "noSpend": {
+      "one": "1 day without spending",
+      "other": "{count} days without spending"
+    },
+    "noSpendSub": "Days when you didn't log any expense.",
+    "saved": "You saved {percent}",
+    "savedSub": "Of everything that came in this month.",
+    "savedNone": "You didn't save this month",
+    "savedNoneSub": "Next month, try setting aside a little when you get paid.",
+    "streak": {
+      "one": "1 month saving",
+      "other": "{count} months saving in a row"
+    },
+    "streakSub": "Keep the streak going.",
+    "endTitle": "That was your {month}",
+    "endSub": "Share it: the image shows no amounts.",
+    "madeWith": "Made with Kuarto",
+    "shareFailed": "Couldn't share. Try again."
+  },
+  "quick": {
+    "label": "Type it or say it",
+    "hint": "E.g. spent 500 on gas. To dictate, tap the keyboard's microphone.",
+    "hintMic": "E.g.: spent 500 on gas. Tap the mic and say it.",
+    "mic": "Dictate",
+    "stop": "Stop listening",
+    "listening": "Listening… say it like you'd tell someone.",
+    "noMic": "To dictate, Kuarto needs permission to use the microphone.",
+    "failed": "Couldn't use the microphone. Try again."
   }
 }

@@ -89,6 +89,32 @@
   font-weight: 500;
 }
 
+.afford {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  margin-top: 16px;
+  padding: 0 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
 .card {
   margin: 0 20px 24px;
   padding: 24px 20px;
@@ -328,4 +354,47 @@ app-pending-banner.pending {
     outline: 3px solid var(--violet-400);
     outline-offset: 2px;
   }
+}
+
+.recap-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 40px);
+  margin: 0 20px 24px;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--brand-gradient);
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  > ion-icon {
+    flex: none;
+    font-size: 24px;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--violet-400);
+    outline-offset: 2px;
+  }
+}
+
+.recap-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recap-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.recap-sub {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
 }

@@ -7,6 +7,36 @@
       </button>
     </header>
 
+    @if (!isEdit() && !isCopy()) {
+      <div class="field quick">
+        <ion-input
+          [label]="t('quick.label')"
+          label-placement="floating"
+          autocapitalize="sentences"
+          enterkeyhint="done"
+          [value]="quickText()"
+          (ionInput)="quickText.set($event.detail.value ?? ''); quick($event.detail.value ?? '')"
+        >
+          @if (canDictate()) {
+            <button
+              slot="end"
+              type="button"
+              class="mic"
+              [class.on]="listening()"
+              [attr.aria-label]="listening() ? t('quick.stop') : t('quick.mic')"
+              [attr.aria-pressed]="listening()"
+              (click)="dictate()"
+            >
+              <ion-icon [name]="listening() ? 'mic' : 'mic-outline'" aria-hidden="true"></ion-icon>
+            </button>
+          }
+        </ion-input>
+      </div>
+      <p class="quick-hint" aria-live="polite" [attr.role]="micError() ? 'alert' : null">
+        {{ micError() ?? (listening() ? t('quick.listening') : canDictate() ? t('quick.hintMic') : t('quick.hint')) }}
+      </p>
+    }
+
     <div class="kind" role="radiogroup" [attr.aria-label]="t('tx.kind')">
       <button type="button" role="radio" [attr.aria-checked]="kind() === 'gasto'" (click)="setKind('gasto')">{{ t('common.expense') }}</button>
       <button type="button" role="radio" [attr.aria-checked]="kind() === 'ingreso'" (click)="setKind('ingreso')">{{ t('common.income') }}</button>

@@ -19,6 +19,8 @@ import {
   SaveTransfer,
 } from './application/use-cases/accounts';
 import { AutoBackup, CreateBackup, OpenBackup, RestoreBackup, WipeAllData } from './application/use-cases/backup';
+import { CanAfford } from './application/use-cases/can-afford';
+import { GetMonthRecap } from './application/use-cases/get-month-recap';
 import { CopyFromMonth } from './application/use-cases/copy-month';
 import { LocalizeDefaultNames } from './application/use-cases/localize-defaults';
 import { ImportTransactions } from './application/use-cases/import-transactions';
@@ -145,6 +147,7 @@ export interface AppContainer {
   getAccountsOverview: GetAccountsOverview;
   getCardStatuses: GetCardStatuses;
   getNetWorth: GetNetWorth;
+  canAfford: CanAfford;
   setCardMinimum: SetCardMinimum;
   saveTransfer: SaveTransfer;
   deleteTransfer: DeleteTransfer;
@@ -167,6 +170,7 @@ export interface AppContainer {
   getAlerts: GetAlerts;
   getNotificationPlan: GetNotificationPlan;
   getMonthHistory: GetMonthHistory;
+  getMonthRecap: GetMonthRecap;
   getReport: GetReport;
   getSubscriptionCost: GetSubscriptionCost;
   getDebtInstallments: GetDebtInstallments;
@@ -194,6 +198,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
   const getAccountsOverview = new GetAccountsOverview(repos.accounts);
   const getBudgetStatuses = new GetBudgetStatuses(repos.budgets, repos.transactions);
   const getUpcomingRecurring = new GetUpcomingRecurring(getMonthRecurringExpenses);
+  const getMonthHistory = new GetMonthHistory(repos.transactions, repos.categories, repos.savings);
   return {
     categories: repos.categories,
     transactions: repos.transactions,
@@ -219,7 +224,8 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     getDebtInstallments: new GetDebtInstallments(getDebtsOverview),
     getSubscriptionCost: new GetSubscriptionCost(repos.recurring, repos.categories),
     getReport: new GetReport(repos.transactions, repos.categories, repos.savings, repos.accounts, getMonthRecurringExpenses),
-    getMonthHistory: new GetMonthHistory(repos.transactions, repos.categories, repos.savings),
+    getMonthHistory,
+    getMonthRecap: new GetMonthRecap(repos.transactions, repos.categories, getMonthHistory),
     getMonthRecurringExpenses,
     payRecurringExpense: new PayRecurringExpense(repos.recurring, repos.transactions, ids, repos.debts),
     getSavingsOverview: new GetSavingsOverview(repos.savings),
@@ -249,6 +255,7 @@ export function buildContainer(repos: Repositories, ids: IdGenerator = uuidGener
     deleteAccount: new DeleteAccount(repos.accounts),
     adjustAccountBalance,
     getAccountsOverview,
+    canAfford: new CanAfford(getMonthHistory, getAccountsOverview, getMonthRecurringExpenses, repos.categories),
     setCardMinimum: new SetCardMinimum(repos.settings),
     getNetWorth: new GetNetWorth(getAccountsOverview, getDebtsOverview, repos.savings),
     getCardStatuses,

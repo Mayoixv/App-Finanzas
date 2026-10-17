@@ -1,4 +1,7 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { parseQuickEntry } from '../../domain/quick-entry';
+import { Component, computed, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { DateFieldComponent } from '../select/date-field.component';
 import { SelectFieldComponent } from '../select/select-field.component';
 import { CategoryFieldComponent } from '../select/category-field.component';
@@ -10,7 +13,7 @@ import {
   ModalController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { addOutline, cameraOutline, close } from 'ionicons/icons';
+import { addOutline, cameraOutline, close, mic, micOutline } from 'ionicons/icons';
 import { Account, CASH_ACCOUNT_ID } from '../../domain/account';
 import { accountChoices, accountOptions, rememberAccount } from '../cuentas/account-choices';
 import { APP_CONTAINER } from '../../app.container';
@@ -23,7 +26,7 @@ import { photoToDataUrl, pickImage } from '../image';
 import { MonthState } from '../month-state';
 import { SuccessCheckComponent } from '../success-check.component';
 import { UndoService } from '../undo.service';
-import { t, errorText } from '../i18n';
+import { t, errorText, locale } from '../i18n';
 
 type Kind = 'gasto' | 'ingreso';
 
@@ -49,7 +52,7 @@ interface Photo {
   styleUrls: ['nueva-transaccion.modal.scss'],
   imports: [DateFieldComponent, SelectFieldComponent, CategoryFieldComponent, IonContent, IonIcon, IonInput, SuccessCheckComponent],
 })
-export class NuevaTransaccionModalComponent implements OnInit {
+export class NuevaTransaccionModalComponent implements OnInit, OnDestroy {
   protected readonly t = t;
   private readonly container = inject(APP_CONTAINER);
   private readonly modalCtrl = inject(ModalController);
@@ -83,6 +86,12 @@ export class NuevaTransaccionModalComponent implements OnInit {
   protected readonly isEdit = signal(false);
   protected readonly isCopy = signal(false);
   protected readonly maxPhotos = MAX_PHOTOS;
+  /** Notas anteriores con su categoría, para que la frase rápida aprenda; se leen al usarla por primera vez. */
+  private history?: { note: string; categoryId: string }[];
+  protected readonly quickText = signal('');
+  protected readonly canDictate = signal(false);
+  protected readonly listening = signal(false);
+  protected readonly micError = signal<string | null>(null);
 
   protected readonly options = computed(() =>
     this.categories().filter((c) =>
@@ -124,10 +133,13 @@ export class NuevaTransaccionModalComponent implements OnInit {
   protected readonly abs = Math.abs;
 
   constructor() {
-    addIcons({ addOutline, cameraOutline, close });
+    addIcons({ addOutline, cameraOutline, close, mic, micOutline });
   }
 
   async ngOnInit() {
+    if (Capacitor.isNativePlatform() && !this.transaction && !this.copyOf) {
+      SpeechRecognition.available().then((r) => this.canDictate.set(r.available), () => undefined);
+    }
     const categories = await this.container.categories.list();
     this.categories.set(categories);
 
@@ -157,6 +169,49 @@ export class NuevaTransaccionModalComponent implements OnInit {
       const attachments = await this.container.transactions.listAttachments(tx.id);
       this.photos.set(attachments.map((a) => ({ id: a.id, data: a.data, isNew: false })));
     }
+  }
+
+  ngOnDestroy() {
+    if (this.listening()) void SpeechRecognition.stop();
+    if (this.canDictate()) void SpeechRecognition.removeAllListeners();
+  }
+
+  /** Botón del micrófono: dicta la frase rápida con el reconocimiento de voz del teléfono; tocarlo otra vez lo detiene. */
+  protected async dictate() {
+    if (this.listening()) return SpeechRecognition.stop();
+    this.micError.set(null);
+    const { speechRecognition } = await SpeechRecognition.requestPermissions();
+    if (speechRecognition !== 'granted') return this.micError.set(t('quick.noMic'));
+    await SpeechRecognition.removeAllListeners();
+    await SpeechRecognition.addListener('partialResults', ({ matches }) => {
+      if (!matches[0]) return;
+      this.quickText.set(matches[0]);
+      void this.quick(matches[0]);
+    });
+    await SpeechRecognition.addListener('listeningState', ({ status }) => this.listening.set(status === 'started'));
+    this.listening.set(true);
+    try {
+      await SpeechRecognition.start({ language: locale(), partialResults: true, popup: false });
+    } catch {
+      this.listening.set(false);
+      this.micError.set(t('quick.failed'));
+    }
+  }
+
+  /** "Gasté 500 en gasolina": llena tipo, monto, categoría y nota mientras se escribe o se dicta. */
+  protected async quick(text: string) {
+    this.history ??= (await this.container.transactions.listAll())
+      .filter((tx) => tx.note)
+      .slice(-500)
+      .map((tx) => ({ note: tx.note, categoryId: tx.categoryId }));
+    const entry = parseQuickEntry(text, this.categories(), this.history);
+    if (entry.kind && entry.kind !== this.kind()) {
+      this.kind.set(entry.kind);
+      this.categoryId.set(null);
+    }
+    if (entry.amount !== null) this.amount.set(amountToInput(entry.amount));
+    if (entry.categoryId) this.categoryId.set(entry.categoryId);
+    this.note.set(entry.note);
   }
 
   protected async setKind(value: Kind) {

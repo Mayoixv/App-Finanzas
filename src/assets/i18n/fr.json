@@ -1222,6 +1222,15 @@
     "dbFailed": "Impossible d'ouvrir la base de données locale. Fermez et rouvrez l'appli.\n\nDétail : {detail}"
   },
   "changelog": {
+    "1_0_13": [
+      "Bouton micro pour dicter : touchez le micro dans « Nouvelle opération », dites « dépensé 500 en essence » et le formulaire se remplit tout seul.",
+      "Je peux me le permettre ? répond d'abord avec l'argent de ce mois, puis en dessous en comptant tout votre patrimoine."
+    ],
+    "1_0_12": [
+      "Je peux me le permettre ? : tapez un prix et Kuarto vous dit si ça passe, combien il vous reste par jour et, sinon, quand vous êtes payé.",
+      "Votre mois en 30 secondes : un récap en cartes du mois écoulé, à partager sans montrer de montants.",
+      "Notez plus vite : écrivez ou dictez « dépensé 500 en essence » et le formulaire se remplit tout seul."
+    ],
     "1_0_11": [
       "En saisissant un mot de passe ou un code PIN, touchez l'œil pour le voir.",
       "Des textes plus clairs dans toute l'appli, et les catégories traduites quand le téléphone est dans une autre langue.",
@@ -1685,5 +1694,77 @@
       "cat-hogar": "Maison"
     },
     "cash": "Espèces"
+  },
+  "afford": {
+    "title": "Je peux me le permettre ?",
+    "label": "Combien ça coûte ?",
+    "verdict": {
+      "si": "Oui, ça passe",
+      "justo": "Ça passe, mais c'est juste",
+      "espera": "Mieux vaut attendre le {date}",
+      "no": "Pas pour l'instant"
+    },
+    "left": "Il vous resterait {amount} pour le reste du mois.",
+    "perDay": {
+      "one": "Soit {amount} pour aujourd'hui.",
+      "other": "Environ {amount} par jour pendant {count} jours."
+    },
+    "short": "Il vous manquerait {amount}.",
+    "waitSub": "Vous êtes payé ce jour-là et ça passe.",
+    "pending": "{amount} de dépenses fixes encore à payer ce mois-ci sont déjà déduits.",
+    "hint": "D'abord avec l'argent de ce mois : ce qui est entré moins ce que vous avez dépensé et épargné. En dessous, la réponse en comptant tout ce que vous avez en comptes et en espèces.",
+    "monthTitle": "Avec l'argent de ce mois-ci",
+    "totalTitle": "En comptant tout votre patrimoine",
+    "totalLeft": "Il vous resterait {amount} au total."
+  },
+  "recap": {
+    "title": "Votre mois en 30 secondes",
+    "cta": "Votre {month} en 30 secondes",
+    "ctaSub": "Le plus marquant de votre mois, sans montants.",
+    "cardOf": "{n} sur {total}",
+    "next": "Suivant",
+    "prev": "Précédent",
+    "share": "Partager",
+    "done": "Terminé",
+    "count": {
+      "one": "Vous avez noté 1 opération",
+      "other": "Vous avez noté {count} opérations"
+    },
+    "countSub": "Chacune aide à voir où va votre argent.",
+    "top": "{name} a pesé le plus",
+    "topSub": "{percent} de vos dépenses.",
+    "up": "{name} a augmenté de {percent}",
+    "down": "{name} a baissé de {percent}",
+    "changeSub": "Par rapport à {month}.",
+    "weekday": "Votre jour le plus cher : {day}",
+    "weekdaySub": "{percent} de vos dépenses tombent ce jour de la semaine.",
+    "noSpend": {
+      "one": "1 jour sans dépenser",
+      "other": "{count} jours sans dépenser"
+    },
+    "noSpendSub": "Jours où vous n'avez noté aucune dépense.",
+    "saved": "Vous avez épargné {percent}",
+    "savedSub": "De tout ce qui est entré ce mois-ci.",
+    "savedNone": "Pas d'épargne ce mois-ci",
+    "savedNoneSub": "Le mois prochain, mettez un peu de côté dès que vous êtes payé.",
+    "streak": {
+      "one": "1 mois d'épargne",
+      "other": "{count} mois d'épargne d'affilée"
+    },
+    "streakSub": "Ne cassez pas la série.",
+    "endTitle": "Voilà votre {month}",
+    "endSub": "Partagez-le : l'image ne montre aucun montant.",
+    "madeWith": "Fait avec Kuarto",
+    "shareFailed": "Impossible de partager. Réessayez."
+  },
+  "quick": {
+    "label": "Écrivez-le ou dictez-le",
+    "hint": "Ex. : dépensé 500 en essence. Pour dicter, touchez le micro du clavier.",
+    "hintMic": "Ex. : dépensé 500 en essence. Touchez le micro et dites-le.",
+    "mic": "Dicter",
+    "stop": "Arrêter l'écoute",
+    "listening": "Je vous écoute… dites-le comme à quelqu'un.",
+    "noMic": "Pour dicter, Kuarto a besoin d'accéder au micro.",
+    "failed": "Impossible d'utiliser le micro. Réessayez."
   }
 }

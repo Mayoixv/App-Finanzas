@@ -1219,6 +1219,15 @@
     "dbFailed": "No se pudo abrir la base de datos local. Cierra y vuelve a abrir la aplicación.\n\nDetalle: {detail}"
   },
   "changelog": {
+    "1_0_13": [
+      "Botón de micrófono para dictar: toca el micrófono en \"Nuevo movimiento\", di \"gasté 500 en gasolina\" y el formulario se llena solo.",
+      "¿Me alcanza? ahora responde primero con el dinero de este mes y, más abajo, contando todo tu patrimonio."
+    ],
+    "1_0_12": [
+      "¿Me alcanza?: escribe cuánto cuesta algo y Kuarto te dice si te alcanza, cuánto te queda por día y, si no, cuándo cobras.",
+      "Tu mes en 30 segundos: un resumen en tarjetas del mes que pasó, que puedes compartir sin mostrar montos.",
+      "Anota más rápido: escribe o dicta \"gasté 500 en gasolina\" y el formulario se llena solo."
+    ],
     "1_0_11": [
       "Al escribir una contraseña o un PIN, toca el ojito para verla.",
       "Textos más claros en toda la app y categorías traducidas también cuando el teléfono está en otro idioma.",
@@ -1676,5 +1685,77 @@
       "cat-hogar": "Hogar"
     },
     "cash": "Efectivo"
+  },
+  "afford": {
+    "title": "¿Me alcanza?",
+    "label": "¿Cuánto cuesta?",
+    "verdict": {
+      "si": "Sí te alcanza",
+      "justo": "Te alcanza, pero queda poco",
+      "espera": "Mejor espera al {date}",
+      "no": "Por ahora no te alcanza"
+    },
+    "left": "Te quedarían {amount} para el resto del mes.",
+    "perDay": {
+      "one": "Eso es {amount} para hoy.",
+      "other": "Unos {amount} por día durante {count} días."
+    },
+    "short": "Te faltarían {amount}.",
+    "waitSub": "Ese día cobras y ya te alcanza.",
+    "pending": "Ya se restaron {amount} de fijos que faltan por pagar este mes.",
+    "hint": "Primero usa el dinero de este mes: lo que entró menos lo que gastaste y ahorraste. Abajo verás la respuesta contando todo lo que tienes en cuentas y efectivo.",
+    "monthTitle": "Con el dinero de este mes",
+    "totalTitle": "Contando todo tu patrimonio",
+    "totalLeft": "Te quedarían {amount} en total."
+  },
+  "recap": {
+    "title": "Tu mes en 30 segundos",
+    "cta": "Tu {month} en 30 segundos",
+    "ctaSub": "Lo más curioso de tu mes, sin mostrar montos.",
+    "cardOf": "{n} de {total}",
+    "next": "Siguiente",
+    "prev": "Anterior",
+    "share": "Compartir",
+    "done": "Listo",
+    "count": {
+      "one": "Anotaste 1 movimiento",
+      "other": "Anotaste {count} movimientos"
+    },
+    "countSub": "Cada uno te ayuda a ver a dónde va tu dinero.",
+    "top": "{name} fue lo que más pesó",
+    "topSub": "Se llevó el {percent} de tus gastos.",
+    "up": "{name} subió {percent}",
+    "down": "{name} bajó {percent}",
+    "changeSub": "Comparado con {month}.",
+    "weekday": "Tu día más caro: el {day}",
+    "weekdaySub": "Ese día de la semana se fue el {percent} de lo que gastaste.",
+    "noSpend": {
+      "one": "1 día sin gastar",
+      "other": "{count} días sin gastar"
+    },
+    "noSpendSub": "Días en los que no anotaste ningún gasto.",
+    "saved": "Ahorraste el {percent}",
+    "savedSub": "De todo lo que entró este mes.",
+    "savedNone": "Este mes no ahorraste",
+    "savedNoneSub": "El próximo, intenta apartar aunque sea un poco al cobrar.",
+    "streak": {
+      "one": "1 mes ahorrando",
+      "other": "{count} meses seguidos ahorrando"
+    },
+    "streakSub": "No rompas la racha.",
+    "endTitle": "Así fue tu {month}",
+    "endSub": "Compártelo: la imagen no muestra ningún monto.",
+    "madeWith": "Hecho con Kuarto",
+    "shareFailed": "No se pudo compartir. Inténtalo de nuevo."
+  },
+  "quick": {
+    "label": "Escríbelo o díctalo",
+    "hint": "Ej.: gasté 500 en gasolina. Para dictar, toca el micrófono del teclado.",
+    "hintMic": "Ej.: gasté 500 en gasolina. Toca el micrófono y dilo.",
+    "mic": "Dictar",
+    "stop": "Dejar de escuchar",
+    "listening": "Te escucho… dilo como se lo dirías a alguien.",
+    "noMic": "Para dictar, Kuarto necesita permiso para usar el micrófono.",
+    "failed": "No se pudo usar el micrófono. Inténtalo de nuevo."
   }
 }

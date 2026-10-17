@@ -64,3 +64,17 @@ export function fileDate(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+/**
+ * Comparte una imagen PNG (llega en base64) con el menú de compartir del teléfono.
+ * En el navegador la descarga.
+ */
+export async function shareImage(name: string, base64: string, title: string): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    const { uri } = await Filesystem.writeFile({ path: name, data: base64, directory: Directory.Cache });
+    const { Share } = await import('@capacitor/share');
+    await Share.share({ title, files: [uri] });
+    return;
+  }
+  await saveBinaryFile(name, base64, 'image/png');
+}

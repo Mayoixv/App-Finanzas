@@ -1222,6 +1222,15 @@
     "dbFailed": "Impossibile aprire il database locale. Chiudi e riapri l'app.\n\nDettaglio: {detail}"
   },
   "changelog": {
+    "1_0_13": [
+      "Pulsante del microfono per dettare: tocca il microfono in \"Nuovo movimento\", di' \"speso 500 di benzina\" e il modulo si compila da solo.",
+      "Me lo posso permettere? ora risponde prima con i soldi di questo mese e, sotto, contando tutto il tuo patrimonio."
+    ],
+    "1_0_12": [
+      "Me lo posso permettere?: scrivi quanto costa e Kuarto ti dice se ci stai dentro, quanto ti resta al giorno e, se no, quando ricevi lo stipendio.",
+      "Il tuo mese in 30 secondi: un riepilogo a schede del mese passato, da condividere senza mostrare importi.",
+      "Segna più in fretta: scrivi o detta \"speso 500 di benzina\" e il modulo si compila da solo."
+    ],
     "1_0_11": [
       "Mentre scrivi una password o un PIN, tocca l'occhio per vederla.",
       "Testi più chiari in tutta l'app e categorie tradotte quando il telefono è in un'altra lingua.",
@@ -1685,5 +1694,77 @@
       "cat-hogar": "Casa"
     },
     "cash": "Contanti"
+  },
+  "afford": {
+    "title": "Me lo posso permettere?",
+    "label": "Quanto costa?",
+    "verdict": {
+      "si": "Sì, puoi",
+      "justo": "Puoi, ma è al limite",
+      "espera": "Meglio aspettare il {date}",
+      "no": "Per ora non puoi"
+    },
+    "left": "Ti resterebbero {amount} per il resto del mese.",
+    "perDay": {
+      "one": "Cioè {amount} per oggi.",
+      "other": "Circa {amount} al giorno per {count} giorni."
+    },
+    "short": "Ti mancherebbero {amount}.",
+    "waitSub": "Quel giorno ricevi lo stipendio e ci stai dentro.",
+    "pending": "Sono già tolti {amount} di spese fisse ancora da pagare questo mese.",
+    "hint": "Prima usa i soldi di questo mese: quello che è entrato meno quello che hai speso e risparmiato. Sotto, la risposta contando tutto quello che hai su conti e contanti.",
+    "monthTitle": "Con i soldi di questo mese",
+    "totalTitle": "Contando tutto il tuo patrimonio",
+    "totalLeft": "Ti resterebbero {amount} in totale."
+  },
+  "recap": {
+    "title": "Il tuo mese in 30 secondi",
+    "cta": "Il tuo {month} in 30 secondi",
+    "ctaSub": "Il meglio del tuo mese, senza importi.",
+    "cardOf": "{n} di {total}",
+    "next": "Avanti",
+    "prev": "Indietro",
+    "share": "Condividi",
+    "done": "Fatto",
+    "count": {
+      "one": "Hai segnato 1 movimento",
+      "other": "Hai segnato {count} movimenti"
+    },
+    "countSub": "Ognuno ti aiuta a vedere dove vanno i tuoi soldi.",
+    "top": "{name} ha pesato di più",
+    "topSub": "Si è preso il {percent} delle tue spese.",
+    "up": "{name} è salito del {percent}",
+    "down": "{name} è sceso del {percent}",
+    "changeSub": "Rispetto a {month}.",
+    "weekday": "Il tuo giorno più caro: {day}",
+    "weekdaySub": "In quel giorno della settimana è andato il {percent} delle tue spese.",
+    "noSpend": {
+      "one": "1 giorno senza spendere",
+      "other": "{count} giorni senza spendere"
+    },
+    "noSpendSub": "Giorni in cui non hai segnato nessuna spesa.",
+    "saved": "Hai risparmiato il {percent}",
+    "savedSub": "Di tutto quello che è entrato questo mese.",
+    "savedNone": "Questo mese non hai risparmiato",
+    "savedNoneSub": "Il prossimo, prova a mettere da parte un po' appena ricevi lo stipendio.",
+    "streak": {
+      "one": "1 mese di risparmio",
+      "other": "{count} mesi di fila a risparmiare"
+    },
+    "streakSub": "Non interrompere la serie.",
+    "endTitle": "Ecco il tuo {month}",
+    "endSub": "Condividilo: l'immagine non mostra nessun importo.",
+    "madeWith": "Fatto con Kuarto",
+    "shareFailed": "Impossibile condividere. Riprova."
+  },
+  "quick": {
+    "label": "Scrivilo o dettalo",
+    "hint": "Es.: speso 500 di benzina. Per dettare, tocca il microfono della tastiera.",
+    "hintMic": "Es.: speso 500 di benzina. Tocca il microfono e dillo.",
+    "mic": "Detta",
+    "stop": "Smetti di ascoltare",
+    "listening": "Ti ascolto… dillo come lo diresti a qualcuno.",
+    "noMic": "Per dettare, Kuarto ha bisogno del permesso per il microfono.",
+    "failed": "Impossibile usare il microfono. Riprova."
   }
 }

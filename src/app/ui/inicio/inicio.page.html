@@ -25,10 +25,24 @@
   @if (failed()) {
     <p class="notice">{{ t('inicio.failed') }}</p>
   } @else if (overview(); as o) {
+    @if (recapMonth(); as m) {
+      <button type="button" class="recap-card" (click)="recap(m)">
+        <ion-icon name="sparkles" aria-hidden="true"></ion-icon>
+        <span class="recap-text">
+          <span class="recap-title">{{ t('recap.cta', { month: label(m) }) }}</span>
+          <span class="recap-sub">{{ t('recap.ctaSub') }}</span>
+        </span>
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+    }
     @if (isEmpty(o.summary)) {
       <section class="empty">
         <p class="empty-title">{{ t('inicio.emptyTitle', { month: monthState.label() }) }}</p>
         <p class="empty-text">{{ t('inicio.emptyText') }}</p>
+        <button type="button" class="afford" (click)="afford()">
+          <ion-icon name="wallet-outline" aria-hidden="true"></ion-icon>
+          {{ t('afford.title') }}
+        </button>
       </section>
       <app-alerts-row></app-alerts-row>
       <app-net-worth-card></app-net-worth-card>
@@ -63,6 +77,10 @@
             {{ t('inicio.noIncome') }}
           }
         </p>
+        <button type="button" class="afford" (click)="afford()">
+          <ion-icon name="wallet-outline" aria-hidden="true"></ion-icon>
+          {{ t('afford.title') }}
+        </button>
       </section>
 
       <app-alerts-row></app-alerts-row>

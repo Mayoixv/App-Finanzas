@@ -1222,6 +1222,15 @@
     "dbFailed": "Não foi possível abrir o banco de dados local. Feche e abra o app de novo.\n\nDetalhe: {detail}"
   },
   "changelog": {
+    "1_0_13": [
+      "Botão de microfone para ditar: toque no microfone em \"Novo movimento\", diga \"gastei 500 em gasolina\" e o formulário se preenche sozinho.",
+      "Dá para comprar? agora responde primeiro com o dinheiro deste mês e, abaixo, contando todo o seu patrimônio."
+    ],
+    "1_0_12": [
+      "Dá para comprar?: digite quanto custa e o Kuarto diz se dá, quanto sobra por dia e, se não der, quando você recebe.",
+      "Seu mês em 30 segundos: um resumo em cartões do mês que passou, para compartilhar sem mostrar valores.",
+      "Anote mais rápido: escreva ou dite \"gastei 500 em gasolina\" e o formulário se preenche sozinho."
+    ],
     "1_0_11": [
       "Ao digitar uma senha ou PIN, toque no olho para vê-la.",
       "Textos mais claros em todo o app e categorias traduzidas quando o celular está em outro idioma.",
@@ -1686,5 +1695,77 @@
       "cat-hogar": "Casa"
     },
     "cash": "Dinheiro"
+  },
+  "afford": {
+    "title": "Dá para comprar?",
+    "label": "Quanto custa?",
+    "verdict": {
+      "si": "Sim, dá",
+      "justo": "Dá, mas fica apertado",
+      "espera": "Melhor esperar até {date}",
+      "no": "Por enquanto não dá"
+    },
+    "left": "Sobrariam {amount} para o resto do mês.",
+    "perDay": {
+      "one": "Isso é {amount} para hoje.",
+      "other": "Cerca de {amount} por dia durante {count} dias."
+    },
+    "short": "Faltariam {amount}.",
+    "waitSub": "Nesse dia você recebe e aí dá.",
+    "pending": "Já foram descontados {amount} de contas fixas que faltam pagar este mês.",
+    "hint": "Primeiro usa o dinheiro deste mês: o que entrou menos o que você gastou e guardou. Abaixo, a resposta contando tudo o que você tem em contas e dinheiro.",
+    "monthTitle": "Com o dinheiro deste mês",
+    "totalTitle": "Contando todo o seu patrimônio",
+    "totalLeft": "Sobrariam {amount} no total."
+  },
+  "recap": {
+    "title": "Seu mês em 30 segundos",
+    "cta": "Seu {month} em 30 segundos",
+    "ctaSub": "O mais curioso do seu mês, sem mostrar valores.",
+    "cardOf": "{n} de {total}",
+    "next": "Próximo",
+    "prev": "Anterior",
+    "share": "Compartilhar",
+    "done": "Pronto",
+    "count": {
+      "one": "Você anotou 1 movimento",
+      "other": "Você anotou {count} movimentos"
+    },
+    "countSub": "Cada um ajuda a ver para onde vai seu dinheiro.",
+    "top": "{name} foi o que mais pesou",
+    "topSub": "Levou {percent} dos seus gastos.",
+    "up": "{name} subiu {percent}",
+    "down": "{name} caiu {percent}",
+    "changeSub": "Comparado com {month}.",
+    "weekday": "Seu dia mais caro: {day}",
+    "weekdaySub": "Nesse dia da semana foram {percent} dos seus gastos.",
+    "noSpend": {
+      "one": "1 dia sem gastar",
+      "other": "{count} dias sem gastar"
+    },
+    "noSpendSub": "Dias em que você não anotou nenhum gasto.",
+    "saved": "Você guardou {percent}",
+    "savedSub": "De tudo o que entrou este mês.",
+    "savedNone": "Este mês você não guardou nada",
+    "savedNoneSub": "No próximo, tente separar um pouco ao receber.",
+    "streak": {
+      "one": "1 mês guardando",
+      "other": "{count} meses seguidos guardando"
+    },
+    "streakSub": "Não quebre a sequência.",
+    "endTitle": "Assim foi seu {month}",
+    "endSub": "Compartilhe: a imagem não mostra nenhum valor.",
+    "madeWith": "Feito com Kuarto",
+    "shareFailed": "Não foi possível compartilhar. Tente de novo."
+  },
+  "quick": {
+    "label": "Escreva ou dite",
+    "hint": "Ex.: gastei 500 em gasolina. Para ditar, toque no microfone do teclado.",
+    "hintMic": "Ex.: gastei 500 em gasolina. Toque no microfone e fale.",
+    "mic": "Ditar",
+    "stop": "Parar de ouvir",
+    "listening": "Estou ouvindo… fale como diria a alguém.",
+    "noMic": "Para ditar, o Kuarto precisa de permissão para usar o microfone.",
+    "failed": "Não foi possível usar o microfone. Tente de novo."
   }
 }
